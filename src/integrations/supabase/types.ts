@@ -14,16 +14,333 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          created_at: string
+          description: string | null
+          elderly_person_id: string
+          id: string
+          resolved_at: string | null
+          severity: string
+          status: string | null
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          created_at?: string
+          description?: string | null
+          elderly_person_id: string
+          id?: string
+          resolved_at?: string | null
+          severity: string
+          status?: string | null
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          created_at?: string
+          description?: string | null
+          elderly_person_id?: string
+          id?: string
+          resolved_at?: string | null
+          severity?: string
+          status?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      caregiver_assignments: {
+        Row: {
+          assignment_type: string | null
+          caregiver_user_id: string
+          created_at: string
+          elderly_person_id: string
+          id: string
+        }
+        Insert: {
+          assignment_type?: string | null
+          caregiver_user_id: string
+          created_at?: string
+          elderly_person_id: string
+          id?: string
+        }
+        Update: {
+          assignment_type?: string | null
+          caregiver_user_id?: string
+          created_at?: string
+          elderly_person_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caregiver_assignments_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      device_data: {
+        Row: {
+          created_at: string
+          data_type: string
+          device_id: string
+          elderly_person_id: string
+          id: string
+          recorded_at: string
+          unit: string | null
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          data_type: string
+          device_id: string
+          elderly_person_id: string
+          id?: string
+          recorded_at?: string
+          unit?: string | null
+          value: Json
+        }
+        Update: {
+          created_at?: string
+          data_type?: string
+          device_id?: string
+          elderly_person_id?: string
+          id?: string
+          recorded_at?: string
+          unit?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_data_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "device_data_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devices: {
+        Row: {
+          battery_level: number | null
+          created_at: string
+          device_id: string
+          device_name: string
+          device_type: string
+          elderly_person_id: string
+          id: string
+          last_sync: string | null
+          location: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          battery_level?: number | null
+          created_at?: string
+          device_id: string
+          device_name: string
+          device_type: string
+          elderly_person_id: string
+          id?: string
+          last_sync?: string | null
+          location?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          battery_level?: number | null
+          created_at?: string
+          device_id?: string
+          device_name?: string
+          device_type?: string
+          elderly_person_id?: string
+          id?: string
+          last_sync?: string | null
+          location?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devices_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      elderly_persons: {
+        Row: {
+          address: string | null
+          created_at: string
+          date_of_birth: string | null
+          emergency_contact: string | null
+          full_name: string
+          id: string
+          medical_conditions: string[] | null
+          medications: string[] | null
+          photo_url: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_contact?: string | null
+          full_name: string
+          id?: string
+          medical_conditions?: string[] | null
+          medications?: string[] | null
+          photo_url?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_contact?: string | null
+          full_name?: string
+          id?: string
+          medical_conditions?: string[] | null
+          medications?: string[] | null
+          photo_url?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      relative_assignments: {
+        Row: {
+          created_at: string
+          elderly_person_id: string
+          id: string
+          relationship: string | null
+          relative_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          elderly_person_id: string
+          id?: string
+          relationship?: string | null
+          relative_user_id: string
+        }
+        Update: {
+          created_at?: string
+          elderly_person_id?: string
+          id?: string
+          relationship?: string | null
+          relative_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relative_assignments_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_access_elderly_person: {
+        Args: { _elderly_person_id: string; _user_id: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "elderly" | "caregiver" | "relative" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +467,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["elderly", "caregiver", "relative", "admin"],
+    },
   },
 } as const
