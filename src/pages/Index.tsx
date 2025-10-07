@@ -1,10 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Activity, Heart, Shield, Bell, Users, TrendingUp } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-healthcare.jpg";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/auth');
+    }
+  };
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -27,8 +39,8 @@ const Index = () => {
               Advanced IoT health monitoring that keeps families connected and elderly loved ones safe, independent, and thriving at home.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" variant="secondary" className="shadow-lg">
-                Start Free Trial
+              <Button size="lg" variant="secondary" className="shadow-lg" onClick={handleGetStarted}>
+                {user ? 'Go to Dashboard' : 'Start Free Trial'}
               </Button>
               <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20">
                 Watch Demo
@@ -123,8 +135,8 @@ const Index = () => {
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Join thousands of families who trust SymBIoT to keep their loved ones safe and independent.
           </p>
-          <Button size="lg" variant="secondary" className="shadow-lg">
-            Get Started Today
+          <Button size="lg" variant="secondary" className="shadow-lg" onClick={handleGetStarted}>
+            {user ? 'Go to Dashboard' : 'Get Started Today'}
           </Button>
         </div>
       </section>
