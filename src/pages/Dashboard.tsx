@@ -10,6 +10,7 @@ import VitalMetrics from '@/components/dashboard/VitalMetrics';
 import AlertsList from '@/components/dashboard/AlertsList';
 import ElderlyList from '@/components/dashboard/ElderlyList';
 import DeviceStatus from '@/components/dashboard/DeviceStatus';
+import DataSharing from '@/components/dashboard/DataSharing';
 
 const Dashboard = () => {
   const { user, userRole, signOut } = useAuth();
@@ -203,6 +204,7 @@ const Dashboard = () => {
           <div className="space-y-6">
             <AlertsList alerts={alerts || []} />
             <DeviceStatus />
+            {user && <DataSharing userId={user.id} />}
           </div>
         </div>
       </main>
