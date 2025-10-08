@@ -9,31 +9,34 @@ import { Plus, Key, Copy, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const DeviceManagement = () => {
   const [open, setOpen] = useState(false);
   const [deviceName, setDeviceName] = useState('');
   const [deviceType, setDeviceType] = useState('');
   const [deviceId, setDeviceId] = useState('');
-  const [elderlyPersonId, setElderlyPersonId] = useState('');
   const [location, setLocation] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-  // Fetch elderly persons for dropdown
-  const { data: elderlyPersons } = useQuery({
-    queryKey: ['elderly-persons-dropdown'],
+  // Fetch logged-in user's elderly person record
+  const { data: userElderlyPerson } = useQuery({
+    queryKey: ['user-elderly-person', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('elderly_persons')
         .select('id, full_name')
-        .order('full_name');
+        .eq('user_id', user?.id)
+        .single();
       
       if (error) throw error;
       return data;
     },
+    enabled: !!user,
   });
 
   // Mutation to add device
@@ -76,10 +79,19 @@ const DeviceManagement = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!deviceName || !deviceType || !deviceId || !elderlyPersonId) {
+    if (!deviceName || !deviceType || !deviceId) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!userElderlyPerson?.id) {
+      toast({
+        title: "No profile found",
+        description: "Please create an elderly person profile first",
         variant: "destructive",
       });
       return;
@@ -89,7 +101,7 @@ const DeviceManagement = () => {
       device_name: deviceName,
       device_type: deviceType,
       device_id: deviceId,
-      elderly_person_id: elderlyPersonId,
+      elderly_person_id: userElderlyPerson.id,
       location: location || null,
       status: 'active',
     });
@@ -99,7 +111,6 @@ const DeviceManagement = () => {
     setDeviceName('');
     setDeviceType('');
     setDeviceId('');
-    setElderlyPersonId('');
     setLocation('');
     setApiKey('');
     setShowApiKey(false);
@@ -174,22 +185,6 @@ const DeviceManagement = () => {
               <p className="text-xs text-muted-foreground">
                 Unique identifier from your IoT device
               </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="elderly-person">Assign to Person *</Label>
-              <Select value={elderlyPersonId} onValueChange={setElderlyPersonId} required>
-                <SelectTrigger id="elderly-person">
-                  <SelectValue placeholder="Select person" />
-                </SelectTrigger>
-                <SelectContent>
-                  {elderlyPersons?.map((person) => (
-                    <SelectItem key={person.id} value={person.id}>
-                      {person.full_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
             <div className="space-y-2">
