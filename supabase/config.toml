@@ -1,1 +1,4 @@
 project_id = "wiyfcvypeifbdaqnfgrr"
+
+[functions.device-ingest]
+verify_jwt = false

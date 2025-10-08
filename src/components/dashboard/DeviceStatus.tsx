@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Wifi, WifiOff, Battery, BatteryWarning } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import DeviceManagement from './DeviceManagement';
 
 const DeviceStatus = () => {
   const { data: devices } = useQuery({
@@ -40,7 +41,13 @@ const DeviceStatus = () => {
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">Device Status</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold">Device Status</h3>
+      </div>
+      
+      <div className="mb-4">
+        <DeviceManagement />
+      </div>
       
       {!devices || devices.length === 0 ? (
         <p className="text-muted-foreground text-center py-8">
