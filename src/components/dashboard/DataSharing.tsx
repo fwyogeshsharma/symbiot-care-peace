@@ -27,14 +27,13 @@ export default function DataSharing({ userId }: DataSharingProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch elderly persons that the current user owns
+  // Fetch elderly persons that the current user has access to
   const { data: elderlyPersons = [] } = useQuery({
-    queryKey: ['owned-elderly-persons', userId],
+    queryKey: ['accessible-elderly-persons', userId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('elderly_persons')
-        .select('id, full_name')
-        .eq('user_id', userId);
+        .select('id, full_name');
       
       if (error) throw error;
       return data || [];
