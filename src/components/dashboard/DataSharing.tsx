@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Share2, Trash2, UserPlus } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface SharedUser {
   id: string;
@@ -24,7 +23,6 @@ interface DataSharingProps {
 
 export default function DataSharing({ userId }: DataSharingProps) {
   const [email, setEmail] = useState('');
-  const [selectedElderlyPerson, setSelectedElderlyPerson] = useState<string>('');
   const [relationship, setRelationship] = useState('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -76,8 +74,12 @@ export default function DataSharing({ userId }: DataSharingProps) {
   // Share data mutation
   const shareMutation = useMutation({
     mutationFn: async () => {
-      if (!email || !selectedElderlyPerson) {
-        throw new Error('Email and person selection are required');
+      if (!email) {
+        throw new Error('Email is required');
+      }
+
+      if (elderlyPersons.length === 0) {
+        throw new Error('No elderly persons found to share');
       }
 
       // Look up user by email
@@ -91,26 +93,31 @@ export default function DataSharing({ userId }: DataSharingProps) {
         throw new Error('User not found with this email');
       }
 
-      // Check if already shared
+      // Create assignments for all elderly persons owned by the user
+      const assignments = elderlyPersons.map((person) => ({
+        relative_user_id: profile.id,
+        elderly_person_id: person.id,
+        relationship: relationship || 'shared',
+      }));
+
+      // Check for existing assignments and filter them out
       const { data: existing } = await supabase
         .from('relative_assignments')
-        .select('id')
+        .select('elderly_person_id')
         .eq('relative_user_id', profile.id)
-        .eq('elderly_person_id', selectedElderlyPerson)
-        .single();
+        .in('elderly_person_id', elderlyPersons.map(p => p.id));
 
-      if (existing) {
-        throw new Error('Access already granted to this user');
+      const existingIds = new Set(existing?.map(e => e.elderly_person_id) || []);
+      const newAssignments = assignments.filter(a => !existingIds.has(a.elderly_person_id));
+
+      if (newAssignments.length === 0) {
+        throw new Error('Access already granted to this user for all persons');
       }
 
-      // Create assignment
+      // Create new assignments
       const { error: assignError } = await supabase
         .from('relative_assignments')
-        .insert({
-          relative_user_id: profile.id,
-          elderly_person_id: selectedElderlyPerson,
-          relationship: relationship || 'shared',
-        });
+        .insert(newAssignments);
 
       if (assignError) throw assignError;
     },
@@ -166,7 +173,7 @@ export default function DataSharing({ userId }: DataSharingProps) {
           Data Sharing
         </CardTitle>
         <CardDescription>
-          Share monitoring data with family members or other caregivers
+          Share monitoring data with family members or other caregivers. Access will be granted to all your monitored persons.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -176,22 +183,6 @@ export default function DataSharing({ userId }: DataSharingProps) {
             <UserPlus className="h-4 w-4" />
             Grant Access
           </h3>
-          
-          <div className="space-y-2">
-            <Label htmlFor="elderly-person">Select Person</Label>
-            <Select value={selectedElderlyPerson} onValueChange={setSelectedElderlyPerson}>
-              <SelectTrigger id="elderly-person">
-                <SelectValue placeholder="Select person to share" />
-              </SelectTrigger>
-              <SelectContent>
-                {elderlyPersons.map((person) => (
-                  <SelectItem key={person.id} value={person.id}>
-                    {person.full_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
 
           <div className="space-y-2">
             <Label htmlFor="email">User Email</Label>
@@ -217,7 +208,7 @@ export default function DataSharing({ userId }: DataSharingProps) {
 
           <Button
             onClick={() => shareMutation.mutate()}
-            disabled={!email || !selectedElderlyPerson || shareMutation.isPending}
+            disabled={!email || shareMutation.isPending}
             className="w-full"
           >
             {shareMutation.isPending ? 'Granting Access...' : 'Grant Access'}
