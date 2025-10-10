@@ -1,7 +1,8 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { LogOut, Heart, Activity, Bell, Users, AlertTriangle } from 'lucide-react';
+import { LogOut, Heart, Activity, Bell, Users, AlertTriangle, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,6 +15,7 @@ import DataSharing from '@/components/dashboard/DataSharing';
 
 const Dashboard = () => {
   const { user, userRole, signOut } = useAuth();
+  const navigate = useNavigate();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
 
   // Fetch elderly persons based on role
@@ -131,6 +133,10 @@ const Dashboard = () => {
                 {userRole}
               </Badge>
             )}
+            <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
+              <User className="w-4 h-4 mr-2" />
+              Profile
+            </Button>
             <Button variant="outline" size="sm" onClick={signOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
