@@ -161,14 +161,9 @@ const DeviceManagement = () => {
                   <SelectValue placeholder="Select device type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="heart_rate_monitor">Heart Rate Monitor</SelectItem>
-                  <SelectItem value="blood_pressure_monitor">Blood Pressure Monitor</SelectItem>
-                  <SelectItem value="glucose_monitor">Glucose Monitor</SelectItem>
-                  <SelectItem value="fall_detector">Fall Detector</SelectItem>
-                  <SelectItem value="activity_tracker">Activity Tracker</SelectItem>
-                  <SelectItem value="temperature_sensor">Temperature Sensor</SelectItem>
-                  <SelectItem value="smart_watch">Smart Watch</SelectItem>
-                  <SelectItem value="multi_sensor">Multi-Sensor Device</SelectItem>
+                  <SelectItem value="wearable">Wearable (Smart Watch, Activity Tracker)</SelectItem>
+                  <SelectItem value="medical">Medical (Heart Rate, Blood Pressure, Glucose Monitor)</SelectItem>
+                  <SelectItem value="environmental">Environmental (Fall Detector, Temperature Sensor)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
