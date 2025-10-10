@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -106,6 +106,18 @@ const DeviceManagement = () => {
       status: 'active',
     });
   };
+
+  // Reset form when dialog opens
+  useEffect(() => {
+    if (!open) {
+      setDeviceName('');
+      setDeviceType('');
+      setDeviceId('');
+      setLocation('');
+      setApiKey('');
+      setShowApiKey(false);
+    }
+  }, [open]);
 
   const resetForm = () => {
     setDeviceName('');
