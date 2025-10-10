@@ -31,7 +31,7 @@ const DeviceManagement = () => {
         .from('elderly_persons')
         .select('id, full_name')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       return data;
