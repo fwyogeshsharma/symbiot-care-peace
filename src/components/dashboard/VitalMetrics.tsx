@@ -35,10 +35,16 @@ const VitalMetrics = () => {
   };
 
   const getVitalColor = (type: string, value: any) => {
-    // Simple logic for color coding
-    const numValue = typeof value === 'object' && value !== null && 'value' in value 
-      ? (value as any).value 
-      : typeof value === 'number' ? value : 0;
+    let numValue = 0;
+    
+    if (typeof value === 'object' && value !== null) {
+      if ('bpm' in value) numValue = value.bpm;
+      else if ('level' in value) numValue = value.level;
+      else if ('temp' in value) numValue = value.temp;
+      else if ('systolic' in value) numValue = value.systolic;
+    } else if (typeof value === 'number') {
+      numValue = value;
+    }
     
     switch (type) {
       case 'heart_rate':
@@ -47,14 +53,23 @@ const VitalMetrics = () => {
       case 'oxygen_level':
         if (numValue < 95) return 'text-destructive';
         return 'text-success';
+      case 'blood_pressure':
+        if (numValue > 140) return 'text-warning';
+        return 'text-success';
       default:
         return 'text-foreground';
     }
   };
 
-  const formatValue = (value: any) => {
-    if (typeof value === 'object' && value !== null && 'value' in value) {
-      return (value as any).value;
+  const formatValue = (value: any, type: string) => {
+    if (typeof value === 'object' && value !== null) {
+      // Handle different data structures
+      if ('bpm' in value) return value.bpm;
+      if ('level' in value) return value.level;
+      if ('temp' in value) return value.temp;
+      if ('systolic' in value && 'diastolic' in value) {
+        return `${value.systolic}/${value.diastolic}`;
+      }
     }
     return value;
   };
@@ -89,7 +104,7 @@ const VitalMetrics = () => {
               </div>
               <div className="text-right">
                 <p className={`text-lg font-semibold ${getVitalColor(vital.data_type, vital.value)}`}>
-                  {formatValue(vital.value)}
+                  {formatValue(vital.value, vital.data_type)}
                   {vital.unit && <span className="text-sm ml-1">{vital.unit}</span>}
                 </p>
                 <p className="text-xs text-muted-foreground">
