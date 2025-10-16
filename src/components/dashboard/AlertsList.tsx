@@ -13,15 +13,22 @@ interface Alert {
   description: string;
   status: string;
   created_at: string;
+  elderly_person_id: string;
   elderly_persons?: { full_name: string };
 }
 
 interface AlertsListProps {
   alerts: Alert[];
+  selectedPersonId?: string | null;
 }
 
-const AlertsList = ({ alerts }: AlertsListProps) => {
+const AlertsList = ({ alerts, selectedPersonId }: AlertsListProps) => {
   const { toast } = useToast();
+  
+  // Filter alerts based on selected person
+  const filteredAlerts = selectedPersonId 
+    ? alerts.filter(alert => alert.elderly_person_id === selectedPersonId)
+    : alerts;
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -64,20 +71,22 @@ const AlertsList = ({ alerts }: AlertsListProps) => {
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Active Alerts</h3>
+        <h3 className="text-lg font-semibold">
+          Active Alerts {selectedPersonId && '(Filtered)'}
+        </h3>
         <Badge variant="outline" className="animate-pulse-soft">
-          {alerts.length} Active
+          {filteredAlerts.length} Active
         </Badge>
       </div>
 
-      {alerts.length === 0 ? (
+      {filteredAlerts.length === 0 ? (
         <div className="text-center py-8">
           <CheckCircle className="w-12 h-12 text-success mx-auto mb-3" />
           <p className="text-muted-foreground">All clear! No active alerts.</p>
         </div>
       ) : (
         <div className="space-y-3 max-h-[600px] overflow-y-auto">
-          {alerts.map((alert) => (
+          {filteredAlerts.map((alert) => (
             <div 
               key={alert.id}
               className="border rounded-lg p-4 hover:shadow-md transition-shadow"

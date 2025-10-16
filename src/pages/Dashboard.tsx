@@ -17,6 +17,7 @@ const Dashboard = () => {
   const { user, userRole, signOut } = useAuth();
   const navigate = useNavigate();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
+  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
 
   // Fetch elderly persons based on role
   const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
@@ -202,13 +203,17 @@ const Dashboard = () => {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left Column - Elderly Persons & Devices */}
           <div className="lg:col-span-2 space-y-6">
-            <ElderlyList elderlyPersons={elderlyPersons || []} />
-            <VitalMetrics />
+            <ElderlyList 
+              elderlyPersons={elderlyPersons || []} 
+              selectedPersonId={selectedPersonId}
+              onSelectPerson={setSelectedPersonId}
+            />
+            <VitalMetrics selectedPersonId={selectedPersonId} />
           </div>
 
           {/* Right Column - Alerts & Device Status */}
           <div className="space-y-6">
-            <AlertsList alerts={alerts || []} />
+            <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
             <DeviceStatus />
             {user && <DataSharing userId={user.id} />}
           </div>

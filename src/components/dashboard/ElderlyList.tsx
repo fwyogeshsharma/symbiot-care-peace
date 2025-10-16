@@ -13,9 +13,11 @@ interface ElderlyPerson {
 
 interface ElderlyListProps {
   elderlyPersons: ElderlyPerson[];
+  selectedPersonId: string | null;
+  onSelectPerson: (id: string | null) => void;
 }
 
-const ElderlyList = ({ elderlyPersons }: ElderlyListProps) => {
+const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson }: ElderlyListProps) => {
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -39,7 +41,10 @@ const ElderlyList = ({ elderlyPersons }: ElderlyListProps) => {
           {elderlyPersons.map((person) => (
             <div 
               key={person.id}
-              className="border rounded-lg p-4 hover:shadow-md transition-all cursor-pointer"
+              onClick={() => onSelectPerson(selectedPersonId === person.id ? null : person.id)}
+              className={`border rounded-lg p-4 hover:shadow-md transition-all cursor-pointer ${
+                selectedPersonId === person.id ? 'ring-2 ring-primary bg-primary/5' : ''
+              }`}
             >
               <div className="flex items-start gap-3">
                 <Avatar className="w-12 h-12">

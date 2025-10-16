@@ -3,15 +3,24 @@ import { Heart, Activity, Thermometer, Wind } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-const VitalMetrics = () => {
+interface VitalMetricsProps {
+  selectedPersonId?: string | null;
+}
+
+const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   const { data: recentData } = useQuery({
-    queryKey: ['recent-vitals'],
+    queryKey: ['recent-vitals', selectedPersonId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('device_data')
         .select('*, elderly_persons(full_name)')
-        .order('recorded_at', { ascending: false })
-        .limit(8);
+        .order('recorded_at', { ascending: false });
+      
+      if (selectedPersonId) {
+        query = query.eq('elderly_person_id', selectedPersonId);
+      }
+      
+      const { data, error } = await query.limit(8);
       
       if (error) throw error;
       return data;
@@ -76,7 +85,9 @@ const VitalMetrics = () => {
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">Recent Vital Signs</h3>
+      <h3 className="text-lg font-semibold mb-4">
+        Recent Vital Signs {selectedPersonId && '(Filtered)'}
+      </h3>
       
       {!recentData || recentData.length === 0 ? (
         <p className="text-muted-foreground text-center py-8">
