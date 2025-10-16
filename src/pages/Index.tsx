@@ -19,8 +19,33 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      {/* Navigation Toolbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Activity className="w-8 h-8 text-primary" />
+              <div>
+                <h1 className="text-xl font-bold text-foreground">SymBIoT</h1>
+                <p className="text-xs text-muted-foreground">Peace of Mind</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {!user && (
+                <Button variant="outline" onClick={() => navigate('/auth')}>
+                  Login
+                </Button>
+              )}
+              <Button onClick={handleGetStarted}>
+                {user ? 'Go to Dashboard' : 'Get Started'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden mt-[73px]">
         <div 
           className="absolute inset-0 z-0"
           style={{
