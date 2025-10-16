@@ -67,9 +67,6 @@ const Index = () => {
               <Button size="lg" variant="secondary" className="shadow-lg" onClick={handleGetStarted}>
                 {user ? 'Go to Dashboard' : 'Start Free Trial'}
               </Button>
-              <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20">
-                Watch Demo
-              </Button>
             </div>
           </div>
         </div>
