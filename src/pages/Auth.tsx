@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Heart } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { z } from 'zod';
 
@@ -97,10 +97,11 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <Card className="w-full max-w-md p-8 shadow-healthcare">
         <div className="flex items-center justify-center mb-8">
-          <div className="w-12 h-12 rounded-xl gradient-healthcare flex items-center justify-center">
-            <Heart className="w-6 h-6 text-white" />
+          <Activity className="w-8 h-8 text-primary" />
+          <div className="ml-3">
+            <h1 className="text-2xl font-bold text-foreground">SymBIoT</h1>
+            <p className="text-xs text-muted-foreground">Peace of Mind</p>
           </div>
-          <h1 className="text-2xl font-bold ml-3">SymBIoT</h1>
         </div>
 
         <h2 className="text-xl font-semibold mb-6 text-center">
