@@ -11,9 +11,9 @@ const Index = () => {
 
   const handleGetStarted = () => {
     if (user) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     } else {
-      navigate('/auth');
+      navigate("/auth");
     }
   };
 
@@ -32,13 +32,11 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-3">
               {!user && (
-                <Button variant="outline" onClick={() => navigate('/auth')}>
+                <Button variant="outline" onClick={() => navigate("/auth")}>
                   Login
                 </Button>
               )}
-              <Button onClick={handleGetStarted}>
-                {user ? 'Go to Dashboard' : 'Get Started'}
-              </Button>
+              <Button onClick={handleGetStarted}>{user ? "Go to Dashboard" : "Get Started"}</Button>
             </div>
           </div>
         </div>
@@ -46,26 +44,27 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden mt-[73px]">
-        <div 
+        <div
           className="absolute inset-0 z-0"
           style={{
             backgroundImage: `linear-gradient(135deg, rgba(0, 149, 219, 0.9), rgba(0, 188, 212, 0.85)), url(${heroImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         />
-        
+
         <div className="relative z-10 container mx-auto px-4 py-24 lg:py-32">
           <div className="max-w-3xl">
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
               Peace of Mind for Your Loved Ones
             </h1>
             <p className="text-xl text-white/90 mb-8 leading-relaxed">
-              Advanced IoT health monitoring that keeps families connected and elderly loved ones safe, independent, and thriving at home.
+              Advanced IoT health monitoring that keeps families connected and elderly loved ones safe, independent, and
+              thriving at home.
             </p>
             <div className="flex flex-wrap gap-4">
               <Button size="lg" variant="secondary" className="shadow-lg" onClick={handleGetStarted}>
-                {user ? 'Go to Dashboard' : 'Start Free Trial'}
+                {user ? "Go to Dashboard" : "Start Free Trial"}
               </Button>
             </div>
           </div>
@@ -76,9 +75,7 @@ const Index = () => {
       <section className="py-20 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-              Comprehensive Care, Simplified
-            </h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">Comprehensive Care, Simplified</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Monitor health, activity, and environment with AI-powered insights that alert you to what matters most.
             </p>
@@ -151,14 +148,12 @@ const Index = () => {
       {/* CTA Section */}
       <section className="py-20 px-4 gradient-healthcare">
         <div className="container mx-auto text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
-            Ready to Bring Peace of Mind Home?
-          </h2>
+          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">Ready to Bring Peace of Mind Home?</h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Join thousands of families who trust SymBIoT to keep their loved ones safe and independent.
           </p>
           <Button size="lg" variant="secondary" className="shadow-lg" onClick={handleGetStarted}>
-            {user ? 'Go to Dashboard' : 'Get Started Today'}
+            {user ? "Go to Dashboard" : "Get Started Today"}
           </Button>
         </div>
       </section>
@@ -166,7 +161,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t py-12 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2025 SymBIoT. All rights reserved.</p>
+          <p>&copy; 2025 SymBIoT. All rights reserved. Version: 1.0.2</p>
           <p className="mt-2">Bringing families and technology together for better care.</p>
         </div>
       </footer>
