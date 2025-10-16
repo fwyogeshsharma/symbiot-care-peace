@@ -1,9 +1,10 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check } from 'lucide-react';
+import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import DeviceManagement from './DeviceManagement';
+import DeviceHistory from './DeviceHistory';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -11,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const DeviceStatus = () => {
   const [selectedDevice, setSelectedDevice] = useState<any>(null);
+  const [historyDevice, setHistoryDevice] = useState<any>(null);
   const [copiedApiKey, setCopiedApiKey] = useState(false);
   const { toast } = useToast();
   
@@ -185,10 +187,29 @@ Body:
                   <strong>Available data types:</strong> heart_rate, blood_pressure, temperature, fall_detected, steps, sleep, activity, location
                 </p>
               </div>
+
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setHistoryDevice(selectedDevice);
+                  setSelectedDevice(null);
+                }}
+              >
+                <History className="w-4 h-4 mr-2" />
+                View Device History
+              </Button>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      <DeviceHistory
+        device={historyDevice}
+        open={!!historyDevice}
+        onOpenChange={(open) => !open && setHistoryDevice(null)}
+      />
     </Card>
   );
 };

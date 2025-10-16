@@ -51,11 +51,15 @@ const DeviceManagement = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async (device) => {
+      // Generate sample data for the new device
+      await generateSampleData(device);
+      
       queryClient.invalidateQueries({ queryKey: ['devices'] });
+      queryClient.invalidateQueries({ queryKey: ['device-data'] });
       toast({
         title: "Device registered successfully",
-        description: "Your IoT device has been added to the system.",
+        description: "Your IoT device has been added with sample data.",
       });
       // Generate API key for display
       generateApiKey();
@@ -68,6 +72,61 @@ const DeviceManagement = () => {
       });
     },
   });
+
+  const generateSampleData = async (device: any) => {
+    const now = new Date();
+    const sampleData = [];
+    
+    // Generate data based on device type
+    const dataTypes: Record<string, any> = {
+      wearable: [
+        { type: 'heart_rate', getValue: () => ({ bpm: 65 + Math.random() * 30 }), unit: 'bpm' },
+        { type: 'steps', getValue: () => ({ count: Math.floor(Math.random() * 5000) }), unit: 'steps' },
+      ],
+      medical: [
+        { type: 'heart_rate', getValue: () => ({ bpm: 65 + Math.random() * 30 }), unit: 'bpm' },
+        { type: 'blood_pressure', getValue: () => ({ systolic: 110 + Math.random() * 40, diastolic: 70 + Math.random() * 20 }), unit: 'mmHg' },
+        { type: 'temperature', getValue: () => ({ temp: 36 + Math.random() * 2 }), unit: '°C' },
+      ],
+      door_sensor: [
+        { type: 'door_status', getValue: () => ({ open: Math.random() > 0.5 }), unit: 'boolean' },
+      ],
+      fall_detector: [
+        { type: 'fall_detected', getValue: () => ({ detected: false }), unit: 'boolean' },
+        { type: 'activity', getValue: () => ({ level: Math.floor(Math.random() * 100) }), unit: '%' },
+      ],
+      temperature_sensor: [
+        { type: 'temperature', getValue: () => ({ temp: 18 + Math.random() * 10 }), unit: '°C' },
+      ],
+    };
+
+    const deviceTypeData = dataTypes[device.device_type] || dataTypes.medical;
+
+    // Generate historical data (past 24 hours, one reading per hour)
+    for (let i = 24; i >= 0; i--) {
+      const recordedAt = new Date(now.getTime() - i * 60 * 60 * 1000);
+      
+      for (const dataType of deviceTypeData) {
+        sampleData.push({
+          device_id: device.id,
+          elderly_person_id: device.elderly_person_id,
+          data_type: dataType.type,
+          value: dataType.getValue(),
+          unit: dataType.unit,
+          recorded_at: recordedAt.toISOString(),
+        });
+      }
+    }
+
+    // Insert sample data
+    const { error } = await supabase
+      .from('device_data')
+      .insert(sampleData);
+    
+    if (error) {
+      console.error('Error generating sample data:', error);
+    }
+  };
 
   const generateApiKey = () => {
     // Generate a simple API key (in production, this should be more secure)
