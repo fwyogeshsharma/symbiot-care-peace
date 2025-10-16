@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { LogOut, Heart, Activity, Bell, Users, AlertTriangle, User } from 'lucide-react';
+import { LogOut, Heart, Activity, Bell, Users, AlertTriangle, User, Wifi, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
@@ -10,8 +10,6 @@ import { useEffect, useState } from 'react';
 import VitalMetrics from '@/components/dashboard/VitalMetrics';
 import AlertsList from '@/components/dashboard/AlertsList';
 import ElderlyList from '@/components/dashboard/ElderlyList';
-import DeviceStatus from '@/components/dashboard/DeviceStatus';
-import DataSharing from '@/components/dashboard/DataSharing';
 
 const Dashboard = () => {
   const { user, userRole, signOut } = useAuth();
@@ -132,6 +130,14 @@ const Dashboard = () => {
                 {userRole}
               </Badge>
             )}
+            <Button variant="ghost" size="sm" onClick={() => navigate('/device-status')}>
+              <Wifi className="w-4 h-4 mr-2" />
+              Device Status
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/data-sharing')}>
+              <Share2 className="w-4 h-4 mr-2" />
+              Data Sharing
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
               <User className="w-4 h-4 mr-2" />
               Profile
@@ -209,11 +215,9 @@ const Dashboard = () => {
             <VitalMetrics selectedPersonId={selectedPersonId} />
           </div>
 
-          {/* Right Column - Alerts & Device Status */}
+          {/* Right Column - Alerts */}
           <div className="space-y-6">
             <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
-            <DeviceStatus />
-            {user && <DataSharing userId={user.id} />}
           </div>
         </div>
       </main>

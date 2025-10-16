@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import DeviceStatusPage from "./pages/DeviceStatusPage";
+import DataSharingPage from "./pages/DataSharingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/device-status" 
+              element={
+                <ProtectedRoute>
+                  <DeviceStatusPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/data-sharing" 
+              element={
+                <ProtectedRoute>
+                  <DataSharingPage />
                 </ProtectedRoute>
               } 
             />
