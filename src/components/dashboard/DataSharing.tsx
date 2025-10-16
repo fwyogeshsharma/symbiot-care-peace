@@ -6,7 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Share2, Trash2, UserPlus } from 'lucide-react';
+import { Share2, Trash2, UserPlus, Edit2 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface SharedUser {
   id: string;
@@ -24,6 +32,8 @@ interface DataSharingProps {
 export default function DataSharing({ userId }: DataSharingProps) {
   const [email, setEmail] = useState('');
   const [relationship, setRelationship] = useState('');
+  const [editingUser, setEditingUser] = useState<SharedUser | null>(null);
+  const [editRelationship, setEditRelationship] = useState('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -138,6 +148,34 @@ export default function DataSharing({ userId }: DataSharingProps) {
     },
   });
 
+  // Update access mutation
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, relationship }: { id: string; relationship: string }) => {
+      const { error } = await supabase
+        .from('relative_assignments')
+        .update({ relationship })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shared-users'] });
+      setEditingUser(null);
+      setEditRelationship('');
+      toast({
+        title: 'Access updated',
+        description: 'Relationship has been updated successfully',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to update',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Revoke access mutation
   const revokeMutation = useMutation({
     mutationFn: async (assignmentId: string) => {
@@ -163,6 +201,20 @@ export default function DataSharing({ userId }: DataSharingProps) {
       });
     },
   });
+
+  const handleEditClick = (user: SharedUser) => {
+    setEditingUser(user);
+    setEditRelationship(user.relationship || '');
+  };
+
+  const handleUpdateAccess = () => {
+    if (editingUser) {
+      updateMutation.mutate({
+        id: editingUser.id,
+        relationship: editRelationship,
+      });
+    }
+  };
 
   return (
     <Card>
@@ -228,26 +280,79 @@ export default function DataSharing({ userId }: DataSharingProps) {
                   key={user.id}
                   className="flex items-center justify-between p-3 border rounded-lg"
                 >
-                  <div className="space-y-1">
+                  <div className="space-y-1 flex-1">
                     <p className="font-medium">{user.full_name || user.email}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
                     <p className="text-sm text-muted-foreground">
-                      {user.elderly_person_name}
+                      Monitoring: {user.elderly_person_name}
                       {user.relationship && ` • ${user.relationship}`}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => revokeMutation.mutate(user.id)}
-                    disabled={revokeMutation.isPending}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditClick(user)}
+                      disabled={updateMutation.isPending || revokeMutation.isPending}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => revokeMutation.mutate(user.id)}
+                      disabled={revokeMutation.isPending || updateMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
+
+        {/* Edit Dialog */}
+        <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Access</DialogTitle>
+              <DialogDescription>
+                Update the relationship for {editingUser?.full_name || editingUser?.email}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-relationship">Relationship</Label>
+                <Input
+                  id="edit-relationship"
+                  type="text"
+                  placeholder="e.g., Family, Friend, Caregiver"
+                  value={editRelationship}
+                  onChange={(e) => setEditRelationship(e.target.value)}
+                />
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Monitoring: {editingUser?.elderly_person_name}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setEditingUser(null)}
+                disabled={updateMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUpdateAccess}
+                disabled={updateMutation.isPending}
+              >
+                {updateMutation.isPending ? 'Updating...' : 'Update Access'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );
