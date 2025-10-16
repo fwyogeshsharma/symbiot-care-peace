@@ -146,6 +146,7 @@ export type Database = {
       }
       devices: {
         Row: {
+          api_key: string
           battery_level: number | null
           created_at: string
           device_id: string
@@ -159,6 +160,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          api_key?: string
           battery_level?: number | null
           created_at?: string
           device_id: string
@@ -172,6 +174,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          api_key?: string
           battery_level?: number | null
           created_at?: string
           device_id?: string
