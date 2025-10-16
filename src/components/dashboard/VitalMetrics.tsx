@@ -73,14 +73,14 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   const formatValue = (value: any, type: string) => {
     if (typeof value === 'object' && value !== null) {
       // Handle different data structures
-      if ('bpm' in value) return value.bpm;
-      if ('level' in value) return value.level;
-      if ('temp' in value) return value.temp;
+      if ('bpm' in value) return Number(value.bpm).toFixed(2);
+      if ('level' in value) return Number(value.level).toFixed(2);
+      if ('temp' in value) return Number(value.temp).toFixed(2);
       if ('systolic' in value && 'diastolic' in value) {
-        return `${value.systolic}/${value.diastolic}`;
+        return `${Number(value.systolic).toFixed(2)}/${Number(value.diastolic).toFixed(2)}`;
       }
     }
-    return value;
+    return typeof value === 'number' ? Number(value).toFixed(2) : value;
   };
 
   return (

@@ -33,11 +33,11 @@ const DeviceHistory = ({ device, open, onOpenChange }: DeviceHistoryProps) => {
 
   const formatValue = (value: any, dataType: string) => {
     if (typeof value === 'object') {
-      if (dataType === 'heart_rate') return `${Math.round(value.bpm)} bpm`;
-      if (dataType === 'blood_pressure') return `${Math.round(value.systolic)}/${Math.round(value.diastolic)} mmHg`;
-      if (dataType === 'temperature') return `${value.temp.toFixed(1)} °C`;
+      if (dataType === 'heart_rate') return `${Number(value.bpm).toFixed(2)} bpm`;
+      if (dataType === 'blood_pressure') return `${Number(value.systolic).toFixed(2)}/${Number(value.diastolic).toFixed(2)} mmHg`;
+      if (dataType === 'temperature') return `${Number(value.temp).toFixed(2)} °C`;
       if (dataType === 'steps') return `${value.count} steps`;
-      if (dataType === 'activity') return `${value.level}% activity`;
+      if (dataType === 'activity') return `${Number(value.level).toFixed(2)}% activity`;
       if (dataType === 'door_status') return value.open ? 'Open' : 'Closed';
       if (dataType === 'fall_detected') return value.detected ? 'Fall Detected!' : 'No Fall';
       return JSON.stringify(value);
