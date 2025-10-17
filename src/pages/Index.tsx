@@ -21,29 +21,32 @@ const Index = () => {
     <div className="min-h-screen">
       {/* Navigation Toolbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Activity className="w-8 h-8 text-primary" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               <div>
-                <h1 className="text-xl font-bold text-foreground">SymBIoT</h1>
-                <p className="text-xs text-muted-foreground">Peace of Mind</p>
+                <h1 className="text-base sm:text-xl font-bold text-foreground">SymBIoT</h1>
+                <p className="text-xs text-muted-foreground hidden sm:block">Peace of Mind</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               {!user && (
-                <Button variant="outline" onClick={() => navigate("/auth")}>
+                <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="hidden sm:inline-flex">
                   Login
                 </Button>
               )}
-              <Button onClick={handleGetStarted}>{user ? "Go to Dashboard" : "Get Started"}</Button>
+              <Button onClick={handleGetStarted} size="sm">
+                <span className="hidden sm:inline">{user ? "Go to Dashboard" : "Get Started"}</span>
+                <span className="sm:hidden">{user ? "Dashboard" : "Start"}</span>
+              </Button>
             </div>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden mt-[73px]">
+      <section className="relative overflow-hidden mt-[57px] sm:mt-[73px]">
         <div
           className="absolute inset-0 z-0"
           style={{
@@ -53,17 +56,17 @@ const Index = () => {
           }}
         />
 
-        <div className="relative z-10 container mx-auto px-4 py-24 lg:py-32">
+        <div className="relative z-10 container mx-auto px-4 py-12 sm:py-20 lg:py-32">
           <div className="max-w-3xl">
-            <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
               Peace of Mind for Your Loved Ones
             </h1>
-            <p className="text-xl text-white/90 mb-8 leading-relaxed">
+            <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 leading-relaxed">
               Advanced IoT health monitoring that keeps families connected and elderly loved ones safe, independent, and
               thriving at home.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Button size="lg" variant="secondary" className="shadow-lg" onClick={handleGetStarted}>
+            <div className="flex flex-wrap gap-3 sm:gap-4">
+              <Button size="default" className="shadow-lg bg-secondary text-white hover:bg-secondary/90" onClick={handleGetStarted}>
                 {user ? "Go to Dashboard" : "Start Free Trial"}
               </Button>
             </div>
@@ -72,22 +75,22 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4">
+      <section className="py-12 sm:py-16 lg:py-20 px-4">
         <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">Comprehensive Care, Simplified</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4">Comprehensive Care, Simplified</h2>
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
               Monitor health, activity, and environment with AI-powered insights that alert you to what matters most.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="p-8 hover:shadow-healthcare transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl gradient-healthcare flex items-center justify-center mb-4">
-                <Heart className="w-6 h-6 text-white" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <Card className="p-6 sm:p-8 hover:shadow-healthcare transition-all duration-300">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-healthcare flex items-center justify-center mb-3 sm:mb-4">
+                <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Real-Time Vitals</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Real-Time Vitals</h3>
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Monitor heart rate, blood pressure, oxygen levels, and more with wearable and non-invasive sensors.
               </p>
             </Card>
@@ -146,23 +149,23 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 gradient-healthcare">
+      <section className="py-12 sm:py-16 lg:py-20 px-4 gradient-healthcare">
         <div className="container mx-auto text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">Ready to Bring Peace of Mind Home?</h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4 sm:mb-6">Ready to Bring Peace of Mind Home?</h2>
+          <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto">
             Join thousands of families who trust SymBIoT to keep their loved ones safe and independent.
           </p>
-          <Button size="lg" variant="secondary" className="shadow-lg" onClick={handleGetStarted}>
+          <Button size="default" className="shadow-lg bg-secondary text-white hover:bg-secondary/90" onClick={handleGetStarted}>
             {user ? "Go to Dashboard" : "Get Started Today"}
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-12 px-4">
+      <footer className="border-t py-8 sm:py-12 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2025 SymBIoT. All rights reserved. Version: 1.0.2</p>
-          <p className="mt-2">Bringing families and technology together for better care.</p>
+          <p className="text-sm sm:text-base">&copy; 2025 SymBIoT. All rights reserved. Version: 1.0.2</p>
+          <p className="mt-2 text-sm sm:text-base">Bringing families and technology together for better care.</p>
         </div>
       </footer>
     </div>

@@ -109,27 +109,27 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b bg-card shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Button variant="ghost" onClick={() => navigate('/dashboard')}>
+          <Button variant="ghost" onClick={() => navigate('/dashboard')} size="sm">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            <span className="hidden sm:inline">Back to Dashboard</span>
+            <span className="sm:hidden">Back</span>
           </Button>
-          <h1 className="text-xl font-bold">Profile</h1>
-          <div className="w-24"></div>
+          <h1 className="text-lg sm:text-xl font-bold">Profile</h1>
+          <div className="w-16 sm:w-24"></div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <User className="w-8 h-8 text-primary" />
+      <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-2xl">
+        <Card className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <User className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               </div>
-              <div>
-                <h2 className="text-2xl font-bold">{profile?.full_name || 'User'}</h2>
+              <div className="min-w-0">
+                <h2 className="text-xl sm:text-2xl font-bold truncate">{profile?.full_name || 'User'}</h2>
                 {userRole && (
                   <Badge className={`${getRoleColor(userRole)} capitalize mt-1`}>
                     {userRole}
@@ -138,8 +138,9 @@ const Profile = () => {
               </div>
             </div>
             {!isEditing && (
-              <Button onClick={() => setIsEditing(true)} variant="outline">
-                Edit Profile
+              <Button onClick={() => setIsEditing(true)} variant="outline" size="sm" className="shrink-0">
+                <span className="hidden sm:inline">Edit Profile</span>
+                <span className="sm:hidden">Edit</span>
               </Button>
             )}
           </div>
@@ -195,7 +196,7 @@ const Profile = () => {
             </div>
 
             {isEditing && (
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Button
                   type="submit"
                   className="flex-1"
@@ -207,6 +208,7 @@ const Profile = () => {
                 <Button
                   type="button"
                   variant="outline"
+                  className="flex-1 sm:flex-none"
                   onClick={() => {
                     setIsEditing(false);
                     setFormData({

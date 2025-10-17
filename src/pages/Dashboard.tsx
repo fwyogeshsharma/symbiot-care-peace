@@ -1,19 +1,16 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { LogOut, Heart, Activity, Bell, Users, AlertTriangle, User, Wifi, Share2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
+import { Heart, Activity, AlertTriangle, Users } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 import VitalMetrics from '@/components/dashboard/VitalMetrics';
 import AlertsList from '@/components/dashboard/AlertsList';
 import ElderlyList from '@/components/dashboard/ElderlyList';
+import Header from '@/components/layout/Header';
 
 const Dashboard = () => {
-  const { user, userRole, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
 
@@ -85,21 +82,6 @@ const Dashboard = () => {
     };
   }, [user, refetchAlerts]);
 
-  const getRoleColor = (role: string | null) => {
-    switch (role) {
-      case 'admin':
-        return 'bg-destructive';
-      case 'caregiver':
-        return 'bg-primary';
-      case 'elderly':
-        return 'bg-secondary';
-      case 'relative':
-        return 'bg-accent';
-      default:
-        return 'bg-muted';
-    }
-  };
-
   if (elderlyLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -113,100 +95,65 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Activity className="w-8 h-8 text-primary" />
-            <div>
-              <h1 className="text-xl font-bold text-foreground">SymBIoT</h1>
-              <p className="text-xs text-muted-foreground">Peace of Mind</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            {userRole && (
-              <Badge className={`${getRoleColor(userRole)} capitalize`}>
-                {userRole}
-              </Badge>
-            )}
-            <Button variant="ghost" size="sm" onClick={() => navigate('/device-status')}>
-              <Wifi className="w-4 h-4 mr-2" />
-              Device Status
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/data-sharing')}>
-              <Share2 className="w-4 h-4 mr-2" />
-              Data Sharing
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
-              <User className="w-4 h-4 mr-2" />
-              Profile
-            </Button>
-            <Button variant="outline" size="sm" onClick={signOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         {/* Stats Overview */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Monitored Persons</p>
-                <p className="text-3xl font-bold">{elderlyPersons?.length || 0}</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <Card className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">Monitored Persons</p>
+                <p className="text-2xl sm:text-3xl font-bold">{elderlyPersons?.length || 0}</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Users className="w-6 h-6 text-primary" />
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Active Alerts</p>
-                <p className="text-3xl font-bold">{alerts?.length || 0}</p>
-              </div>
-              <div className="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-warning" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
             </div>
           </Card>
 
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Avg Heart Rate</p>
-                <p className="text-3xl font-bold">72</p>
+          <Card className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">Active Alerts</p>
+                <p className="text-2xl sm:text-3xl font-bold">{alerts?.length || 0}</p>
+              </div>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-warning" />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">Avg Heart Rate</p>
+                <p className="text-2xl sm:text-3xl font-bold">72</p>
                 <p className="text-xs text-muted-foreground">bpm</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center">
-                <Heart className="w-6 h-6 text-success" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
+                <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-success" />
               </div>
             </div>
           </Card>
 
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Activity Level</p>
-                <p className="text-3xl font-bold">Good</p>
+          <Card className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">Activity Level</p>
+                <p className="text-2xl sm:text-3xl font-bold">Good</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center">
-                <Activity className="w-6 h-6 text-secondary" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
+                <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
               </div>
             </div>
           </Card>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column - Elderly Persons & Devices */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             <ElderlyList 
               elderlyPersons={elderlyPersons || []} 
               selectedPersonId={selectedPersonId}
@@ -216,7 +163,7 @@ const Dashboard = () => {
           </div>
 
           {/* Right Column - Alerts */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
           </div>
         </div>
