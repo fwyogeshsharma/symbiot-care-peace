@@ -56,27 +56,46 @@ export default function DataSharing({ userId }: DataSharingProps) {
   const { data: sharedUsers = [], isLoading } = useQuery({
     queryKey: ['shared-users', userId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First get assignments with elderly_persons info
+      const { data: assignments, error: assignmentsError } = await supabase
         .from('relative_assignments')
         .select(`
           id,
           relationship,
           elderly_person_id,
-          elderly_persons!inner(full_name, user_id),
-          profiles!relative_assignments_relative_user_id_fkey(email, full_name)
+          relative_user_id,
+          elderly_persons!inner(full_name, user_id)
         `)
         .eq('elderly_persons.user_id', userId);
       
-      if (error) throw error;
+      if (assignmentsError) throw assignmentsError;
+      if (!assignments || assignments.length === 0) return [];
+
+      // Get unique user IDs
+      const userIds = [...new Set(assignments.map((a: any) => a.relative_user_id))];
+
+      // Fetch profiles for these users
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, full_name')
+        .in('id', userIds);
       
-      return (data || []).map((item: any) => ({
-        id: item.id,
-        email: item.profiles?.email || '',
-        full_name: item.profiles?.full_name || null,
-        relationship: item.relationship,
-        elderly_person_name: item.elderly_persons?.full_name || '',
-        elderly_person_id: item.elderly_person_id,
-      }));
+      if (profilesError) throw profilesError;
+
+      // Create a map for quick profile lookup
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      
+      return assignments.map((item: any) => {
+        const profile = profileMap.get(item.relative_user_id);
+        return {
+          id: item.id,
+          email: profile?.email || '',
+          full_name: profile?.full_name || null,
+          relationship: item.relationship,
+          elderly_person_name: item.elderly_persons?.full_name || '',
+          elderly_person_id: item.elderly_person_id,
+        };
+      });
     },
     enabled: !!userId,
   });
