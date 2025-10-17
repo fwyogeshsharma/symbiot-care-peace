@@ -77,33 +77,71 @@ const DeviceManagement = () => {
     const now = new Date();
     const sampleData = [];
     
-    // Generate data based on device type
+    // Generate data based on device type with comprehensive readings
     const dataTypes: Record<string, any> = {
       wearable: [
         { type: 'heart_rate', getValue: () => ({ bpm: 65 + Math.random() * 30 }), unit: 'bpm' },
         { type: 'steps', getValue: () => ({ count: Math.floor(Math.random() * 5000) }), unit: 'steps' },
+        { type: 'activity', getValue: () => ({ level: Math.floor(Math.random() * 100) }), unit: '%' },
       ],
       medical: [
         { type: 'heart_rate', getValue: () => ({ bpm: 65 + Math.random() * 30 }), unit: 'bpm' },
         { type: 'blood_pressure', getValue: () => ({ systolic: 110 + Math.random() * 40, diastolic: 70 + Math.random() * 20 }), unit: 'mmHg' },
         { type: 'temperature', getValue: () => ({ temp: 36 + Math.random() * 2 }), unit: '°C' },
+        { type: 'oxygen_saturation', getValue: () => ({ spo2: 95 + Math.random() * 5 }), unit: '%' },
       ],
       door_sensor: [
-        { type: 'door_status', getValue: () => ({ open: Math.random() > 0.5 }), unit: 'boolean' },
+        { type: 'door_status', getValue: () => ({ status: Math.random() > 0.5 ? 'opened' : 'closed' }), unit: 'status' },
+        { type: 'movement_detected', getValue: () => ({ detected: Math.random() > 0.7 }), unit: 'boolean' },
+      ],
+      bed_sensor: [
+        { type: 'bed_occupancy', getValue: () => ({ status: Math.random() > 0.3 ? 'occupied' : 'vacant' }), unit: 'status' },
+        { type: 'movement', getValue: () => ({ level: Math.floor(Math.random() * 100) }), unit: '%' },
+        { type: 'duration', getValue: () => ({ minutes: Math.floor(Math.random() * 480) }), unit: 'minutes' },
+      ],
+      seat_sensor: [
+        { type: 'seat_occupancy', getValue: () => ({ status: Math.random() > 0.5 ? 'occupied' : 'vacant' }), unit: 'status' },
+        { type: 'duration', getValue: () => ({ minutes: Math.floor(Math.random() * 240) }), unit: 'minutes' },
+      ],
+      room_sensor: [
+        { type: 'presence', getValue: () => ({ detected: Math.random() > 0.4 }), unit: 'boolean' },
+        { type: 'movement', getValue: () => ({ level: Math.floor(Math.random() * 100) }), unit: '%' },
+        { type: 'duration', getValue: () => ({ minutes: Math.floor(Math.random() * 360) }), unit: 'minutes' },
+      ],
+      scale_sensor: [
+        { type: 'weight', getValue: () => ({ kg: 60 + Math.random() * 40 }), unit: 'kg' },
+        { type: 'bmi', getValue: () => ({ value: 20 + Math.random() * 10 }), unit: 'kg/m²' },
+      ],
+      ambient_sensor: [
+        { type: 'temperature', getValue: () => ({ temp: 18 + Math.random() * 10 }), unit: '°C' },
+        { type: 'humidity', getValue: () => ({ value: 30 + Math.random() * 40 }), unit: '%' },
+        { type: 'light', getValue: () => ({ lux: Math.floor(Math.random() * 1000) }), unit: 'lux' },
+      ],
+      electronics_monitor: [
+        { type: 'power_status', getValue: () => ({ status: Math.random() > 0.3 ? 'on' : 'off' }), unit: 'status' },
+        { type: 'usage', getValue: () => ({ hours: Math.floor(Math.random() * 12) }), unit: 'hours' },
+      ],
+      motion_sensor: [
+        { type: 'motion_detected', getValue: () => ({ detected: Math.random() > 0.6 }), unit: 'boolean' },
+        { type: 'activity', getValue: () => ({ level: Math.floor(Math.random() * 100) }), unit: '%' },
       ],
       fall_detector: [
         { type: 'fall_detected', getValue: () => ({ detected: false }), unit: 'boolean' },
         { type: 'activity', getValue: () => ({ level: Math.floor(Math.random() * 100) }), unit: '%' },
+        { type: 'orientation', getValue: () => ({ angle: Math.floor(Math.random() * 360) }), unit: 'degrees' },
       ],
       temperature_sensor: [
         { type: 'temperature', getValue: () => ({ temp: 18 + Math.random() * 10 }), unit: '°C' },
+        { type: 'alert_threshold', getValue: () => ({ exceeded: false }), unit: 'boolean' },
       ],
     };
 
     const deviceTypeData = dataTypes[device.device_type] || dataTypes.medical;
 
-    // Generate historical data (past 24 hours, one reading per hour)
-    for (let i = 24; i >= 0; i--) {
+    // Generate historical data (past 7 days, one reading every 2 hours = 84 data points)
+    const hoursBack = 168; // 7 days
+    const intervalHours = 2;
+    for (let i = hoursBack; i >= 0; i -= intervalHours) {
       const recordedAt = new Date(now.getTime() - i * 60 * 60 * 1000);
       
       for (const dataType of deviceTypeData) {
