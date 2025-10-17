@@ -14,6 +14,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       let query = supabase
         .from('device_data')
         .select('*, elderly_persons(full_name)')
+        .in('data_type', ['heart_rate', 'blood_pressure', 'blood_sugar', 'oxygen_level', 'temperature', 'steps'])
         .order('recorded_at', { ascending: false });
       
       if (selectedPersonId) {
