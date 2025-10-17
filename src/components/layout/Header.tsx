@@ -43,7 +43,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         className={cn(isMobile && 'w-full justify-start')}
       >
         <Activity className="w-4 h-4 mr-2" />
-        Movement
+        Activity
       </Button>
       <Button
         variant={isActive('/device-status') ? 'default' : 'ghost'}

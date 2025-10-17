@@ -123,13 +123,13 @@ export default function MovementDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header showBackButton title="Movement Dashboard" subtitle="Track movement patterns over time" />
+      <Header showBackButton title="Activity Dashboard" subtitle="Track activity patterns over time" />
       <main className="container mx-auto p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Movement Dashboard</h1>
+            <h1 className="text-3xl font-bold">Activity Dashboard</h1>
             <p className="text-muted-foreground">
-              Track and visualize movement patterns over time
+              Track and visualize activity patterns over time
             </p>
           </div>
           
