@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import { MovementSummary } from "@/components/dashboard/MovementSummary";
 import { MovementTimeline } from "@/components/dashboard/MovementTimeline";
 import { MovementHeatmap } from "@/components/dashboard/MovementHeatmap";
+import ElderlyList from "@/components/dashboard/ElderlyList";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import {
@@ -22,6 +23,7 @@ export default function MovementDashboard() {
   const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
   const [selectedPreset, setSelectedPreset] = useState<string>('today');
+  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -31,14 +33,13 @@ export default function MovementDashboard() {
     },
   });
 
-  const { data: elderlyPerson } = useQuery({
-    queryKey: ['elderly-person', user?.id],
+  // Fetch all accessible elderly persons
+  const { data: elderlyPersons = [], isLoading: elderlyLoading } = useQuery({
+    queryKey: ['elderly-persons', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('elderly_persons')
-        .select('*')
-        .eq('user_id', user?.id)
-        .single();
+        .select('*');
       
       if (error) throw error;
       return data;
@@ -46,8 +47,15 @@ export default function MovementDashboard() {
     enabled: !!user?.id,
   });
 
+  // Auto-select first person if none selected
+  useEffect(() => {
+    if (elderlyPersons.length > 0 && !selectedPersonId) {
+      setSelectedPersonId(elderlyPersons[0].id);
+    }
+  }, [elderlyPersons, selectedPersonId]);
+
   const { data: rawMovementData = [], isLoading } = useQuery({
-    queryKey: ['movement-data', elderlyPerson?.id, dateRange],
+    queryKey: ['movement-data', selectedPersonId, dateRange],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('device_data')
@@ -55,7 +63,7 @@ export default function MovementDashboard() {
           *,
           devices!inner(location, device_name, device_type)
         `)
-        .eq('elderly_person_id', elderlyPerson?.id)
+        .eq('elderly_person_id', selectedPersonId)
         .gte('recorded_at', dateRange.start)
         .lte('recorded_at', dateRange.end)
         .order('recorded_at', { ascending: true });
@@ -67,12 +75,12 @@ export default function MovementDashboard() {
         MOVEMENT_SENSOR_TYPES.includes(item.devices?.device_type)
       );
     },
-    enabled: !!elderlyPerson?.id,
+    enabled: !!selectedPersonId,
   });
 
   // Subscribe to real-time updates
   useEffect(() => {
-    if (!elderlyPerson?.id) return;
+    if (!selectedPersonId) return;
 
     const channel = supabase
       .channel('movement-updates')
@@ -82,7 +90,7 @@ export default function MovementDashboard() {
           event: 'INSERT',
           schema: 'public',
           table: 'device_data',
-          filter: `elderly_person_id=eq.${elderlyPerson.id}`,
+          filter: `elderly_person_id=eq.${selectedPersonId}`,
         },
         () => {
           // Refetch data on new movement events
@@ -94,7 +102,7 @@ export default function MovementDashboard() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [elderlyPerson?.id]);
+  }, [selectedPersonId, queryClient]);
 
   const processedData = processMovementData(rawMovementData);
 
@@ -105,7 +113,7 @@ export default function MovementDashboard() {
     }
   };
 
-  if (isLoading) {
+  if (elderlyLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -139,6 +147,13 @@ export default function MovementDashboard() {
             </Select>
           </div>
         </div>
+
+        {/* Monitored Individuals Selection */}
+        <ElderlyList 
+          elderlyPersons={elderlyPersons} 
+          selectedPersonId={selectedPersonId}
+          onSelectPerson={setSelectedPersonId}
+        />
 
         <MovementSummary data={processedData} />
 
