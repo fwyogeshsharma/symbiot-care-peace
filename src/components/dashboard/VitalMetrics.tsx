@@ -80,8 +80,10 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       if ('systolic' in value && 'diastolic' in value) {
         return `${Number(value.systolic).toFixed(2)}/${Number(value.diastolic).toFixed(2)}`;
       }
+      // Fallback for unknown objects - convert to string
+      return JSON.stringify(value);
     }
-    return typeof value === 'number' ? Number(value).toFixed(2) : value;
+    return typeof value === 'number' ? Number(value).toFixed(2) : String(value);
   };
 
   return (
