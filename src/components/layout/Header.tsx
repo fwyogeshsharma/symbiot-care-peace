@@ -37,6 +37,15 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
   const NavButtons = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
       <Button
+        variant={isActive('/movement-dashboard') ? 'default' : 'ghost'}
+        size={isMobile ? 'default' : 'sm'}
+        onClick={() => navigate('/movement-dashboard')}
+        className={cn(isMobile && 'w-full justify-start')}
+      >
+        <Activity className="w-4 h-4 mr-2" />
+        Movement
+      </Button>
+      <Button
         variant={isActive('/device-status') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/device-status')}

@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import DeviceStatusPage from "./pages/DeviceStatusPage";
 import DataSharingPage from "./pages/DataSharingPage";
+import MovementDashboard from "./pages/MovementDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <DataSharingPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/movement-dashboard" 
+              element={
+                <ProtectedRoute>
+                  <MovementDashboard />
                 </ProtectedRoute>
               } 
             />
