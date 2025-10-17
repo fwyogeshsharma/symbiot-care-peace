@@ -1,20 +1,29 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import DeviceManagement from './DeviceManagement';
 import DeviceHistory from './DeviceHistory';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 const DeviceStatus = () => {
   const [selectedDevice, setSelectedDevice] = useState<any>(null);
   const [historyDevice, setHistoryDevice] = useState<any>(null);
+  const [editDevice, setEditDevice] = useState<any>(null);
+  const [deleteDevice, setDeleteDevice] = useState<any>(null);
+  const [deleteDeviceData, setDeleteDeviceData] = useState(false);
   const [copiedApiKey, setCopiedApiKey] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const { data: devices } = useQuery({
     queryKey: ['devices'],
@@ -61,6 +70,95 @@ const DeviceStatus = () => {
     }
   };
 
+  // Update device mutation
+  const updateDeviceMutation = useMutation({
+    mutationFn: async (data: { id: string; updates: any }) => {
+      const { error } = await supabase
+        .from('devices')
+        .update(data.updates)
+        .eq('id', data.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['devices'] });
+      setEditDevice(null);
+      toast({
+        title: "Device updated",
+        description: "Device information has been updated successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete device mutation
+  const deleteDeviceMutation = useMutation({
+    mutationFn: async (data: { id: string; deleteData: boolean }) => {
+      // Delete device data if requested
+      if (data.deleteData) {
+        const { error: dataError } = await supabase
+          .from('device_data')
+          .delete()
+          .eq('device_id', data.id);
+        
+        if (dataError) throw dataError;
+      }
+      
+      // Delete device
+      const { error } = await supabase
+        .from('devices')
+        .delete()
+        .eq('id', data.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['devices'] });
+      queryClient.invalidateQueries({ queryKey: ['device-data'] });
+      setDeleteDevice(null);
+      setDeleteDeviceData(false);
+      toast({
+        title: "Device deleted",
+        description: "Device has been removed successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Delete failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleUpdateDevice = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editDevice) return;
+
+    updateDeviceMutation.mutate({
+      id: editDevice.id,
+      updates: {
+        device_name: editDevice.device_name,
+        device_type: editDevice.device_type,
+        location: editDevice.location,
+      },
+    });
+  };
+
+  const handleDeleteDevice = () => {
+    if (!deleteDevice) return;
+    deleteDeviceMutation.mutate({
+      id: deleteDevice.id,
+      deleteData: deleteDeviceData,
+    });
+  };
+
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
@@ -80,11 +178,13 @@ const DeviceStatus = () => {
           {devices.map((device) => (
             <div 
               key={device.id}
-              className="border rounded-lg p-3 hover:bg-muted/30 transition-colors cursor-pointer"
-              onClick={() => setSelectedDevice(device)}
+              className="border rounded-lg p-3 hover:bg-muted/30 transition-colors"
             >
               <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
+                <div 
+                  className="flex items-center gap-2 cursor-pointer flex-1"
+                  onClick={() => setSelectedDevice(device)}
+                >
                   {device.status === 'active' ? (
                     <Wifi className="w-4 h-4 text-success" />
                   ) : (
@@ -92,15 +192,42 @@ const DeviceStatus = () => {
                   )}
                   <span className="font-medium text-sm">{device.device_name}</span>
                 </div>
-                <Badge 
-                  variant="outline" 
-                  className={`${getStatusColor(device.status)} text-xs capitalize`}
-                >
-                  {device.status}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge 
+                    variant="outline" 
+                    className={`${getStatusColor(device.status)} text-xs capitalize`}
+                  >
+                    {device.status}
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditDevice(device);
+                    }}
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-destructive hover:text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteDevice(device);
+                    }}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
               </div>
               
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div 
+                className="flex items-center justify-between text-xs text-muted-foreground cursor-pointer"
+                onClick={() => setSelectedDevice(device)}
+              >
                 <span>{device.elderly_persons?.full_name || 'Unassigned'}</span>
                 <div className="flex items-center gap-1">
                   {getBatteryIcon(device.battery_level)}
@@ -109,7 +236,12 @@ const DeviceStatus = () => {
               </div>
               
               {device.location && (
-                <p className="text-xs text-muted-foreground mt-1">📍 {device.location}</p>
+                <p 
+                  className="text-xs text-muted-foreground mt-1 cursor-pointer"
+                  onClick={() => setSelectedDevice(device)}
+                >
+                  📍 {device.location}
+                </p>
               )}
             </div>
           ))}
@@ -210,6 +342,120 @@ Body:
         open={!!historyDevice}
         onOpenChange={(open) => !open && setHistoryDevice(null)}
       />
+
+      {/* Edit Device Dialog */}
+      <Dialog open={!!editDevice} onOpenChange={() => setEditDevice(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Device</DialogTitle>
+            <DialogDescription>
+              Update device information
+            </DialogDescription>
+          </DialogHeader>
+
+          {editDevice && (
+            <form onSubmit={handleUpdateDevice} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-device-name">Device Name</Label>
+                <Input
+                  id="edit-device-name"
+                  value={editDevice.device_name}
+                  onChange={(e) => setEditDevice({ ...editDevice, device_name: e.target.value })}
+                  placeholder="e.g., Living Room Monitor"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-device-type">Device Type</Label>
+                <Select 
+                  value={editDevice.device_type} 
+                  onValueChange={(value) => setEditDevice({ ...editDevice, device_type: value })}
+                >
+                  <SelectTrigger id="edit-device-type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="wearable">Wearable (Smart Watch, Activity Tracker)</SelectItem>
+                    <SelectItem value="medical">Medical Device (Heart Rate, Blood Pressure, Glucose Monitor)</SelectItem>
+                    <SelectItem value="door_sensor">Door Sensor</SelectItem>
+                    <SelectItem value="bed_sensor">Bed Sensor</SelectItem>
+                    <SelectItem value="seat_sensor">Seat Sensor</SelectItem>
+                    <SelectItem value="room_sensor">Room/Presence Sensor</SelectItem>
+                    <SelectItem value="scale_sensor">Scale/Weight Sensor</SelectItem>
+                    <SelectItem value="ambient_sensor">Ambient Environment Sensor</SelectItem>
+                    <SelectItem value="electronics_monitor">Electronics Monitor</SelectItem>
+                    <SelectItem value="motion_sensor">Motion Sensor</SelectItem>
+                    <SelectItem value="fall_detector">Fall Detector</SelectItem>
+                    <SelectItem value="temperature_sensor">Temperature Sensor</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-location">Location</Label>
+                <Input
+                  id="edit-location"
+                  value={editDevice.location || ''}
+                  onChange={(e) => setEditDevice({ ...editDevice, location: e.target.value })}
+                  placeholder="e.g., Bedroom, Living Room"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" className="flex-1" onClick={() => setEditDevice(null)}>
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1" disabled={updateDeviceMutation.isPending}>
+                  {updateDeviceMutation.isPending ? 'Updating...' : 'Update Device'}
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Device Dialog */}
+      <AlertDialog open={!!deleteDevice} onOpenChange={() => setDeleteDevice(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Device</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{deleteDevice?.device_name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="flex items-center space-x-2 py-4">
+            <Checkbox
+              id="delete-data"
+              checked={deleteDeviceData}
+              onCheckedChange={(checked) => setDeleteDeviceData(checked === true)}
+            />
+            <Label
+              htmlFor="delete-data"
+              className="text-sm font-normal cursor-pointer"
+            >
+              Also delete all device data (health records, sensor readings, etc.)
+            </Label>
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setDeleteDevice(null);
+              setDeleteDeviceData(false);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteDevice}
+              disabled={deleteDeviceMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteDeviceMutation.isPending ? 'Deleting...' : 'Delete Device'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };
