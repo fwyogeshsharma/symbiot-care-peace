@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { FloorPlanGrid } from '@/components/indoor-tracking/FloorPlanGrid';
@@ -8,11 +8,13 @@ import { processPositionData } from '@/lib/positionUtils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import Header from '@/components/layout/Header';
+import ElderlyList from '@/components/dashboard/ElderlyList';
 
 export default function IndoorTracking() {
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
+  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
 
-  // Fetch current user's elderly person
+  // Fetch current user
   const { data: user } = useQuery({
     queryKey: ['user'],
     queryFn: async () => {
@@ -21,14 +23,13 @@ export default function IndoorTracking() {
     }
   });
 
-  const { data: elderlyPerson } = useQuery({
-    queryKey: ['elderly-person', user?.id],
+  // Fetch all accessible elderly persons
+  const { data: elderlyPersons = [], isLoading: elderlyLoading } = useQuery({
+    queryKey: ['elderly-persons', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('elderly_persons')
-        .select('*')
-        .eq('user_id', user?.id)
-        .single();
+        .select('*');
       
       if (error) throw error;
       return data;
@@ -36,14 +37,21 @@ export default function IndoorTracking() {
     enabled: !!user?.id
   });
 
+  // Auto-select first person if none selected
+  useEffect(() => {
+    if (elderlyPersons.length > 0 && !selectedPersonId) {
+      setSelectedPersonId(elderlyPersons[0].id);
+    }
+  }, [elderlyPersons, selectedPersonId]);
+
   // Fetch floor plan
   const { data: floorPlan, isLoading: floorPlanLoading } = useQuery({
-    queryKey: ['floor-plan', elderlyPerson?.id],
+    queryKey: ['floor-plan', selectedPersonId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('floor_plans')
         .select('*')
-        .eq('elderly_person_id', elderlyPerson?.id)
+        .eq('elderly_person_id', selectedPersonId)
         .maybeSingle();
       
       if (error) throw error;
@@ -55,17 +63,17 @@ export default function IndoorTracking() {
         zones: (data.zones as any) || []
       };
     },
-    enabled: !!elderlyPerson?.id
+    enabled: !!selectedPersonId
   });
 
   // Fetch position data
   const { data: positionData = [], isLoading: positionLoading } = useQuery({
-    queryKey: ['position-data', elderlyPerson?.id],
+    queryKey: ['position-data', selectedPersonId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('device_data')
         .select('*, devices(*)')
-        .eq('elderly_person_id', elderlyPerson?.id)
+        .eq('elderly_person_id', selectedPersonId)
         .eq('data_type', 'position')
         .order('recorded_at', { ascending: true })
         .limit(1000);
@@ -73,10 +81,10 @@ export default function IndoorTracking() {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!elderlyPerson?.id
+    enabled: !!selectedPersonId
   });
 
-  if (floorPlanLoading || positionLoading) {
+  if (elderlyLoading || floorPlanLoading || positionLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Header showBackButton title="Indoor Tracking" subtitle="Real-time positioning system" />
@@ -123,6 +131,13 @@ export default function IndoorTracking() {
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
+          {/* Monitored Individuals Selection */}
+          <ElderlyList 
+            elderlyPersons={elderlyPersons} 
+            selectedPersonId={selectedPersonId}
+            onSelectPerson={setSelectedPersonId}
+          />
+
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2">
               <FloorPlanGrid
