@@ -77,6 +77,68 @@ const DeviceManagement = () => {
     const now = new Date();
     const sampleData = [];
     
+    // Special handling for worker-wearable devices
+    if (device.device_type === 'worker_wearable') {
+      // Import position utilities
+      const { getDefaultFloorPlan, generateIndoorMovementPath } = await import('@/lib/positionUtils');
+      
+      // Create floor plan if it doesn't exist
+      const { data: existingFloorPlan } = await supabase
+        .from('floor_plans')
+        .select('id')
+        .eq('elderly_person_id', device.elderly_person_id)
+        .maybeSingle();
+      
+      let floorPlanId = existingFloorPlan?.id;
+      
+      if (!existingFloorPlan) {
+        const defaultFloorPlan = getDefaultFloorPlan(device.elderly_person_id);
+        const { data: newFloorPlan } = await supabase
+          .from('floor_plans')
+          .insert([{
+            ...defaultFloorPlan,
+            zones: defaultFloorPlan.zones as any
+          }])
+          .select('*')
+          .single();
+        
+        floorPlanId = newFloorPlan?.id;
+      }
+      
+      // Fetch the floor plan to generate movement
+      const { data: floorPlan } = await supabase
+        .from('floor_plans')
+        .select('*')
+        .eq('id', floorPlanId)
+        .single();
+      
+      if (floorPlan) {
+        // Generate 24 hours of indoor movement data
+        const startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const positions = generateIndoorMovementPath(
+          floorPlan.zones as any,
+          { width: floorPlan.width, height: floorPlan.height },
+          startTime,
+          24,
+          30 // position every 30 seconds
+        );
+        
+        // Create position data records
+        positions.forEach((position, index) => {
+          const recordedAt = new Date(startTime.getTime() + index * 30 * 1000);
+          sampleData.push({
+            device_id: device.id,
+            elderly_person_id: device.elderly_person_id,
+            data_type: 'position',
+            value: position,
+            unit: 'meters',
+            recorded_at: recordedAt.toISOString(),
+          });
+        });
+      }
+    } else {
+      // Original logic for other device types
+    
     // Generate data based on device type with comprehensive readings
     const dataTypes: Record<string, any> = {
       wearable: [
@@ -84,6 +146,7 @@ const DeviceManagement = () => {
         { type: 'steps', getValue: () => ({ count: Math.floor(Math.random() * 5000) }), unit: 'steps' },
         { type: 'activity', getValue: () => ({ level: Math.floor(Math.random() * 100) }), unit: '%' },
       ],
+      worker_wearable: [], // Handled separately with position data
       medical: [
         { type: 'heart_rate', getValue: () => ({ bpm: 65 + Math.random() * 30 }), unit: 'bpm' },
         { type: 'blood_pressure', getValue: () => ({ systolic: 110 + Math.random() * 40, diastolic: 70 + Math.random() * 20 }), unit: 'mmHg' },
@@ -154,6 +217,8 @@ const DeviceManagement = () => {
           recorded_at: recordedAt.toISOString(),
         });
       }
+    }
+
     }
 
     // Insert sample data
@@ -271,6 +336,7 @@ const DeviceManagement = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="wearable">Wearable (Smart Watch, Activity Tracker)</SelectItem>
+                  <SelectItem value="worker_wearable">Worker Wearable (Indoor Positioning)</SelectItem>
                   <SelectItem value="medical">Medical Device (Heart Rate, Blood Pressure, Glucose Monitor)</SelectItem>
                   <SelectItem value="door_sensor">Door Sensor</SelectItem>
                   <SelectItem value="bed_sensor">Bed Sensor</SelectItem>

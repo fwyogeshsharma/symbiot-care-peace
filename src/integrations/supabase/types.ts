@@ -242,6 +242,53 @@ export type Database = {
         }
         Relationships: []
       }
+      floor_plans: {
+        Row: {
+          created_at: string | null
+          elderly_person_id: string | null
+          grid_size: number | null
+          height: number
+          id: string
+          image_url: string | null
+          name: string
+          updated_at: string | null
+          width: number
+          zones: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          elderly_person_id?: string | null
+          grid_size?: number | null
+          height: number
+          id?: string
+          image_url?: string | null
+          name: string
+          updated_at?: string | null
+          width: number
+          zones?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          elderly_person_id?: string | null
+          grid_size?: number | null
+          height?: number
+          id?: string
+          image_url?: string | null
+          name?: string
+          updated_at?: string | null
+          width?: number
+          zones?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "floor_plans_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

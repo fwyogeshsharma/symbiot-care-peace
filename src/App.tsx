@@ -14,6 +14,8 @@ import DataSharingPage from "./pages/DataSharingPage";
 import MovementDashboard from "./pages/MovementDashboard";
 import NotFound from "./pages/NotFound";
 
+import IndoorTracking from "./pages/IndoorTracking";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -63,6 +65,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <MovementDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/indoor-tracking" 
+              element={
+                <ProtectedRoute>
+                  <IndoorTracking />
                 </ProtectedRoute>
               } 
             />
