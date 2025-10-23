@@ -7,6 +7,7 @@ import { MovementMetrics } from '@/components/indoor-tracking/MovementMetrics';
 import { processPositionData } from '@/lib/positionUtils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import Header from '@/components/layout/Header';
 
 export default function IndoorTracking() {
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
@@ -77,23 +78,31 @@ export default function IndoorTracking() {
 
   if (floorPlanLoading || positionLoading) {
     return (
-      <div className="container mx-auto p-6 space-y-6">
-        <Skeleton className="h-12 w-64" />
-        <Skeleton className="h-96 w-full" />
-        <Skeleton className="h-48 w-full" />
+      <div className="min-h-screen bg-background">
+        <Header showBackButton title="Indoor Tracking" subtitle="Real-time positioning system" />
+        <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
+          <div className="space-y-6">
+            <Skeleton className="h-12 w-64" />
+            <Skeleton className="h-96 w-full" />
+            <Skeleton className="h-48 w-full" />
+          </div>
+        </main>
       </div>
     );
   }
 
   if (!floorPlan) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold mb-4">No Floor Plan Found</h2>
-          <p className="text-muted-foreground">
-            Register a worker-wearable device to see indoor tracking
-          </p>
-        </div>
+      <div className="min-h-screen bg-background">
+        <Header showBackButton title="Indoor Tracking" subtitle="Real-time positioning system" />
+        <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-bold mb-4">No Floor Plan Found</h2>
+            <p className="text-muted-foreground">
+              Register a worker-wearable device to see indoor tracking
+            </p>
+          </div>
+        </main>
       </div>
     );
   }
@@ -109,34 +118,33 @@ export default function IndoorTracking() {
     .map(p => p.position);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Indoor Positioning</h1>
-        <p className="text-muted-foreground">
-          Real-time tracking and movement analysis
-        </p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Header showBackButton title="Indoor Tracking" subtitle="Real-time positioning system" />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <FloorPlanGrid
-            floorPlan={floorPlan}
-            currentPosition={currentPosition}
-            trail={trail}
-            showGrid={true}
-          />
+      <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
+        <div className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <FloorPlanGrid
+                floorPlan={floorPlan}
+                currentPosition={currentPosition}
+                trail={trail}
+                showGrid={true}
+              />
+            </div>
+
+            <div>
+              <MovementPlayback
+                positions={positionEvents}
+                onPositionChange={setCurrentPositionIndex}
+                currentIndex={currentPositionIndex}
+              />
+            </div>
+          </div>
+
+          <MovementMetrics data={processedData} />
         </div>
-
-        <div>
-          <MovementPlayback
-            positions={positionEvents}
-            onPositionChange={setCurrentPositionIndex}
-            currentIndex={currentPositionIndex}
-          />
-        </div>
-      </div>
-
-      <MovementMetrics data={processedData} />
+      </main>
     </div>
   );
 }
