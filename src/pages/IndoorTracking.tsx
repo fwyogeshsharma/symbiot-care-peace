@@ -43,9 +43,10 @@ export default function IndoorTracking() {
         .from('floor_plans')
         .select('*')
         .eq('elderly_person_id', elderlyPerson?.id)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
+      if (!data) return null;
       
       // Transform the data to match FloorPlan type
       return {
