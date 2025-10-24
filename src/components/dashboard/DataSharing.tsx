@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -28,6 +29,12 @@ interface SharedUser {
 interface DataSharingProps {
   userId: string;
 }
+
+// Validation schema for data sharing inputs
+const sharingSchema = z.object({
+  email: z.string().trim().email('Invalid email address').max(255, 'Email must be less than 255 characters'),
+  relationship: z.string().trim().max(100, 'Relationship must be less than 100 characters').optional().or(z.literal(''))
+});
 
 export default function DataSharing({ userId }: DataSharingProps) {
   const [email, setEmail] = useState('');
@@ -103,37 +110,36 @@ export default function DataSharing({ userId }: DataSharingProps) {
   // Share data mutation
   const shareMutation = useMutation({
     mutationFn: async () => {
-      if (!email) {
-        throw new Error('Email is required');
+      // Validate inputs
+      const validation = sharingSchema.safeParse({ email, relationship });
+      if (!validation.success) {
+        throw new Error(validation.error.errors[0].message);
       }
 
       if (elderlyPersons.length === 0) {
         throw new Error('No elderly persons found to share');
       }
 
-      // Look up user by email
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .single();
+      // Use secure lookup function to find user by email
+      const { data: targetUserId, error: profileError } = await supabase
+        .rpc('lookup_user_by_email', { _email: validation.data.email });
 
-      if (profileError || !profile) {
+      if (profileError || !targetUserId) {
         throw new Error('User not found with this email');
       }
 
       // Create assignments for all elderly persons owned by the user
       const assignments = elderlyPersons.map((person) => ({
-        relative_user_id: profile.id,
+        relative_user_id: targetUserId,
         elderly_person_id: person.id,
-        relationship: relationship || 'shared',
+        relationship: validation.data.relationship || 'shared',
       }));
 
       // Check for existing assignments and filter them out
       const { data: existing } = await supabase
         .from('relative_assignments')
         .select('elderly_person_id')
-        .eq('relative_user_id', profile.id)
+        .eq('relative_user_id', targetUserId)
         .in('elderly_person_id', elderlyPersons.map(p => p.id));
 
       const existingIds = new Set(existing?.map(e => e.elderly_person_id) || []);
@@ -171,9 +177,15 @@ export default function DataSharing({ userId }: DataSharingProps) {
   // Update access mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, relationship }: { id: string; relationship: string }) => {
+      // Validate relationship input
+      const validation = z.string().trim().max(100, 'Relationship must be less than 100 characters').safeParse(relationship);
+      if (!validation.success) {
+        throw new Error(validation.error.errors[0].message);
+      }
+
       const { error } = await supabase
         .from('relative_assignments')
-        .update({ relationship })
+        .update({ relationship: validation.data })
         .eq('id', id);
 
       if (error) throw error;

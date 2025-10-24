@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     // Verify device exists and get elderly_person_id
     const { data: device, error: deviceError } = await supabase
       .from('devices')
-      .select('id, elderly_person_id, status')
+      .select('id, elderly_person_id, status, api_key')
       .eq('device_id', payload.device_id)
       .single();
 
@@ -73,6 +73,15 @@ Deno.serve(async (req) => {
       console.error('Device not active:', device.status);
       return new Response(
         JSON.stringify({ error: 'Device is not active' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate API key matches the device's stored key
+    if (device.api_key !== apiKey) {
+      console.error('Invalid API key for device:', payload.device_id);
+      return new Response(
+        JSON.stringify({ error: 'Invalid API key' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -96,7 +105,7 @@ Deno.serve(async (req) => {
     if (insertError) {
       console.error('Error inserting device data:', insertError);
       return new Response(
-        JSON.stringify({ error: 'Failed to store device data', details: insertError.message }),
+        JSON.stringify({ error: 'Failed to store device data' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -123,9 +132,8 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Unexpected error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: errorMessage }),
+      JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
