@@ -104,11 +104,20 @@ export default function IndoorTracking() {
       <div className="min-h-screen bg-background">
         <Header showBackButton title="Indoor Tracking" subtitle="Real-time positioning system" />
         <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold mb-4">No Floor Plan Found</h2>
-            <p className="text-muted-foreground">
-              Register a worker-wearable device to see indoor tracking
-            </p>
+          <div className="space-y-6">
+            {/* Monitored Individuals Selection */}
+            <ElderlyList 
+              elderlyPersons={elderlyPersons} 
+              selectedPersonId={selectedPersonId}
+              onSelectPerson={setSelectedPersonId}
+            />
+            
+            <div className="text-center py-12">
+              <h2 className="text-2xl font-bold mb-4">No Floor Plan Found</h2>
+              <p className="text-muted-foreground">
+                Register a worker-wearable device to see indoor tracking
+              </p>
+            </div>
           </div>
         </main>
       </div>
