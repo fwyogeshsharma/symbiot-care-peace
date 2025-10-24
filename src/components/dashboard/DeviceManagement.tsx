@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { z } from 'zod';
 
 const DeviceManagement = () => {
   const [open, setOpen] = useState(false);
@@ -252,6 +253,30 @@ const DeviceManagement = () => {
       return;
     }
 
+    // Validate input using zod schema
+    const deviceSchema = z.object({
+      device_name: z.string().trim().min(1, 'Device name is required').max(100, 'Device name must be less than 100 characters'),
+      device_type: z.string().min(1, 'Device type is required'),
+      device_id: z.string().trim().min(1, 'Device ID is required').max(50, 'Device ID must be less than 50 characters').regex(/^[a-zA-Z0-9_-]+$/, 'Device ID can only contain letters, numbers, hyphens, and underscores'),
+      location: z.string().trim().max(100, 'Location must be less than 100 characters').optional()
+    });
+
+    const validation = deviceSchema.safeParse({
+      device_name: deviceName,
+      device_type: deviceType,
+      device_id: deviceId,
+      location: location || undefined
+    });
+
+    if (!validation.success) {
+      toast({
+        title: "Validation Error",
+        description: validation.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!userElderlyPerson?.id) {
       toast({
         title: "No profile found",
@@ -262,11 +287,11 @@ const DeviceManagement = () => {
     }
 
     addDeviceMutation.mutate({
-      device_name: deviceName,
-      device_type: deviceType,
-      device_id: deviceId,
+      device_name: validation.data.device_name,
+      device_type: validation.data.device_type,
+      device_id: validation.data.device_id,
       elderly_person_id: userElderlyPerson.id,
-      location: location || null,
+      location: validation.data.location || null,
       status: 'active',
     });
   };
