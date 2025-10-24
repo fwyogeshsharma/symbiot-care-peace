@@ -133,7 +133,6 @@ const Auth = () => {
                     <SelectItem value="elderly">Elderly Person</SelectItem>
                     <SelectItem value="caregiver">Caregiver</SelectItem>
                     <SelectItem value="relative">Family Member / Relative</SelectItem>
-                    <SelectItem value="admin">Administrator</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
