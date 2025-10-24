@@ -57,6 +57,8 @@ const DeviceManagement = () => {
       
       queryClient.invalidateQueries({ queryKey: ['devices'] });
       queryClient.invalidateQueries({ queryKey: ['device-data'] });
+      queryClient.invalidateQueries({ queryKey: ['floor-plan'] });
+      queryClient.invalidateQueries({ queryKey: ['position-data'] });
       toast({
         title: "Device registered successfully",
         description: "Your IoT device has been added with sample data.",
