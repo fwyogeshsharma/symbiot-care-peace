@@ -103,6 +103,60 @@ const DeviceStatus = () => {
       const now = new Date();
       const sampleData = [];
       
+      // Special handling for worker-wearable devices with position data
+      if (device.device_type === 'worker_wearable') {
+        const { getDefaultFloorPlan, generateIndoorMovementPath } = await import('@/lib/positionUtils');
+        
+        // Check if floor plan exists
+        const { data: existingFloorPlan } = await supabase
+          .from('floor_plans')
+          .select('*')
+          .eq('elderly_person_id', device.elderly_person_id)
+          .maybeSingle();
+        
+        let floorPlan = existingFloorPlan;
+        
+        // Create floor plan if it doesn't exist
+        if (!existingFloorPlan) {
+          const defaultFloorPlan = getDefaultFloorPlan(device.elderly_person_id);
+          const { data: newFloorPlan } = await supabase
+            .from('floor_plans')
+            .insert([{
+              ...defaultFloorPlan,
+              zones: defaultFloorPlan.zones as any
+            }])
+            .select('*')
+            .single();
+          
+          floorPlan = newFloorPlan;
+        }
+        
+        if (floorPlan) {
+          // Generate 24 hours of indoor movement data
+          const startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          const positions = generateIndoorMovementPath(
+            floorPlan.zones as any,
+            { width: floorPlan.width, height: floorPlan.height },
+            startTime,
+            24,
+            30 // position every 30 seconds
+          );
+          
+          // Create position data records
+          positions.forEach((position, index) => {
+            const recordedAt = new Date(startTime.getTime() + index * 30 * 1000);
+            sampleData.push({
+              device_id: device.id,
+              elderly_person_id: device.elderly_person_id,
+              data_type: 'position',
+              value: position,
+              unit: 'meters',
+              recorded_at: recordedAt.toISOString(),
+            });
+          });
+        }
+      } else {
+      
       // Generate data based on device type
       const dataTypes: Record<string, any> = {
         wearable: [
@@ -181,20 +235,26 @@ const DeviceStatus = () => {
           });
         }
       }
+      }
 
       // Insert sample data
-      const { error } = await supabase
-        .from('device_data')
-        .insert(sampleData);
-      
-      if (error) throw error;
+      if (sampleData.length > 0) {
+        const { error } = await supabase
+          .from('device_data')
+          .insert(sampleData);
+        
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['devices'] });
       queryClient.invalidateQueries({ queryKey: ['device-data'] });
       queryClient.invalidateQueries({ queryKey: ['movement-data'] });
+      queryClient.invalidateQueries({ queryKey: ['floor-plan'] });
+      queryClient.invalidateQueries({ queryKey: ['position-data'] });
       toast({
         title: "Data generated",
-        description: "Fake data has been generated successfully for the device.",
+        description: "Sample data has been generated successfully for the device.",
       });
     },
     onError: (error: any) => {

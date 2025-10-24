@@ -77,11 +77,12 @@ const DeviceManagement = () => {
   });
 
   const generateSampleData = async (device: any) => {
-    const now = new Date();
-    const sampleData = [];
-    
-    // Special handling for worker-wearable devices
-    if (device.device_type === 'worker_wearable') {
+    try {
+      const now = new Date();
+      const sampleData = [];
+      
+      // Special handling for worker-wearable devices
+      if (device.device_type === 'worker_wearable') {
       // Import position utilities
       const { getDefaultFloorPlan, generateIndoorMovementPath } = await import('@/lib/positionUtils');
       
@@ -225,12 +226,26 @@ const DeviceManagement = () => {
     }
 
     // Insert sample data
-    const { error } = await supabase
-      .from('device_data')
-      .insert(sampleData);
-    
-    if (error) {
-      console.error('Error generating sample data:', error);
+    if (sampleData.length > 0) {
+      const { error } = await supabase
+        .from('device_data')
+        .insert(sampleData);
+      
+      if (error) {
+        console.error('Error generating sample data:', error);
+        throw error;
+      }
+      
+      console.log(`Generated ${sampleData.length} sample data points for device ${device.device_name}`);
+    }
+    } catch (error) {
+      console.error('Error in generateSampleData:', error);
+      toast({
+        title: "Sample data generation failed",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+      throw error;
     }
   };
 
