@@ -82,6 +82,8 @@ const Auth = () => {
             title: "Success!",
             description: "Please check your email to verify your account.",
           });
+          // Switch to login view after successful sign-up
+          setIsLogin(true);
         }
       }
     } catch (error) {
