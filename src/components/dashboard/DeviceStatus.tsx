@@ -15,7 +15,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-const DeviceStatus = () => {
+interface DeviceStatusProps {
+  selectedPersonId?: string | null;
+}
+
+const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   const [selectedDevice, setSelectedDevice] = useState<any>(null);
   const [historyDevice, setHistoryDevice] = useState<any>(null);
   const [editDevice, setEditDevice] = useState<any>(null);
@@ -26,12 +30,18 @@ const DeviceStatus = () => {
   const queryClient = useQueryClient();
   
   const { data: devices } = useQuery({
-    queryKey: ['devices'],
+    queryKey: ['devices', selectedPersonId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('devices')
         .select('*, elderly_persons(full_name)')
         .order('created_at', { ascending: false });
+      
+      if (selectedPersonId) {
+        query = query.eq('elderly_person_id', selectedPersonId);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return data;
