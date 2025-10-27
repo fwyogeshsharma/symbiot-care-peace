@@ -14,6 +14,7 @@ const authSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   fullName: z.string().min(2, 'Name must be at least 2 characters').optional(),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits').regex(/^[0-9+\-\s()]*$/, 'Invalid phone number format').optional(),
   role: z.enum(['elderly', 'caregiver', 'relative', 'admin']).optional(),
 });
 
@@ -22,6 +23,7 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
   const [role, setRole] = useState<string>('relative');
   const [loading, setLoading] = useState(false);
   const { signUp, signIn, user } = useAuth();
@@ -57,7 +59,7 @@ const Auth = () => {
           });
         }
       } else {
-        const validation = authSchema.safeParse({ email, password, fullName, role });
+        const validation = authSchema.safeParse({ email, password, fullName, phone, role });
         if (!validation.success) {
           toast({
             title: "Validation Error",
@@ -68,7 +70,7 @@ const Auth = () => {
           return;
         }
 
-        const { error } = await signUp(email, password, fullName, role);
+        const { error } = await signUp(email, password, fullName, phone, role);
         if (error) {
           toast({
             title: "Sign Up Failed",
@@ -112,7 +114,7 @@ const Auth = () => {
           {!isLogin && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName">Full Name *</Label>
                 <Input
                   id="fullName"
                   type="text"
@@ -120,6 +122,18 @@ const Auth = () => {
                   onChange={(e) => setFullName(e.target.value)}
                   required
                   placeholder="John Doe"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number *</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  placeholder="+1 (555) 123-4567"
                 />
               </div>
 
