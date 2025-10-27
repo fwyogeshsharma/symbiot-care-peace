@@ -9,10 +9,21 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import Header from '@/components/layout/Header';
 import ElderlyList from '@/components/dashboard/ElderlyList';
+import { Calendar } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { getDateRangePreset } from '@/lib/movementUtils';
 
 export default function IndoorTracking() {
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
+  const [selectedPreset, setSelectedPreset] = useState<string>('today');
 
   // Fetch current user
   const { data: user } = useQuery({
@@ -68,13 +79,15 @@ export default function IndoorTracking() {
 
   // Fetch position data
   const { data: positionData = [], isLoading: positionLoading } = useQuery({
-    queryKey: ['position-data', selectedPersonId],
+    queryKey: ['position-data', selectedPersonId, dateRange],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('device_data')
         .select('*, devices(*)')
         .eq('elderly_person_id', selectedPersonId)
         .eq('data_type', 'position')
+        .gte('recorded_at', dateRange.start)
+        .lte('recorded_at', dateRange.end)
         .order('recorded_at', { ascending: true })
         .limit(1000);
       
@@ -83,6 +96,13 @@ export default function IndoorTracking() {
     },
     enabled: !!selectedPersonId
   });
+
+  const handlePresetChange = (preset: string) => {
+    setSelectedPreset(preset);
+    if (preset === 'today' || preset === 'last7days' || preset === 'last30days') {
+      setDateRange(getDateRangePreset(preset));
+    }
+  };
 
   if (elderlyLoading || floorPlanLoading || positionLoading) {
     return (
@@ -140,6 +160,29 @@ export default function IndoorTracking() {
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">Indoor Tracking</h1>
+              <p className="text-muted-foreground">
+                Real-time positioning and movement visualization
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Select value={selectedPreset} onValueChange={handlePresetChange}>
+                <SelectTrigger className="w-[180px]">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder="Select period" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="today">Today</SelectItem>
+                  <SelectItem value="last7days">Last 7 Days</SelectItem>
+                  <SelectItem value="last30days">Last 30 Days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           {/* Monitored Individuals Selection */}
           <ElderlyList 
             elderlyPersons={elderlyPersons} 
