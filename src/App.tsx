@@ -13,8 +13,9 @@ import DeviceStatusPage from "./pages/DeviceStatusPage";
 import DataSharingPage from "./pages/DataSharingPage";
 import MovementDashboard from "./pages/MovementDashboard";
 import NotFound from "./pages/NotFound";
-
 import IndoorTracking from "./pages/IndoorTracking";
+import DeviceTypesManagement from "./pages/admin/DeviceTypesManagement";
+import DeviceTypeDataConfigs from "./pages/admin/DeviceTypeDataConfigs";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <IndoorTracking />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/device-types" 
+              element={
+                <ProtectedRoute>
+                  <DeviceTypesManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/device-types/:deviceTypeId/configs" 
+              element={
+                <ProtectedRoute>
+                  <DeviceTypeDataConfigs />
                 </ProtectedRoute>
               } 
             />

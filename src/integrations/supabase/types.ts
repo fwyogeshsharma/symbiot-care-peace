@@ -144,6 +144,95 @@ export type Database = {
           },
         ]
       }
+      device_type_data_configs: {
+        Row: {
+          created_at: string | null
+          data_type: string
+          device_type_id: string
+          display_name: string
+          id: string
+          is_required: boolean | null
+          sample_data_config: Json | null
+          sort_order: number | null
+          unit: string | null
+          updated_at: string | null
+          value_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          data_type: string
+          device_type_id: string
+          display_name: string
+          id?: string
+          is_required?: boolean | null
+          sample_data_config?: Json | null
+          sort_order?: number | null
+          unit?: string | null
+          updated_at?: string | null
+          value_type: string
+        }
+        Update: {
+          created_at?: string | null
+          data_type?: string
+          device_type_id?: string
+          display_name?: string
+          id?: string
+          is_required?: boolean | null
+          sample_data_config?: Json | null
+          sort_order?: number | null
+          unit?: string | null
+          updated_at?: string | null
+          value_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_type_data_configs_device_type_id_fkey"
+            columns: ["device_type_id"]
+            isOneToOne: false
+            referencedRelation: "device_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      device_types: {
+        Row: {
+          category: string
+          code: string
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          supports_position_tracking: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          supports_position_tracking?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          supports_position_tracking?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       devices: {
         Row: {
           api_key: string
