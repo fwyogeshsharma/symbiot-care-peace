@@ -70,18 +70,18 @@ const Auth = () => {
           return;
         }
 
-        const { error } = await signUp(email, password, fullName, phone, role);
-        if (error) {
-          // Provide clearer error message for duplicate email
-          const errorMessage = error.message.toLowerCase().includes('already registered') || 
-                               error.message.toLowerCase().includes('already exists') ||
-                               error.message.toLowerCase().includes('duplicate')
-            ? "This email is already registered. Please sign in instead."
-            : error.message;
-          
+        const { error, isDuplicate } = await signUp(email, password, fullName, phone, role);
+        
+        if (isDuplicate) {
           toast({
             title: "Sign Up Failed",
-            description: errorMessage,
+            description: "This email is already registered. Please sign in instead.",
+            variant: "destructive",
+          });
+        } else if (error) {
+          toast({
+            title: "Sign Up Failed",
+            description: error.message,
             variant: "destructive",
           });
         } else {

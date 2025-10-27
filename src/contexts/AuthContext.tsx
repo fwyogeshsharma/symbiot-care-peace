@@ -8,7 +8,7 @@ interface AuthContextType {
   session: Session | null;
   userRole: string | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, phone: string, role: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, phone: string, role: string) => Promise<{ error: any; isDuplicate?: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string, phone: string, role: string) => {
     const redirectUrl = `${window.location.origin}/dashboard`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -86,7 +86,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
     
-    return { error };
+    // Check if user already exists (Supabase returns success but with identities array empty for existing users)
+    const isDuplicate = !error && data.user && (!data.user.identities || data.user.identities.length === 0);
+    
+    return { error, isDuplicate };
   };
 
   const signIn = async (email: string, password: string) => {
