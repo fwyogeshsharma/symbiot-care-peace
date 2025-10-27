@@ -6,26 +6,38 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Activity } from 'lucide-react';
+import { Activity, Eye, EyeOff } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { z } from 'zod';
 
-const authSchema = z.object({
+const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  fullName: z.string().min(2, 'Name must be at least 2 characters').optional(),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits').regex(/^[0-9+\-\s()]*$/, 'Invalid phone number format').optional(),
-  role: z.enum(['elderly', 'caregiver', 'relative', 'admin']).optional(),
+});
+
+const signupSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string().min(6, 'Please confirm your password'),
+  fullName: z.string().min(2, 'Name must be at least 2 characters'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits').regex(/^[0-9+\-\s()]*$/, 'Invalid phone number format'),
+  role: z.enum(['elderly', 'caregiver', 'relative', 'admin']),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<string>('relative');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { signUp, signIn, user } = useAuth();
   const { toast } = useToast();
 
@@ -39,7 +51,7 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const validation = authSchema.pick({ email: true, password: true }).safeParse({ email, password });
+        const validation = loginSchema.safeParse({ email, password });
         if (!validation.success) {
           toast({
             title: "Validation Error",
@@ -59,7 +71,7 @@ const Auth = () => {
           });
         }
       } else {
-        const validation = authSchema.safeParse({ email, password, fullName, phone, role });
+        const validation = signupSchema.safeParse({ email, password, confirmPassword, fullName, phone, role });
         if (!validation.success) {
           toast({
             title: "Validation Error",
@@ -176,15 +188,49 @@ const Auth = () => {
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
+
+          {!isLogin && (
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+          )}
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
