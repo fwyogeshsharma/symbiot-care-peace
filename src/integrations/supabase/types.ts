@@ -284,6 +284,13 @@ export type Database = {
             referencedRelation: "elderly_persons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_devices_device_type"
+            columns: ["device_type"]
+            isOneToOne: false
+            referencedRelation: "device_types"
+            referencedColumns: ["code"]
+          },
         ]
       }
       elderly_persons: {
