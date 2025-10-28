@@ -86,32 +86,36 @@ export const FloorPlanGrid = ({
 
     // Draw trail
     if (trail.length > 0) {
-      ctx.strokeStyle = 'hsl(var(--primary))';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      trail.forEach((pos, index) => {
-        const x = pos.x * scale;
-        const y = pos.y * scale;
-        if (index === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-      });
-      ctx.stroke();
-
-      // Draw breadcrumb dots
-      trail.forEach((pos, index) => {
-        const opacity = 0.3 + (index / trail.length) * 0.7;
-        ctx.fillStyle = `hsla(var(--primary) / ${opacity})`;
+      const validTrail = trail.filter(pos => typeof pos.x === 'number' && typeof pos.y === 'number');
+      
+      if (validTrail.length > 0) {
+        ctx.strokeStyle = 'hsl(var(--primary))';
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(pos.x * scale, pos.y * scale, 3, 0, Math.PI * 2);
-        ctx.fill();
-      });
+        validTrail.forEach((pos, index) => {
+          const x = pos.x * scale;
+          const y = pos.y * scale;
+          if (index === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.stroke();
+
+        // Draw breadcrumb dots
+        validTrail.forEach((pos, index) => {
+          const opacity = 0.3 + (index / validTrail.length) * 0.7;
+          ctx.fillStyle = `hsla(var(--primary) / ${opacity})`;
+          ctx.beginPath();
+          ctx.arc(pos.x * scale, pos.y * scale, 3, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
     }
 
     // Draw current position
-    if (currentPosition) {
+    if (currentPosition && typeof currentPosition.x === 'number' && typeof currentPosition.y === 'number') {
       const x = currentPosition.x * scale;
       const y = currentPosition.y * scale;
 
@@ -178,9 +182,11 @@ export const FloorPlanGrid = ({
               <span className="font-medium">Current Zone:</span>
               <span className="text-muted-foreground">{currentPosition.zone}</span>
             </div>
-            <div className="text-muted-foreground">
-              Position: ({currentPosition.x.toFixed(1)}m, {currentPosition.y.toFixed(1)}m)
-            </div>
+            {typeof currentPosition.x === 'number' && typeof currentPosition.y === 'number' && (
+              <div className="text-muted-foreground">
+                Position: ({currentPosition.x.toFixed(1)}m, {currentPosition.y.toFixed(1)}m)
+              </div>
+            )}
           </div>
         )}
       </div>
