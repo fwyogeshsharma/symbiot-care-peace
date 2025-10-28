@@ -1,24 +1,27 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import DeviceStatus from '@/components/dashboard/DeviceStatus';
 import Header from '@/components/layout/Header';
 import ElderlyList from '@/components/dashboard/ElderlyList';
 
 const DeviceStatusPage = () => {
+  const { user } = useAuth();
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
 
   const { data: elderlyPersons = [] } = useQuery({
-    queryKey: ['elderly-persons'],
+    queryKey: ['elderly-persons', user?.id],
     queryFn: async () => {
+      if (!user?.id) return [];
+      
       const { data, error } = await supabase
-        .from('elderly_persons')
-        .select('*')
-        .order('full_name');
+        .rpc('get_accessible_elderly_persons', { _user_id: user.id });
       
       if (error) throw error;
       return data || [];
-    }
+    },
+    enabled: !!user?.id
   });
 
   return (

@@ -18,14 +18,15 @@ const Dashboard = () => {
   const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
     queryKey: ['elderly-persons', user?.id],
     queryFn: async () => {
+      if (!user?.id) return [];
+      
       const { data, error } = await supabase
-        .from('elderly_persons')
-        .select('*');
+        .rpc('get_accessible_elderly_persons', { _user_id: user.id });
       
       if (error) throw error;
-      return data;
+      return data || [];
     },
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   // Fetch active alerts

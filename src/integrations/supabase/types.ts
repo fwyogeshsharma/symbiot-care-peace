@@ -477,6 +477,29 @@ export type Database = {
         Args: { _elderly_person_id: string; _user_id: string }
         Returns: boolean
       }
+      get_accessible_elderly_persons: {
+        Args: { _user_id: string }
+        Returns: {
+          address: string | null
+          created_at: string
+          date_of_birth: string | null
+          emergency_contact: string | null
+          full_name: string
+          id: string
+          medical_conditions: string[] | null
+          medications: string[] | null
+          photo_url: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "elderly_persons"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
