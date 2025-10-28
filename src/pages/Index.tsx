@@ -4,11 +4,11 @@ import { Activity, Heart, Shield, Bell, Users, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-healthcare.jpg";
 import { useAuth } from "@/contexts/AuthContext";
-
 const Index = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-
+  const {
+    user
+  } = useAuth();
   const handleGetStarted = () => {
     if (user) {
       navigate("/dashboard");
@@ -16,9 +16,7 @@ const Index = () => {
       navigate("/auth");
     }
   };
-
-  return (
-    <div className="min-h-screen">
+  return <div className="min-h-screen">
       {/* Navigation Toolbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-3 sm:py-4">
@@ -31,11 +29,9 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
-              {!user && (
-                <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="hidden sm:inline-flex">
+              {!user && <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="hidden sm:inline-flex">
                   Login
-                </Button>
-              )}
+                </Button>}
               <Button onClick={handleGetStarted} size="sm">
                 <span className="hidden sm:inline">{user ? "Go to Dashboard" : "Get Started"}</span>
                 <span className="sm:hidden">{user ? "Dashboard" : "Start"}</span>
@@ -47,14 +43,11 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden mt-[57px] sm:mt-[73px]">
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0, 149, 219, 0.9), rgba(0, 188, 212, 0.85)), url(${heroImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
+        <div className="absolute inset-0 z-0" style={{
+        backgroundImage: `linear-gradient(135deg, rgba(0, 149, 219, 0.9), rgba(0, 188, 212, 0.85)), url(${heroImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center"
+      }} />
 
         <div className="relative z-10 container mx-auto px-4 py-12 sm:py-20 lg:py-32">
           <div className="max-w-3xl">
@@ -164,12 +157,10 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t py-8 sm:py-12 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p className="text-sm sm:text-base">&copy; 2025 SymBIoT. All rights reserved. Version: 1.0.2</p>
+          <p className="text-sm sm:text-base">© 2025 SymBIoT. All rights reserved. Version: 1.0.3</p>
           <p className="mt-2 text-sm sm:text-base">Bringing families and technology together for better care.</p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
