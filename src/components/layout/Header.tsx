@@ -96,13 +96,13 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
       )}
       {userRole === 'super_admin' && (
         <Button
-          variant={isActive('/admin/users') ? 'default' : 'ghost'}
+          variant={isActive('/admin/user-management') ? 'default' : 'ghost'}
           size={isMobile ? 'default' : 'sm'}
-          onClick={() => navigate('/admin/users')}
+          onClick={() => navigate('/admin/user-management')}
           className={cn(isMobile && 'w-full justify-start')}
         >
           <Shield className="w-4 h-4 mr-2" />
-          Users
+          User Management
         </Button>
       )}
       <Button
