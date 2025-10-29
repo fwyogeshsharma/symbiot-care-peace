@@ -391,6 +391,8 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          blocked_at: string | null
+          blocked_by: string | null
           created_at: string
           email: string
           full_name: string | null
@@ -400,6 +402,8 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          blocked_at?: string | null
+          blocked_by?: string | null
           created_at?: string
           email: string
           full_name?: string | null
@@ -409,6 +413,8 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          blocked_at?: string | null
+          blocked_by?: string | null
           created_at?: string
           email?: string
           full_name?: string | null
@@ -513,7 +519,7 @@ export type Database = {
       lookup_user_by_email: { Args: { _email: string }; Returns: string }
     }
     Enums: {
-      app_role: "elderly" | "caregiver" | "relative" | "admin"
+      app_role: "elderly" | "caregiver" | "relative" | "admin" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -641,7 +647,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["elderly", "caregiver", "relative", "admin"],
+      app_role: ["elderly", "caregiver", "relative", "admin", "super_admin"],
     },
   },
 } as const
