@@ -71,3 +71,22 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+
+
+
+                                             Go to the SQL Editor in your Supabase dashboard
+Get the user's ID by running:
+
+SELECT id, email FROM profiles WHERE email = 'user@example.com';
+Insert the super_admin role:
+
+INSERT INTO user_roles (user_id, role)
+VALUES ('user-id-here', 'super_admin')
+ON CONFLICT (user_id, role) DO NOTHING;
+Important: The user will need to log out and log back in for the new role to take effect.
+
+
+
+
+  
