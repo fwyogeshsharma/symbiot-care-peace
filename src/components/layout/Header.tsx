@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Share2, Menu, ArrowLeft, MapPin } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Share2, Menu, ArrowLeft, MapPin, Settings, Shield } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +19,8 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
 
   const getRoleColor = (role: string | null) => {
     switch (role) {
+      case 'super_admin':
+        return 'bg-destructive';
       case 'admin':
         return 'bg-destructive';
       case 'caregiver':
@@ -81,6 +83,28 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         <User className="w-4 h-4 mr-2" />
         Profile
       </Button>
+      {(userRole === 'admin' || userRole === 'super_admin') && (
+        <Button
+          variant={isActive('/admin/device-types') ? 'default' : 'ghost'}
+          size={isMobile ? 'default' : 'sm'}
+          onClick={() => navigate('/admin/device-types')}
+          className={cn(isMobile && 'w-full justify-start')}
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          Device Types
+        </Button>
+      )}
+      {userRole === 'super_admin' && (
+        <Button
+          variant={isActive('/admin/users') ? 'default' : 'ghost'}
+          size={isMobile ? 'default' : 'sm'}
+          onClick={() => navigate('/admin/users')}
+          className={cn(isMobile && 'w-full justify-start')}
+        >
+          <Shield className="w-4 h-4 mr-2" />
+          Users
+        </Button>
+      )}
       <Button
         variant="outline"
         size={isMobile ? 'default' : 'sm'}

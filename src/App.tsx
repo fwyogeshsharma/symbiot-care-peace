@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import IndoorTracking from "./pages/IndoorTracking";
 import DeviceTypesManagement from "./pages/admin/DeviceTypesManagement";
 import DeviceTypeDataConfigs from "./pages/admin/DeviceTypeDataConfigs";
+import UserManagement from "./pages/admin/UserManagement";
 
 const queryClient = new QueryClient();
 
@@ -90,6 +91,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <DeviceTypeDataConfigs />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/users" 
+              element={
+                <ProtectedRoute>
+                  <UserManagement />
                 </ProtectedRoute>
               } 
             />

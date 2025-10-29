@@ -29,9 +29,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Fetch user role when session changes
+        // Fetch user role and check if blocked when session changes
         if (session?.user) {
           setTimeout(async () => {
+            // Check if user is blocked
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('blocked_at')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (profileData?.blocked_at) {
+              // User is blocked, sign them out
+              await supabase.auth.signOut();
+              setUserRole(null);
+              return;
+            }
+
             const { data } = await supabase
               .from('user_roles')
               .select('role')

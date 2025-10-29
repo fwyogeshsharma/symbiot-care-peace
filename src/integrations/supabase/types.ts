@@ -516,6 +516,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       lookup_user_by_email: { Args: { _email: string }; Returns: string }
     }
     Enums: {
