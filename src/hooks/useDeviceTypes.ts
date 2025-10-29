@@ -10,6 +10,7 @@ export interface DeviceType {
   category: string;
   is_active: boolean;
   supports_position_tracking: boolean;
+  data_frequency_per_day: number;
   created_at: string;
   updated_at: string;
 }

@@ -199,6 +199,7 @@ export type Database = {
           category: string
           code: string
           created_at: string | null
+          data_frequency_per_day: number
           description: string | null
           icon: string | null
           id: string
@@ -211,6 +212,7 @@ export type Database = {
           category: string
           code: string
           created_at?: string | null
+          data_frequency_per_day?: number
           description?: string | null
           icon?: string | null
           id?: string
@@ -223,6 +225,7 @@ export type Database = {
           category?: string
           code?: string
           created_at?: string | null
+          data_frequency_per_day?: number
           description?: string | null
           icon?: string | null
           id?: string

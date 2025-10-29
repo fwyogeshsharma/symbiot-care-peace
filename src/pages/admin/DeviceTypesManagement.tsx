@@ -33,6 +33,7 @@ const DeviceTypesManagement = () => {
     category: 'health',
     is_active: true,
     supports_position_tracking: false,
+    data_frequency_per_day: 48,
   });
 
   const saveMutation = useMutation({
@@ -82,6 +83,7 @@ const DeviceTypesManagement = () => {
       category: 'health',
       is_active: true,
       supports_position_tracking: false,
+      data_frequency_per_day: 48,
     });
     setEditingType(null);
     setOpen(false);
@@ -97,6 +99,7 @@ const DeviceTypesManagement = () => {
       category: type.category,
       is_active: type.is_active,
       supports_position_tracking: type.supports_position_tracking,
+      data_frequency_per_day: type.data_frequency_per_day,
     });
     setOpen(true);
   };
@@ -209,6 +212,25 @@ const DeviceTypesManagement = () => {
                       </div>
                     </div>
 
+                    <div className="space-y-2">
+                      <Label htmlFor="data_frequency_per_day">Data Frequency (per 24h) *</Label>
+                      <Input
+                        id="data_frequency_per_day"
+                        type="number"
+                        min="1"
+                        value={formData.data_frequency_per_day}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          data_frequency_per_day: parseInt(e.target.value) || 1 
+                        })}
+                        placeholder="e.g., 48 (every 30 minutes)"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        How many times per day should this device send data on average
+                      </p>
+                    </div>
+
                     <div className="flex items-center justify-between space-x-4">
                       <div className="flex items-center space-x-2">
                         <Switch
@@ -255,6 +277,7 @@ const DeviceTypesManagement = () => {
                     <TableHead>Name</TableHead>
                     <TableHead>Code</TableHead>
                     <TableHead>Category</TableHead>
+                    <TableHead>Frequency/Day</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
@@ -270,6 +293,9 @@ const DeviceTypesManagement = () => {
                       </TableCell>
                       <TableCell>
                         <Badge className={getCategoryBadge(type.category)}>{type.category}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{type.data_frequency_per_day}x</Badge>
                       </TableCell>
                       <TableCell className="max-w-xs truncate">{type.description}</TableCell>
                       <TableCell>
