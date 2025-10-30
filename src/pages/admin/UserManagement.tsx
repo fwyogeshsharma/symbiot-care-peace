@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,10 +35,11 @@ export default function UserManagement() {
   });
 
   // Redirect if not super admin
-  if (userRole !== 'super_admin') {
-    navigate('/dashboard');
-    return null;
-  }
+  useEffect(() => {
+    if (userRole && userRole !== 'super_admin') {
+      navigate('/dashboard');
+    }
+  }, [userRole, navigate]);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['all-users'],
