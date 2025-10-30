@@ -46,6 +46,79 @@ const Dashboard = () => {
     enabled: !!user,
   });
 
+  // Fetch heart rate data for average calculation
+  const { data: heartRateData } = useQuery({
+    queryKey: ['heart-rate-avg', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('device_data')
+        .select('value')
+        .eq('data_type', 'heart_rate')
+        .order('recorded_at', { ascending: false })
+        .limit(10);
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  // Fetch activity/steps data
+  const { data: activityData } = useQuery({
+    queryKey: ['activity-level', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('device_data')
+        .select('value, data_type')
+        .in('data_type', ['steps', 'activity'])
+        .gte('recorded_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+        .order('recorded_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  // Calculate average heart rate
+  const calculateAvgHeartRate = () => {
+    if (!heartRateData || heartRateData.length === 0) return null;
+    
+    const values = heartRateData.map(d => {
+      if (typeof d.value === 'object' && d.value !== null && 'bpm' in d.value) {
+        return Number(d.value.bpm);
+      }
+      return Number(d.value);
+    }).filter(v => !isNaN(v));
+    
+    if (values.length === 0) return null;
+    
+    const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
+    return Math.round(avg);
+  };
+
+  // Calculate activity level
+  const calculateActivityLevel = () => {
+    if (!activityData || activityData.length === 0) return null;
+    
+    const totalSteps = activityData
+      .filter(d => d.data_type === 'steps')
+      .reduce((sum, d) => {
+        const steps = typeof d.value === 'object' && d.value !== null && 'count' in d.value 
+          ? Number(d.value.count)
+          : Number(d.value);
+        return sum + (isNaN(steps) ? 0 : steps);
+      }, 0);
+    
+    if (totalSteps > 8000) return 'Good';
+    if (totalSteps > 4000) return 'Fair';
+    if (totalSteps > 0) return 'Low';
+    return null;
+  };
+
+  const avgHeartRate = calculateAvgHeartRate();
+  const activityLevel = calculateActivityLevel();
+
   // Subscribe to real-time updates
   useEffect(() => {
     if (!user) return;
@@ -129,8 +202,14 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <p className="text-xs sm:text-sm text-muted-foreground truncate">Avg Heart Rate</p>
-                <p className="text-2xl sm:text-3xl font-bold">72</p>
-                <p className="text-xs text-muted-foreground">bpm</p>
+                <p className="text-2xl sm:text-3xl font-bold">
+                  {avgHeartRate !== null ? avgHeartRate : '—'}
+                </p>
+                {avgHeartRate !== null ? (
+                  <p className="text-xs text-muted-foreground">bpm</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">No data</p>
+                )}
               </div>
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
                 <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-success" />
@@ -142,7 +221,12 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <p className="text-xs sm:text-sm text-muted-foreground truncate">Activity Level</p>
-                <p className="text-2xl sm:text-3xl font-bold">Good</p>
+                <p className="text-2xl sm:text-3xl font-bold">
+                  {activityLevel !== null ? activityLevel : '—'}
+                </p>
+                {activityLevel === null && (
+                  <p className="text-xs text-muted-foreground">No data</p>
+                )}
               </div>
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
                 <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
