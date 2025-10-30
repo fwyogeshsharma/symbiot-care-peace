@@ -36,12 +36,19 @@ const DeviceStatusPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header showBackButton title="Device Status" subtitle="Monitor your devices" />
+      <Header showBackButton title="Devices" subtitle="Monitor your devices" />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
-          {(userRole === 'admin' || userRole === 'super_admin') && (
-            <div className="flex justify-end">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">Devices</h1>
+              <p className="text-muted-foreground">
+                Monitor and manage all connected devices
+              </p>
+            </div>
+            
+            {(userRole === 'admin' || userRole === 'super_admin') && (
               <Button
                 variant="outline"
                 onClick={() => navigate('/admin/device-types')}
@@ -49,8 +56,9 @@ const DeviceStatusPage = () => {
                 <Settings className="w-4 h-4 mr-2" />
                 Device Types
               </Button>
-            </div>
-          )}
+            )}
+          </div>
+          
           <ElderlyList 
             elderlyPersons={elderlyPersons}
             selectedPersonId={selectedPersonId}

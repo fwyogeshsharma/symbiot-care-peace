@@ -63,7 +63,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         className={cn(isMobile && 'w-full justify-start')}
       >
         <Wifi className="w-4 h-4 mr-2" />
-        Device Status
+        Devices
       </Button>
       <Button
         variant={isActive('/data-sharing') ? 'default' : 'ghost'}
