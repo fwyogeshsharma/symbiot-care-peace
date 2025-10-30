@@ -7,12 +7,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Phone, Save } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 const Profile = () => {
-  const { user, userRole } = useAuth();
+  const { user, userRole, signOut } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -222,6 +223,34 @@ const Profile = () => {
               </div>
             )}
           </form>
+        </Card>
+
+        {/* Additional Actions */}
+        <Card className="p-4 sm:p-6 mt-6">
+          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+          <div className="space-y-3">
+            {userRole === 'super_admin' && (
+              <>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => navigate('/admin/user-management')}
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  User Management
+                </Button>
+                <Separator />
+              </>
+            )}
+            <Button
+              variant="outline"
+              className="w-full justify-start text-destructive hover:text-destructive"
+              onClick={signOut}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </Card>
       </main>
     </div>

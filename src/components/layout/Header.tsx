@@ -85,17 +85,6 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         <Share2 className="w-4 h-4 mr-2" />
         Data Sharing
       </Button>
-      {(userRole === 'admin' || userRole === 'super_admin') && (
-        <Button
-          variant={isActive('/admin/device-types') ? 'default' : 'ghost'}
-          size={isMobile ? 'default' : 'sm'}
-          onClick={() => navigate('/admin/device-types')}
-          className={cn(isMobile && 'w-full justify-start')}
-        >
-          <Settings className="w-4 h-4 mr-2" />
-          Device Types
-        </Button>
-      )}
       <Button
         variant={isActive('/profile') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
@@ -104,26 +93,6 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
       >
         <User className="w-4 h-4 mr-2" />
         Profile
-      </Button>
-      {userRole === 'super_admin' && (
-        <Button
-          variant={isActive('/admin/user-management') ? 'default' : 'ghost'}
-          size={isMobile ? 'default' : 'sm'}
-          onClick={() => navigate('/admin/user-management')}
-          className={cn(isMobile && 'w-full justify-start')}
-        >
-          <Shield className="w-4 h-4 mr-2" />
-          User Management
-        </Button>
-      )}
-      <Button
-        variant="outline"
-        size={isMobile ? 'default' : 'sm'}
-        onClick={signOut}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <LogOut className="w-4 h-4 mr-2" />
-        Sign Out
       </Button>
     </>
   );
