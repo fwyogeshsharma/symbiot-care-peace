@@ -49,9 +49,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const { data } = await supabase
               .from('user_roles')
               .select('role')
-              .eq('user_id', session.user.id)
-              .single();
-            setUserRole(data?.role ?? null);
+              .eq('user_id', session.user.id);
+            
+            // Check if user has super_admin role, otherwise use first role
+            const roles = data?.map(r => r.role) ?? [];
+            const role = roles.includes('super_admin') ? 'super_admin' 
+                       : roles.includes('admin') ? 'admin'
+                       : roles[0] ?? null;
+            setUserRole(role);
           }, 0);
         } else {
           setUserRole(null);
@@ -71,9 +76,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .from('user_roles')
           .select('role')
           .eq('user_id', session.user.id)
-          .single()
           .then(({ data }) => {
-            setUserRole(data?.role ?? null);
+            const roles = data?.map(r => r.role) ?? [];
+            const role = roles.includes('super_admin') ? 'super_admin' 
+                       : roles.includes('admin') ? 'admin'
+                       : roles[0] ?? null;
+            setUserRole(role);
             setLoading(false);
           });
       } else {
