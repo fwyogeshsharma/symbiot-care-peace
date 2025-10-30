@@ -17,6 +17,8 @@ import IndoorTracking from "./pages/IndoorTracking";
 import DeviceTypesManagement from "./pages/admin/DeviceTypesManagement";
 import DeviceTypeDataConfigs from "./pages/admin/DeviceTypeDataConfigs";
 import UserManagement from "./pages/admin/UserManagement";
+import FloorPlanManagement from "./pages/FloorPlanManagement";
+import FloorPlanEditor from "./pages/FloorPlanEditor";
 
 const queryClient = new QueryClient();
 
@@ -99,6 +101,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <UserManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/floor-plan-management" 
+              element={
+                <ProtectedRoute>
+                  <FloorPlanManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/floor-plan-editor/:elderlyPersonId/:floorPlanId" 
+              element={
+                <ProtectedRoute>
+                  <FloorPlanEditor />
                 </ProtectedRoute>
               } 
             />

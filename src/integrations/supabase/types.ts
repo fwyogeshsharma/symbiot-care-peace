@@ -486,6 +486,16 @@ export type Database = {
         Args: { _elderly_person_id: string; _user_id: string }
         Returns: boolean
       }
+      delete_user_account: {
+        Args: { target_email: string }
+        Returns: {
+          deleted_device_data_count: number
+          deleted_devices_count: number
+          deleted_elderly_persons_count: number
+          deleted_profiles_count: number
+          status: string
+        }[]
+      }
       get_accessible_elderly_persons: {
         Args: { _user_id: string }
         Returns: {

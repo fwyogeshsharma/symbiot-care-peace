@@ -9,7 +9,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import Header from '@/components/layout/Header';
 import ElderlyList from '@/components/dashboard/ElderlyList';
-import { Calendar } from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import {
   Select,
   SelectContent,
@@ -20,6 +22,7 @@ import {
 import { getDateRangePreset } from '@/lib/movementUtils';
 
 export default function IndoorTracking() {
+  const navigate = useNavigate();
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
@@ -170,6 +173,15 @@ export default function IndoorTracking() {
             </div>
             
             <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/floor-plan-management')}
+              >
+                <MapPin className="h-4 w-4 mr-2" />
+                Manage Floor Plans
+              </Button>
+              
               <Select value={selectedPreset} onValueChange={handlePresetChange}>
                 <SelectTrigger className="w-[180px]">
                   <Calendar className="mr-2 h-4 w-4" />
