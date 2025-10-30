@@ -33,20 +33,21 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   const { data: devices } = useQuery({
     queryKey: ['devices', selectedPersonId],
     queryFn: async () => {
-      let query = supabase
-        .from('devices')
-        .select('*, elderly_persons(full_name)')
-        .order('created_at', { ascending: false });
-      
-      if (selectedPersonId) {
-        query = query.eq('elderly_person_id', selectedPersonId);
+      // Only fetch if we have a selected person
+      if (!selectedPersonId) {
+        return [];
       }
       
-      const { data, error } = await query;
+      const { data, error } = await supabase
+        .from('devices')
+        .select('*, elderly_persons(full_name)')
+        .eq('elderly_person_id', selectedPersonId)
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       return data;
     },
+    enabled: !!selectedPersonId,
     refetchInterval: 15000, // Refetch every 15 seconds
   });
 

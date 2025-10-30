@@ -48,36 +48,46 @@ const Dashboard = () => {
 
   // Fetch heart rate data for average calculation
   const { data: heartRateData } = useQuery({
-    queryKey: ['heart-rate-avg', user?.id],
+    queryKey: ['heart-rate-avg', user?.id, elderlyPersons],
     queryFn: async () => {
+      if (!elderlyPersons || elderlyPersons.length === 0) return [];
+      
+      const elderlyIds = elderlyPersons.map(p => p.id);
+      
       const { data, error } = await supabase
         .from('device_data')
         .select('value')
         .eq('data_type', 'heart_rate')
+        .in('elderly_person_id', elderlyIds)
         .order('recorded_at', { ascending: false })
         .limit(10);
       
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
+    enabled: !!user && !!elderlyPersons && elderlyPersons.length > 0,
   });
 
   // Fetch activity/steps data
   const { data: activityData } = useQuery({
-    queryKey: ['activity-level', user?.id],
+    queryKey: ['activity-level', user?.id, elderlyPersons],
     queryFn: async () => {
+      if (!elderlyPersons || elderlyPersons.length === 0) return [];
+      
+      const elderlyIds = elderlyPersons.map(p => p.id);
+      
       const { data, error } = await supabase
         .from('device_data')
         .select('value, data_type')
         .in('data_type', ['steps', 'activity'])
+        .in('elderly_person_id', elderlyIds)
         .gte('recorded_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
         .order('recorded_at', { ascending: false });
       
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
+    enabled: !!user && !!elderlyPersons && elderlyPersons.length > 0,
   });
 
   // Calculate average heart rate
