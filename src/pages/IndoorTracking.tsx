@@ -12,6 +12,7 @@ import ElderlyList from '@/components/dashboard/ElderlyList';
 import { Calendar, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Select,
   SelectContent,
@@ -23,6 +24,7 @@ import { getDateRangePreset } from '@/lib/movementUtils';
 
 export default function IndoorTracking() {
   const navigate = useNavigate();
+  const { userRole } = useAuth();
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
@@ -173,14 +175,16 @@ export default function IndoorTracking() {
             </div>
             
             <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/floor-plan-management')}
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                Manage Floor Plans
-              </Button>
+              {(userRole === 'admin' || userRole === 'super_admin') && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/floor-plan-management')}
+                >
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Floor Plans
+                </Button>
+              )}
               
               <Select value={selectedPreset} onValueChange={handlePresetChange}>
                 <SelectTrigger className="w-[180px]">

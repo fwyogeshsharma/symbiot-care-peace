@@ -56,17 +56,6 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         <MapPin className="w-4 h-4 mr-2" />
         Indoor Tracking
       </Button>
-      {(userRole === 'admin' || userRole === 'super_admin') && (
-        <Button
-          variant={isActive('/floor-plan-management') ? 'default' : 'ghost'}
-          size={isMobile ? 'default' : 'sm'}
-          onClick={() => navigate('/floor-plan-management')}
-          className={cn(isMobile && 'w-full justify-start')}
-        >
-          <MapPin className="h-4 w-4 mr-2" />
-          Floor Plans
-        </Button>
-      )}
       <Button
         variant={isActive('/device-status') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
