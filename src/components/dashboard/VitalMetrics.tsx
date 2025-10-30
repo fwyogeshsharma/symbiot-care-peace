@@ -11,21 +11,23 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   const { data: recentData } = useQuery({
     queryKey: ['recent-vitals', selectedPersonId],
     queryFn: async () => {
-      let query = supabase
+      // Only fetch if we have a selected person
+      if (!selectedPersonId) {
+        return [];
+      }
+      
+      const { data, error } = await supabase
         .from('device_data')
         .select('*, elderly_persons(full_name)')
         .in('data_type', ['heart_rate', 'blood_pressure', 'blood_sugar', 'oxygen_level', 'temperature', 'steps'])
-        .order('recorded_at', { ascending: false });
-      
-      if (selectedPersonId) {
-        query = query.eq('elderly_person_id', selectedPersonId);
-      }
-      
-      const { data, error } = await query.limit(8);
+        .eq('elderly_person_id', selectedPersonId)
+        .order('recorded_at', { ascending: false })
+        .limit(8);
       
       if (error) throw error;
       return data;
     },
+    enabled: !!selectedPersonId,
     refetchInterval: 10000, // Refetch every 10 seconds
   });
 
