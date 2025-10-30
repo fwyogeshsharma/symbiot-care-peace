@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,6 +23,12 @@ const DeviceStatusPage = () => {
     },
     enabled: !!user?.id
   });
+
+  useEffect(() => {
+    if (elderlyPersons.length > 0 && !selectedPersonId) {
+      setSelectedPersonId(elderlyPersons[0].id);
+    }
+  }, [elderlyPersons, selectedPersonId]);
 
   return (
     <div className="min-h-screen bg-background">
