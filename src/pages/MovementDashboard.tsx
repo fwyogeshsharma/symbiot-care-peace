@@ -16,8 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { processMovementData, getDateRangePreset } from "@/lib/movementUtils";
-
-const MOVEMENT_SENSOR_TYPES = ['door_sensor', 'room_sensor', 'seat_sensor', 'bed_sensor'];
+import { isActivityDevice, isActivityDataType } from "@/lib/deviceDataMapping";
 
 export default function MovementDashboard() {
   const queryClient = useQueryClient();
@@ -62,7 +61,7 @@ export default function MovementDashboard() {
         .from('device_data')
         .select(`
           *,
-          devices!inner(location, device_name, device_type)
+          devices!inner(location, device_name, device_type, device_types!inner(category))
         `)
         .eq('elderly_person_id', selectedPersonId)
         .gte('recorded_at', dateRange.start)
@@ -71,10 +70,14 @@ export default function MovementDashboard() {
       
       if (error) throw error;
       
-      // Filter for movement-related sensor types
-      return data.filter((item: any) => 
-        MOVEMENT_SENSOR_TYPES.includes(item.devices?.device_type)
-      );
+      // Filter for activity-related data: devices from activity categories OR data types that represent activity
+      return data.filter((item: any) => {
+        const deviceType = item.devices?.device_type;
+        const deviceCategory = item.devices?.device_types?.category;
+        const dataType = item.data_type;
+        
+        return isActivityDevice(deviceType, deviceCategory) || isActivityDataType(dataType);
+      });
     },
     enabled: !!selectedPersonId,
   });

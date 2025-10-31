@@ -1,136 +1,287 @@
-import { Card } from '@/components/ui/card';
-import { Heart, Activity, Thermometer, Wind } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heart, Activity, Droplet, Thermometer, Wind, Moon, Pill, Footprints, AlertTriangle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
+import { isHealthDevice, isHealthDataType } from '@/lib/deviceDataMapping';
 
 interface VitalMetricsProps {
   selectedPersonId?: string | null;
 }
 
 const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
-  const { data: recentData } = useQuery({
-    queryKey: ['recent-vitals', selectedPersonId],
+  const { data: recentData = [], isLoading } = useQuery({
+    queryKey: ['vital-metrics', selectedPersonId],
     queryFn: async () => {
-      // Only fetch if we have a selected person
-      if (!selectedPersonId) {
-        return [];
-      }
-      
+      if (!selectedPersonId) return [];
+
       const { data, error } = await supabase
         .from('device_data')
-        .select('*, elderly_persons(full_name)')
-        .in('data_type', ['heart_rate', 'blood_pressure', 'blood_sugar', 'oxygen_level', 'temperature', 'steps'])
+        .select(`
+          *,
+          devices!inner(device_name, device_type, device_types!inner(category))
+        `)
         .eq('elderly_person_id', selectedPersonId)
         .order('recorded_at', { ascending: false })
-        .limit(8);
-      
+        .limit(100);
+
       if (error) throw error;
-      return data;
+
+      // Filter for health-related data
+      const healthData = data.filter((item: any) => {
+        const deviceType = item.devices?.device_type;
+        const deviceCategory = item.devices?.device_types?.category;
+        const dataType = item.data_type;
+        
+        return isHealthDevice(deviceType, deviceCategory) || isHealthDataType(dataType);
+      });
+
+      // Get most recent value for each data type
+      const latestByType = new Map();
+      healthData.forEach((item: any) => {
+        if (!latestByType.has(item.data_type)) {
+          latestByType.set(item.data_type, item);
+        }
+      });
+
+      return Array.from(latestByType.values());
     },
     enabled: !!selectedPersonId,
-    refetchInterval: 10000, // Refetch every 10 seconds
+    refetchInterval: 10000,
   });
 
   const getVitalIcon = (type: string) => {
-    switch (type) {
-      case 'heart_rate':
-        return <Heart className="w-5 h-5" />;
-      case 'blood_pressure':
-        return <Activity className="w-5 h-5" />;
-      case 'temperature':
-        return <Thermometer className="w-5 h-5" />;
-      case 'oxygen_level':
-        return <Wind className="w-5 h-5" />;
-      default:
-        return <Activity className="w-5 h-5" />;
-    }
+    const iconMap: Record<string, any> = {
+      heart_rate: Heart,
+      blood_pressure: Activity,
+      blood_sugar: Droplet,
+      oxygen_saturation: Wind,
+      oxygen_level: Wind,
+      temperature: Thermometer,
+      steps: Footprints,
+      activity: Activity,
+      sleep_quality: Moon,
+      sleep_stage: Moon,
+      medication_taken: Pill,
+      next_dose_time: Pill,
+      humidity: Wind,
+      fall_detected: AlertTriangle,
+      impact_force: AlertTriangle,
+    };
+    return iconMap[type] || Activity;
   };
 
   const getVitalColor = (type: string, value: any) => {
-    let numValue = 0;
-    
-    if (typeof value === 'object' && value !== null) {
-      if ('bpm' in value) numValue = value.bpm;
-      else if ('level' in value) numValue = value.level;
-      else if ('temp' in value) numValue = value.temp;
-      else if ('systolic' in value) numValue = value.systolic;
-    } else if (typeof value === 'number') {
-      numValue = value;
-    }
-    
     switch (type) {
       case 'heart_rate':
-        if (numValue < 60 || numValue > 100) return 'text-warning';
+        const hr = typeof value === 'object' ? value.value : value;
+        if (hr < 60 || hr > 100) return 'text-warning';
         return 'text-success';
-      case 'oxygen_level':
-        if (numValue < 95) return 'text-destructive';
-        return 'text-success';
+      
       case 'blood_pressure':
-        if (numValue > 140) return 'text-warning';
+        const sys = value.systolic || value.value?.systolic;
+        if (sys > 140 || sys < 90) return 'text-warning';
         return 'text-success';
+      
+      case 'oxygen_saturation':
+      case 'oxygen_level':
+        const o2 = typeof value === 'object' ? value.value : value;
+        if (o2 < 95) return 'text-warning';
+        return 'text-success';
+      
+      case 'temperature':
+        const temp = typeof value === 'object' ? value.value : value;
+        if (temp < 36.1 || temp > 37.2) return 'text-warning';
+        return 'text-success';
+      
+      case 'blood_sugar':
+        const bs = typeof value === 'object' ? value.value : value;
+        if (bs < 70 || bs > 140) return 'text-warning';
+        return 'text-success';
+      
+      case 'fall_detected':
+        const fallen = typeof value === 'object' ? value.value : value;
+        return fallen ? 'text-destructive' : 'text-success';
+      
+      case 'medication_taken':
+        const taken = typeof value === 'object' ? value.value : value;
+        return taken ? 'text-success' : 'text-warning';
+      
       default:
         return 'text-foreground';
     }
   };
 
   const formatValue = (value: any, type: string) => {
-    if (typeof value === 'object' && value !== null) {
-      // Handle different data structures
-      if ('bpm' in value) return Number(value.bpm).toFixed(2);
-      if ('level' in value) return Number(value.level).toFixed(2);
-      if ('temp' in value) return Number(value.temp).toFixed(2);
-      if ('systolic' in value && 'diastolic' in value) {
-        return `${Number(value.systolic).toFixed(2)}/${Number(value.diastolic).toFixed(2)}`;
-      }
-      // Fallback for unknown objects - convert to string
-      return JSON.stringify(value);
+    if (value === null || value === undefined) return 'N/A';
+    
+    switch (type) {
+      case 'blood_pressure':
+        if (value.systolic && value.diastolic) {
+          return `${Math.round(value.systolic)}/${Math.round(value.diastolic)} mmHg`;
+        }
+        if (value.value?.systolic && value.value?.diastolic) {
+          return `${Math.round(value.value.systolic)}/${Math.round(value.value.diastolic)} mmHg`;
+        }
+        return 'N/A';
+      
+      case 'heart_rate':
+        const hr = typeof value === 'object' ? value.value : value;
+        return `${Math.round(hr)} bpm`;
+      
+      case 'oxygen_saturation':
+      case 'oxygen_level':
+        const o2 = typeof value === 'object' ? value.value : value;
+        return `${Math.round(o2)}%`;
+      
+      case 'temperature':
+        const temp = typeof value === 'object' ? value.value : value;
+        return `${temp.toFixed(1)}°C`;
+      
+      case 'blood_sugar':
+        const bs = typeof value === 'object' ? value.value : value;
+        return `${Math.round(bs)} mg/dL`;
+      
+      case 'steps':
+        const steps = typeof value === 'object' ? value.value : value;
+        return `${steps.toLocaleString()} steps`;
+      
+      case 'activity':
+        const activity = typeof value === 'object' ? value.value : value;
+        return activity;
+      
+      case 'sleep_quality':
+        const quality = typeof value === 'object' ? value.value : value;
+        return `${quality}%`;
+      
+      case 'sleep_stage':
+        return typeof value === 'object' ? value.value : value;
+      
+      case 'medication_taken':
+        const taken = typeof value === 'object' ? value.value : value;
+        return taken ? 'Yes' : 'No';
+      
+      case 'next_dose_time':
+        const time = typeof value === 'object' ? value.value : value;
+        try {
+          return format(new Date(time), 'HH:mm');
+        } catch {
+          return time;
+        }
+      
+      case 'humidity':
+        const humidity = typeof value === 'object' ? value.value : value;
+        return `${Math.round(humidity)}%`;
+      
+      case 'fall_detected':
+        const fallen = typeof value === 'object' ? value.value : value;
+        return fallen ? 'Fall Detected!' : 'No Falls';
+      
+      case 'impact_force':
+        const force = typeof value === 'object' ? value.value : value;
+        return `${force.toFixed(1)} G`;
+      
+      default:
+        if (typeof value === 'object' && value.value !== undefined) {
+          return value.value;
+        }
+        return value;
     }
-    return typeof value === 'number' ? Number(value).toFixed(2) : String(value);
   };
 
+  const getDisplayName = (type: string) => {
+    const nameMap: Record<string, string> = {
+      heart_rate: 'Heart Rate',
+      blood_pressure: 'Blood Pressure',
+      blood_sugar: 'Blood Sugar',
+      oxygen_saturation: 'Oxygen Level',
+      oxygen_level: 'Oxygen Level',
+      temperature: 'Temperature',
+      steps: 'Steps Today',
+      activity: 'Activity Level',
+      sleep_quality: 'Sleep Quality',
+      sleep_stage: 'Sleep Stage',
+      medication_taken: 'Medication Taken',
+      next_dose_time: 'Next Dose',
+      humidity: 'Room Humidity',
+      fall_detected: 'Fall Status',
+      impact_force: 'Impact Force',
+    };
+    return nameMap[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Health Metrics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-16 bg-muted rounded" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!selectedPersonId || recentData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Health Metrics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-center py-8">
+            No health data available yet
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">
-        Recent Vital Signs {selectedPersonId && '(Filtered)'}
-      </h3>
-      
-      {!recentData || recentData.length === 0 ? (
-        <p className="text-muted-foreground text-center py-8">
-          No vital sign data available yet
-        </p>
-      ) : (
-        <div className="space-y-3">
-          {recentData.map((vital) => (
-            <div 
-              key={vital.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center ${getVitalColor(vital.data_type, vital.value)}`}>
-                  {getVitalIcon(vital.data_type)}
+    <Card>
+      <CardHeader>
+        <CardTitle>Health Metrics</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {recentData.map((item: any) => {
+            const Icon = getVitalIcon(item.data_type);
+            const color = getVitalColor(item.data_type, item.value);
+            
+            return (
+              <div
+                key={item.id}
+                className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Icon className={`h-5 w-5 ${color}`} />
+                  </div>
+                  <div>
+                    <p className="font-medium">{getDisplayName(item.data_type)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.devices?.device_name}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium capitalize">
-                    {vital.data_type.replace('_', ' ')}
+                <div className="text-right">
+                  <p className={`font-semibold ${color}`}>
+                    {formatValue(item.value, item.data_type)}
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    {vital.elderly_persons?.full_name || 'Unknown'}
+                  <p className="text-xs text-muted-foreground">
+                    {format(new Date(item.recorded_at), 'MMM d, HH:mm')}
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className={`text-lg font-semibold ${getVitalColor(vital.data_type, vital.value)}`}>
-                  {formatValue(vital.value, vital.data_type)}
-                  {vital.unit && <span className="text-sm ml-1">{vital.unit}</span>}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(vital.recorded_at).toLocaleTimeString()}
-                </p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-      )}
+      </CardContent>
     </Card>
   );
 };
