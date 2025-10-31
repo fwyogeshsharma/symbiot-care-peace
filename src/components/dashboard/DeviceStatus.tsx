@@ -15,6 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSampleDataPoints } from '@/lib/sampleDataGenerator';
+import { useAllDeviceTypes } from '@/hooks/useDeviceTypes';
 
 interface DeviceStatusProps {
   selectedPersonId?: string | null;
@@ -29,6 +30,9 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   const [copiedApiKey, setCopiedApiKey] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Fetch all device types for the edit dialog
+  const { data: allDeviceTypes = [] } = useAllDeviceTypes();
   
   const { data: devices } = useQuery({
     queryKey: ['devices', selectedPersonId],
@@ -510,18 +514,13 @@ Body:
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="wearable">Wearable (Smart Watch, Activity Tracker)</SelectItem>
-                    <SelectItem value="medical">Medical Device (Heart Rate, Blood Pressure, Glucose Monitor)</SelectItem>
-                    <SelectItem value="door_sensor">Door Sensor</SelectItem>
-                    <SelectItem value="bed_sensor">Bed Sensor</SelectItem>
-                    <SelectItem value="seat_sensor">Seat Sensor</SelectItem>
-                    <SelectItem value="room_sensor">Room/Presence Sensor</SelectItem>
-                    <SelectItem value="scale_sensor">Scale/Weight Sensor</SelectItem>
-                    <SelectItem value="ambient_sensor">Ambient Environment Sensor</SelectItem>
-                    <SelectItem value="electronics_monitor">Electronics Monitor</SelectItem>
-                    <SelectItem value="motion_sensor">Motion Sensor</SelectItem>
-                    <SelectItem value="fall_detector">Fall Detector</SelectItem>
-                    <SelectItem value="temperature_sensor">Temperature Sensor</SelectItem>
+                    {allDeviceTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.code}>
+                        {type.icon && `${type.icon} `}
+                        {type.name}
+                        {type.description && ` (${type.description})`}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

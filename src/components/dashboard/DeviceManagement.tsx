@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Key, Copy, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -23,6 +24,7 @@ const DeviceManagement = () => {
   const [location, setLocation] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
+  const [generateFakeData, setGenerateFakeData] = useState(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -62,8 +64,10 @@ const DeviceManagement = () => {
       return data;
     },
     onSuccess: async (device) => {
-      // Generate sample data for the new device
-      await generateSampleData(device);
+      // Generate sample data only if checkbox is checked
+      if (generateFakeData) {
+        await generateSampleData(device);
+      }
       
       queryClient.invalidateQueries({ queryKey: ['devices'] });
       queryClient.invalidateQueries({ queryKey: ['device-data'] });
@@ -71,7 +75,9 @@ const DeviceManagement = () => {
       queryClient.invalidateQueries({ queryKey: ['position-data'] });
       toast({
         title: "Device registered successfully",
-        description: "Your IoT device has been added with sample data.",
+        description: generateFakeData 
+          ? "Your IoT device has been added with sample data."
+          : "Your IoT device has been added.",
       });
       // Generate API key for display
       generateApiKey();
@@ -275,6 +281,7 @@ const DeviceManagement = () => {
     setLocation('');
     setApiKey('');
     setShowApiKey(false);
+    setGenerateFakeData(true);
     setOpen(false);
   };
 
@@ -356,6 +363,23 @@ const DeviceManagement = () => {
                 placeholder="e.g., Bedroom, Living Room"
               />
             </div>
+
+            <div className="flex items-center space-x-2 py-2">
+              <Checkbox
+                id="generate-fake-data"
+                checked={generateFakeData}
+                onCheckedChange={(checked) => setGenerateFakeData(checked === true)}
+              />
+              <Label
+                htmlFor="generate-fake-data"
+                className="text-sm font-normal cursor-pointer"
+              >
+                Generate sample data for testing
+              </Label>
+            </div>
+            <p className="text-xs text-muted-foreground -mt-2">
+              Automatically create 7 days of fake data to test dashboards
+            </p>
 
             <Button type="submit" className="w-full" disabled={addDeviceMutation.isPending}>
               {addDeviceMutation.isPending ? 'Registering...' : 'Register Device'}
