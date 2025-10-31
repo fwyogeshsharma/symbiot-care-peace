@@ -157,7 +157,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t py-8 sm:py-12 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p className="text-sm sm:text-base">© 2025 SymBIoT. All rights reserved. Version: 1.0.3</p>
+          <p className="text-sm sm:text-base">© 2025 SymBIoT. All rights reserved. Version: 1.0.4</p>
           <p className="mt-2 text-sm sm:text-base">Bringing families and technology together for better care.</p>
         </div>
       </footer>
