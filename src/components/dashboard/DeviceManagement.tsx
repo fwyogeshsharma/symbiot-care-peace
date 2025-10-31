@@ -24,7 +24,7 @@ const DeviceManagement = () => {
   const [location, setLocation] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
-  const [generateFakeData, setGenerateFakeData] = useState(true);
+  const [generateFakeData, setGenerateFakeData] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -281,7 +281,7 @@ const DeviceManagement = () => {
     setLocation('');
     setApiKey('');
     setShowApiKey(false);
-    setGenerateFakeData(true);
+    setGenerateFakeData(false);
     setOpen(false);
   };
 
