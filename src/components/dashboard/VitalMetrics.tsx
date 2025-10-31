@@ -1,15 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Activity, Droplet, Thermometer, Wind, Moon, Pill, Footprints, AlertTriangle } from 'lucide-react';
+import { Heart, Activity, Droplet, Thermometer, Wind, Moon, Pill, Footprints, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { isHealthDevice, isHealthDataType } from '@/lib/deviceDataMapping';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import HealthMetricsCharts from './HealthMetricsCharts';
 
 interface VitalMetricsProps {
   selectedPersonId?: string | null;
 }
 
 const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
+  const [showCharts, setShowCharts] = useState(false);
+
   const { data: recentData = [], isLoading } = useQuery({
     queryKey: ['vital-metrics', selectedPersonId],
     queryFn: async () => {
@@ -243,13 +248,26 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Health Metrics</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {recentData.map((item: any) => {
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Health Metrics</CardTitle>
+            {selectedPersonId && recentData.length > 0 && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowCharts(true)}
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                View Charts
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {recentData.map((item: any) => {
             const Icon = getVitalIcon(item.data_type);
             const color = getVitalColor(item.data_type, item.value);
             
@@ -283,6 +301,13 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         </div>
       </CardContent>
     </Card>
+
+    <HealthMetricsCharts
+      open={showCharts}
+      onOpenChange={setShowCharts}
+      selectedPersonId={selectedPersonId}
+    />
+  </>
   );
 };
 
