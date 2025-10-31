@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar } from 'recharts';
 import { format, subDays } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
@@ -87,6 +87,33 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
         fullDate: new Date(item.recorded_at),
       };
     });
+  };
+
+  const processPanicSosData = () => {
+    if (!historicalData) return [];
+
+    const filtered = historicalData.filter((item: any) => item.data_type === 'panic_sos');
+    
+    // Group by date
+    const grouped = filtered.reduce((acc: any, item: any) => {
+      const date = format(new Date(item.recorded_at), 'MMM dd');
+      if (!acc[date]) {
+        acc[date] = { date, critical: 0, warning: 0, info: 0 };
+      }
+      
+      const status = (item.value as any)?.status || 'info';
+      if (status === 'critical' || status === 'emergency') {
+        acc[date].critical += 1;
+      } else if (status === 'warning' || status === 'high') {
+        acc[date].warning += 1;
+      } else {
+        acc[date].info += 1;
+      }
+      
+      return acc;
+    }, {});
+
+    return Object.values(grouped);
   };
 
   const renderChart = (dataType: string, label: string, color: string, unit?: string) => {
@@ -189,6 +216,47 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
     );
   };
 
+  const renderPanicSosChart = () => {
+    const data = processPanicSosData();
+
+    if (data.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-64 text-muted-foreground">
+          No panic/SOS events recorded for this period
+        </div>
+      );
+    }
+
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+          <XAxis 
+            dataKey="date" 
+            stroke="hsl(var(--muted-foreground))"
+            fontSize={12}
+          />
+          <YAxis 
+            stroke="hsl(var(--muted-foreground))"
+            fontSize={12}
+            label={{ value: 'Events', angle: -90, position: 'insideLeft' }}
+          />
+          <Tooltip 
+            contentStyle={{ 
+              backgroundColor: 'hsl(var(--popover))',
+              border: '1px solid hsl(var(--border))',
+              borderRadius: '6px',
+            }}
+          />
+          <Legend />
+          <Bar dataKey="critical" stackId="a" fill="hsl(var(--destructive))" name="Critical" />
+          <Bar dataKey="warning" stackId="a" fill="hsl(var(--warning))" name="Warning" />
+          <Bar dataKey="info" stackId="a" fill="hsl(var(--primary))" name="Info" />
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
@@ -249,11 +317,12 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           </div>
         ) : (
           <Tabs defaultValue="heart_rate" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
               <TabsTrigger value="heart_rate">Heart Rate</TabsTrigger>
               <TabsTrigger value="blood_pressure">Blood Pressure</TabsTrigger>
               <TabsTrigger value="oxygen">Oxygen</TabsTrigger>
               <TabsTrigger value="temperature">Temperature</TabsTrigger>
+              <TabsTrigger value="panic_sos">Panic/SOS</TabsTrigger>
             </TabsList>
 
             <TabsContent value="heart_rate" className="mt-4">
@@ -281,6 +350,13 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
               <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-4">Body Temperature Over Time</h3>
                 {renderChart('temperature', 'Temperature', 'hsl(var(--warning))', '°C')}
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="panic_sos" className="mt-4">
+              <Card className="p-4">
+                <h3 className="text-lg font-semibold mb-4">Panic/SOS Events Over Time</h3>
+                {renderPanicSosChart()}
               </Card>
             </TabsContent>
           </Tabs>
