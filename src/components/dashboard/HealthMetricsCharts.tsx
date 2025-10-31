@@ -92,23 +92,19 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
   const processPanicSosData = () => {
     if (!historicalData) return [];
 
-    const filtered = historicalData.filter((item: any) => item.data_type === 'panic_sos');
+    const filtered = historicalData.filter((item: any) => 
+      item.data_type === 'button_pressed' && 
+      item.devices?.device_type === 'emergency_button'
+    );
     
     // Group by date
     const grouped = filtered.reduce((acc: any, item: any) => {
       const date = format(new Date(item.recorded_at), 'MMM dd');
       if (!acc[date]) {
-        acc[date] = { date, critical: 0, warning: 0, info: 0 };
+        acc[date] = { date, total: 0 };
       }
       
-      const status = (item.value as any)?.status || 'info';
-      if (status === 'critical' || status === 'emergency') {
-        acc[date].critical += 1;
-      } else if (status === 'warning' || status === 'high') {
-        acc[date].warning += 1;
-      } else {
-        acc[date].info += 1;
-      }
+      acc[date].total += 1;
       
       return acc;
     }, {});
@@ -222,7 +218,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
     if (data.length === 0) {
       return (
         <div className="flex items-center justify-center h-64 text-muted-foreground">
-          No panic/SOS events recorded for this period
+          No panic/SOS button presses recorded for this period
         </div>
       );
     }
@@ -239,7 +235,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           <YAxis 
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
-            label={{ value: 'Events', angle: -90, position: 'insideLeft' }}
+            label={{ value: 'Button Presses', angle: -90, position: 'insideLeft' }}
           />
           <Tooltip 
             contentStyle={{ 
@@ -249,9 +245,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
             }}
           />
           <Legend />
-          <Bar dataKey="critical" stackId="a" fill="hsl(var(--destructive))" name="Critical" />
-          <Bar dataKey="warning" stackId="a" fill="hsl(var(--warning))" name="Warning" />
-          <Bar dataKey="info" stackId="a" fill="hsl(var(--primary))" name="Info" />
+          <Bar dataKey="total" fill="hsl(var(--destructive))" name="Button Presses" />
         </BarChart>
       </ResponsiveContainer>
     );
