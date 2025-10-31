@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Wand2 } from 'lucide-react';
+import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Wand2, Loader2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import DeviceManagement from './DeviceManagement';
@@ -53,6 +54,31 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
     },
     enabled: !!selectedPersonId,
     refetchInterval: 15000, // Refetch every 15 seconds
+  });
+
+  // Fetch data counts for each device
+  const { data: dataCounts = {} } = useQuery({
+    queryKey: ['device-data-counts', selectedPersonId],
+    queryFn: async () => {
+      if (!devices || devices.length === 0) return {};
+      
+      const counts: Record<string, number> = {};
+      
+      for (const device of devices) {
+        const { count, error } = await supabase
+          .from('device_data')
+          .select('*', { count: 'exact', head: true })
+          .eq('device_id', device.id);
+        
+        if (!error) {
+          counts[device.id] = count || 0;
+        }
+      }
+      
+      return counts;
+    },
+    enabled: !!devices && devices.length > 0,
+    refetchInterval: 15000,
   });
 
   const getStatusColor = (status: string) => {
@@ -300,67 +326,95 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
         </p>
       ) : (
         <div className="space-y-3">
-          {devices.map((device) => (
-            <div 
-              key={device.id}
-              className="border rounded-lg p-3 hover:bg-muted/30 transition-colors"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div 
-                  className="flex items-center gap-2 cursor-pointer flex-1"
-                  onClick={() => setSelectedDevice(device)}
-                >
-                  {device.status === 'active' ? (
-                    <Wifi className="w-4 h-4 text-success" />
-                  ) : (
-                    <WifiOff className="w-4 h-4 text-muted-foreground" />
-                  )}
-                  <span className="font-medium text-sm">{device.device_name}</span>
+          {devices.map((device) => {
+            const dataCount = dataCounts[device.id] || 0;
+            const hasNoData = dataCount === 0;
+            
+            return (
+              <div 
+                key={device.id}
+                className="border rounded-lg p-3 hover:bg-muted/30 transition-colors"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div 
+                    className="flex items-center gap-2 cursor-pointer flex-1"
+                    onClick={() => setSelectedDevice(device)}
+                  >
+                    {device.status === 'active' ? (
+                      <Wifi className="w-4 h-4 text-success" />
+                    ) : (
+                      <WifiOff className="w-4 h-4 text-muted-foreground" />
+                    )}
+                    <span className="font-medium text-sm">{device.device_name}</span>
+                    {hasNoData ? (
+                      <Badge variant="outline" className="text-xs border-warning text-warning">
+                        No Data
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-xs">
+                        {dataCount} records
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge 
+                      variant="outline" 
+                      className={`${getStatusColor(device.status)} text-xs capitalize`}
+                    >
+                      {device.status}
+                    </Badge>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={hasNoData ? "default" : "ghost"}
+                            size="sm"
+                            className={hasNoData ? "h-7 text-xs" : "h-7 w-7"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              generateDataMutation.mutate(device);
+                            }}
+                            disabled={generateDataMutation.isPending}
+                          >
+                            {generateDataMutation.isPending ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <>
+                                <Wand2 className="w-3.5 h-3.5" />
+                                {hasNoData && <span className="ml-1">Generate Data</span>}
+                              </>
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Generate 7 days of sample data for testing</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditDevice(device);
+                      }}
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-destructive hover:text-destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteDevice(device);
+                      }}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge 
-                    variant="outline" 
-                    className={`${getStatusColor(device.status)} text-xs capitalize`}
-                  >
-                    {device.status}
-                  </Badge>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      generateDataMutation.mutate(device);
-                    }}
-                    disabled={generateDataMutation.isPending}
-                    title="Generate fake data"
-                  >
-                    <Wand2 className="w-3.5 h-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEditDevice(device);
-                    }}
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-destructive hover:text-destructive"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteDevice(device);
-                    }}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              </div>
               
               <div 
                 className="flex items-center justify-between text-xs text-muted-foreground cursor-pointer"
@@ -382,7 +436,8 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                 </p>
               )}
             </div>
-          ))}
+          );
+          })}
         </div>
       )}
 
