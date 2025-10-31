@@ -1,11 +1,12 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Clock, User } from 'lucide-react';
+import { AlertCircle, Clock, User, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { PanicSosCharts } from './PanicSosCharts';
 
 interface PanicSosEventsProps {
   selectedPersonId?: string | null;
@@ -13,6 +14,7 @@ interface PanicSosEventsProps {
 
 const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
   const [showAll, setShowAll] = useState(false);
+  const [showCharts, setShowCharts] = useState(false);
 
   const { data: panicEvents, isLoading } = useQuery({
     queryKey: ['panic-sos-events', selectedPersonId],
@@ -84,18 +86,32 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
   }
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 text-destructive" />
-          Panic/SOS Events
-        </h3>
-        {panicEvents && panicEvents.length > 0 && (
-          <Badge variant="outline" className="border-destructive text-destructive">
-            {panicEvents.length} {panicEvents.length === 1 ? 'event' : 'events'}
-          </Badge>
-        )}
-      </div>
+    <>
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-destructive" />
+            Panic/SOS Events
+          </h3>
+          <div className="flex items-center gap-2">
+            {panicEvents && panicEvents.length > 0 && (
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setShowCharts(true)}
+                  className="gap-2"
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  View Charts
+                </Button>
+                <Badge variant="outline" className="border-destructive text-destructive">
+                  {panicEvents.length} {panicEvents.length === 1 ? 'event' : 'events'}
+                </Badge>
+              </>
+            )}
+          </div>
+        </div>
 
       {!panicEvents || panicEvents.length === 0 ? (
         <div className="text-center py-8">
@@ -175,7 +191,14 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
           )}
         </>
       )}
-    </Card>
+      </Card>
+
+      <PanicSosCharts 
+        open={showCharts}
+        onOpenChange={setShowCharts}
+        selectedPersonId={selectedPersonId}
+      />
+    </>
   );
 };
 
