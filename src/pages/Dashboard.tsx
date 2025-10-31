@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import VitalMetrics from '@/components/dashboard/VitalMetrics';
 import AlertsList from '@/components/dashboard/AlertsList';
 import ElderlyList from '@/components/dashboard/ElderlyList';
+import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
 import Header from '@/components/layout/Header';
 
 const Dashboard = () => {
@@ -257,8 +258,9 @@ const Dashboard = () => {
             <VitalMetrics selectedPersonId={selectedPersonId} />
           </div>
 
-          {/* Right Column - Alerts */}
+          {/* Right Column - Alerts & Emergency Events */}
           <div className="space-y-4 sm:space-y-6">
+            <PanicSosEvents selectedPersonId={selectedPersonId} />
             <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
           </div>
         </div>
