@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,6 +47,7 @@ const PLACE_TYPES = [
 export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
+  const [isGeocoding, setIsGeocoding] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     place_type: 'other',
@@ -114,6 +115,37 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
     },
     onError: () => toast.error('Failed to delete place'),
   });
+
+  // Geocode address to get lat/lng using Nominatim (free OSM service)
+  useEffect(() => {
+    const geocodeAddress = async () => {
+      if (formData.address.length < 5) return;
+      
+      setIsGeocoding(true);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formData.address)}&limit=1`
+        );
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            latitude: parseFloat(data[0].lat),
+            longitude: parseFloat(data[0].lon),
+          }));
+          toast.success('Location found! Coordinates updated.');
+        }
+      } catch (error) {
+        console.error('Geocoding error:', error);
+      } finally {
+        setIsGeocoding(false);
+      }
+    };
+
+    const timeoutId = setTimeout(geocodeAddress, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [formData.address]);
 
   const resetForm = () => {
     setFormData({
@@ -187,13 +219,16 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
               </div>
 
               <div>
-                <Label htmlFor="address">Address</Label>
+                <Label htmlFor="address">Address {isGeocoding && <span className="text-xs text-muted-foreground">(searching...)</span>}</Label>
                 <Input
                   id="address"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  placeholder="123 Main St, City"
+                  placeholder="Type address to auto-fill coordinates"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Coordinates will be automatically filled when you type an address
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
