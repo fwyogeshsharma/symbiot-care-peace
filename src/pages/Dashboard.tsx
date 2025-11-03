@@ -9,6 +9,7 @@ import AlertsList from '@/components/dashboard/AlertsList';
 import ElderlyList from '@/components/dashboard/ElderlyList';
 import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
 import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
+import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
 import Header from '@/components/layout/Header';
 
 const Dashboard = () => {
@@ -259,8 +260,9 @@ const Dashboard = () => {
             <VitalMetrics selectedPersonId={selectedPersonId} />
           </div>
 
-          {/* Right Column - Alerts, Emergency Events & Environmental */}
+          {/* Right Column - Medication, Environmental, Emergency Events & Alerts */}
           <div className="space-y-4 sm:space-y-6">
+            <MedicationManagement selectedPersonId={selectedPersonId} />
             <EnvironmentalSensors selectedPersonId={selectedPersonId} />
             <PanicSosEvents selectedPersonId={selectedPersonId} />
             <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
