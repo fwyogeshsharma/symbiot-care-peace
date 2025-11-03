@@ -120,6 +120,18 @@ Deno.serve(async (req) => {
 
     // Check for alert conditions
     await checkAlertConditions(supabase, device.elderly_person_id, payload.data_type, payload.value);
+    
+    // Check for geofence events if GPS data
+    if ((payload.data_type === 'gps' || payload.data_type === 'location') && payload.value.latitude && payload.value.longitude) {
+      await checkGeofenceEvents(
+        supabase,
+        device.elderly_person_id,
+        device.id,
+        payload.value.latitude,
+        payload.value.longitude,
+        payload.recorded_at || new Date().toISOString()
+      );
+    }
 
     return new Response(
       JSON.stringify({ 
@@ -217,6 +229,175 @@ async function checkAlertConditions(
       console.error('Error creating alert:', error);
     } else {
       console.log('Alert created successfully');
+    }
+  }
+}
+
+// Haversine formula to calculate distance between two GPS coordinates
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371e3; // Earth's radius in meters
+  const φ1 = (lat1 * Math.PI) / 180;
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in meters
+}
+
+// Check if position is inside a geofence
+function isInsideGeofence(
+  latitude: number,
+  longitude: number,
+  placeLatitude: number,
+  placeLongitude: number,
+  radiusMeters: number
+): boolean {
+  const distance = calculateDistance(latitude, longitude, placeLatitude, placeLongitude);
+  return distance <= radiusMeters;
+}
+
+// Function to check geofence entry/exit events
+async function checkGeofenceEvents(
+  supabase: any,
+  elderlyPersonId: string,
+  deviceId: string,
+  latitude: number,
+  longitude: number,
+  timestamp: string
+) {
+  console.log('Checking geofence events for:', elderlyPersonId, latitude, longitude);
+
+  // Fetch all active geofences for this person
+  const { data: geofences, error: geofencesError } = await supabase
+    .from('geofence_places')
+    .select('*')
+    .eq('elderly_person_id', elderlyPersonId)
+    .eq('is_active', true);
+
+  if (geofencesError) {
+    console.error('Error fetching geofences:', geofencesError);
+    return;
+  }
+
+  if (!geofences || geofences.length === 0) {
+    console.log('No active geofences found');
+    return;
+  }
+
+  // Check which geofences the person is currently inside
+  const currentGeofences: string[] = [];
+  geofences.forEach((place: any) => {
+    if (isInsideGeofence(latitude, longitude, place.latitude, place.longitude, place.radius_meters)) {
+      currentGeofences.push(place.id);
+    }
+  });
+
+  // Fetch the last known state
+  const { data: lastState, error: stateError } = await supabase
+    .from('geofence_state')
+    .select('*')
+    .eq('elderly_person_id', elderlyPersonId);
+
+  if (stateError) {
+    console.error('Error fetching geofence state:', stateError);
+    return;
+  }
+
+  const lastGeofences = (lastState || []).map((s: any) => s.place_id);
+
+  // Detect entry events (now inside, wasn't before)
+  const entries = currentGeofences.filter(placeId => !lastGeofences.includes(placeId));
+
+  // Detect exit events (was inside, now outside)
+  const exits = lastGeofences.filter((placeId: string) => !currentGeofences.includes(placeId));
+
+  console.log('Entries:', entries, 'Exits:', exits);
+
+  // Log entry events
+  for (const placeId of entries) {
+    const place = geofences.find((g: any) => g.id === placeId);
+    console.log('Entry to:', place?.name);
+    
+    const { error: entryError } = await supabase
+      .from('geofence_events')
+      .insert({
+        elderly_person_id: elderlyPersonId,
+        place_id: placeId,
+        device_id: deviceId,
+        event_type: 'entry',
+        latitude,
+        longitude,
+        timestamp,
+      });
+
+    if (entryError) {
+      console.error('Error logging entry event:', entryError);
+    }
+
+    // Add to state table
+    const { error: stateInsertError } = await supabase
+      .from('geofence_state')
+      .insert({
+        elderly_person_id: elderlyPersonId,
+        place_id: placeId,
+        entry_timestamp: timestamp,
+      });
+
+    if (stateInsertError) {
+      console.error('Error updating state:', stateInsertError);
+    }
+  }
+
+  // Log exit events and calculate duration
+  for (const placeId of exits) {
+    const place = geofences.find((g: any) => g.id === placeId);
+    const stateEntry = lastState?.find((s: any) => s.place_id === placeId);
+    
+    let durationMinutes = null;
+    if (stateEntry) {
+      const entryTime = new Date(stateEntry.entry_timestamp).getTime();
+      const exitTime = new Date(timestamp).getTime();
+      durationMinutes = Math.round((exitTime - entryTime) / 1000 / 60);
+    }
+
+    console.log('Exit from:', place?.name, 'Duration:', durationMinutes, 'minutes');
+
+    const { error: exitError } = await supabase
+      .from('geofence_events')
+      .insert({
+        elderly_person_id: elderlyPersonId,
+        place_id: placeId,
+        device_id: deviceId,
+        event_type: 'exit',
+        latitude,
+        longitude,
+        timestamp,
+        duration_minutes: durationMinutes,
+      });
+
+    if (exitError) {
+      console.error('Error logging exit event:', exitError);
+    }
+
+    // Remove from state table
+    const { error: stateDeleteError } = await supabase
+      .from('geofence_state')
+      .delete()
+      .eq('elderly_person_id', elderlyPersonId)
+      .eq('place_id', placeId);
+
+    if (stateDeleteError) {
+      console.error('Error removing from state:', stateDeleteError);
     }
   }
 }

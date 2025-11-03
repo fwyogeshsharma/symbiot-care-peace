@@ -388,6 +388,159 @@ export type Database = {
           },
         ]
       }
+      geofence_events: {
+        Row: {
+          created_at: string
+          device_id: string
+          duration_minutes: number | null
+          elderly_person_id: string
+          event_type: string
+          id: string
+          latitude: number
+          longitude: number
+          place_id: string
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          duration_minutes?: number | null
+          elderly_person_id: string
+          event_type: string
+          id?: string
+          latitude: number
+          longitude: number
+          place_id: string
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          duration_minutes?: number | null
+          elderly_person_id?: string
+          event_type?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          place_id?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geofence_events_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_events_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_events_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "geofence_places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      geofence_places: {
+        Row: {
+          address: string | null
+          color: string | null
+          created_at: string
+          elderly_person_id: string
+          icon: string | null
+          id: string
+          is_active: boolean
+          latitude: number
+          longitude: number
+          name: string
+          notes: string | null
+          place_type: string
+          radius_meters: number
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          color?: string | null
+          created_at?: string
+          elderly_person_id: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          latitude: number
+          longitude: number
+          name: string
+          notes?: string | null
+          place_type: string
+          radius_meters?: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          color?: string | null
+          created_at?: string
+          elderly_person_id?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          latitude?: number
+          longitude?: number
+          name?: string
+          notes?: string | null
+          place_type?: string
+          radius_meters?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geofence_places_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      geofence_state: {
+        Row: {
+          elderly_person_id: string
+          entry_timestamp: string
+          place_id: string
+        }
+        Insert: {
+          elderly_person_id: string
+          entry_timestamp?: string
+          place_id: string
+        }
+        Update: {
+          elderly_person_id?: string
+          entry_timestamp?: string
+          place_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geofence_state_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_state_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "geofence_places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
