@@ -1,4 +1,4 @@
-import { memo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 
 interface MapUpdaterProps {
@@ -11,7 +11,9 @@ function MapUpdater({ center, zoom }: MapUpdaterProps) {
   const map = useMap();
   
   useEffect(() => {
-    map.setView(center, zoom, { animate: true });
+    if (map) {
+      map.setView(center, zoom, { animate: true });
+    }
   }, [center, zoom, map]);
   
   return null;
@@ -23,8 +25,8 @@ interface StableMapContainerProps {
   children: React.ReactNode;
 }
 
-// Memoized container that doesn't remount on prop changes
-export const StableMapContainer = memo(function StableMapContainer({
+// Container that doesn't remount on prop changes
+export function StableMapContainer({
   center,
   zoom,
   children,
@@ -44,4 +46,4 @@ export const StableMapContainer = memo(function StableMapContainer({
       {children}
     </MapContainer>
   );
-});
+}
