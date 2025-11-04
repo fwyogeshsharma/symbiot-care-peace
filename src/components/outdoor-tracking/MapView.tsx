@@ -9,15 +9,18 @@ import 'leaflet/dist/leaflet.css';
 // Fix for default marker icons in React-Leaflet
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
 
-let DefaultIcon = L.icon({
+// Create default icon for place markers
+const defaultIcon = L.icon({
   iconUrl: icon,
+  iconRetinaUrl: iconRetina,
   shadowUrl: iconShadow,
   iconSize: [25, 41],
   iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 });
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 interface Place {
   id: string;
@@ -176,6 +179,7 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
             <Marker
               key={`marker-${place.id}`}
               position={[place.latitude, place.longitude]}
+              icon={defaultIcon}
             >
               <Popup>
                 <div className="text-center">
