@@ -1,9 +1,11 @@
-import { MapContainer, TileLayer, Circle, Marker, Polyline } from 'react-leaflet';
+import { Circle, Marker, Polyline } from 'react-leaflet';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Navigation } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { StableMapContainer } from './StableMapContainer';
+import { MapErrorBoundary } from './MapErrorBoundary';
 
 // Fix for default marker icons in React-Leaflet
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -121,18 +123,9 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
           }
         `}</style>
         
-        <MapContainer
-          center={center}
-          zoom={13}
-          scrollWheelZoom={true}
-          style={{ height: '500px', borderRadius: '8px' }}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          
-          {places.map((place) => (
+        <MapErrorBoundary>
+          <StableMapContainer center={center} zoom={13}>
+            {places.map((place) => (
             <Circle
               key={place.id}
               center={[place.latitude, place.longitude]}
@@ -172,7 +165,8 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
               icon={createCurrentPositionIcon()}
             />
           )}
-        </MapContainer>
+          </StableMapContainer>
+        </MapErrorBoundary>
         
         {!currentPosition && places.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
