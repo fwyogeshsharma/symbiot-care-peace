@@ -45,25 +45,27 @@ interface MapViewProps {
   trail?: Position[];
 }
 
-// Component to update map view when position changes
-function MapUpdater({ position }: { position?: Position }) {
+
+// Component to update map view when position changes (must be inside MapContainer)
+function MapUpdaterAndContent({ 
+  places, 
+  currentPosition, 
+  trail 
+}: { 
+  places: Place[]; 
+  currentPosition?: Position; 
+  trail: Position[] 
+}) {
   const map = useMap();
   
   useEffect(() => {
-    if (position) {
-      map.setView([position.latitude, position.longitude], 15);
+    if (currentPosition) {
+      map.setView([currentPosition.latitude, currentPosition.longitude], 15);
     }
-  }, [position, map]);
+  }, [currentPosition, map]);
   
-  return null;
-}
-
-// Separate the map content to ensure proper context handling
-function MapContent({ places, currentPosition, trail }: MapViewProps) {
   return (
     <>
-      <MapUpdater position={currentPosition} />
-      
       {/* Draw geofence circles */}
       {places.map((place) => (
         <Circle
@@ -108,7 +110,7 @@ function MapContent({ places, currentPosition, trail }: MapViewProps) {
       ))}
       
       {/* Movement trail */}
-      {trail.length > 1 && (
+      {trail && trail.length > 1 && (
         <Polyline
           positions={trail.map(p => [p.latitude, p.longitude] as [number, number])}
           pathOptions={{
@@ -233,7 +235,7 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
-          <MapContent places={places} currentPosition={currentPosition} trail={trail} />
+          <MapUpdaterAndContent places={places} currentPosition={currentPosition} trail={trail} />
         </MapContainer>
         
         {!currentPosition && places.length === 0 && (
