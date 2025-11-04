@@ -58,6 +58,93 @@ function MapUpdater({ position }: { position?: Position }) {
   return null;
 }
 
+// Separate the map content to ensure proper context handling
+function MapContent({ places, currentPosition, trail }: MapViewProps) {
+  return (
+    <>
+      <MapUpdater position={currentPosition} />
+      
+      {/* Draw geofence circles */}
+      {places.map((place) => (
+        <Circle
+          key={place.id}
+          center={[place.latitude, place.longitude]}
+          radius={place.radius_meters}
+          pathOptions={{
+            color: place.color,
+            fillColor: place.color,
+            fillOpacity: 0.2,
+            weight: 2,
+          }}
+        >
+          <Popup>
+            <div className="text-center">
+              <div className="text-lg mb-1">{place.icon}</div>
+              <div className="font-semibold">{place.name}</div>
+              <div className="text-sm text-muted-foreground">{place.place_type}</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Radius: {place.radius_meters}m
+              </div>
+            </div>
+          </Popup>
+        </Circle>
+      ))}
+      
+      {/* Place markers */}
+      {places.map((place) => (
+        <Marker
+          key={`marker-${place.id}`}
+          position={[place.latitude, place.longitude]}
+          icon={defaultIcon}
+        >
+          <Popup>
+            <div className="text-center">
+              <div className="text-lg mb-1">{place.icon}</div>
+              <div className="font-semibold">{place.name}</div>
+              <div className="text-sm text-muted-foreground">{place.place_type}</div>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+      
+      {/* Movement trail */}
+      {trail.length > 1 && (
+        <Polyline
+          positions={trail.map(p => [p.latitude, p.longitude] as [number, number])}
+          pathOptions={{
+            color: '#8b5cf6',
+            weight: 3,
+            opacity: 0.7,
+            dashArray: '5, 10',
+          }}
+        />
+      )}
+      
+      {/* Current position marker */}
+      {currentPosition && (
+        <Marker
+          position={[currentPosition.latitude, currentPosition.longitude]}
+          icon={createCurrentPositionIcon()}
+        >
+          <Popup>
+            <div className="text-center">
+              <div className="font-semibold">Current Location</div>
+              <div className="text-xs text-muted-foreground">
+                {currentPosition.latitude.toFixed(6)}, {currentPosition.longitude.toFixed(6)}
+              </div>
+              {currentPosition.timestamp && (
+                <div className="text-xs text-muted-foreground mt-1">
+                  {new Date(currentPosition.timestamp).toLocaleString()}
+                </div>
+              )}
+            </div>
+          </Popup>
+        </Marker>
+      )}
+    </>
+  );
+}
+
 // Create custom icon for current position
 const createCurrentPositionIcon = () => {
   return L.divIcon({
@@ -146,85 +233,7 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
-          <MapUpdater position={currentPosition} />
-          
-          {/* Draw geofence circles */}
-          {places.map((place) => (
-            <Circle
-              key={place.id}
-              center={[place.latitude, place.longitude]}
-              radius={place.radius_meters}
-              pathOptions={{
-                color: place.color,
-                fillColor: place.color,
-                fillOpacity: 0.2,
-                weight: 2,
-              }}
-            >
-              <Popup>
-                <div className="text-center">
-                  <div className="text-lg mb-1">{place.icon}</div>
-                  <div className="font-semibold">{place.name}</div>
-                  <div className="text-sm text-muted-foreground">{place.place_type}</div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Radius: {place.radius_meters}m
-                  </div>
-                </div>
-              </Popup>
-            </Circle>
-          ))}
-          
-          {/* Place markers */}
-          {places.map((place) => (
-            <Marker
-              key={`marker-${place.id}`}
-              position={[place.latitude, place.longitude]}
-              icon={defaultIcon}
-            >
-              <Popup>
-                <div className="text-center">
-                  <div className="text-lg mb-1">{place.icon}</div>
-                  <div className="font-semibold">{place.name}</div>
-                  <div className="text-sm text-muted-foreground">{place.place_type}</div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-          
-          {/* Movement trail */}
-          {trail.length > 1 && (
-            <Polyline
-              positions={trail.map(p => [p.latitude, p.longitude] as [number, number])}
-              pathOptions={{
-                color: '#8b5cf6',
-                weight: 3,
-                opacity: 0.7,
-                dashArray: '5, 10',
-              }}
-            />
-          )}
-          
-          {/* Current position marker */}
-          {currentPosition && (
-            <Marker
-              position={[currentPosition.latitude, currentPosition.longitude]}
-              icon={createCurrentPositionIcon()}
-            >
-              <Popup>
-                <div className="text-center">
-                  <div className="font-semibold">Current Location</div>
-                  <div className="text-xs text-muted-foreground">
-                    {currentPosition.latitude.toFixed(6)}, {currentPosition.longitude.toFixed(6)}
-                  </div>
-                  {currentPosition.timestamp && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {new Date(currentPosition.timestamp).toLocaleString()}
-                    </div>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
-          )}
+          <MapContent places={places} currentPosition={currentPosition} trail={trail} />
         </MapContainer>
         
         {!currentPosition && places.length === 0 && (
