@@ -167,16 +167,6 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
           )}
           </StableMapContainer>
         </MapErrorBoundary>
-        
-        {!currentPosition && places.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
-            <div className="text-center text-muted-foreground">
-              <MapPin className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No location data available</p>
-              <p className="text-sm">Add places or wait for GPS data</p>
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
