@@ -90,11 +90,6 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
     ? [places[0].latitude, places[0].longitude]
     : [40.7128, -74.0060]; // Default to NYC
 
-  // Create unique key to force map re-render when position changes significantly
-  const mapKey = currentPosition 
-    ? `${currentPosition.latitude.toFixed(4)}-${currentPosition.longitude.toFixed(4)}`
-    : 'default';
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -129,9 +124,8 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
         `}</style>
         
         <MapContainer
-          key={mapKey}
           center={center}
-          zoom={currentPosition ? 15 : 13}
+          zoom={13}
           scrollWheelZoom={true}
           className="rounded-lg"
         >
