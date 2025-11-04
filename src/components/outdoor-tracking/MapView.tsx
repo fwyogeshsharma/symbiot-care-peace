@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Circle, Marker, Popup, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Circle, Marker, Polyline } from 'react-leaflet';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Navigation } from 'lucide-react';
@@ -43,8 +43,6 @@ interface MapViewProps {
   currentPosition?: Position;
   trail?: Position[];
 }
-
-
 
 // Create custom icon for current position
 const createCurrentPositionIcon = () => {
@@ -127,14 +125,13 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
           center={center}
           zoom={13}
           scrollWheelZoom={true}
-          className="rounded-lg"
+          style={{ height: '500px', borderRadius: '8px' }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
-          {/* Draw geofence circles */}
           {places.map((place) => (
             <Circle
               key={place.id}
@@ -146,39 +143,18 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
                 fillOpacity: 0.2,
                 weight: 2,
               }}
-            >
-              <Popup>
-                <div className="text-center">
-                  <div className="text-lg mb-1">{place.icon}</div>
-                  <div className="font-semibold">{place.name}</div>
-                  <div className="text-sm text-muted-foreground">{place.place_type}</div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Radius: {place.radius_meters}m
-                  </div>
-                </div>
-              </Popup>
-            </Circle>
+            />
           ))}
           
-          {/* Place markers */}
           {places.map((place) => (
             <Marker
               key={`marker-${place.id}`}
               position={[place.latitude, place.longitude]}
               icon={defaultIcon}
-            >
-              <Popup>
-                <div className="text-center">
-                  <div className="text-lg mb-1">{place.icon}</div>
-                  <div className="font-semibold">{place.name}</div>
-                  <div className="text-sm text-muted-foreground">{place.place_type}</div>
-                </div>
-              </Popup>
-            </Marker>
+            />
           ))}
           
-          {/* Movement trail */}
-          {trail && trail.length > 1 && (
+          {trail.length > 1 && (
             <Polyline
               positions={trail.map(p => [p.latitude, p.longitude] as [number, number])}
               pathOptions={{
@@ -190,26 +166,11 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
             />
           )}
           
-          {/* Current position marker */}
           {currentPosition && (
             <Marker
               position={[currentPosition.latitude, currentPosition.longitude]}
               icon={createCurrentPositionIcon()}
-            >
-              <Popup>
-                <div className="text-center">
-                  <div className="font-semibold">Current Location</div>
-                  <div className="text-xs text-muted-foreground">
-                    {currentPosition.latitude.toFixed(6)}, {currentPosition.longitude.toFixed(6)}
-                  </div>
-                  {currentPosition.timestamp && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {new Date(currentPosition.timestamp).toLocaleString()}
-                    </div>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
+            />
           )}
         </MapContainer>
         
