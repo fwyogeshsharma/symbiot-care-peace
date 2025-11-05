@@ -6,21 +6,14 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { StableMapContainer } from './StableMapContainer';
 import { MapErrorBoundary } from './MapErrorBoundary';
+import { useMemo } from 'react';
 
 // Fix for default marker icons in React-Leaflet
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
-
-// Create default icon for place markers
-const defaultIcon = L.icon({
-  iconUrl: icon,
-  iconRetinaUrl: iconRetina,
-  shadowUrl: iconShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
 interface Place {
@@ -46,49 +39,51 @@ interface MapViewProps {
   trail?: Position[];
 }
 
-// Create custom icon for current position
-const createCurrentPositionIcon = () => {
-  return L.divIcon({
-    className: 'custom-current-position',
-    html: `
-      <div style="position: relative; width: 30px; height: 30px;">
-        <div style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 16px;
-          height: 16px;
-          background: #3b82f6;
-          border: 3px solid white;
-          border-radius: 50%;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        "></div>
-        <div style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 30px;
-          height: 30px;
-          background: rgba(59, 130, 246, 0.3);
-          border-radius: 50%;
-          animation: pulse 2s ease-out infinite;
-        "></div>
-      </div>
-    `,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15],
-  });
-};
+// Create custom icon for current position (memoized to prevent recreation)
+const currentPositionIcon = L.divIcon({
+  className: 'custom-current-position',
+  html: `
+    <div style="position: relative; width: 30px; height: 30px;">
+      <div style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 16px;
+        height: 16px;
+        background: #3b82f6;
+        border: 3px solid white;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      "></div>
+      <div style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 30px;
+        height: 30px;
+        background: rgba(59, 130, 246, 0.3);
+        border-radius: 50%;
+        animation: pulse 2s ease-out infinite;
+      "></div>
+    </div>
+  `,
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+});
 
 export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
-  // Default center (use current position or first place or default location)
-  const center: [number, number] = currentPosition
-    ? [currentPosition.latitude, currentPosition.longitude]
-    : places.length > 0
-    ? [places[0].latitude, places[0].longitude]
-    : [40.7128, -74.0060]; // Default to NYC
+  // Memoize center calculation
+  const center: [number, number] = useMemo(() => {
+    if (currentPosition) {
+      return [currentPosition.latitude, currentPosition.longitude];
+    }
+    if (places.length > 0) {
+      return [places[0].latitude, places[0].longitude];
+    }
+    return [40.7128, -74.0060]; // Default to NYC
+  }, [currentPosition, places]);
 
   return (
     <Card>
@@ -143,7 +138,6 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
             <Marker
               key={`marker-${place.id}`}
               position={[place.latitude, place.longitude]}
-              icon={defaultIcon}
             />
           ))}
           
@@ -162,7 +156,7 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
           {currentPosition && (
             <Marker
               position={[currentPosition.latitude, currentPosition.longitude]}
-              icon={createCurrentPositionIcon()}
+              icon={currentPositionIcon}
             />
           )}
           </StableMapContainer>
