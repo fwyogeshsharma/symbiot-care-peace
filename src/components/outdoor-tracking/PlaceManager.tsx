@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,8 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Plus, MapPin, Trash2, Edit } from 'lucide-react';
+import { Plus, MapPin, Trash2, Target } from 'lucide-react';
 import { toast } from 'sonner';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface Place {
   id: string;
@@ -46,10 +49,29 @@ const PLACE_TYPES = [
   { value: 'other', label: 'Other', icon: '📍', color: '#6366f1' },
 ];
 
+// Fix default marker icons
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+// Component to handle map clicks
+function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
+  useMapEvents({
+    click(e) {
+      onLocationSelect(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+}
+
 export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     place_type: 'other',
@@ -177,6 +199,15 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
     createMutation.mutate(formData);
   };
 
+  const handleMapClick = (lat: number, lng: number) => {
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng,
+    }));
+    toast.success('Location set! You can adjust it by clicking again.');
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -188,7 +219,7 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
               Add Place
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Place</DialogTitle>
             </DialogHeader>
@@ -235,8 +266,50 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
                   placeholder="Type address to auto-fill coordinates"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Coordinates will be automatically filled when you type an address
+                  Coordinates will be automatically filled when you type an address, or click "Set on Map" below
                 </p>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Label>Click on Map to Set Location</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowMap(!showMap)}
+                  >
+                    <Target className="h-4 w-4 mr-2" />
+                    {showMap ? 'Hide Map' : 'Set on Map'}
+                  </Button>
+                </div>
+                
+                {showMap && (
+                  <div className="border rounded-lg overflow-hidden">
+                    <MapContainer
+                      center={
+                        formData.latitude !== 0 && formData.longitude !== 0
+                          ? [formData.latitude, formData.longitude]
+                          : [40.7128, -74.0060]
+                      }
+                      zoom={13}
+                      style={{ height: '300px', width: '100%' }}
+                      scrollWheelZoom={true}
+                    >
+                      <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <MapClickHandler onLocationSelect={handleMapClick} />
+                      {formData.latitude !== 0 && formData.longitude !== 0 && (
+                        <Marker position={[formData.latitude, formData.longitude]} />
+                      )}
+                    </MapContainer>
+                    <p className="text-xs text-muted-foreground p-2 bg-muted">
+                      Click anywhere on the map to set the place location
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
