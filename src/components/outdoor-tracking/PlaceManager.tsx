@@ -33,6 +33,8 @@ interface PlaceManagerProps {
 }
 
 const PLACE_TYPES = [
+  { value: 'home', label: 'Home', icon: '🏠', color: '#3b82f6' },
+  { value: 'work', label: 'Work', icon: '💼', color: '#6366f1' },
   { value: 'hospital', label: 'Hospital', icon: '🏥', color: '#ef4444' },
   { value: 'mall', label: 'Mall', icon: '🛒', color: '#8b5cf6' },
   { value: 'grocery', label: 'Grocery Store', icon: '🛒', color: '#10b981' },
