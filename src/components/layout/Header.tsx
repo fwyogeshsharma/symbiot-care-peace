@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Share2, Menu, ArrowLeft, Navigation, Settings, Shield } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Share2, Menu, ArrowLeft, MapPin, Settings, Shield } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -48,13 +48,13 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         Activity
       </Button>
       <Button
-        variant={isActive('/tracking') ? 'default' : 'ghost'}
+        variant={isActive('/indoor-tracking') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/tracking')}
+        onClick={() => navigate('/indoor-tracking')}
         className={cn(isMobile && 'w-full justify-start')}
       >
-        <Navigation className="w-4 h-4 mr-2" />
-        Tracking
+        <MapPin className="w-4 h-4 mr-2" />
+        Indoor Tracking
       </Button>
       <Button
         variant={isActive('/device-status') ? 'default' : 'ghost'}
