@@ -79,6 +79,9 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      if (!elderlyPersonId) {
+        throw new Error('No elderly person selected');
+      }
       const placeType = PLACE_TYPES.find(t => t.value === data.place_type);
       const { error } = await supabase.from('geofence_places').insert({
         elderly_person_id: elderlyPersonId,
@@ -92,7 +95,10 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
         icon: placeType?.icon,
         notes: data.notes || null,
       });
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['geofence-places'] });
