@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +28,7 @@ interface GeofenceEvent {
 }
 
 export function PlaceVisitHistory({ elderlyPersonId, placeId }: PlaceVisitHistoryProps) {
+  const queryClient = useQueryClient();
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['geofence-events', elderlyPersonId, placeId],
     queryFn: async () => {
@@ -55,6 +57,33 @@ export function PlaceVisitHistory({ elderlyPersonId, placeId }: PlaceVisitHistor
     },
     enabled: !!elderlyPersonId,
   });
+
+  // Real-time subscription for new geofence events
+  useEffect(() => {
+    if (!elderlyPersonId) return;
+
+    const channel = supabase
+      .channel('geofence-events-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'geofence_events',
+          filter: `elderly_person_id=eq.${elderlyPersonId}`,
+        },
+        (payload) => {
+          console.log('New geofence event:', payload);
+          // Invalidate and refetch the events query
+          queryClient.invalidateQueries({ queryKey: ['geofence-events', elderlyPersonId, placeId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [elderlyPersonId, placeId, queryClient]);
 
   const formatDuration = (minutes: number | null) => {
     if (!minutes) return 'In progress';
