@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,9 +12,7 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Plus, MapPin, Trash2, Target } from 'lucide-react';
 import { toast } from 'sonner';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 
 interface Place {
   id: string;
@@ -49,24 +47,6 @@ const PLACE_TYPES = [
   { value: 'other', label: 'Other', icon: '📍', color: '#6366f1' },
 ];
 
-// Fix default marker icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
-
-// Component to handle map clicks
-function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
-  useMapEvents({
-    click(e) {
-      onLocationSelect(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
-}
-
 export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
@@ -80,6 +60,10 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
     longitude: 0,
     radius_meters: 100,
     notes: '',
+  });
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
   });
 
   const queryClient = useQueryClient();
@@ -146,26 +130,25 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
     onError: () => toast.error('Failed to delete place'),
   });
 
-  // Geocode address to get lat/lng using Nominatim (free OSM service)
+  // Geocode address using Google Geocoding API
   useEffect(() => {
     const geocodeAddress = async () => {
-      if (formData.address.length < 5) return;
+      if (formData.address.length < 5 || !isLoaded) return;
       
       setIsGeocoding(true);
       try {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formData.address)}&limit=1`
-        );
-        const data = await response.json();
-        
-        if (data && data.length > 0) {
-          setFormData(prev => ({
-            ...prev,
-            latitude: parseFloat(data[0].lat),
-            longitude: parseFloat(data[0].lon),
-          }));
-          toast.success('Location found! Coordinates updated.');
-        }
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: formData.address }, (results, status) => {
+          if (status === 'OK' && results && results[0]) {
+            const location = results[0].geometry.location;
+            setFormData(prev => ({
+              ...prev,
+              latitude: location.lat(),
+              longitude: location.lng(),
+            }));
+            toast.success('Location found! Coordinates updated.');
+          }
+        });
       } catch (error) {
         console.error('Geocoding error:', error);
       } finally {
@@ -175,7 +158,7 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
 
     const timeoutId = setTimeout(geocodeAddress, 1000);
     return () => clearTimeout(timeoutId);
-  }, [formData.address]);
+  }, [formData.address, isLoaded]);
 
   const resetForm = () => {
     setFormData({
@@ -199,13 +182,15 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
     createMutation.mutate(formData);
   };
 
-  const handleMapClick = (lat: number, lng: number) => {
-    setFormData(prev => ({
-      ...prev,
-      latitude: lat,
-      longitude: lng,
-    }));
-    toast.success('Location set! You can adjust it by clicking again.');
+  const handleMapClick = (e: google.maps.MapMouseEvent) => {
+    if (e.latLng) {
+      setFormData(prev => ({
+        ...prev,
+        latitude: e.latLng!.lat(),
+        longitude: e.latLng!.lng(),
+      }));
+      toast.success('Location set! You can adjust it by clicking again.');
+    }
   };
 
   return (
@@ -284,27 +269,22 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
                   </Button>
                 </div>
                 
-                {showMap && (
+                {showMap && isLoaded && (
                   <div className="border rounded-lg overflow-hidden">
-                    <MapContainer
+                    <GoogleMap
+                      mapContainerStyle={{ height: '300px', width: '100%' }}
                       center={
                         formData.latitude !== 0 && formData.longitude !== 0
-                          ? [formData.latitude, formData.longitude]
-                          : [40.7128, -74.0060]
+                          ? { lat: formData.latitude, lng: formData.longitude }
+                          : { lat: 40.7128, lng: -74.006 }
                       }
                       zoom={13}
-                      style={{ height: '300px', width: '100%' }}
-                      scrollWheelZoom={true}
+                      onClick={handleMapClick}
                     >
-                      <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      />
-                      <MapClickHandler onLocationSelect={handleMapClick} />
                       {formData.latitude !== 0 && formData.longitude !== 0 && (
-                        <Marker position={[formData.latitude, formData.longitude]} />
+                        <Marker position={{ lat: formData.latitude, lng: formData.longitude }} />
                       )}
-                    </MapContainer>
+                    </GoogleMap>
                     <p className="text-xs text-muted-foreground p-2 bg-muted">
                       Click anywhere on the map to set the place location
                     </p>
