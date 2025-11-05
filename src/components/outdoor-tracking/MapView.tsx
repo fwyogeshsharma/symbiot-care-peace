@@ -6,7 +6,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { StableMapContainer } from './StableMapContainer';
 import { MapErrorBoundary } from './MapErrorBoundary';
-import { useMemo } from 'react';
+import { useMemo, Fragment } from 'react';
 
 // Fix for default marker icons in React-Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -120,45 +120,47 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
         
         <MapErrorBoundary>
           <StableMapContainer center={center} zoom={13}>
-            {places.map((place) => (
-            <Circle
-              key={place.id}
-              center={[place.latitude, place.longitude]}
-              radius={place.radius_meters}
-              pathOptions={{
-                color: place.color,
-                fillColor: place.color,
-                fillOpacity: 0.2,
-                weight: 2,
-              }}
-            />
-          ))}
-          
-          {places.map((place) => (
-            <Marker
-              key={`marker-${place.id}`}
-              position={[place.latitude, place.longitude]}
-            />
-          ))}
-          
-          {trail.length > 1 && (
-            <Polyline
-              positions={trail.map(p => [p.latitude, p.longitude] as [number, number])}
-              pathOptions={{
-                color: '#8b5cf6',
-                weight: 3,
-                opacity: 0.7,
-                dashArray: '5, 10',
-              }}
-            />
-          )}
-          
-          {currentPosition && (
-            <Marker
-              position={[currentPosition.latitude, currentPosition.longitude]}
-              icon={currentPositionIcon}
-            />
-          )}
+            <Fragment>
+              {places.map((place) => (
+                <Circle
+                  key={place.id}
+                  center={[place.latitude, place.longitude]}
+                  radius={place.radius_meters}
+                  pathOptions={{
+                    color: place.color,
+                    fillColor: place.color,
+                    fillOpacity: 0.2,
+                    weight: 2,
+                  }}
+                />
+              ))}
+              
+              {places.map((place) => (
+                <Marker
+                  key={`marker-${place.id}`}
+                  position={[place.latitude, place.longitude]}
+                />
+              ))}
+              
+              {trail.length > 1 && (
+                <Polyline
+                  positions={trail.map(p => [p.latitude, p.longitude] as [number, number])}
+                  pathOptions={{
+                    color: '#8b5cf6',
+                    weight: 3,
+                    opacity: 0.7,
+                    dashArray: '5, 10',
+                  }}
+                />
+              )}
+              
+              {currentPosition && (
+                <Marker
+                  position={[currentPosition.latitude, currentPosition.longitude]}
+                  icon={currentPositionIcon}
+                />
+              )}
+            </Fragment>
           </StableMapContainer>
         </MapErrorBoundary>
       </CardContent>
