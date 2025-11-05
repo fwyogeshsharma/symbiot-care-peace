@@ -1,9 +1,10 @@
-import { Circle, Marker, Polyline, Popup } from 'react-leaflet';
+import { Marker, Polyline, Popup } from 'react-leaflet';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Navigation } from 'lucide-react';
 import { StableMapContainer } from './StableMapContainer';
-import { useMemo, Fragment } from 'react';
+import { PlaceMarkers } from './PlaceMarkers';
+import { useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -41,14 +42,7 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
     return [40.7128, -74.006];
   }, [currentPosition, places]);
 
-  // Custom icons for Leaflet
-  const placeIcon = L.divIcon({
-    className: 'custom-place-icon',
-    html: '<div style="background-color: #3b82f6; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
-  });
-
+  // Custom icon for current position
   const currentPositionIcon = L.divIcon({
     className: 'custom-position-icon',
     html: '<div style="background-color: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);"></div>',
@@ -73,29 +67,7 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
       <CardContent>
         <StableMapContainer center={center} zoom={13}>
           {places.map((place) => (
-            <Fragment key={place.id}>
-              <Circle
-                center={[place.latitude, place.longitude]}
-                radius={place.radius_meters}
-                pathOptions={{
-                  color: place.color,
-                  opacity: 0.8,
-                  weight: 2,
-                  fillColor: place.color,
-                  fillOpacity: 0.2,
-                }}
-              />
-              <Marker position={[place.latitude, place.longitude]} icon={placeIcon}>
-                <Popup>
-                  <div className="text-sm">
-                    <p className="font-semibold">{place.name}</p>
-                    <p className="text-muted-foreground">
-                      {place.place_type} • {place.radius_meters}m radius
-                    </p>
-                  </div>
-                </Popup>
-              </Marker>
-            </Fragment>
+            <PlaceMarkers key={place.id} place={place} />
           ))}
 
           {trail.length > 1 && (
