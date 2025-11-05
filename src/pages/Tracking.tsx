@@ -10,6 +10,7 @@ import { MovementPlayback } from '@/components/indoor-tracking/MovementPlayback'
 import { MovementMetrics } from '@/components/indoor-tracking/MovementMetrics';
 import { MapView } from '@/components/outdoor-tracking/MapView';
 import { PlaceManager } from '@/components/outdoor-tracking/PlaceManager';
+import { PlaceVisitHistory } from '@/components/outdoor-tracking/PlaceVisitHistory';
 import { VisitHistory } from '@/components/outdoor-tracking/VisitHistory';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -213,8 +214,9 @@ export default function Tracking() {
                   />
                   <VisitHistory elderlyPersonId={selectedPersonId} dateRange={dateRange} />
                 </div>
-                <div>
+                <div className="space-y-6">
                   <PlaceManager elderlyPersonId={selectedPersonId} />
+                  <PlaceVisitHistory elderlyPersonId={selectedPersonId} />
                 </div>
               </div>
             </TabsContent>
