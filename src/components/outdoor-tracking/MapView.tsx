@@ -41,21 +41,6 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
     return [40.7128, -74.006];
   }, [currentPosition, places]);
 
-  // Custom icons
-  const placeIcon = useMemo(() => L.divIcon({
-    className: 'custom-place-icon',
-    html: '<div style="background-color: #3b82f6; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
-  }), []);
-
-  const currentPositionIcon = useMemo(() => L.divIcon({
-    className: 'custom-position-icon',
-    html: '<div style="background-color: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);"></div>',
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
-  }), []);
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -88,7 +73,7 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
           ))}
           
           {places.map((place) => (
-            <Marker key={`marker-${place.id}`} position={[place.latitude, place.longitude]} icon={placeIcon}>
+            <Marker key={`marker-${place.id}`} position={[place.latitude, place.longitude]}>
               <Popup>
                 <div className="text-sm">
                   <p className="font-semibold">{place.name}</p>
@@ -112,7 +97,7 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
           )}
 
           {currentPosition && (
-            <Marker position={[currentPosition.latitude, currentPosition.longitude]} icon={currentPositionIcon}>
+            <Marker position={[currentPosition.latitude, currentPosition.longitude]}>
               <Popup>Current Position</Popup>
             </Marker>
           )}
