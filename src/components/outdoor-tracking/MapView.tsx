@@ -72,7 +72,7 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
       </CardHeader>
       <CardContent>
         <StableMapContainer center={center} zoom={13}>
-          {places.flatMap((place) => [
+          {places.map((place) => (
             <Circle
               key={`circle-${place.id}`}
               center={[place.latitude, place.longitude]}
@@ -84,7 +84,10 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
                 fillColor: place.color,
                 fillOpacity: 0.2,
               }}
-            />,
+            />
+          ))}
+          
+          {places.map((place) => (
             <Marker key={`marker-${place.id}`} position={[place.latitude, place.longitude]} icon={placeIcon}>
               <Popup>
                 <div className="text-sm">
@@ -95,7 +98,7 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
                 </div>
               </Popup>
             </Marker>
-          ])}
+          ))}
 
           {trail.length > 1 && (
             <Polyline
