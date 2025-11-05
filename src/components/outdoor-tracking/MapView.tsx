@@ -1,9 +1,11 @@
-import { Circle, Marker, Polyline } from '@react-google-maps/api';
+import { Circle, Marker, Polyline, Popup } from 'react-leaflet';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Navigation } from 'lucide-react';
-import { GoogleMapContainer } from './GoogleMapContainer';
+import { StableMapContainer } from './StableMapContainer';
 import { useMemo } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface Place {
   id: string;
@@ -29,15 +31,30 @@ interface MapViewProps {
 }
 
 export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
-  const center = useMemo(() => {
+  const center = useMemo((): [number, number] => {
     if (currentPosition) {
-      return { lat: currentPosition.latitude, lng: currentPosition.longitude };
+      return [currentPosition.latitude, currentPosition.longitude];
     }
     if (places.length > 0) {
-      return { lat: places[0].latitude, lng: places[0].longitude };
+      return [places[0].latitude, places[0].longitude];
     }
-    return { lat: 40.7128, lng: -74.006 };
+    return [40.7128, -74.006];
   }, [currentPosition, places]);
+
+  // Custom icons for Leaflet
+  const placeIcon = L.divIcon({
+    className: 'custom-place-icon',
+    html: '<div style="background-color: #3b82f6; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
+  });
+
+  const currentPositionIcon = L.divIcon({
+    className: 'custom-position-icon',
+    html: '<div style="background-color: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);"></div>',
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+  });
 
   return (
     <Card>
@@ -54,59 +71,50 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
         )}
       </CardHeader>
       <CardContent>
-        <GoogleMapContainer center={center} zoom={13}>
+        <StableMapContainer center={center} zoom={13}>
           {places.map((place) => (
-            <Circle
-              key={place.id}
-              center={{ lat: place.latitude, lng: place.longitude }}
-              radius={place.radius_meters}
-              options={{
-                strokeColor: place.color,
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: place.color,
-                fillOpacity: 0.2,
-              }}
-            />
-          ))}
-
-          {places.map((place) => (
-            <Marker
-              key={`marker-${place.id}`}
-              position={{ lat: place.latitude, lng: place.longitude }}
-              label={{
-                text: place.icon || '📍',
-                fontSize: '24px',
-              }}
-            />
+            <div key={place.id}>
+              <Circle
+                center={[place.latitude, place.longitude]}
+                radius={place.radius_meters}
+                pathOptions={{
+                  color: place.color,
+                  opacity: 0.8,
+                  weight: 2,
+                  fillColor: place.color,
+                  fillOpacity: 0.2,
+                }}
+              />
+              <Marker position={[place.latitude, place.longitude]} icon={placeIcon}>
+                <Popup>
+                  <div className="text-sm">
+                    <p className="font-semibold">{place.name}</p>
+                    <p className="text-muted-foreground">
+                      {place.place_type} • {place.radius_meters}m radius
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+            </div>
           ))}
 
           {trail.length > 1 && (
             <Polyline
-              path={trail.map((p) => ({ lat: p.latitude, lng: p.longitude }))}
-              options={{
-                strokeColor: '#8b5cf6',
-                strokeOpacity: 0.7,
-                strokeWeight: 3,
+              positions={trail.map((p) => [p.latitude, p.longitude] as [number, number])}
+              pathOptions={{
+                color: '#8b5cf6',
+                opacity: 0.7,
+                weight: 3,
               }}
             />
           )}
 
           {currentPosition && (
-            <Marker
-              position={{ lat: currentPosition.latitude, lng: currentPosition.longitude }}
-              icon={{
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 10,
-                fillColor: '#3b82f6',
-                fillOpacity: 1,
-                strokeColor: '#ffffff',
-                strokeWeight: 3,
-              }}
-              animation={google.maps.Animation.DROP}
-            />
+            <Marker position={[currentPosition.latitude, currentPosition.longitude]} icon={currentPositionIcon}>
+              <Popup>Current Position</Popup>
+            </Marker>
           )}
-        </GoogleMapContainer>
+        </StableMapContainer>
       </CardContent>
     </Card>
   );

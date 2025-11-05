@@ -12,7 +12,9 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Plus, MapPin, Trash2, Target } from 'lucide-react';
 import { toast } from 'sonner';
-import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface Place {
   id: string;
@@ -47,10 +49,19 @@ const PLACE_TYPES = [
   { value: 'other', label: 'Other', icon: '📍', color: '#6366f1' },
 ];
 
+// Component to handle map clicks
+function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
+  useMapEvents({
+    click: (e) => {
+      onLocationSelect(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+}
+
 export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
-  const [isGeocoding, setIsGeocoding] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -62,8 +73,12 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
     notes: '',
   });
 
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+  // Custom marker icon
+  const markerIcon = L.divIcon({
+    className: 'custom-marker-icon',
+    html: '<div style="background-color: #ef4444; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>',
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
   });
 
   const queryClient = useQueryClient();
@@ -130,35 +145,14 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
     onError: () => toast.error('Failed to delete place'),
   });
 
-  // Geocode address using Google Geocoding API
-  useEffect(() => {
-    const geocodeAddress = async () => {
-      if (formData.address.length < 5 || !isLoaded) return;
-      
-      setIsGeocoding(true);
-      try {
-        const geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ address: formData.address }, (results, status) => {
-          if (status === 'OK' && results && results[0]) {
-            const location = results[0].geometry.location;
-            setFormData(prev => ({
-              ...prev,
-              latitude: location.lat(),
-              longitude: location.lng(),
-            }));
-            toast.success('Location found! Coordinates updated.');
-          }
-        });
-      } catch (error) {
-        console.error('Geocoding error:', error);
-      } finally {
-        setIsGeocoding(false);
-      }
-    };
-
-    const timeoutId = setTimeout(geocodeAddress, 1000);
-    return () => clearTimeout(timeoutId);
-  }, [formData.address, isLoaded]);
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng,
+    }));
+    toast.success('Location set! You can adjust it by clicking again.');
+  };
 
   const resetForm = () => {
     setFormData({
@@ -180,17 +174,6 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
       return;
     }
     createMutation.mutate(formData);
-  };
-
-  const handleMapClick = (e: google.maps.MapMouseEvent) => {
-    if (e.latLng) {
-      setFormData(prev => ({
-        ...prev,
-        latitude: e.latLng!.lat(),
-        longitude: e.latLng!.lng(),
-      }));
-      toast.success('Location set! You can adjust it by clicking again.');
-    }
   };
 
   return (
@@ -246,15 +229,15 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
               </div>
 
               <div>
-                <Label htmlFor="address">Address {isGeocoding && <span className="text-xs text-muted-foreground">(searching...)</span>}</Label>
+                <Label htmlFor="address">Address (Optional)</Label>
                 <Input
                   id="address"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  placeholder="Type address to auto-fill coordinates"
+                  placeholder="123 Main St, City, State"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Coordinates will be automatically filled when you type an address, or click "Set on Map" below
+                  Click "Set on Map" below to set the exact coordinates
                 </p>
               </div>
 
@@ -272,22 +255,26 @@ export function PlaceManager({ elderlyPersonId, onPlaceClick }: PlaceManagerProp
                   </Button>
                 </div>
                 
-                {showMap && isLoaded && (
+                {showMap && (
                   <div className="border rounded-lg overflow-hidden">
-                    <GoogleMap
-                      mapContainerStyle={{ height: '300px', width: '100%' }}
+                    <MapContainer
                       center={
                         formData.latitude !== 0 && formData.longitude !== 0
-                          ? { lat: formData.latitude, lng: formData.longitude }
-                          : { lat: 40.7128, lng: -74.006 }
+                          ? [formData.latitude, formData.longitude]
+                          : [40.7128, -74.006]
                       }
                       zoom={13}
-                      onClick={handleMapClick}
+                      style={{ height: '300px', width: '100%' }}
                     >
+                      <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <MapClickHandler onLocationSelect={handleLocationSelect} />
                       {formData.latitude !== 0 && formData.longitude !== 0 && (
-                        <Marker position={{ lat: formData.latitude, lng: formData.longitude }} />
+                        <Marker position={[formData.latitude, formData.longitude]} icon={markerIcon} />
                       )}
-                    </GoogleMap>
+                    </MapContainer>
                     <p className="text-xs text-muted-foreground p-2 bg-muted">
                       Click anywhere on the map to set the place location
                     </p>
