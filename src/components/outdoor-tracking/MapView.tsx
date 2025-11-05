@@ -1,11 +1,22 @@
-import { Circle, Marker, Polyline, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Circle, Marker, Polyline, Popup } from 'react-leaflet';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Navigation } from 'lucide-react';
-import { StableMapContainer } from './StableMapContainer';
-import { useMemo } from 'react';
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
+// Fix for default marker icons in react-leaflet
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 interface Place {
   id: string;
@@ -31,15 +42,12 @@ interface MapViewProps {
 }
 
 export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
-  const center = useMemo((): [number, number] => {
-    if (currentPosition) {
-      return [currentPosition.latitude, currentPosition.longitude];
-    }
-    if (places.length > 0) {
-      return [places[0].latitude, places[0].longitude];
-    }
-    return [40.7128, -74.006];
-  }, [currentPosition, places]);
+  // Determine map center
+  const center: [number, number] = currentPosition
+    ? [currentPosition.latitude, currentPosition.longitude]
+    : places.length > 0
+    ? [places[0].latitude, places[0].longitude]
+    : [40.7128, -74.006];
 
   return (
     <Card>
@@ -56,52 +64,64 @@ export function MapView({ places, currentPosition, trail = [] }: MapViewProps) {
         )}
       </CardHeader>
       <CardContent>
-        <StableMapContainer center={center} zoom={13}>
-          {places.map((place) => (
-            <Circle
-              key={`circle-${place.id}`}
-              center={[place.latitude, place.longitude]}
-              radius={place.radius_meters}
-              pathOptions={{
-                color: place.color,
-                opacity: 0.8,
-                weight: 2,
-                fillColor: place.color,
-                fillOpacity: 0.2,
-              }}
+        <div style={{ height: '500px', borderRadius: '8px', overflow: 'hidden' }}>
+          <MapContainer
+            center={center}
+            zoom={13}
+            scrollWheelZoom={true}
+            style={{ height: '100%', width: '100%' }}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-          ))}
-          
-          {places.map((place) => (
-            <Marker key={`marker-${place.id}`} position={[place.latitude, place.longitude]}>
-              <Popup>
-                <div className="text-sm">
-                  <p className="font-semibold">{place.name}</p>
-                  <p className="text-muted-foreground">
-                    {place.place_type} • {place.radius_meters}m radius
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+            
+            {places.map((place) => (
+              <Circle
+                key={`circle-${place.id}`}
+                center={[place.latitude, place.longitude]}
+                radius={place.radius_meters}
+                pathOptions={{
+                  color: place.color,
+                  opacity: 0.8,
+                  weight: 2,
+                  fillColor: place.color,
+                  fillOpacity: 0.2,
+                }}
+              />
+            ))}
+            
+            {places.map((place) => (
+              <Marker key={`marker-${place.id}`} position={[place.latitude, place.longitude]}>
+                <Popup>
+                  <div className="text-sm">
+                    <p className="font-semibold">{place.name}</p>
+                    <p className="text-muted-foreground">
+                      {place.place_type} • {place.radius_meters}m radius
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
 
-          {trail.length > 1 && (
-            <Polyline
-              positions={trail.map((p) => [p.latitude, p.longitude] as [number, number])}
-              pathOptions={{
-                color: '#8b5cf6',
-                opacity: 0.7,
-                weight: 3,
-              }}
-            />
-          )}
+            {trail.length > 1 && (
+              <Polyline
+                positions={trail.map((p) => [p.latitude, p.longitude] as [number, number])}
+                pathOptions={{
+                  color: '#8b5cf6',
+                  opacity: 0.7,
+                  weight: 3,
+                }}
+              />
+            )}
 
-          {currentPosition && (
-            <Marker position={[currentPosition.latitude, currentPosition.longitude]}>
-              <Popup>Current Position</Popup>
-            </Marker>
-          )}
-        </StableMapContainer>
+            {currentPosition && (
+              <Marker position={[currentPosition.latitude, currentPosition.longitude]}>
+                <Popup>Current Position</Popup>
+              </Marker>
+            )}
+          </MapContainer>
+        </div>
       </CardContent>
     </Card>
   );
