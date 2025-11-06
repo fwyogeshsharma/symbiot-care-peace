@@ -13,7 +13,7 @@ import DeviceStatusPage from "./pages/DeviceStatusPage";
 import DataSharingPage from "./pages/DataSharingPage";
 import MovementDashboard from "./pages/MovementDashboard";
 import NotFound from "./pages/NotFound";
-import IndoorTracking from "./pages/IndoorTracking";
+import Tracking from "./pages/Tracking";
 import DeviceTypesManagement from "./pages/admin/DeviceTypesManagement";
 import DeviceTypeDataConfigs from "./pages/admin/DeviceTypeDataConfigs";
 import UserManagement from "./pages/admin/UserManagement";
@@ -73,10 +73,10 @@ const App = () => (
               } 
             />
             <Route 
-              path="/indoor-tracking" 
+              path="/tracking" 
               element={
                 <ProtectedRoute>
-                  <IndoorTracking />
+                  <Tracking />
                 </ProtectedRoute>
               } 
             />

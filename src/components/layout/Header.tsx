@@ -48,13 +48,13 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         Activity
       </Button>
       <Button
-        variant={isActive('/indoor-tracking') ? 'default' : 'ghost'}
+        variant={isActive('/tracking') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/indoor-tracking')}
+        onClick={() => navigate('/tracking')}
         className={cn(isMobile && 'w-full justify-start')}
       >
         <MapPin className="w-4 h-4 mr-2" />
-        Indoor Tracking
+        Tracking
       </Button>
       <Button
         variant={isActive('/device-status') ? 'default' : 'ghost'}
