@@ -83,8 +83,6 @@ export const helpTopics: HelpTopic[] = [
     category: 'Activity Monitoring',
     keywords: ['ideal', 'profile', 'baseline', 'pattern', 'normal'],
     relatedPages: ['/movement-dashboard'],
-    mediaUrl: '/tutorials/creating-ideal-profiles.mp4',
-    mediaType: 'video',
   },
 
   // Alerts
@@ -119,8 +117,6 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['acknowledge', 'confirm', 'review', 'response'],
     relatedPages: ['/alerts'],
-    mediaUrl: '/tutorials/acknowledging-alerts.gif',
-    mediaType: 'gif',
   },
 
   // Devices
@@ -165,8 +161,6 @@ export const helpTopics: HelpTopic[] = [
     category: 'Tracking',
     keywords: ['geofence', 'boundary', 'zone', 'area', 'perimeter'],
     relatedPages: ['/tracking'],
-    mediaUrl: '/tutorials/setting-up-geofences.mp4',
-    mediaType: 'video',
   },
 
   // Data Sharing
