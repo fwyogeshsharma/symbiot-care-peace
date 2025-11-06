@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit } from 'lucide-react';
+import { Plus, Trash2, Edit, MapPin } from 'lucide-react';
 import { GeofencePlace, getPlaceTypeOptions, getPlaceTypeColor } from '@/lib/geofenceUtils';
 
 interface GeofenceManagerProps {
@@ -19,6 +19,7 @@ interface GeofenceManagerProps {
 export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPlace, setEditingPlace] = useState<GeofencePlace | null>(null);
+  const [isGeocoding, setIsGeocoding] = useState(false);
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
@@ -139,6 +140,42 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
     setIsDialogOpen(true);
   };
 
+  const handleGeocodeAddress = async () => {
+    if (!formData.address.trim()) {
+      toast.error('Please enter an address first');
+      return;
+    }
+
+    setIsGeocoding(true);
+    try {
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          formData.address
+        )}&key=${apiKey}`
+      );
+      
+      const data = await response.json();
+      
+      if (data.status === 'OK' && data.results.length > 0) {
+        const location = data.results[0].geometry.location;
+        setFormData({
+          ...formData,
+          latitude: location.lat.toString(),
+          longitude: location.lng.toString(),
+        });
+        toast.success('Coordinates updated from address');
+      } else {
+        toast.error('Could not find coordinates for this address');
+      }
+    } catch (error) {
+      toast.error('Failed to geocode address');
+      console.error('Geocoding error:', error);
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -249,12 +286,25 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                 </div>
                 <div>
                   <Label htmlFor="address">Address (optional)</Label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="123 Main St"
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id="address"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      placeholder="123 Main St, City, Country"
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={handleGeocodeAddress}
+                      disabled={isGeocoding || !formData.address.trim()}
+                      title="Get coordinates from address"
+                    >
+                      <MapPin className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="color">Color</Label>
