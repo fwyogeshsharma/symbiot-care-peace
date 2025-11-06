@@ -27,6 +27,90 @@ interface MapViewProps {
   zoom?: number;
 }
 
+function MapContent({
+  geofencePlaces,
+  gpsTrail,
+  currentPosition,
+}: {
+  geofencePlaces: GeofencePlace[];
+  gpsTrail: [number, number][];
+  currentPosition?: GPSCoordinate;
+}) {
+  return (
+    <>
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+
+      {geofencePlaces.map(place => (
+        <Circle
+          key={place.id}
+          center={[place.latitude, place.longitude]}
+          radius={place.radius_meters}
+          pathOptions={{
+            color: place.color,
+            fillColor: place.color,
+            fillOpacity: 0.2,
+            weight: 2,
+          }}
+        >
+          <Popup>
+            <div className="font-semibold">{place.name}</div>
+            <div className="text-sm text-muted-foreground">{place.place_type}</div>
+            {place.address && <div className="text-xs mt-1">{place.address}</div>}
+          </Popup>
+        </Circle>
+      ))}
+
+      {geofencePlaces.map(place => (
+        <Marker
+          key={`marker-${place.id}`}
+          position={[place.latitude, place.longitude]}
+          icon={defaultIcon}
+        >
+          <Popup>
+            <div className="font-semibold">{place.name}</div>
+            <div className="text-sm text-muted-foreground">{place.place_type}</div>
+            {place.address && <div className="text-xs mt-1">{place.address}</div>}
+          </Popup>
+        </Marker>
+      ))}
+
+      {gpsTrail.length > 1 ? (
+        <Polyline
+          positions={gpsTrail}
+          pathOptions={{
+            color: 'hsl(var(--primary))',
+            weight: 3,
+            opacity: 0.7,
+          }}
+        />
+      ) : null}
+
+      {currentPosition ? (
+        <Circle
+          center={[currentPosition.latitude, currentPosition.longitude]}
+          radius={currentPosition.accuracy || 10}
+          pathOptions={{
+            color: 'hsl(var(--primary))',
+            fillColor: 'hsl(var(--primary))',
+            fillOpacity: 0.5,
+            weight: 2,
+          }}
+        >
+          <Popup>
+            <div className="font-semibold">Current Position</div>
+            <div className="text-xs">
+              {currentPosition.latitude.toFixed(6)}, {currentPosition.longitude.toFixed(6)}
+            </div>
+          </Popup>
+        </Circle>
+      ) : null}
+    </>
+  );
+}
+
 export function MapView({
   center,
   currentPosition,
@@ -42,79 +126,11 @@ export function MapView({
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={true}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        <MapContent
+          geofencePlaces={geofencePlaces}
+          gpsTrail={gpsTrail}
+          currentPosition={currentPosition}
         />
-
-        {/* Geofence circles */}
-        {geofencePlaces.map(place => (
-          <Circle
-            key={place.id}
-            center={[place.latitude, place.longitude]}
-            radius={place.radius_meters}
-            pathOptions={{
-              color: place.color,
-              fillColor: place.color,
-              fillOpacity: 0.2,
-              weight: 2,
-            }}
-          >
-            <Popup>
-              <div className="font-semibold">{place.name}</div>
-              <div className="text-sm text-muted-foreground">{place.place_type}</div>
-              {place.address && <div className="text-xs mt-1">{place.address}</div>}
-            </Popup>
-          </Circle>
-        ))}
-
-        {/* Geofence markers */}
-        {geofencePlaces.map(place => (
-          <Marker
-            key={`marker-${place.id}`}
-            position={[place.latitude, place.longitude]}
-            icon={defaultIcon}
-          >
-            <Popup>
-              <div className="font-semibold">{place.name}</div>
-              <div className="text-sm text-muted-foreground">{place.place_type}</div>
-              {place.address && <div className="text-xs mt-1">{place.address}</div>}
-            </Popup>
-          </Marker>
-        ))}
-
-        {/* GPS trail */}
-        {gpsTrail.length > 1 && (
-          <Polyline
-            positions={gpsTrail}
-            pathOptions={{
-              color: 'hsl(var(--primary))',
-              weight: 3,
-              opacity: 0.7,
-            }}
-          />
-        )}
-
-        {/* Current position */}
-        {currentPosition && (
-          <Circle
-            center={[currentPosition.latitude, currentPosition.longitude]}
-            radius={currentPosition.accuracy || 10}
-            pathOptions={{
-              color: 'hsl(var(--primary))',
-              fillColor: 'hsl(var(--primary))',
-              fillOpacity: 0.5,
-              weight: 2,
-            }}
-          >
-            <Popup>
-              <div className="font-semibold">Current Position</div>
-              <div className="text-xs">
-                {currentPosition.latitude.toFixed(6)}, {currentPosition.longitude.toFixed(6)}
-              </div>
-            </Popup>
-          </Circle>
-        )}
       </MapContainer>
     </div>
   );
