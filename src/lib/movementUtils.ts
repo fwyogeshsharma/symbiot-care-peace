@@ -88,3 +88,31 @@ export const getDateRangePreset = (preset: 'today' | 'last7days' | 'last30days')
     end: end.toISOString(),
   };
 };
+
+// Calculate dwell time per location
+export const calculateDwellTimes = (events: MovementEvent[]): Record<string, number> => {
+  const dwellTimes: Record<string, number> = {};
+  
+  // Sort events by timestamp
+  const sortedEvents = [...events].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+  
+  for (let i = 0; i < sortedEvents.length - 1; i++) {
+    const currentEvent = sortedEvents[i];
+    const nextEvent = sortedEvents[i + 1];
+    
+    // Calculate time spent at this location (until next event)
+    const duration = (nextEvent.timestamp.getTime() - currentEvent.timestamp.getTime()) / 60000; // Convert to minutes
+    
+    const location = currentEvent.location;
+    dwellTimes[location] = (dwellTimes[location] || 0) + duration;
+  }
+  
+  // Handle the last event (assume 5 minute dwell if no next event)
+  if (sortedEvents.length > 0) {
+    const lastEvent = sortedEvents[sortedEvents.length - 1];
+    const location = lastEvent.location;
+    dwellTimes[location] = (dwellTimes[location] || 0) + 5;
+  }
+  
+  return dwellTimes;
+};

@@ -5,6 +5,8 @@ import Header from "@/components/layout/Header";
 import { MovementSummary } from "@/components/dashboard/MovementSummary";
 import { MovementTimeline } from "@/components/dashboard/MovementTimeline";
 import { MovementHeatmap } from "@/components/dashboard/MovementHeatmap";
+import { DwellTimeAnalysis } from "@/components/dashboard/DwellTimeAnalysis";
+import { IdealProfileManager } from "@/components/dashboard/IdealProfileManager";
 import ElderlyList from "@/components/dashboard/ElderlyList";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
@@ -17,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { processMovementData, getDateRangePreset } from "@/lib/movementUtils";
 import { isActivityDevice, isActivityDataType } from "@/lib/deviceDataMapping";
+import { checkDwellTimeDeviations } from "@/lib/dwellTimeAlerts";
 
 export default function MovementDashboard() {
   const queryClient = useQueryClient();
@@ -82,6 +85,22 @@ export default function MovementDashboard() {
     enabled: !!selectedPersonId,
   });
 
+  // Fetch active ideal profile
+  const { data: activeProfile } = useQuery({
+    queryKey: ['active-ideal-profile', selectedPersonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ideal_profiles')
+        .select('*')
+        .eq('elderly_person_id', selectedPersonId)
+        .eq('is_active', true)
+        .maybeSingle();
+      if (error) throw error;
+      return data as any;
+    },
+    enabled: !!selectedPersonId,
+  });
+
   // Subscribe to real-time updates
   useEffect(() => {
     if (!selectedPersonId) return;
@@ -109,6 +128,13 @@ export default function MovementDashboard() {
   }, [selectedPersonId, queryClient]);
 
   const processedData = processMovementData(rawMovementData);
+
+  // Check for dwell time deviations and generate alerts
+  useEffect(() => {
+    if (selectedPersonId && activeProfile && processedData.events.length > 0) {
+      checkDwellTimeDeviations(processedData, activeProfile, selectedPersonId);
+    }
+  }, [selectedPersonId, activeProfile, processedData.events.length]);
 
   const handlePresetChange = (preset: string) => {
     setSelectedPreset(preset);
@@ -160,6 +186,14 @@ export default function MovementDashboard() {
         />
 
         <MovementSummary data={processedData} />
+
+        {/* Dwell Time Analysis - Priority Feature */}
+        <DwellTimeAnalysis data={processedData} idealProfile={activeProfile} />
+
+        {/* Ideal Profile Manager */}
+        {selectedPersonId && (
+          <IdealProfileManager elderlyPersonId={selectedPersonId} currentData={processedData} />
+        )}
 
         <div className="grid gap-6 lg:grid-cols-2">
           <MovementTimeline events={processedData.events} />
