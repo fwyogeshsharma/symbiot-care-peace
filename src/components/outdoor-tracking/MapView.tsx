@@ -33,6 +33,7 @@ export function MapView({
 }: MapViewProps) {
   const [selectedPlace, setSelectedPlace] = useState<GeofencePlace | null>(null);
   const [showCurrentInfo, setShowCurrentInfo] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const mapCenter = {
     lat: center[0],
@@ -56,9 +57,16 @@ export function MapView({
     }
   }, [geofencePlaces, currentPosition]);
 
+  const handleScriptLoad = () => {
+    setIsLoaded(true);
+  };
+
   return (
     <div className="w-full rounded-lg overflow-hidden border border-border">
-      <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+      <LoadScript 
+        googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+        onLoad={handleScriptLoad}
+      >
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={mapCenter}
@@ -66,97 +74,101 @@ export function MapView({
           options={mapOptions}
           onLoad={handleLoad}
         >
-          {/* Geofence circles and markers */}
-          {geofencePlaces.map(place => (
-            <div key={place.id}>
-              <Circle
-                center={{ lat: place.latitude, lng: place.longitude }}
-                radius={place.radius_meters}
-                options={{
-                  strokeColor: place.color,
-                  strokeOpacity: 0.8,
-                  strokeWeight: 2,
-                  fillColor: place.color,
-                  fillOpacity: 0.2,
-                }}
-              />
-              <Marker
-                position={{ lat: place.latitude, lng: place.longitude }}
-                onClick={() => setSelectedPlace(place)}
-                icon={{
-                  path: google.maps.SymbolPath.CIRCLE,
-                  scale: 8,
-                  fillColor: place.color,
-                  fillOpacity: 1,
-                  strokeColor: '#ffffff',
-                  strokeWeight: 2,
-                }}
-              />
-              {selectedPlace?.id === place.id && (
-                <InfoWindow
-                  position={{ lat: place.latitude, lng: place.longitude }}
-                  onCloseClick={() => setSelectedPlace(null)}
-                >
-                  <div className="p-2">
-                    <div className="font-semibold text-foreground">{place.name}</div>
-                    <div className="text-sm text-muted-foreground">{place.place_type}</div>
-                    {place.address && <div className="text-xs mt-1">{place.address}</div>}
-                  </div>
-                </InfoWindow>
-              )}
-            </div>
-          ))}
-
-          {/* GPS trail */}
-          {gpsTrail.length > 1 && (
-            <Polyline
-              path={gpsTrail.map(([lat, lng]) => ({ lat, lng }))}
-              options={{
-                strokeColor: 'hsl(var(--primary))',
-                strokeOpacity: 0.7,
-                strokeWeight: 3,
-              }}
-            />
-          )}
-
-          {/* Current position */}
-          {currentPosition && (
+          {isLoaded && (
             <>
-              <Circle
-                center={{ lat: currentPosition.latitude, lng: currentPosition.longitude }}
-                radius={currentPosition.accuracy || 10}
-                options={{
-                  strokeColor: '#3b82f6',
-                  strokeOpacity: 0.8,
-                  strokeWeight: 2,
-                  fillColor: '#3b82f6',
-                  fillOpacity: 0.5,
-                }}
-              />
-              <Marker
-                position={{ lat: currentPosition.latitude, lng: currentPosition.longitude }}
-                onClick={() => setShowCurrentInfo(true)}
-                icon={{
-                  path: google.maps.SymbolPath.CIRCLE,
-                  scale: 10,
-                  fillColor: '#3b82f6',
-                  fillOpacity: 1,
-                  strokeColor: '#ffffff',
-                  strokeWeight: 3,
-                }}
-              />
-              {showCurrentInfo && (
-                <InfoWindow
-                  position={{ lat: currentPosition.latitude, lng: currentPosition.longitude }}
-                  onCloseClick={() => setShowCurrentInfo(false)}
-                >
-                  <div className="p-2">
-                    <div className="font-semibold text-foreground">Current Position</div>
-                    <div className="text-xs">
-                      {currentPosition.latitude.toFixed(6)}, {currentPosition.longitude.toFixed(6)}
-                    </div>
-                  </div>
-                </InfoWindow>
+              {/* Geofence circles and markers */}
+              {geofencePlaces.map(place => (
+                <div key={place.id}>
+                  <Circle
+                    center={{ lat: place.latitude, lng: place.longitude }}
+                    radius={place.radius_meters}
+                    options={{
+                      strokeColor: place.color,
+                      strokeOpacity: 0.8,
+                      strokeWeight: 2,
+                      fillColor: place.color,
+                      fillOpacity: 0.2,
+                    }}
+                  />
+                  <Marker
+                    position={{ lat: place.latitude, lng: place.longitude }}
+                    onClick={() => setSelectedPlace(place)}
+                    icon={{
+                      path: google.maps.SymbolPath.CIRCLE,
+                      scale: 8,
+                      fillColor: place.color,
+                      fillOpacity: 1,
+                      strokeColor: '#ffffff',
+                      strokeWeight: 2,
+                    }}
+                  />
+                  {selectedPlace?.id === place.id && (
+                    <InfoWindow
+                      position={{ lat: place.latitude, lng: place.longitude }}
+                      onCloseClick={() => setSelectedPlace(null)}
+                    >
+                      <div className="p-2">
+                        <div className="font-semibold text-foreground">{place.name}</div>
+                        <div className="text-sm text-muted-foreground">{place.place_type}</div>
+                        {place.address && <div className="text-xs mt-1">{place.address}</div>}
+                      </div>
+                    </InfoWindow>
+                  )}
+                </div>
+              ))}
+
+              {/* GPS trail */}
+              {gpsTrail.length > 1 && (
+                <Polyline
+                  path={gpsTrail.map(([lat, lng]) => ({ lat, lng }))}
+                  options={{
+                    strokeColor: '#3b82f6',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 3,
+                  }}
+                />
+              )}
+
+              {/* Current position */}
+              {currentPosition && (
+                <>
+                  <Circle
+                    center={{ lat: currentPosition.latitude, lng: currentPosition.longitude }}
+                    radius={currentPosition.accuracy || 10}
+                    options={{
+                      strokeColor: '#3b82f6',
+                      strokeOpacity: 0.8,
+                      strokeWeight: 2,
+                      fillColor: '#3b82f6',
+                      fillOpacity: 0.5,
+                    }}
+                  />
+                  <Marker
+                    position={{ lat: currentPosition.latitude, lng: currentPosition.longitude }}
+                    onClick={() => setShowCurrentInfo(true)}
+                    icon={{
+                      path: google.maps.SymbolPath.CIRCLE,
+                      scale: 10,
+                      fillColor: '#3b82f6',
+                      fillOpacity: 1,
+                      strokeColor: '#ffffff',
+                      strokeWeight: 3,
+                    }}
+                  />
+                  {showCurrentInfo && (
+                    <InfoWindow
+                      position={{ lat: currentPosition.latitude, lng: currentPosition.longitude }}
+                      onCloseClick={() => setShowCurrentInfo(false)}
+                    >
+                      <div className="p-2">
+                        <div className="font-semibold text-foreground">Current Position</div>
+                        <div className="text-xs">
+                          {currentPosition.latitude.toFixed(6)}, {currentPosition.longitude.toFixed(6)}
+                        </div>
+                      </div>
+                    </InfoWindow>
+                  )}
+                </>
               )}
             </>
           )}
