@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Settings, Plus, Trash2, CheckCircle, Camera, Edit } from 'lucide-react';
 import { ProcessedMovementData, calculateDwellTimes } from '@/lib/movementUtils';
+import { HelpTooltip } from '@/components/help/HelpTooltip';
+import { EmptyState } from '@/components/help/EmptyState';
 
 interface IdealProfileManagerProps {
   elderlyPersonId: string;
@@ -183,10 +185,28 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="w-5 h-5" />
-            Ideal Profile Management
-          </CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              Ideal Profile Management
+            </CardTitle>
+            <HelpTooltip 
+              title="What are Ideal Profiles?"
+              content={
+                <div className="space-y-2">
+                  <p>Ideal profiles define baseline activity patterns for monitoring deviations.</p>
+                  <p className="text-xs mt-2"><strong>How to use:</strong></p>
+                  <ol className="text-xs space-y-1 list-decimal list-inside">
+                    <li>Create a profile with a descriptive name</li>
+                    <li>Use "Use Current as Baseline" to capture current activity</li>
+                    <li>Adjust min/max thresholds for each location</li>
+                    <li>Activate the profile to start monitoring</li>
+                  </ol>
+                  <p className="text-xs mt-2">The system will alert you when actual dwell times deviate significantly from the ideal ranges.</p>
+                </div>
+              }
+            />
+          </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
             if (!open) resetForm();
@@ -352,10 +372,11 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
             ))}
           </div>
         ) : (
-          <div className="text-center py-8">
-            <Settings className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-50" />
-            <p className="text-sm text-muted-foreground">No ideal profiles created yet</p>
-          </div>
+          <EmptyState
+            icon={Settings}
+            title="No ideal profiles yet"
+            description="Create an ideal profile to establish baseline activity patterns and receive alerts when deviations occur. Use the 'New Profile' button above to get started."
+          />
         )}
       </CardContent>
     </Card>

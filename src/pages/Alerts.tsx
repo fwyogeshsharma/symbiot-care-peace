@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import Header from '@/components/layout/Header';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, subDays } from 'date-fns';
+import { HelpTooltip } from '@/components/help/HelpTooltip';
+import { EmptyState } from '@/components/help/EmptyState';
 
 interface Alert {
   id: string;
@@ -189,7 +191,10 @@ const Alerts = () => {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Alerts</p>
+                <div className="flex items-center gap-1 mb-1">
+                  <p className="text-sm text-muted-foreground">Total Alerts</p>
+                  <HelpTooltip content="Total number of alerts in the selected time period, including active, acknowledged, and resolved alerts." />
+                </div>
                 <p className="text-3xl font-bold">{totalAlerts}</p>
               </div>
               <AlertTriangle className="w-10 h-10 text-primary" />
@@ -219,7 +224,13 @@ const Alerts = () => {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Avg Response</p>
+                <div className="flex items-center gap-1 mb-1">
+                  <p className="text-sm text-muted-foreground">Avg Response</p>
+                  <HelpTooltip 
+                    title="Response Time"
+                    content="Average time taken to acknowledge alerts. Lower response times indicate faster attention to critical issues."
+                  />
+                </div>
                 <p className="text-3xl font-bold">{Math.round(avgResponseTime)}</p>
                 <p className="text-xs text-muted-foreground">minutes</p>
               </div>
@@ -371,13 +382,26 @@ const Alerts = () => {
 
         {/* Alert Timeline */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Alert Timeline</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-semibold">Alert Timeline</h3>
+            <HelpTooltip 
+              title="Alert Severity Levels"
+              content={
+                <div className="space-y-2">
+                  <div><strong className="text-destructive">Critical:</strong> Immediate action required (e.g., panic button, severe vital anomaly)</div>
+                  <div><strong className="text-warning">High:</strong> Urgent attention needed (e.g., geofence breach, device offline)</div>
+                  <div><strong className="text-accent">Medium:</strong> Should be reviewed soon (e.g., minor vital deviation)</div>
+                  <div><strong className="text-muted-foreground">Low:</strong> Informational (e.g., routine notifications)</div>
+                </div>
+              }
+            />
+          </div>
           {filteredAlerts.length === 0 ? (
-            <div className="text-center py-12">
-              <CheckCircle className="w-16 h-16 text-success mx-auto mb-4" />
-              <p className="text-lg font-medium">No alerts found</p>
-              <p className="text-sm text-muted-foreground">All clear! No alerts match your filters.</p>
-            </div>
+            <EmptyState
+              icon={CheckCircle}
+              title="No alerts found"
+              description="All clear! No alerts match your current filters. Try adjusting the filters above to view different alerts."
+            />
           ) : (
             <div className="space-y-4 max-h-[600px] overflow-y-auto">
               {filteredAlerts.map((alert) => (

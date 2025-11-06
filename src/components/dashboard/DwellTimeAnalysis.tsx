@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, TrendingDown, TrendingUp, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { ProcessedMovementData, calculateDwellTimes } from "@/lib/movementUtils";
+import { HelpTooltip } from "@/components/help/HelpTooltip";
 
 interface DwellTimeAnalysisProps {
   data: ProcessedMovementData;
@@ -81,10 +82,34 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
     <Card className="col-span-full">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            Dwell Time Analysis
-          </CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              Dwell Time Analysis
+            </CardTitle>
+            <HelpTooltip 
+              title="Understanding Dwell Times"
+              content={
+                <div className="space-y-2">
+                  <p>Dwell time is the amount of time spent in each location/zone.</p>
+                  <div className="mt-2 space-y-1 text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-primary rounded" />
+                      <span>Normal: Within ideal range</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-warning rounded" />
+                      <span>Warning: 10-20% deviation</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-destructive rounded" />
+                      <span>Alert: &gt;20% deviation or outside range</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            />
+          </div>
           {idealProfile && (
             <Badge variant="outline" className="text-xs">
               Comparing to: {idealProfile?.baseline_data ? 'Active Profile' : 'No Profile'}

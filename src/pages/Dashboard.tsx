@@ -11,6 +11,7 @@ import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
 import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
 import Header from '@/components/layout/Header';
+import { HelpTooltip } from '@/components/help/HelpTooltip';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -190,7 +191,10 @@ const Dashboard = () => {
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">Monitored Persons</p>
+                <div className="flex items-center gap-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Monitored Persons</p>
+                  <HelpTooltip content="Total number of elderly persons you are currently monitoring. This includes all individuals assigned to your care." />
+                </div>
                 <p className="text-2xl sm:text-3xl font-bold">{elderlyPersons?.length || 0}</p>
               </div>
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -202,7 +206,10 @@ const Dashboard = () => {
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">Active Alerts</p>
+                <div className="flex items-center gap-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Active Alerts</p>
+                  <HelpTooltip content="Alerts requiring attention. These may include vital sign anomalies, panic button activations, geofence violations, or device issues. Click on alerts to acknowledge and resolve them." />
+                </div>
                 <p className="text-2xl sm:text-3xl font-bold">{alerts?.length || 0}</p>
               </div>
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
@@ -214,7 +221,13 @@ const Dashboard = () => {
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">Avg Heart Rate</p>
+                <div className="flex items-center gap-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Avg Heart Rate</p>
+                  <HelpTooltip 
+                    title="Heart Rate Monitoring"
+                    content="Average heart rate from recent readings. Normal resting heart rate: 60-100 bpm. Alerts are triggered for values outside safe ranges."
+                  />
+                </div>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {avgHeartRate !== null ? avgHeartRate : '—'}
                 </p>
@@ -233,7 +246,19 @@ const Dashboard = () => {
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">Activity Level</p>
+                <div className="flex items-center gap-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Activity Level</p>
+                  <HelpTooltip 
+                    title="Activity Level Guide"
+                    content={
+                      <div className="space-y-1">
+                        <div><strong>Good:</strong> 8,000+ steps/day</div>
+                        <div><strong>Fair:</strong> 4,000-8,000 steps/day</div>
+                        <div><strong>Low:</strong> &lt;4,000 steps/day</div>
+                      </div>
+                    }
+                  />
+                </div>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {activityLevel !== null ? activityLevel : '—'}
                 </p>

@@ -8,6 +8,7 @@ import ElderlyList from '@/components/dashboard/ElderlyList';
 import { Button } from '@/components/ui/button';
 import { Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { HelpTooltip } from '@/components/help/HelpTooltip';
 
 const DeviceStatusPage = () => {
   const { user, userRole } = useAuth();
@@ -42,7 +43,23 @@ const DeviceStatusPage = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Devices</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-3xl font-bold">Devices</h1>
+                <HelpTooltip 
+                  title="Device Status Guide"
+                  content={
+                    <div className="space-y-2">
+                      <p>Monitor all connected devices and their real-time status.</p>
+                      <div className="mt-2 space-y-1 text-xs">
+                        <div><strong className="text-success">Online:</strong> Device is connected and transmitting</div>
+                        <div><strong className="text-warning">Offline:</strong> No recent data received</div>
+                        <div><strong className="text-muted-foreground">Inactive:</strong> Device not configured</div>
+                      </div>
+                      <p className="text-xs mt-2">Click on any device card to view detailed information and history.</p>
+                    </div>
+                  }
+                />
+              </div>
               <p className="text-muted-foreground">
                 Monitor and manage all connected devices
               </p>
