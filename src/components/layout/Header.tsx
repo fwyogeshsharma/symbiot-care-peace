@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Share2, Menu, ArrowLeft, MapPin, Settings, Shield } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Share2, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -46,6 +46,15 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
       >
         <Activity className="w-4 h-4 mr-2" />
         Activity
+      </Button>
+      <Button
+        variant={isActive('/alerts') ? 'default' : 'ghost'}
+        size={isMobile ? 'default' : 'sm'}
+        onClick={() => navigate('/alerts')}
+        className={cn(isMobile && 'w-full justify-start')}
+      >
+        <AlertTriangle className="w-4 h-4 mr-2" />
+        Alerts
       </Button>
       <Button
         variant={isActive('/tracking') ? 'default' : 'ghost'}

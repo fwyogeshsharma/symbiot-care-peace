@@ -19,6 +19,7 @@ import DeviceTypeDataConfigs from "./pages/admin/DeviceTypeDataConfigs";
 import UserManagement from "./pages/admin/UserManagement";
 import FloorPlanManagement from "./pages/FloorPlanManagement";
 import FloorPlanEditor from "./pages/FloorPlanEditor";
+import Alerts from "./pages/Alerts";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <MovementDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/alerts" 
+              element={
+                <ProtectedRoute>
+                  <Alerts />
                 </ProtectedRoute>
               } 
             />
