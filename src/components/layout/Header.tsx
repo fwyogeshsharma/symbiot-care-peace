@@ -39,6 +39,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
   const NavButtons = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
       <Button
+        data-tour="nav-activity"
         variant={isActive('/movement-dashboard') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/movement-dashboard')}
@@ -48,6 +49,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         Activity
       </Button>
       <Button
+        data-tour="nav-alerts"
         variant={isActive('/alerts') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/alerts')}
@@ -57,6 +59,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         Alerts
       </Button>
       <Button
+        data-tour="nav-tracking"
         variant={isActive('/tracking') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/tracking')}
@@ -66,6 +69,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         Tracking
       </Button>
       <Button
+        data-tour="nav-devices"
         variant={isActive('/device-status') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/device-status')}
@@ -84,6 +88,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         Data Sharing
       </Button>
       <Button
+        data-tour="user-menu"
         variant={isActive('/profile') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/profile')}
@@ -113,14 +118,22 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
               </Button>
             )}
             <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
-            <div className="min-w-0">
-              <h1 className="text-base sm:text-xl font-bold text-foreground truncate">
-                {title || 'SymBIoT'}
-              </h1>
-              <p className="text-xs text-muted-foreground hidden sm:block truncate">
-                {subtitle || 'Peace of Mind'}
-              </p>
-            </div>
+            <Button
+              data-tour="nav-dashboard"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/dashboard')}
+              className="min-w-0 p-0 hover:bg-transparent"
+            >
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-xl font-bold text-foreground truncate">
+                  {title || 'SymBIoT'}
+                </h1>
+                <p className="text-xs text-muted-foreground hidden sm:block truncate">
+                  {subtitle || 'Peace of Mind'}
+                </p>
+              </div>
+            </Button>
           </div>
 
           {/* Right side - Desktop Navigation */}

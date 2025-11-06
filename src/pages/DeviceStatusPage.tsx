@@ -9,11 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
+import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 
 const DeviceStatusPage = () => {
   const { user, userRole } = useAuth();
   const navigate = useNavigate();
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const shouldShowTour = useShouldShowTour();
 
   const { data: elderlyPersons = [] } = useQuery({
     queryKey: ['elderly-persons', user?.id],
@@ -37,6 +39,7 @@ const DeviceStatusPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <OnboardingTour runTour={shouldShowTour} />
       <Header showBackButton title="Devices" subtitle="Monitor your devices" />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
@@ -76,12 +79,16 @@ const DeviceStatusPage = () => {
             )}
           </div>
           
-          <ElderlyList 
-            elderlyPersons={elderlyPersons}
-            selectedPersonId={selectedPersonId}
-            onSelectPerson={setSelectedPersonId}
-          />
-          <DeviceStatus selectedPersonId={selectedPersonId} />
+          <div data-tour="device-person-list">
+            <ElderlyList 
+              elderlyPersons={elderlyPersons}
+              selectedPersonId={selectedPersonId}
+              onSelectPerson={setSelectedPersonId}
+            />
+          </div>
+          <div data-tour="device-status-cards">
+            <DeviceStatus selectedPersonId={selectedPersonId} />
+          </div>
         </div>
       </main>
     </div>

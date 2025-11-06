@@ -20,12 +20,14 @@ import {
 import { processMovementData, getDateRangePreset } from "@/lib/movementUtils";
 import { isActivityDevice, isActivityDataType } from "@/lib/deviceDataMapping";
 import { checkDwellTimeDeviations } from "@/lib/dwellTimeAlerts";
+import { OnboardingTour, useShouldShowTour } from "@/components/help/OnboardingTour";
 
 export default function MovementDashboard() {
   const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
   const [selectedPreset, setSelectedPreset] = useState<string>('today');
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const shouldShowTour = useShouldShowTour();
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -153,6 +155,7 @@ export default function MovementDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <OnboardingTour runTour={shouldShowTour} />
       <Header showBackButton title="Activity Dashboard" subtitle="Track activity patterns over time" />
       <main className="container mx-auto p-6 space-y-6">
         <div className="flex items-center justify-between">
@@ -163,7 +166,7 @@ export default function MovementDashboard() {
             </p>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div data-tour="date-range-selector" className="flex items-center gap-4">
             <Select value={selectedPreset} onValueChange={handlePresetChange}>
               <SelectTrigger className="w-[180px]">
                 <Calendar className="mr-2 h-4 w-4" />
@@ -185,14 +188,20 @@ export default function MovementDashboard() {
           onSelectPerson={setSelectedPersonId}
         />
 
-        <MovementSummary data={processedData} />
+        <div data-tour="movement-summary">
+          <MovementSummary data={processedData} />
+        </div>
 
         {/* Dwell Time Analysis - Priority Feature */}
-        <DwellTimeAnalysis data={processedData} idealProfile={activeProfile} />
+        <div data-tour="dwell-time-analysis">
+          <DwellTimeAnalysis data={processedData} idealProfile={activeProfile} />
+        </div>
 
         {/* Ideal Profile Manager */}
         {selectedPersonId && (
-          <IdealProfileManager elderlyPersonId={selectedPersonId} currentData={processedData} />
+          <div data-tour="ideal-profile-manager">
+            <IdealProfileManager elderlyPersonId={selectedPersonId} currentData={processedData} />
+          </div>
         )}
 
         <div className="grid gap-6 lg:grid-cols-2">

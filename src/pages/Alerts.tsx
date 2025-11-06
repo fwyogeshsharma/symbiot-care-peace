@@ -14,6 +14,7 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import { format, subDays } from 'date-fns';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { EmptyState } from '@/components/help/EmptyState';
+import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 
 interface Alert {
   id: string;
@@ -44,6 +45,7 @@ const Alerts = () => {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateRange, setDateRange] = useState<string>('7');
+  const shouldShowTour = useShouldShowTour();
 
   // Fetch elderly persons
   const { data: elderlyPersons } = useQuery({
@@ -183,11 +185,12 @@ const Alerts = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <OnboardingTour runTour={shouldShowTour} />
       <Header title="Alert Management" subtitle="Monitor and respond to system alerts" />
 
       <main className="container mx-auto px-4 py-6 space-y-6">
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div data-tour="alert-stats" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -240,7 +243,7 @@ const Alerts = () => {
         </div>
 
         {/* Filters */}
-        <Card className="p-6">
+        <Card className="p-6" data-tour="alert-filters">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -302,7 +305,7 @@ const Alerts = () => {
         </Card>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div data-tour="alert-charts" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Alert Trends Chart */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Alert Trends</h3>
@@ -381,7 +384,7 @@ const Alerts = () => {
         </div>
 
         {/* Alert Timeline */}
-        <Card className="p-6">
+        <Card className="p-6" data-tour="alert-timeline">
           <div className="flex items-center gap-2 mb-4">
             <h3 className="text-lg font-semibold">Alert Timeline</h3>
             <HelpTooltip 

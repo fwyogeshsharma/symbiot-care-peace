@@ -11,12 +11,14 @@ import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
 import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
 import Header from '@/components/layout/Header';
+import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const shouldShowTour = useShouldShowTour();
 
   // Fetch elderly persons based on role
   const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
@@ -183,11 +185,12 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <OnboardingTour runTour={shouldShowTour} />
       <Header />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         {/* Stats Overview */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div data-tour="stats-overview" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
@@ -277,12 +280,16 @@ const Dashboard = () => {
         <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column - Elderly Persons & Devices */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            <ElderlyList 
-              elderlyPersons={elderlyPersons || []} 
-              selectedPersonId={selectedPersonId}
-              onSelectPerson={setSelectedPersonId}
-            />
-            <VitalMetrics selectedPersonId={selectedPersonId} />
+            <div data-tour="elderly-list">
+              <ElderlyList 
+                elderlyPersons={elderlyPersons || []} 
+                selectedPersonId={selectedPersonId}
+                onSelectPerson={setSelectedPersonId}
+              />
+            </div>
+            <div data-tour="vital-metrics">
+              <VitalMetrics selectedPersonId={selectedPersonId} />
+            </div>
           </div>
 
           {/* Right Column - Medication, Environmental, Emergency Events & Alerts */}
@@ -290,7 +297,9 @@ const Dashboard = () => {
             <MedicationManagement selectedPersonId={selectedPersonId} />
             <EnvironmentalSensors selectedPersonId={selectedPersonId} />
             <PanicSosEvents selectedPersonId={selectedPersonId} />
-            <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
+            <div data-tour="alerts-list">
+              <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
+            </div>
           </div>
         </div>
       </main>
