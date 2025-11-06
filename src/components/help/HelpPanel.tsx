@@ -7,9 +7,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Search, X, ExternalLink, LayoutDashboard, Activity, AlertTriangle, Wifi, MapPin, HelpCircle, ArrowRight } from 'lucide-react';
+import { Search, X, ExternalLink, LayoutDashboard, Activity, AlertTriangle, Wifi, MapPin, HelpCircle, ArrowRight, Play } from 'lucide-react';
 import { helpTopics, quickLinks, categorizeTopics, searchHelpTopics, HelpTopic } from '@/data/help-content';
 import { restartTour } from './OnboardingTour';
+import { HelpTopicCard } from './HelpTopicCard';
 
 interface HelpPanelProps {
   open: boolean;
@@ -113,13 +114,15 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
                 </div>
                 <div className="space-y-2">
                   {contextTopics.map((topic) => (
-                    <div
+                    <HelpTopicCard
                       key={topic.id}
-                      className="p-3 rounded-lg border hover:border-primary/50 transition-colors cursor-pointer bg-accent/50"
-                    >
-                      <h4 className="font-medium mb-1 text-sm">{topic.title}</h4>
-                      <p className="text-sm text-muted-foreground">{topic.content}</p>
-                    </div>
+                      topic={topic}
+                      onNavigate={(path) => {
+                        navigate(path);
+                        onOpenChange(false);
+                      }}
+                      highlighted
+                    />
                   ))}
                 </div>
                 <Separator className="my-6" />
@@ -179,31 +182,15 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
                 ) : (
                   <div className="space-y-2">
                     {filteredTopics.map((topic) => (
-                      <div
+                      <HelpTopicCard
                         key={topic.id}
-                        className="p-3 rounded-lg border hover:border-primary/50 transition-colors"
-                      >
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <h4 className="font-medium text-sm">{topic.title}</h4>
-                          <Badge variant="outline" className="text-xs shrink-0">
-                            {topic.category}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{topic.content}</p>
-                        {topic.relatedPages && topic.relatedPages.length > 0 && (
-                          <Button
-                            variant="link"
-                            size="sm"
-                            className="h-auto p-0 mt-2 text-xs"
-                            onClick={() => {
-                              navigate(topic.relatedPages![0]);
-                              onOpenChange(false);
-                            }}
-                          >
-                            Go to page <ArrowRight className="w-3 h-3 ml-1" />
-                          </Button>
-                        )}
-                      </div>
+                        topic={topic}
+                        onNavigate={(path) => {
+                          navigate(path);
+                          onOpenChange(false);
+                        }}
+                        showCategory
+                      />
                     ))}
                   </div>
                 )}
@@ -225,23 +212,15 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
                       <AccordionContent>
                         <div className="space-y-3 pt-2">
                           {topics.map((topic) => (
-                            <div key={topic.id} className="pl-2">
-                              <h4 className="font-medium text-sm mb-1">{topic.title}</h4>
-                              <p className="text-sm text-muted-foreground">{topic.content}</p>
-                              {topic.relatedPages && topic.relatedPages.length > 0 && (
-                                <Button
-                                  variant="link"
-                                  size="sm"
-                                  className="h-auto p-0 mt-1 text-xs"
-                                  onClick={() => {
-                                    navigate(topic.relatedPages![0]);
-                                    onOpenChange(false);
-                                  }}
-                                >
-                                  Go to page <ArrowRight className="w-3 h-3 ml-1" />
-                                </Button>
-                              )}
-                            </div>
+                            <HelpTopicCard
+                              key={topic.id}
+                              topic={topic}
+                              onNavigate={(path) => {
+                                navigate(path);
+                                onOpenChange(false);
+                              }}
+                              compact
+                            />
                           ))}
                         </div>
                       </AccordionContent>
