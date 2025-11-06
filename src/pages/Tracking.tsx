@@ -117,7 +117,7 @@ export default function Tracking() {
         .from('device_data')
         .select('*')
         .eq('elderly_person_id', selectedPersonId)
-        .eq('data_type', 'gps')
+        .in('data_type', ['gps', 'latitude', 'longitude'])
         .gte('recorded_at', dateRange.start)
         .lte('recorded_at', dateRange.end)
         .order('recorded_at', { ascending: true })
@@ -125,15 +125,37 @@ export default function Tracking() {
       
       if (error) throw error;
       
-      return data.map(d => {
+      // Group by recorded_at to combine latitude/longitude pairs or use gps type
+      const gpsMap = new Map<string, any>();
+      
+      data.forEach(d => {
+        const key = d.recorded_at;
+        const existing = gpsMap.get(key) || {};
         const value = d.value as any;
-        return {
-          latitude: value.latitude,
-          longitude: value.longitude,
-          accuracy: value.accuracy,
-          timestamp: d.recorded_at,
-        };
-      }) as GPSCoordinate[];
+        
+        if (d.data_type === 'gps') {
+          // Direct GPS data
+          gpsMap.set(key, {
+            latitude: value.latitude || value,
+            longitude: value.longitude,
+            accuracy: value.accuracy || 10,
+            timestamp: d.recorded_at,
+          });
+        } else if (d.data_type === 'latitude') {
+          existing.latitude = typeof value === 'number' ? value : parseFloat(value);
+          existing.timestamp = d.recorded_at;
+          gpsMap.set(key, existing);
+        } else if (d.data_type === 'longitude') {
+          existing.longitude = typeof value === 'number' ? value : parseFloat(value);
+          existing.timestamp = d.recorded_at;
+          gpsMap.set(key, existing);
+        }
+      });
+      
+      // Filter out incomplete coordinates
+      return Array.from(gpsMap.values()).filter(
+        coord => coord.latitude && coord.longitude
+      ) as GPSCoordinate[];
     },
     enabled: !!selectedPersonId && activeTab === 'outdoor'
   });
@@ -272,7 +294,7 @@ export default function Tracking() {
               </TabsTrigger>
               <TabsTrigger value="outdoor">
                 <Navigation className="h-4 w-4 mr-2" />
-                Outdoor GPS
+                Outdoor Tracking
               </TabsTrigger>
             </TabsList>
 
