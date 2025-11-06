@@ -2,9 +2,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Share2, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Share2, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
+import { HelpPanel } from '@/components/help/HelpPanel';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -16,6 +18,25 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
   const { userRole, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [helpPanelOpen, setHelpPanelOpen] = useState(false);
+
+  // Keyboard shortcut to open help panel (F1)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F1') {
+        e.preventDefault();
+        setHelpPanelOpen(true);
+      }
+      // Ctrl+? or Cmd+? to open help
+      if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+        e.preventDefault();
+        setHelpPanelOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const getRoleColor = (role: string | null) => {
     switch (role) {
@@ -102,6 +123,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
 
   return (
     <header className="border-b bg-card shadow-sm sticky top-0 z-10">
+      <HelpPanel open={helpPanelOpen} onOpenChange={setHelpPanelOpen} />
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
           {/* Left side - Logo/Title */}
@@ -144,6 +166,16 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
               </Badge>
             )}
             <NavButtons />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setHelpPanelOpen(true)}
+              className="gap-2"
+              title="Help & Support (F1)"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="hidden xl:inline">Help</span>
+            </Button>
           </div>
 
           {/* Right side - Mobile/Tablet */}
@@ -153,6 +185,14 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
                 {userRole}
               </Badge>
             )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setHelpPanelOpen(true)}
+              title="Help & Support"
+            >
+              <HelpCircle className="w-5 h-5" />
+            </Button>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm">
