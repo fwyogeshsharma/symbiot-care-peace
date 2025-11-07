@@ -6,10 +6,11 @@ import DeviceStatus from '@/components/dashboard/DeviceStatus';
 import Header from '@/components/layout/Header';
 import ElderlyList from '@/components/dashboard/ElderlyList';
 import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
+import { Settings, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
+import { PairingApprovalPanel } from '@/components/pairing/PairingApprovalPanel';
 
 const DeviceStatusPage = () => {
   const { user, userRole } = useAuth();
@@ -69,13 +70,22 @@ const DeviceStatusPage = () => {
             </div>
             
             {(userRole === 'admin' || userRole === 'super_admin') && (
-              <Button
-                variant="outline"
-                onClick={() => navigate('/admin/device-types')}
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                Device Types
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/platform-metrics')}
+                >
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Platform Metrics
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/admin/device-types')}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Device Types
+                </Button>
+              </div>
             )}
           </div>
           
@@ -86,6 +96,11 @@ const DeviceStatusPage = () => {
               onSelectPerson={setSelectedPersonId}
             />
           </div>
+
+          <div className="mb-6">
+            <PairingApprovalPanel />
+          </div>
+          
           <div data-tour="device-status-cards">
             <DeviceStatus selectedPersonId={selectedPersonId} />
           </div>

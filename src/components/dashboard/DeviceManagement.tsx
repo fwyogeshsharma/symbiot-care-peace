@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Key, Copy, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -15,6 +16,7 @@ import { z } from 'zod';
 import { useDeviceTypes } from '@/hooks/useDeviceTypes';
 import { useDeviceTypeDataConfigs } from '@/hooks/useDeviceTypeDataConfigs';
 import { generateSampleDataPoints } from '@/lib/sampleDataGenerator';
+import { DeviceDiscovery } from '@/components/pairing/DeviceDiscovery';
 
 const DeviceManagement = () => {
   const [open, setOpen] = useState(false);
@@ -301,13 +303,21 @@ const DeviceManagement = () => {
           Register New Device
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Register IoT Device</DialogTitle>
+          <DialogTitle>Add IoT Device</DialogTitle>
           <DialogDescription>
-            Add a new IoT device to monitor an elderly person. You'll receive an API key for device authentication.
+            Register a device manually or use the pairing flow for collaborative setup.
           </DialogDescription>
         </DialogHeader>
+
+        <Tabs defaultValue="manual" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="manual">Manual Registration</TabsTrigger>
+            <TabsTrigger value="pair">Pair Device</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="manual" className="space-y-4 mt-4">
 
         {!showApiKey ? (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -447,6 +457,25 @@ Body:
             </Button>
           </div>
         )}
+          </TabsContent>
+
+          <TabsContent value="pair" className="space-y-4 mt-4">
+            {userElderlyPerson ? (
+              <DeviceDiscovery 
+                elderlyPersonId={userElderlyPerson.id} 
+                onSuccess={() => {
+                  queryClient.invalidateQueries({ queryKey: ['devices'] });
+                  setOpen(false);
+                }}
+              />
+            ) : (
+              <div className="text-center p-6 text-muted-foreground">
+                <p>No elderly person profile found.</p>
+                <p className="text-sm mt-2">Please set up a profile first to pair devices.</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

@@ -20,6 +20,7 @@ import UserManagement from "./pages/admin/UserManagement";
 import FloorPlanManagement from "./pages/FloorPlanManagement";
 import FloorPlanEditor from "./pages/FloorPlanEditor";
 import Alerts from "./pages/Alerts";
+import PlatformMetrics from "./pages/PlatformMetrics";
 
 const queryClient = new QueryClient();
 
@@ -126,6 +127,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <FloorPlanEditor />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/platform-metrics" 
+              element={
+                <ProtectedRoute>
+                  <PlatformMetrics />
                 </ProtectedRoute>
               } 
             />

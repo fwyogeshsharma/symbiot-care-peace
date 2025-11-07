@@ -96,6 +96,51 @@ export type Database = {
           },
         ]
       }
+      device_association_logs: {
+        Row: {
+          created_at: string
+          details: Json | null
+          device_id: string | null
+          event_type: string
+          id: string
+          pairing_request_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          device_id?: string | null
+          event_type: string
+          id?: string
+          pairing_request_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          device_id?: string | null
+          event_type?: string
+          id?: string
+          pairing_request_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_association_logs_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "device_association_logs_pairing_request_id_fkey"
+            columns: ["pairing_request_id"]
+            isOneToOne: false
+            referencedRelation: "device_pairing_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       device_data: {
         Row: {
           created_at: string
@@ -137,6 +182,109 @@ export type Database = {
           },
           {
             foreignKeyName: "device_data_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      device_health_logs: {
+        Row: {
+          battery_status: string | null
+          connectivity_status: string | null
+          created_at: string
+          data_points_24h: number | null
+          device_id: string
+          error_count: number | null
+          health_score: number
+          id: string
+          last_data_transmission: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          battery_status?: string | null
+          connectivity_status?: string | null
+          created_at?: string
+          data_points_24h?: number | null
+          device_id: string
+          error_count?: number | null
+          health_score: number
+          id?: string
+          last_data_transmission?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          battery_status?: string | null
+          connectivity_status?: string | null
+          created_at?: string
+          data_points_24h?: number | null
+          device_id?: string
+          error_count?: number | null
+          health_score?: number
+          id?: string
+          last_data_transmission?: string | null
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_health_logs_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      device_pairing_requests: {
+        Row: {
+          approved_by: string | null
+          created_at: string
+          device_id: string
+          device_metadata: Json | null
+          device_type: string | null
+          elderly_person_id: string
+          expires_at: string
+          id: string
+          network_info: Json | null
+          paired_at: string | null
+          pairing_code: string
+          requested_by: string
+          status: string
+        }
+        Insert: {
+          approved_by?: string | null
+          created_at?: string
+          device_id: string
+          device_metadata?: Json | null
+          device_type?: string | null
+          elderly_person_id: string
+          expires_at: string
+          id?: string
+          network_info?: Json | null
+          paired_at?: string | null
+          pairing_code: string
+          requested_by: string
+          status?: string
+        }
+        Update: {
+          approved_by?: string | null
+          created_at?: string
+          device_id?: string
+          device_metadata?: Json | null
+          device_type?: string | null
+          elderly_person_id?: string
+          expires_at?: string
+          id?: string
+          network_info?: Json | null
+          paired_at?: string | null
+          pairing_code?: string
+          requested_by?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_pairing_requests_elderly_person_id_fkey"
             columns: ["elderly_person_id"]
             isOneToOne: false
             referencedRelation: "elderly_persons"
@@ -584,6 +732,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json | null
+          metric_name: string
+          metric_type: string
+          recorded_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_name: string
+          metric_type: string
+          recorded_at?: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_name?: string
+          metric_type?: string
+          recorded_at?: string
+          value?: number
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
