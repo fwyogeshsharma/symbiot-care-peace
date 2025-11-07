@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import { ZoneEditor } from "@/components/floor-plan/ZoneEditor";
@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function FloorPlanEditor() {
   const { elderlyPersonId, floorPlanId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: floorPlan, isLoading } = useQuery({
     queryKey: ['floor-plan', floorPlanId],
@@ -27,12 +28,18 @@ export default function FloorPlanEditor() {
   });
 
   const handleSave = async (zones: any[]) => {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('floor_plans')
       .update({ zones })
-      .eq('id', floorPlanId);
+      .eq('id', floorPlanId)
+      .select()
+      .single();
     
     if (error) throw error;
+    
+    // Invalidate queries to refresh data
+    await queryClient.invalidateQueries({ queryKey: ['floor-plan', floorPlanId] });
+    await queryClient.invalidateQueries({ queryKey: ['floor-plans'] });
   };
 
   if (isLoading) {
