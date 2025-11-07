@@ -223,12 +223,13 @@ export function ZoneEditor({
 
       const zoneId = target.data.zoneId;
       
-      // Extract new coordinates from the modified polygon
+      // Get the transformation matrix
       const matrix = target.calcTransformMatrix();
       const points = target.points;
       
       if (!points || points.length < 3) return;
 
+      // Calculate absolute coordinates for each point
       const newCoordinates = points.map((point: any) => {
         const transformedPoint = fabricUtil.transformPoint(
           { x: point.x, y: point.y },
@@ -246,6 +247,22 @@ export function ZoneEditor({
           ? { ...zone, coordinates: newCoordinates }
           : zone
       );
+      
+      // Important: Reset the polygon's transform to prevent drift
+      // by recreating it with the new absolute coordinates
+      target.set({
+        points: newCoordinates.map(coord => ({
+          x: coord.x * SCALE,
+          y: coord.y * SCALE
+        })),
+        left: 0,
+        top: 0,
+        scaleX: 1,
+        scaleY: 1,
+        angle: 0,
+      });
+      target.setCoords();
+      fabricCanvas.renderAll();
       
       addToHistory(updatedZones);
       setZones(updatedZones);
