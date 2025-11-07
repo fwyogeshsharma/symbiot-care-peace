@@ -47,19 +47,40 @@ export const generateSampleDataPoints = (
   dataConfigs: DeviceTypeDataConfig[],
   device: any,
   hoursBack: number = 168, // 7 days
-  intervalHours: number = 2
+  intervalHours: number = 2,
+  geofences: any[] = []
 ) => {
   const now = new Date();
   const sampleData: any[] = [];
 
   for (let i = hoursBack; i >= 0; i -= intervalHours) {
     const recordedAt = new Date(now.getTime() - i * 60 * 60 * 1000);
+    const timeIndex = Math.floor((hoursBack - i) / intervalHours);
 
     for (const config of dataConfigs) {
       // Skip position data as it's handled separately
       if (config.sample_data_config?.type === 'position') continue;
 
-      const value = generateValueFromConfig(config.sample_data_config);
+      let value: any;
+      
+      // Special handling for GPS data with geofences
+      if (config.sample_data_config?.type === 'gps' && geofences.length > 0) {
+        // Cycle through geofences and add variation within radius
+        const geofenceIndex = timeIndex % geofences.length;
+        const currentGeofence = geofences[geofenceIndex];
+        
+        // Add random offset within geofence radius (convert meters to degrees, roughly)
+        const radiusInDegrees = (currentGeofence.radius_meters || 100) / 111000;
+        const angle = Math.random() * 2 * Math.PI;
+        const distance = Math.random() * radiusInDegrees;
+        
+        value = {
+          latitude: Number(currentGeofence.latitude) + distance * Math.cos(angle),
+          longitude: Number(currentGeofence.longitude) + distance * Math.sin(angle),
+        };
+      } else {
+        value = generateValueFromConfig(config.sample_data_config);
+      }
 
       if (value !== null) {
         sampleData.push({

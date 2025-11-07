@@ -167,12 +167,20 @@ const DeviceManagement = () => {
         `)
         .eq('device_types.code', device.device_type);
 
+      // Fetch geofences for GPS devices
+      const { data: geofences } = await supabase
+        .from('geofence_places')
+        .select('*')
+        .eq('elderly_person_id', device.elderly_person_id)
+        .eq('is_active', true);
+
       if (deviceTypeDataConfigs && deviceTypeDataConfigs.length > 0) {
         const generatedData = generateSampleDataPoints(
           deviceTypeDataConfigs as any,
           device,
           168, // 7 days
-          2 // every 2 hours
+          2, // every 2 hours
+          geofences || []
         );
         sampleData.push(...generatedData);
       }
