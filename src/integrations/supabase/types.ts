@@ -493,6 +493,7 @@ export type Database = {
         Row: {
           created_at: string | null
           elderly_person_id: string | null
+          furniture: Json | null
           grid_size: number | null
           height: number
           id: string
@@ -505,6 +506,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           elderly_person_id?: string | null
+          furniture?: Json | null
           grid_size?: number | null
           height: number
           id?: string
@@ -517,6 +519,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           elderly_person_id?: string | null
+          furniture?: Json | null
           grid_size?: number | null
           height?: number
           id?: string

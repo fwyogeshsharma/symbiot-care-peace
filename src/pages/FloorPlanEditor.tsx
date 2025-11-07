@@ -96,7 +96,7 @@ export default function FloorPlanEditor() {
           gridSize={floorPlan.grid_size}
           imageUrl={floorPlan.image_url}
           initialZones={Array.isArray(floorPlan.zones) ? floorPlan.zones as any : []}
-          initialFurniture={Array.isArray(floorPlan.furniture) ? floorPlan.furniture as any : []}
+          initialFurniture={Array.isArray((floorPlan as any).furniture) ? (floorPlan as any).furniture : []}
           onSave={handleSave}
         />
       </div>
