@@ -10,7 +10,6 @@ interface Zone {
   name: string;
   color: string;
   coordinates: Array<{ x: number; y: number }>;
-  fabricObject?: Polygon;
 }
 
 export interface FurnitureItem {
@@ -21,7 +20,6 @@ export interface FurnitureItem {
   width: number;
   height: number;
   rotation: number;
-  fabricObject?: FabricObject;
 }
 
 interface ZoneEditorProps {
@@ -111,116 +109,76 @@ export function ZoneEditor({
     fabricCanvas.renderAll();
   }, [fabricCanvas, gridSize]);
 
-  // Render zones and furniture on canvas
+  // Render zones and furniture on canvas - always clear and recreate from state
   useEffect(() => {
     if (!fabricCanvas) return;
 
-    // Get existing objects
-    const existingZoneIds = new Set(Array.from(zoneObjectsRef.current.keys()));
-    const existingFurnitureIds = new Set(Array.from(furnitureObjectsRef.current.keys()));
-    const currentZoneIds = new Set(zones.map(z => z.id));
-    const currentFurnitureIds = new Set(furniture.map(f => f.id));
-
-    // Remove deleted zones
-    existingZoneIds.forEach(id => {
-      if (!currentZoneIds.has(id)) {
-        const obj = zoneObjectsRef.current.get(id);
-        if (obj) {
-          fabricCanvas.remove(obj);
-          zoneObjectsRef.current.delete(id);
-        }
-      }
+    // Remove ALL zones and furniture from canvas
+    Array.from(zoneObjectsRef.current.values()).forEach(obj => {
+      fabricCanvas.remove(obj);
     });
-
-    // Remove deleted furniture
-    existingFurnitureIds.forEach(id => {
-      if (!currentFurnitureIds.has(id)) {
-        const obj = furnitureObjectsRef.current.get(id);
-        if (obj) {
-          fabricCanvas.remove(obj);
-          furnitureObjectsRef.current.delete(id);
-        }
-      }
+    Array.from(furnitureObjectsRef.current.values()).forEach(obj => {
+      fabricCanvas.remove(obj);
     });
+    
+    // Clear the refs
+    zoneObjectsRef.current.clear();
+    furnitureObjectsRef.current.clear();
 
-    // Add or update zones
+    // Recreate ALL zones from state
     zones.forEach((zone) => {
-      let polygon = zoneObjectsRef.current.get(zone.id);
-      
-      if (!polygon) {
-        // Create new polygon
-        const points = zone.coordinates.map(coord => ({
-          x: coord.x * SCALE,
-          y: coord.y * SCALE,
-        }));
+      const points = zone.coordinates.map(coord => ({
+        x: coord.x * SCALE,
+        y: coord.y * SCALE,
+      }));
 
-        polygon = new Polygon(points, {
-          fill: zone.color + '40',
-          stroke: zone.color,
-          strokeWidth: 2,
-          selectable: activeTool === "select" || activeTool === "delete",
-          hasControls: activeTool === "select",
-          hasBorders: true,
-          objectCaching: false,
-        });
+      const polygon = new Polygon(points, {
+        fill: zone.color + '40',
+        stroke: zone.color,
+        strokeWidth: 2,
+        selectable: activeTool === "select" || activeTool === "delete",
+        hasControls: activeTool === "select",
+        hasBorders: true,
+        objectCaching: false,
+      });
 
-        polygon.set('data', { zoneId: zone.id, type: 'zone' });
-        fabricCanvas.add(polygon);
-        zoneObjectsRef.current.set(zone.id, polygon);
-      } else {
-        // Update existing polygon properties
-        polygon.set({
-          fill: zone.color + '40',
-          stroke: zone.color,
-          selectable: activeTool === "select" || activeTool === "delete",
-          hasControls: activeTool === "select",
-        });
-      }
+      polygon.set('data', { zoneId: zone.id, type: 'zone' });
+      fabricCanvas.add(polygon);
+      zoneObjectsRef.current.set(zone.id, polygon);
     });
 
-    // Add or update furniture
+    // Recreate ALL furniture from state
     furniture.forEach((item) => {
-      let furnitureObj = furnitureObjectsRef.current.get(item.id);
-      
-      if (!furnitureObj) {
-        // Create new furniture object
-        const colors = {
-          bed: '#ef4444',
-          chair: '#f59e0b',
-          table: '#84cc16',
-          sofa: '#06b6d4',
-          desk: '#8b5cf6',
-          toilet: '#ec4899',
-          sink: '#14b8a6',
-          door: '#6b7280',
-        };
+      const colors = {
+        bed: '#ef4444',
+        chair: '#f59e0b',
+        table: '#84cc16',
+        sofa: '#06b6d4',
+        desk: '#8b5cf6',
+        toilet: '#ec4899',
+        sink: '#14b8a6',
+        door: '#6b7280',
+      };
 
-        furnitureObj = new Rect({
-          left: item.x * SCALE,
-          top: item.y * SCALE,
-          width: item.width * SCALE,
-          height: item.height * SCALE,
-          fill: colors[item.type] + '80',
-          stroke: colors[item.type],
-          strokeWidth: 2,
-          angle: item.rotation,
-          selectable: activeTool === "select" || activeTool === "furniture",
-          hasControls: activeTool === "select" || activeTool === "furniture",
-          hasBorders: true,
-          rx: 4,
-          ry: 4,
-        });
+      const furnitureObj = new Rect({
+        left: item.x * SCALE,
+        top: item.y * SCALE,
+        width: item.width * SCALE,
+        height: item.height * SCALE,
+        fill: colors[item.type] + '80',
+        stroke: colors[item.type],
+        strokeWidth: 2,
+        angle: item.rotation,
+        selectable: activeTool === "select" || activeTool === "furniture",
+        hasControls: activeTool === "select" || activeTool === "furniture",
+        hasBorders: true,
+        rx: 4,
+        ry: 4,
+      });
 
-        furnitureObj.set('data', { furnitureId: item.id, type: 'furniture', furnitureType: item.type });
-        fabricCanvas.add(furnitureObj);
-        furnitureObjectsRef.current.set(item.id, furnitureObj);
-      } else {
-        // Update existing furniture properties
-        furnitureObj.set({
-          selectable: activeTool === "select" || activeTool === "furniture",
-          hasControls: activeTool === "select" || activeTool === "furniture",
-        });
-      }
+      furnitureObj.set('data', { furnitureId: item.id, type: 'furniture', furnitureType: item.type });
+      fabricCanvas.add(furnitureObj);
+      furnitureObjectsRef.current.set(item.id, furnitureObj);
     });
 
     fabricCanvas.renderAll();
@@ -377,7 +335,7 @@ export function ZoneEditor({
         
         if (!points || points.length < 3) return;
 
-        // Calculate absolute coordinates for each point
+        // Calculate NEW absolute coordinates
         const newCoordinates = points.map((point: any) => {
           const transformedPoint = fabricUtil.transformPoint(
             { x: point.x, y: point.y },
@@ -389,26 +347,12 @@ export function ZoneEditor({
           };
         });
 
-        // Update the zone with new coordinates
+        // Update state - render effect will recreate the polygon
         const updatedZones = zones.map(zone => 
           zone.id === zoneId 
             ? { ...zone, coordinates: newCoordinates }
             : zone
         );
-        
-        // Reset the polygon's transform to prevent drift
-        target.set({
-          points: newCoordinates.map(coord => ({
-            x: coord.x * SCALE,
-            y: coord.y * SCALE
-          })),
-          left: 0,
-          top: 0,
-          scaleX: 1,
-          scaleY: 1,
-          angle: 0,
-        });
-        target.setCoords();
         
         const newState = { zones: updatedZones, furniture };
         addToHistory(newState);
@@ -417,7 +361,7 @@ export function ZoneEditor({
       } else if (target.data.type === 'furniture' && target.data.furnitureId) {
         const furnitureId = target.data.furnitureId;
         
-        // Update furniture position and dimensions
+        // Extract new position, dimensions, and rotation
         const updatedFurniture = furniture.map(item => 
           item.id === furnitureId 
             ? {
@@ -431,21 +375,12 @@ export function ZoneEditor({
             : item
         );
         
-        // Reset scales to 1 to prevent drift
-        target.set({
-          scaleX: 1,
-          scaleY: 1,
-          width: target.width * target.scaleX,
-          height: target.height * target.scaleY,
-        });
-        target.setCoords();
-        
         const newState = { zones, furniture: updatedFurniture };
         addToHistory(newState);
         setFurniture(updatedFurniture);
       }
       
-      fabricCanvas.renderAll();
+      // Don't call renderAll - the render effect will handle it
     };
 
     fabricCanvas.on('object:modified', handleObjectModified);
@@ -488,9 +423,7 @@ export function ZoneEditor({
       setHistoryIndex(historyIndex - 1);
       setZones(prevState.zones);
       setFurniture(prevState.furniture);
-      // Clear object references to force recreation
-      zoneObjectsRef.current.clear();
-      furnitureObjectsRef.current.clear();
+      // Render effect will automatically clear and recreate
     }
   };
 
@@ -500,9 +433,7 @@ export function ZoneEditor({
       setHistoryIndex(historyIndex + 1);
       setZones(nextState.zones);
       setFurniture(nextState.furniture);
-      // Clear object references to force recreation
-      zoneObjectsRef.current.clear();
-      furnitureObjectsRef.current.clear();
+      // Render effect will automatically clear and recreate
     }
   };
 
@@ -514,8 +445,7 @@ export function ZoneEditor({
       setFurniture([]);
       setSelectedZoneId(null);
       setSelectedFurnitureId(null);
-      zoneObjectsRef.current.clear();
-      furnitureObjectsRef.current.clear();
+      // Render effect will automatically clear everything
     }
   };
 
@@ -534,7 +464,7 @@ export function ZoneEditor({
     if (selectedZoneId === zoneId) {
       setSelectedZoneId(null);
     }
-    zoneObjectsRef.current.delete(zoneId);
+    // Render effect will handle removal
     toast.success("Zone deleted");
   };
 
@@ -546,7 +476,7 @@ export function ZoneEditor({
     if (selectedFurnitureId === furnitureId) {
       setSelectedFurnitureId(null);
     }
-    furnitureObjectsRef.current.delete(furnitureId);
+    // Render effect will handle removal
     toast.success("Furniture deleted");
   };
 
