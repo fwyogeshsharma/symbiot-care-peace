@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Canvas as FabricCanvas, Polygon, Rect, FabricObject } from "fabric";
+import { Canvas as FabricCanvas, Polygon, Rect, FabricObject, util as fabricUtil } from "fabric";
 import { ZoneDrawingTools, DrawingTool } from "./ZoneDrawingTools";
 import { ZonePropertiesPanel } from "./ZonePropertiesPanel";
 import { toast } from "sonner";
@@ -212,6 +212,53 @@ export function ZoneEditor({
       fabricCanvas.off('mouse:down', handleObjectClick);
     };
   }, [fabricCanvas, activeTool, zones, polygonPoints, tempLines]);
+
+  // Handle zone modifications (resize, move, rotate)
+  useEffect(() => {
+    if (!fabricCanvas) return;
+
+    const handleObjectModified = (e: any) => {
+      const target = e.target;
+      if (!target || !target.data || !target.data.zoneId) return;
+
+      const zoneId = target.data.zoneId;
+      
+      // Extract new coordinates from the modified polygon
+      const matrix = target.calcTransformMatrix();
+      const points = target.points;
+      
+      if (!points || points.length < 3) return;
+
+      const newCoordinates = points.map((point: any) => {
+        const transformedPoint = fabricUtil.transformPoint(
+          { x: point.x, y: point.y },
+          matrix
+        );
+        return {
+          x: transformedPoint.x / SCALE,
+          y: transformedPoint.y / SCALE,
+        };
+      });
+
+      // Update the zone with new coordinates
+      const updatedZones = zones.map(zone => 
+        zone.id === zoneId 
+          ? { ...zone, coordinates: newCoordinates }
+          : zone
+      );
+      
+      addToHistory(updatedZones);
+      setZones(updatedZones);
+      
+      toast.success("Zone updated");
+    };
+
+    fabricCanvas.on('object:modified', handleObjectModified);
+
+    return () => {
+      fabricCanvas.off('object:modified', handleObjectModified);
+    };
+  }, [fabricCanvas, zones, SCALE]);
 
   const completePolygon = (points: Array<{ x: number; y: number }>) => {
     // Clear temp lines
