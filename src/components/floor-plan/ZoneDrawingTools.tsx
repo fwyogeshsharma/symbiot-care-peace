@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Square, Pentagon, MousePointer, Trash2, Undo2, Redo2, Save } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-export type DrawingTool = "select" | "rectangle" | "polygon" | "delete";
+export type DrawingTool = "select" | "rectangle" | "polygon" | "delete" | "furniture";
 
 interface ZoneDrawingToolsProps {
   activeTool: DrawingTool;

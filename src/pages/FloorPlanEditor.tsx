@@ -27,10 +27,13 @@ export default function FloorPlanEditor() {
     enabled: !!floorPlanId,
   });
 
-  const handleSave = async (zones: any[]) => {
+  const handleSave = async (zones: any[], furniture: any[]) => {
     const { data, error } = await supabase
       .from('floor_plans')
-      .update({ zones })
+      .update({ 
+        zones,
+        furniture: furniture || []
+      })
       .eq('id', floorPlanId)
       .select()
       .single();
@@ -93,6 +96,7 @@ export default function FloorPlanEditor() {
           gridSize={floorPlan.grid_size}
           imageUrl={floorPlan.image_url}
           initialZones={Array.isArray(floorPlan.zones) ? floorPlan.zones as any : []}
+          initialFurniture={Array.isArray(floorPlan.furniture) ? floorPlan.furniture as any : []}
           onSave={handleSave}
         />
       </div>
