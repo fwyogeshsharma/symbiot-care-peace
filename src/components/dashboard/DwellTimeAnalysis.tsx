@@ -143,11 +143,11 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="location"
-                  angle={-45}
-                  textAnchor="end"
-                  height={120}
+                  angle={0}
+                  textAnchor="middle"
+                  height={80}
                   interval={0}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 11 }}
                 />
                 <YAxis
                   label={{ value: 'Minutes', angle: -90, position: 'insideLeft' }}
