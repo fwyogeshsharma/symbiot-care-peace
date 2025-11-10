@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAllDeviceTypes, DeviceType } from '@/hooks/useDeviceTypes';
 import Header from '@/components/layout/Header';
 import { useNavigate } from 'react-router-dom';
+import { PopulateDeviceConfigs } from '@/components/admin/PopulateDeviceConfigs';
 
 const DeviceTypesManagement = () => {
   const { data: deviceTypes = [], isLoading } = useAllDeviceTypes();
@@ -127,7 +128,9 @@ const DeviceTypesManagement = () => {
     <div className="min-h-screen bg-background">
       <Header showBackButton title="Device Types Management" subtitle="Configure device types and categories" />
 
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-4 py-6 space-y-6">
+        <PopulateDeviceConfigs />
+        
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
