@@ -138,11 +138,21 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
         {chartData.length > 0 && (
           <div>
             <h4 className="text-sm font-semibold mb-3">Actual vs Ideal Dwell Time by Location</h4>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="location" angle={-45} textAnchor="end" height={100} />
-                <YAxis label={{ value: 'Minutes', angle: -90, position: 'insideLeft' }} />
+                <XAxis
+                  dataKey="location"
+                  angle={-45}
+                  textAnchor="end"
+                  height={120}
+                  interval={0}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis
+                  label={{ value: 'Minutes', angle: -90, position: 'insideLeft' }}
+                  tick={{ fontSize: 12 }}
+                />
                 <Tooltip 
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
