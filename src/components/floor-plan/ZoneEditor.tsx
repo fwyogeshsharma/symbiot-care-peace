@@ -56,10 +56,21 @@ export function ZoneEditor({
   const [tempLines, setTempLines] = useState<FabricObject[]>([]);
   const zoneObjectsRef = useRef<Map<string, Polygon>>(new Map());
   const furnitureObjectsRef = useRef<Map<string, FabricObject>>(new Map());
+  const isModifyingRef = useRef(false);
 
   const CANVAS_WIDTH = 800;
   const CANVAS_HEIGHT = 600;
   const SCALE = Math.min(CANVAS_WIDTH / floorPlanWidth, CANVAS_HEIGHT / floorPlanHeight);
+
+  // Sync state with initialZones/initialFurniture when they change (e.g., after save/reload)
+  useEffect(() => {
+    console.log('Loading zones from props:', JSON.stringify(initialZones, null, 2));
+    console.log('Loading furniture from props:', JSON.stringify(initialFurniture, null, 2));
+    setZones(initialZones);
+    setFurniture(initialFurniture);
+    setHistory([{ zones: initialZones, furniture: initialFurniture }]);
+    setHistoryIndex(0);
+  }, [JSON.stringify(initialZones), JSON.stringify(initialFurniture)]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -109,46 +120,100 @@ export function ZoneEditor({
     fabricCanvas.renderAll();
   }, [fabricCanvas, gridSize]);
 
-  // Render zones and furniture on canvas - always clear and recreate from state
+  // Render zones and furniture on canvas - smart update instead of full recreate
   useEffect(() => {
     if (!fabricCanvas) return;
 
-    // Remove ALL zones and furniture from canvas
-    Array.from(zoneObjectsRef.current.values()).forEach(obj => {
-      fabricCanvas.remove(obj);
-    });
-    Array.from(furnitureObjectsRef.current.values()).forEach(obj => {
-      fabricCanvas.remove(obj);
-    });
-    
-    // Clear the refs
-    zoneObjectsRef.current.clear();
-    furnitureObjectsRef.current.clear();
+    // Don't update while user is actively dragging/modifying
+    if (isModifyingRef.current) return;
 
-    // Recreate ALL zones from state
+    const existingZoneIds = new Set(zoneObjectsRef.current.keys());
+    const currentZoneIds = new Set(zones.map(z => z.id));
+
+    const existingFurnitureIds = new Set(furnitureObjectsRef.current.keys());
+    const currentFurnitureIds = new Set(furniture.map(f => f.id));
+
+    // Remove zones that no longer exist in state
+    existingZoneIds.forEach(id => {
+      if (!currentZoneIds.has(id)) {
+        const obj = zoneObjectsRef.current.get(id);
+        if (obj) {
+          fabricCanvas.remove(obj);
+          zoneObjectsRef.current.delete(id);
+        }
+      }
+    });
+
+    // Remove furniture that no longer exists in state
+    existingFurnitureIds.forEach(id => {
+      if (!currentFurnitureIds.has(id)) {
+        const obj = furnitureObjectsRef.current.get(id);
+        if (obj) {
+          fabricCanvas.remove(obj);
+          furnitureObjectsRef.current.delete(id);
+        }
+      }
+    });
+
+    // Add or update zones
     zones.forEach((zone) => {
-      const points = zone.coordinates.map(coord => ({
-        x: coord.x * SCALE,
-        y: coord.y * SCALE,
-      }));
+      const existingPolygon = zoneObjectsRef.current.get(zone.id);
 
-      const polygon = new Polygon(points, {
-        fill: zone.color + '40',
-        stroke: zone.color,
-        strokeWidth: 2,
-        selectable: activeTool === "select" || activeTool === "delete",
-        hasControls: activeTool === "select",
-        hasBorders: true,
-        objectCaching: false,
-      });
+      if (!existingPolygon) {
+        // Create new zone with exact absolute coordinates
+        console.log(`Creating zone ${zone.name} with coordinates:`, zone.coordinates);
 
-      polygon.set('data', { zoneId: zone.id, type: 'zone' });
-      fabricCanvas.add(polygon);
-      zoneObjectsRef.current.set(zone.id, polygon);
+        const points = zone.coordinates.map(coord => ({
+          x: coord.x * SCALE,
+          y: coord.y * SCALE,
+        }));
+
+        console.log(`Zone ${zone.name} - Points in pixels:`, points);
+
+        // Calculate centroid for proper positioning
+        const centerX = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+        const centerY = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+
+        console.log(`Zone ${zone.name} - Center at:`, { centerX, centerY });
+
+        // Create points relative to center (Fabric.js polygon coordinate system)
+        const relativePoints = points.map(p => ({
+          x: p.x - centerX,
+          y: p.y - centerY,
+        }));
+
+        const polygon = new Polygon(relativePoints, {
+          fill: zone.color + '40',
+          stroke: zone.color,
+          strokeWidth: 2,
+          selectable: activeTool === "select" || activeTool === "delete",
+          hasControls: activeTool === "select",
+          hasBorders: true,
+          objectCaching: false,
+          left: centerX,
+          top: centerY,
+          originX: 'center',
+          originY: 'center',
+        });
+
+        polygon.set('data', { zoneId: zone.id, type: 'zone' });
+        fabricCanvas.add(polygon);
+        zoneObjectsRef.current.set(zone.id, polygon);
+      } else {
+        // Update existing zone properties (color, name) only - don't touch coordinates
+        existingPolygon.set({
+          fill: zone.color + '40',
+          stroke: zone.color,
+          selectable: activeTool === "select" || activeTool === "delete",
+          hasControls: activeTool === "select",
+        });
+      }
     });
 
-    // Recreate ALL furniture from state
+    // Add or update furniture
     furniture.forEach((item) => {
+      const existingFurniture = furnitureObjectsRef.current.get(item.id);
+
       const colors = {
         bed: '#ef4444',
         chair: '#f59e0b',
@@ -160,25 +225,36 @@ export function ZoneEditor({
         door: '#6b7280',
       };
 
-      const furnitureObj = new Rect({
-        left: item.x * SCALE,
-        top: item.y * SCALE,
-        width: item.width * SCALE,
-        height: item.height * SCALE,
-        fill: colors[item.type] + '80',
-        stroke: colors[item.type],
-        strokeWidth: 2,
-        angle: item.rotation,
-        selectable: activeTool === "select" || activeTool === "furniture",
-        hasControls: activeTool === "select" || activeTool === "furniture",
-        hasBorders: true,
-        rx: 4,
-        ry: 4,
-      });
+      if (!existingFurniture) {
+        // Create new furniture with exact coordinates
+        const furnitureObj = new Rect({
+          left: item.x * SCALE,
+          top: item.y * SCALE,
+          width: item.width * SCALE,
+          height: item.height * SCALE,
+          fill: colors[item.type] + '80',
+          stroke: colors[item.type],
+          strokeWidth: 2,
+          angle: item.rotation || 0,
+          selectable: activeTool === "select" || activeTool === "furniture",
+          hasControls: activeTool === "select" || activeTool === "furniture",
+          hasBorders: true,
+          rx: 4,
+          ry: 4,
+          scaleX: 1,
+          scaleY: 1,
+        });
 
-      furnitureObj.set('data', { furnitureId: item.id, type: 'furniture', furnitureType: item.type });
-      fabricCanvas.add(furnitureObj);
-      furnitureObjectsRef.current.set(item.id, furnitureObj);
+        furnitureObj.set('data', { furnitureId: item.id, type: 'furniture', furnitureType: item.type });
+        fabricCanvas.add(furnitureObj);
+        furnitureObjectsRef.current.set(item.id, furnitureObj);
+      } else {
+        // Update tool-specific properties only - don't touch position
+        existingFurniture.set({
+          selectable: activeTool === "select" || activeTool === "furniture",
+          hasControls: activeTool === "select" || activeTool === "furniture",
+        });
+      }
     });
 
     fabricCanvas.renderAll();
@@ -220,16 +296,8 @@ export function ZoneEditor({
         toast.success(`${selectedFurnitureType} placed`);
       } else if (activeTool === "rectangle") {
         const pointer = fabricCanvas.getPointer(e.e);
-        const rect = new Rect({
-          left: pointer.x,
-          top: pointer.y,
-          width: 100,
-          height: 100,
-          fill: '#3b82f6' + '40',
-          stroke: '#3b82f6',
-          strokeWidth: 2,
-        });
-        
+
+        // Create zone with absolute coordinates in meters
         const newZone: Zone = {
           id: `zone_${Date.now()}`,
           name: `Zone ${zones.length + 1}`,
@@ -246,6 +314,7 @@ export function ZoneEditor({
         addToHistory(newState);
         setZones(newState.zones);
         setActiveTool("select");
+        toast.success("Rectangle zone created");
       } else if (activeTool === "polygon") {
         const pointer = fabricCanvas.getPointer(e.e);
         const newPoint = { x: pointer.x, y: pointer.y };
@@ -322,70 +391,98 @@ export function ZoneEditor({
   useEffect(() => {
     if (!fabricCanvas) return;
 
+    const handleObjectMoving = (e: any) => {
+      isModifyingRef.current = true;
+    };
+
     const handleObjectModified = (e: any) => {
       const target = e.target;
       if (!target || !target.data) return;
 
+      // Mark modification as complete
+      isModifyingRef.current = false;
+
       if (target.data.type === 'zone' && target.data.zoneId) {
         const zoneId = target.data.zoneId;
-        
-        // Get the transformation matrix
-        const matrix = target.calcTransformMatrix();
-        const points = target.points;
-        
-        if (!points || points.length < 3) return;
 
-        // Calculate NEW absolute coordinates
+        // Get the absolute bounding box of the polygon
+        const aCoords = target.aCoords;
+        const points = target.points;
+
+        if (!points || points.length < 3 || !aCoords) return;
+
+        // Calculate absolute coordinates using the actual position on canvas
+        const matrix = target.calcTransformMatrix();
+        console.log('Zone modification - Matrix:', matrix);
+        console.log('Zone modification - Target left/top:', target.left, target.top);
+        console.log('Zone modification - Points:', points);
+
         const newCoordinates = points.map((point: any) => {
-          const transformedPoint = fabricUtil.transformPoint(
+          // Transform point using the matrix to get absolute canvas position
+          const absPoint = fabricUtil.transformPoint(
             { x: point.x, y: point.y },
             matrix
           );
+
+          // Convert from canvas pixels to meters
           return {
-            x: transformedPoint.x / SCALE,
-            y: transformedPoint.y / SCALE,
+            x: absPoint.x / SCALE,
+            y: absPoint.y / SCALE,
           };
         });
 
-        // Update state - render effect will recreate the polygon
-        const updatedZones = zones.map(zone => 
-          zone.id === zoneId 
+        console.log('Zone modification - New coordinates:', newCoordinates);
+
+        // Verify coordinates are valid (not all zeros)
+        const hasValidCoords = newCoordinates.some(c => c.x !== 0 || c.y !== 0);
+        if (!hasValidCoords) {
+          console.error('Invalid coordinates detected, skipping save. Coords:', newCoordinates);
+          return;
+        }
+
+        // Update state only after modification is complete
+        const updatedZones = zones.map(zone =>
+          zone.id === zoneId
             ? { ...zone, coordinates: newCoordinates }
             : zone
         );
-        
+
         const newState = { zones: updatedZones, furniture };
         addToHistory(newState);
         setZones(updatedZones);
-        
+
       } else if (target.data.type === 'furniture' && target.data.furnitureId) {
         const furnitureId = target.data.furnitureId;
-        
+
         // Extract new position, dimensions, and rotation
-        const updatedFurniture = furniture.map(item => 
-          item.id === furnitureId 
+        const updatedFurniture = furniture.map(item =>
+          item.id === furnitureId
             ? {
                 ...item,
-                x: target.left / SCALE,
-                y: target.top / SCALE,
-                width: (target.width * target.scaleX) / SCALE,
-                height: (target.height * target.scaleY) / SCALE,
+                x: (target.left || 0) / SCALE,
+                y: (target.top || 0) / SCALE,
+                width: ((target.width || 0) * (target.scaleX || 1)) / SCALE,
+                height: ((target.height || 0) * (target.scaleY || 1)) / SCALE,
                 rotation: target.angle || 0,
               }
             : item
         );
-        
+
         const newState = { zones, furniture: updatedFurniture };
         addToHistory(newState);
         setFurniture(updatedFurniture);
       }
-      
-      // Don't call renderAll - the render effect will handle it
     };
 
+    fabricCanvas.on('object:moving', handleObjectMoving);
+    fabricCanvas.on('object:scaling', handleObjectMoving);
+    fabricCanvas.on('object:rotating', handleObjectMoving);
     fabricCanvas.on('object:modified', handleObjectModified);
 
     return () => {
+      fabricCanvas.off('object:moving', handleObjectMoving);
+      fabricCanvas.off('object:scaling', handleObjectMoving);
+      fabricCanvas.off('object:rotating', handleObjectMoving);
       fabricCanvas.off('object:modified', handleObjectModified);
     };
   }, [fabricCanvas, zones, furniture, SCALE]);
@@ -483,9 +580,28 @@ export function ZoneEditor({
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      // Validate zones before saving
+      const validZones = zones.filter(zone => {
+        // Check if zone has valid coordinates (not all zeros)
+        const hasValidCoords = zone.coordinates.some(c => c.x !== 0 || c.y !== 0);
+        if (!hasValidCoords) {
+          console.error('Invalid zone detected:', zone);
+          toast.error(`Zone "${zone.name}" has invalid coordinates and will not be saved`);
+          return false;
+        }
+        return true;
+      });
+
+      if (validZones.length !== zones.length) {
+        toast.error("Some zones have invalid coordinates and were not saved");
+        return;
+      }
+
+      console.log('Saving zones:', JSON.stringify(zones, null, 2));
       await onSave(zones, furniture);
       toast.success("Floor plan saved successfully");
     } catch (error: any) {
+      console.error('Save error:', error);
       toast.error(error.message || "Failed to save floor plan");
     } finally {
       setIsSaving(false);

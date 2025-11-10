@@ -18,7 +18,11 @@ export const FloorPlanGrid = ({
   showHeatmap = false
 }: FloorPlanGridProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [scale, setScale] = useState(40); // pixels per meter
+
+  // Calculate scale to fit the canvas in viewport (matching editor behavior)
+  const CANVAS_WIDTH = 800;
+  const CANVAS_HEIGHT = 600;
+  const scale = Math.min(CANVAS_WIDTH / floorPlan.width, CANVAS_HEIGHT / floorPlan.height);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -27,14 +31,12 @@ export const FloorPlanGrid = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size
-    const width = floorPlan.width * scale;
-    const height = floorPlan.height * scale;
-    canvas.width = width;
-    canvas.height = height;
+    // Set canvas size to match editor
+    canvas.width = CANVAS_WIDTH;
+    canvas.height = CANVAS_HEIGHT;
 
     // Clear canvas
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     // Draw grid
     if (showGrid) {
@@ -43,13 +45,13 @@ export const FloorPlanGrid = ({
       for (let x = 0; x <= floorPlan.width; x += floorPlan.grid_size) {
         ctx.beginPath();
         ctx.moveTo(x * scale, 0);
-        ctx.lineTo(x * scale, height);
+        ctx.lineTo(x * scale, CANVAS_HEIGHT);
         ctx.stroke();
       }
       for (let y = 0; y <= floorPlan.height; y += floorPlan.grid_size) {
         ctx.beginPath();
         ctx.moveTo(0, y * scale);
-        ctx.lineTo(width, y * scale);
+        ctx.lineTo(CANVAS_WIDTH, y * scale);
         ctx.stroke();
       }
     }
@@ -146,16 +148,129 @@ export const FloorPlanGrid = ({
   // Animation loop for pulsing effect
   useEffect(() => {
     if (!currentPosition) return;
-    
-    const interval = setInterval(() => {
+
+    let animationFrameId: number;
+    const animate = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      // Trigger redraw by forcing component update
-      setScale(s => s);
-    }, 50);
 
-    return () => clearInterval(interval);
-  }, [currentPosition]);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Redraw everything to show the pulsing effect
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Redraw grid
+      if (showGrid) {
+        ctx.strokeStyle = 'hsl(var(--muted))';
+        ctx.lineWidth = 0.5;
+        for (let x = 0; x <= floorPlan.width; x += floorPlan.grid_size) {
+          ctx.beginPath();
+          ctx.moveTo(x * scale, 0);
+          ctx.lineTo(x * scale, CANVAS_HEIGHT);
+          ctx.stroke();
+        }
+        for (let y = 0; y <= floorPlan.height; y += floorPlan.grid_size) {
+          ctx.beginPath();
+          ctx.moveTo(0, y * scale);
+          ctx.lineTo(CANVAS_WIDTH, y * scale);
+          ctx.stroke();
+        }
+      }
+
+      // Redraw zones
+      floorPlan.zones.forEach(zone => {
+        ctx.fillStyle = zone.color + '20';
+        ctx.strokeStyle = zone.color;
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        zone.coordinates.forEach((coord, index) => {
+          const x = coord.x * scale;
+          const y = coord.y * scale;
+          if (index === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        const centerX = zone.coordinates.reduce((sum, c) => sum + c.x, 0) / zone.coordinates.length * scale;
+        const centerY = zone.coordinates.reduce((sum, c) => sum + c.y, 0) / zone.coordinates.length * scale;
+        ctx.fillStyle = 'hsl(var(--foreground))';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(zone.name, centerX, centerY);
+      });
+
+      // Redraw trail
+      if (trail.length > 0) {
+        const validTrail = trail.filter(pos => typeof pos.x === 'number' && typeof pos.y === 'number');
+
+        if (validTrail.length > 0) {
+          ctx.strokeStyle = 'hsl(var(--primary))';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          validTrail.forEach((pos, index) => {
+            const x = pos.x * scale;
+            const y = pos.y * scale;
+            if (index === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          });
+          ctx.stroke();
+
+          validTrail.forEach((pos, index) => {
+            const opacity = 0.3 + (index / validTrail.length) * 0.7;
+            ctx.fillStyle = `hsla(var(--primary) / ${opacity})`;
+            ctx.beginPath();
+            ctx.arc(pos.x * scale, pos.y * scale, 3, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+      }
+
+      // Draw current position with animation
+      if (currentPosition && typeof currentPosition.x === 'number' && typeof currentPosition.y === 'number') {
+        const x = currentPosition.x * scale;
+        const y = currentPosition.y * scale;
+
+        const time = Date.now() / 500;
+        const pulseRadius = 8 + Math.sin(time) * 3;
+
+        ctx.fillStyle = 'hsla(var(--primary) / 0.3)';
+        ctx.beginPath();
+        ctx.arc(x, y, pulseRadius + 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'hsl(var(--primary))';
+        ctx.beginPath();
+        ctx.arc(x, y, pulseRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [currentPosition, floorPlan, trail, showGrid, scale]);
 
   return (
     <Card className="p-4">
