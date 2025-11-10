@@ -82,8 +82,9 @@ const Auth = () => {
         return;
       }
 
+      const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth`,
+        redirectTo: `${baseUrl}/auth`,
       });
 
       if (error) {
@@ -149,16 +150,21 @@ const Auth = () => {
         });
       } else {
         toast({
-          title: "Success!",
-          description: "Your password has been updated successfully.",
+          title: "Password Updated!",
+          description: "Your password has been updated successfully. Redirecting to dashboard...",
+          duration: 3000,
         });
-        // Clear the hash from URL
+
+        // Clear the hash from URL and state
         window.history.replaceState(null, '', window.location.pathname);
         setIsResetPassword(false);
-        setIsLogin(true);
         setNewPassword('');
         setConfirmNewPassword('');
-        navigate('/auth');
+
+        // Redirect to dashboard after a short delay
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
       }
     } catch (error) {
       toast({
