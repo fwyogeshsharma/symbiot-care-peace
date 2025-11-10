@@ -102,9 +102,9 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">7-Day Compliance</span>
+              <span className="text-base font-semibold">7-Day Compliance</span>
             </div>
-            <span className={`text-2xl font-bold ${getComplianceColor(complianceRate)}`}>
+            <span className={`text-xl font-bold ${getComplianceColor(complianceRate)}`}>
               {complianceRate}%
             </span>
           </div>

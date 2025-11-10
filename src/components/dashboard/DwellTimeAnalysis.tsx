@@ -121,16 +121,16 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 rounded-lg bg-muted/50">
-            <p className="text-sm text-muted-foreground mb-1">Total Dwell Time</p>
-            <p className="text-2xl font-bold">{Math.round(totalDwellTime)} min</p>
+            <p className="text-base font-semibold mb-1">Total Dwell Time</p>
+            <p className="text-xl font-bold">{Math.round(totalDwellTime)} min</p>
           </div>
           <div className="p-4 rounded-lg bg-muted/50">
-            <p className="text-sm text-muted-foreground mb-1">Average per Location</p>
-            <p className="text-2xl font-bold">{Math.round(averageDwellTime)} min</p>
+            <p className="text-base font-semibold mb-1">Average per Location</p>
+            <p className="text-xl font-bold">{Math.round(averageDwellTime)} min</p>
           </div>
           <div className="p-4 rounded-lg bg-muted/50">
-            <p className="text-sm text-muted-foreground mb-1">Locations Visited</p>
-            <p className="text-2xl font-bold">{Object.keys(dwellTimes).length}</p>
+            <p className="text-base font-semibold mb-1">Locations Visited</p>
+            <p className="text-xl font-bold">{Object.keys(dwellTimes).length}</p>
           </div>
         </div>
 

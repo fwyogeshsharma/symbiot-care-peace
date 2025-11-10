@@ -187,21 +187,21 @@ export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSo
               {/* Summary Statistics */}
               <div className="grid grid-cols-3 gap-4">
                 <Card className="p-4">
-                  <div className="text-sm text-muted-foreground">Total Events</div>
-                  <div className="text-2xl font-bold">{panicData.length}</div>
+                  <div className="text-base font-semibold">Total Events</div>
+                  <div className="text-xl font-bold">{panicData.length}</div>
                 </Card>
                 <Card className="p-4">
-                  <div className="text-sm text-muted-foreground">Critical Events</div>
-                  <div className="text-2xl font-bold text-destructive">
-                    {panicData.filter((e: any) => 
+                  <div className="text-base font-semibold">Critical Events</div>
+                  <div className="text-xl font-bold text-destructive">
+                    {panicData.filter((e: any) =>
                       e.value?.status === 'critical' || e.value?.status === 'emergency'
                     ).length}
                   </div>
                 </Card>
                 <Card className="p-4">
-                  <div className="text-sm text-muted-foreground">Avg Per Day</div>
-                  <div className="text-2xl font-bold">
-                    {chartData.length > 0 
+                  <div className="text-base font-semibold">Avg Per Day</div>
+                  <div className="text-xl font-bold">
+                    {chartData.length > 0
                       ? (panicData.length / chartData.length).toFixed(1)
                       : 0
                     }
