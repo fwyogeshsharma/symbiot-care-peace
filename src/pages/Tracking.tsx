@@ -18,7 +18,6 @@ import ElderlyList from '@/components/dashboard/ElderlyList';
 import { Calendar, MapPin, Navigation } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import {
   Select,
   SelectContent,
@@ -30,7 +29,6 @@ import { getDateRangePreset } from '@/lib/movementUtils';
 
 export default function Tracking() {
   const navigate = useNavigate();
-  const { userRole } = useAuth();
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
@@ -242,17 +240,15 @@ export default function Tracking() {
             </div>
             
             <div className="flex items-center gap-4">
-              {(userRole === 'admin' || userRole === 'super_admin') && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate('/floor-plan-management')}
-                >
-                  <MapPin className="h-4 w-4 mr-2" />
-                  Floor Plans
-                </Button>
-              )}
-              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/floor-plan-management')}
+              >
+                <MapPin className="h-4 w-4 mr-2" />
+                Floor Plans
+              </Button>
+
               <Select value={selectedPreset} onValueChange={handlePresetChange}>
                 <SelectTrigger className="w-[180px]">
                   <Calendar className="mr-2 h-4 w-4" />
