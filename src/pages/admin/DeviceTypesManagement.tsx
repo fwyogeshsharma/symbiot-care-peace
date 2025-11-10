@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit, Settings } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAllDeviceTypes, DeviceType } from '@/hooks/useDeviceTypes';
 import Header from '@/components/layout/Header';
@@ -102,6 +103,12 @@ const DeviceTypesManagement = () => {
       data_frequency_per_day: type.data_frequency_per_day,
     });
     setOpen(true);
+  };
+
+  const getIconComponent = (iconName: string | null) => {
+    if (!iconName) return null;
+    const IconComponent = Icons[iconName as keyof typeof Icons] as React.ComponentType<any>;
+    return IconComponent ? <IconComponent className="w-5 h-5" /> : null;
   };
 
   const getCategoryBadge = (category: string) => {
@@ -286,7 +293,7 @@ const DeviceTypesManagement = () => {
                 <TableBody>
                   {deviceTypes.map((type) => (
                     <TableRow key={type.id}>
-                      <TableCell className="text-2xl">{type.icon}</TableCell>
+                      <TableCell>{getIconComponent(type.icon)}</TableCell>
                       <TableCell className="font-medium">{type.name}</TableCell>
                       <TableCell>
                         <code className="text-xs bg-muted px-2 py-1 rounded">{type.code}</code>
