@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,8 +7,9 @@ import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Activity, Eye, EyeOff } from 'lucide-react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { supabase } from '@/integrations/supabase/client';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -30,17 +31,36 @@ const signupSchema = z.object({
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isResetPassword, setIsResetPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<string>('relative');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   const { signUp, signIn, user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if this is a password reset flow
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
+    const type = hashParams.get('type');
+    
+    if (accessToken && type === 'recovery') {
+      setIsResetPassword(true);
+      setIsLogin(false);
+      setIsForgotPassword(false);
+    }
+  }, []);
 
   if (user) {
     return <Navigate to="/dashboard" replace />;
@@ -62,9 +82,8 @@ const Auth = () => {
         return;
       }
 
-      const { supabase } = await import('@/integrations/supabase/client');
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth?reset=true`,
+        redirectTo: `${window.location.origin}/auth`,
       });
 
       if (error) {
@@ -80,6 +99,66 @@ const Auth = () => {
         });
         setIsForgotPassword(false);
         setIsLogin(true);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Validate new password
+      if (newPassword.length < 6) {
+        toast({
+          title: "Validation Error",
+          description: "Password must be at least 6 characters",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (newPassword !== confirmNewPassword) {
+        toast({
+          title: "Validation Error",
+          description: "Passwords don't match",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success!",
+          description: "Your password has been updated successfully.",
+        });
+        // Clear the hash from URL
+        window.history.replaceState(null, '', window.location.pathname);
+        setIsResetPassword(false);
+        setIsLogin(true);
+        setNewPassword('');
+        setConfirmNewPassword('');
+        navigate('/auth');
       }
     } catch (error) {
       toast({
@@ -175,10 +254,60 @@ const Auth = () => {
         </div>
 
         <h2 className="text-xl font-semibold mb-6 text-center">
-          {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back' : 'Create Account'}
+          {isResetPassword ? 'Set New Password' : isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back' : 'Create Account'}
         </h2>
 
-        {isForgotPassword ? (
+        {isResetPassword ? (
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New Password</Label>
+              <div className="relative">
+                <Input
+                  id="newPassword"
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmNewPassword">Confirm New Password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmNewPassword"
+                  type={showConfirmNewPassword ? "text" : "password"}
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showConfirmNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Updating...' : 'Update Password'}
+            </Button>
+          </form>
+        ) : isForgotPassword ? (
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -331,7 +460,7 @@ const Auth = () => {
           </form>
         )}
 
-        {!isForgotPassword && (
+        {!isForgotPassword && !isResetPassword && (
           <div className="mt-6 text-center">
           <button
             type="button"
