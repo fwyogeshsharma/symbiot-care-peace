@@ -354,9 +354,7 @@ export default function Tracking() {
                       places={geofencePlaces}
                     />
 
-                    {(userRole === 'admin' || userRole === 'super_admin') && (
-                      <GeofenceManager elderlyPersonId={selectedPersonId!} />
-                    )}
+                    <GeofenceManager elderlyPersonId={selectedPersonId!} />
                   </div>
                 </>
               )}
