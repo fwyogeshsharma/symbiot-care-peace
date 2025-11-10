@@ -49,31 +49,58 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
         </CardHeader>
         <CardContent>
           {locationData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={locationData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis 
-                  dataKey="location" 
-                  className="text-xs"
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis className="text-xs" />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px',
-                  }}
-                />
-                <Bar dataKey="count" radius={[8, 8, 0, 0]}>
-                  {locationData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={getBarColor(index)} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="space-y-4">
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart
+                  data={locationData}
+                  margin={{ top: 20, right: 20, left: 10, bottom: 20 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis
+                    dataKey="location"
+                    tick={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    label={{ value: 'Events', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+                    tick={{ fontSize: 11 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                    }}
+                    wrapperStyle={{
+                      zIndex: 1000,
+                      pointerEvents: 'none',
+                    }}
+                    cursor={{ fill: 'hsl(var(--muted) / 0.2)' }}
+                  />
+                  <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                    {locationData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={getBarColor(index)} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+
+              {/* Custom Legend */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 px-2">
+                {locationData.map((item, index) => (
+                  <div key={item.location} className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-sm flex-shrink-0"
+                      style={{ backgroundColor: getBarColor(index) }}
+                    />
+                    <span className="text-xs text-muted-foreground truncate" title={item.location}>
+                      {item.location} ({item.count})
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : (
             <p className="text-muted-foreground text-center py-8">
               No location data available
@@ -88,27 +115,62 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
         </CardHeader>
         <CardContent>
           {hourlyData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={hourlyData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis 
-                  dataKey="hour" 
-                  className="text-xs"
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis className="text-xs" />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px',
-                  }}
-                />
-                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="space-y-4">
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart
+                  data={hourlyData}
+                  margin={{ top: 20, right: 20, left: 10, bottom: 20 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis
+                    dataKey="hour"
+                    tick={{ fontSize: 10 }}
+                    interval={0}
+                    height={40}
+                  />
+                  <YAxis
+                    label={{ value: 'Events', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+                    tick={{ fontSize: 11 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                    }}
+                    wrapperStyle={{
+                      zIndex: 1000,
+                      pointerEvents: 'none',
+                    }}
+                    cursor={{ fill: 'hsl(var(--muted) / 0.2)' }}
+                  />
+                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+
+              {/* Summary Stats */}
+              <div className="grid grid-cols-3 gap-3 px-2">
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground">Peak Hour</p>
+                  <p className="text-sm font-semibold">
+                    {hourlyData.reduce((max, item) => item.count > max.count ? item : max, hourlyData[0]).hour}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground">Total Events</p>
+                  <p className="text-sm font-semibold">
+                    {hourlyData.reduce((sum, item) => sum + item.count, 0)}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground">Active Hours</p>
+                  <p className="text-sm font-semibold">
+                    {hourlyData.filter(item => item.count > 0).length}
+                  </p>
+                </div>
+              </div>
+            </div>
           ) : (
             <p className="text-muted-foreground text-center py-8">
               No hourly data available
