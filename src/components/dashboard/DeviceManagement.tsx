@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Key, Copy, CheckCircle } from 'lucide-react';
+import { Plus, Key, Copy, CheckCircle, Bed, Armchair, Droplet, Scale, Smartphone, LucideIcon } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
@@ -303,6 +304,11 @@ const DeviceManagement = () => {
     });
   };
 
+  const getIconComponent = (iconName: string | null): LucideIcon | null => {
+    if (!iconName) return null;
+    return (Icons as any)[iconName] || null;
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -347,13 +353,17 @@ const DeviceManagement = () => {
                   <SelectValue placeholder="Select device type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {deviceTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.code}>
-                      {type.icon && `${type.icon} `}
-                      {type.name}
-                      {type.description && ` (${type.description})`}
-                    </SelectItem>
-                  ))}
+                  {deviceTypes.map((type) => {
+                    const IconComponent = getIconComponent(type.icon);
+                    return (
+                      <SelectItem key={type.id} value={type.code}>
+                        <div className="flex items-center gap-2">
+                          {IconComponent && <IconComponent className="w-4 h-4" />}
+                          <span>{type.name}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
