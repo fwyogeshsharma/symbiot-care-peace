@@ -4,9 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Wifi, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Wifi, CheckCircle2, XCircle, Clock, LucideIcon } from "lucide-react";
+import * as Icons from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useDeviceTypes } from "@/hooks/useDeviceTypes";
 
 interface DeviceDiscoveryProps {
   elderlyPersonId: string;
@@ -20,6 +23,12 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
   const [pairingCode, setPairingCode] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'pending' | 'verified' | 'paired' | 'expired' | 'rejected'>('idle');
   const [requestId, setRequestId] = useState<string | null>(null);
+  const { data: deviceTypes = [] } = useDeviceTypes();
+
+  const getIconComponent = (iconName: string | null): LucideIcon | null => {
+    if (!iconName) return null;
+    return (Icons as any)[iconName] || null;
+  };
 
   const startPairing = async () => {
     if (!deviceId.trim()) {
@@ -210,12 +219,24 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
 
         <div className="space-y-2">
           <Label htmlFor="deviceType">Device Type (Optional)</Label>
-          <Input
-            id="deviceType"
-            placeholder="e.g., smartwatch, sensor"
-            value={deviceType}
-            onChange={(e) => setDeviceType(e.target.value)}
-          />
+          <Select value={deviceType} onValueChange={setDeviceType}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select device type" />
+            </SelectTrigger>
+            <SelectContent>
+              {deviceTypes.map((type) => {
+                const IconComponent = getIconComponent(type.icon);
+                return (
+                  <SelectItem key={type.id} value={type.code}>
+                    <div className="flex items-center gap-2">
+                      {IconComponent && <IconComponent className="w-4 h-4" />}
+                      <span>{type.name}</span>
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
         </div>
 
         <Button 
