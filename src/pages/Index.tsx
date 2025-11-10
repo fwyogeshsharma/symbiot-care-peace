@@ -16,6 +16,13 @@ const Index = () => {
       navigate("/auth");
     }
   };
+
+  const handleKnowMore = () => {
+    const featuresSection = document.getElementById("features-section");
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
   return <div className="min-h-screen">
       {/* Navigation Toolbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b">
@@ -59,8 +66,8 @@ const Index = () => {
               thriving at home.
             </p>
             <div className="flex flex-wrap gap-3 sm:gap-4">
-              <Button size="default" className="shadow-lg bg-secondary text-white hover:bg-secondary/90" onClick={handleGetStarted}>
-                {user ? "Go to Dashboard" : "Start Free Trial"}
+              <Button size="default" className="shadow-lg bg-secondary text-white hover:bg-secondary/90" onClick={handleKnowMore}>
+                Know More
               </Button>
             </div>
           </div>
@@ -68,7 +75,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4">
+      <section id="features-section" className="py-12 sm:py-16 lg:py-20 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-10 sm:mb-12 lg:mb-16">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4">Comprehensive Care, Simplified</h2>
