@@ -54,7 +54,7 @@ const Auth = () => {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const accessToken = hashParams.get('access_token');
     const type = hashParams.get('type');
-    
+
     if (accessToken && type === 'recovery') {
       setIsResetPassword(true);
       setIsLogin(false);
@@ -62,7 +62,8 @@ const Auth = () => {
     }
   }, []);
 
-  if (user) {
+  // Only redirect to dashboard if user is logged in AND NOT in password reset flow
+  if (user && !isResetPassword) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -155,15 +156,17 @@ const Auth = () => {
           duration: 3000,
         });
 
-        // Clear the hash from URL and state
-        window.history.replaceState(null, '', window.location.pathname);
-        setIsResetPassword(false);
+        // Clear password fields
         setNewPassword('');
         setConfirmNewPassword('');
 
-        // Redirect to dashboard after a short delay
+        // Clear the hash from URL
+        window.history.replaceState(null, '', window.location.pathname);
+
+        // Redirect to dashboard after showing success message
         setTimeout(() => {
-          navigate('/dashboard');
+          setIsResetPassword(false);
+          navigate('/dashboard', { replace: true });
         }, 1500);
       }
     } catch (error) {
@@ -265,6 +268,12 @@ const Auth = () => {
 
         {isResetPassword ? (
           <form onSubmit={handleResetPassword} className="space-y-4">
+            <div className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-md">
+              <p className="text-sm text-muted-foreground text-center">
+                Please enter your new password below. Your password must be at least 6 characters long.
+              </p>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="newPassword">New Password</Label>
               <div className="relative">
@@ -274,7 +283,8 @@ const Auth = () => {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
-                  placeholder="••••••••"
+                  minLength={6}
+                  placeholder="Enter new password (min 6 characters)"
                   className="pr-10"
                 />
                 <button
@@ -296,7 +306,8 @@ const Auth = () => {
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}
                   required
-                  placeholder="••••••••"
+                  minLength={6}
+                  placeholder="Confirm your new password"
                   className="pr-10"
                 />
                 <button
