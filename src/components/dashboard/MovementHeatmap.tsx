@@ -50,7 +50,7 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
         <CardContent>
           {locationData.length > 0 ? (
             <div className="space-y-4">
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={320}>
                 <BarChart
                   data={locationData}
                   margin={{ top: 20, right: 20, left: 10, bottom: 20 }}
@@ -116,17 +116,17 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
         <CardContent>
           {hourlyData.length > 0 ? (
             <div className="space-y-4">
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={320}>
                 <BarChart
                   data={hourlyData}
-                  margin={{ top: 20, right: 20, left: 10, bottom: 20 }}
+                  margin={{ top: 20, right: 20, left: 10, bottom: 60 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis
                     dataKey="hour"
-                    tick={{ fontSize: 10 }}
-                    interval={0}
-                    height={40}
+                    tick={{ fontSize: 10, angle: -45, textAnchor: 'end' }}
+                    interval={1}
+                    height={60}
                   />
                   <YAxis
                     label={{ value: 'Events', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
