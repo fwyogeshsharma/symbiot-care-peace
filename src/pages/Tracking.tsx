@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { FloorPlanGrid } from '@/components/indoor-tracking/FloorPlanGrid';
 import { MovementPlayback } from '@/components/indoor-tracking/MovementPlayback';
@@ -11,6 +11,7 @@ import { GPSMetrics } from '@/components/outdoor-tracking/GPSMetrics';
 import { processPositionData } from '@/lib/positionUtils';
 import { processGPSTrail, GPSCoordinate } from '@/lib/gpsUtils';
 import { GeofencePlace } from '@/lib/geofenceUtils';
+import { detectGeofenceEvents } from '@/lib/geofenceDetectionService';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/layout/Header';
@@ -29,6 +30,8 @@ import { getDateRangePreset } from '@/lib/movementUtils';
 
 export default function Tracking() {
   const navigate = useNavigate();
+  const { userRole } = useAuth();
+  const queryClient = useQueryClient();
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
@@ -175,12 +178,68 @@ export default function Tracking() {
         .gte('timestamp', dateRange.start)
         .lte('timestamp', dateRange.end)
         .order('timestamp', { ascending: false });
-      
+
       if (error) throw error;
       return data as any;
     },
     enabled: !!selectedPersonId && activeTab === 'outdoor'
   });
+
+  // Real-time subscription for GPS data and geofence detection
+  useEffect(() => {
+    // Only subscribe if we have selected person and on outdoor tab
+    if (!selectedPersonId || activeTab !== 'outdoor') {
+      return;
+    }
+
+    // Subscribe to new GPS data
+    const channel = supabase
+      .channel(`gps-realtime-${selectedPersonId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'device_data',
+          filter: `elderly_person_id=eq.${selectedPersonId}`
+        },
+        async (payload) => {
+          // Check if this is GPS/location data
+          const data = payload.new as any;
+          if (data.data_type === 'gps' || data.data_type === 'location') {
+            const value = data.value as any;
+            if (value.latitude && value.longitude) {
+              const gpsPoint: GPSCoordinate = {
+                latitude: value.latitude,
+                longitude: value.longitude,
+                accuracy: value.accuracy || 10,
+                timestamp: data.recorded_at
+              };
+
+              // Detect and handle geofence events (only if geofence places are loaded)
+              if (geofencePlaces.length > 0) {
+                await detectGeofenceEvents(
+                  selectedPersonId,
+                  gpsPoint,
+                  geofencePlaces,
+                  data.device_id
+                );
+              }
+
+              // Refresh GPS data and geofence events
+              queryClient.invalidateQueries({ queryKey: ['gps-data', selectedPersonId, dateRange] });
+              queryClient.invalidateQueries({ queryKey: ['geofence-events', selectedPersonId, dateRange] });
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup: unsubscribe when component unmounts or dependencies change
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedPersonId, activeTab, geofencePlaces, dateRange, queryClient]);
 
   const handlePresetChange = (preset: string) => {
     setSelectedPreset(preset);
