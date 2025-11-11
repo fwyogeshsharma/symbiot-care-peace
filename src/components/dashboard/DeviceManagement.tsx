@@ -119,6 +119,7 @@ const DeviceManagement = () => {
           .from('floor_plans')
           .insert([{
             ...defaultFloorPlan,
+            furniture: defaultFloorPlan.furniture as any,
             zones: defaultFloorPlan.zones as any
           }])
           .select('*')

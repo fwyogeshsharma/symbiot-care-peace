@@ -124,7 +124,9 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis
                     dataKey="hour"
-                    tick={{ fontSize: 10, angle: -45, textAnchor: 'end' }}
+                    tick={{ fontSize: 10 }}
+                    angle={-45}
+                    textAnchor="end"
                     interval={1}
                     height={60}
                   />

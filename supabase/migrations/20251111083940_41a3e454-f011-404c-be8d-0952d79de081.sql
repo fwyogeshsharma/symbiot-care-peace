@@ -1,0 +1,52 @@
+-- Drop the old constraint
+ALTER TABLE public.device_data DROP CONSTRAINT IF EXISTS device_data_data_type_check;
+
+-- Add updated constraint with all data types including the new ones
+ALTER TABLE public.device_data ADD CONSTRAINT device_data_data_type_check 
+CHECK (data_type = ANY (ARRAY[
+  'heart_rate',
+  'blood_pressure',
+  'temperature',
+  'fall_detected',
+  'steps',
+  'sleep',
+  'sleep_quality',
+  'sleep_stage',
+  'activity',
+  'location',
+  'oxygen_saturation',
+  'bed_occupancy',
+  'movement',
+  'duration',
+  'door_status',
+  'movement_detected',
+  'seat_occupancy',
+  'presence',
+  'weight',
+  'bmi',
+  'humidity',
+  'light',
+  'power_status',
+  'usage',
+  'motion_detected',
+  'orientation',
+  'alert_threshold',
+  'button_pressed',
+  'medication_taken',
+  'next_dose_time',
+  'last_opened',
+  'impact_force',
+  'speed',
+  'power_consumption',
+  'system_status',
+  'recording_status',
+  'position',
+  -- New data types
+  'battery',
+  'body_fat',
+  'gps',
+  'occupancy',
+  'posture',
+  'pressure',
+  'urine_analysis'
+]::text[]));

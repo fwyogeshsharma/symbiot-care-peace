@@ -81,6 +81,7 @@ export default function Tracking() {
       
       return {
         ...data,
+        furniture: (data.furniture as any) || [],
         zones: (data.zones as any) || []
       };
     },
