@@ -232,26 +232,27 @@ export default function Tracking() {
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Movement Tracking</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-2xl sm:text-3xl font-bold">Movement Tracking</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Real-time indoor and outdoor positioning
               </p>
             </div>
-            
-            <div className="flex items-center gap-4">
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigate('/floor-plan-management')}
+                className="w-full sm:w-auto"
               >
                 <MapPin className="h-4 w-4 mr-2" />
                 Floor Plans
               </Button>
 
               <Select value={selectedPreset} onValueChange={handlePresetChange}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-full sm:w-[180px]">
                   <Calendar className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Select period" />
                 </SelectTrigger>

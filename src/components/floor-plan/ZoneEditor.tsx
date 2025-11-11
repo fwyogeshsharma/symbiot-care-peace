@@ -42,6 +42,7 @@ export function ZoneEditor({
   onSave,
 }: ZoneEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
   const [activeTool, setActiveTool] = useState<DrawingTool>("select");
   const [zones, setZones] = useState<Zone[]>(initialZones);
@@ -52,12 +53,21 @@ export function ZoneEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [history, setHistory] = useState<{ zones: Zone[], furniture: FurnitureItem[] }[]>([{ zones: initialZones, furniture: initialFurniture }]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const [showFurniturePalette, setShowFurniturePalette] = useState(false);
+  const [showPropertiesPanel, setShowPropertiesPanel] = useState(false);
+  const [canvasSize, setCanvasSize] = useState(() => {
+    // Calculate initial size based on window
+    const isMobile = window.innerWidth < 768;
+    const baseWidth = isMobile ? Math.min(window.innerWidth - 32, 400) : 800;
+    const baseHeight = isMobile ? Math.min(window.innerHeight * 0.5, 400) : 600;
+    return { width: baseWidth, height: baseHeight };
+  });
   const zoneObjectsRef = useRef<Map<string, Polygon>>(new Map());
   const furnitureObjectsRef = useRef<Map<string, FabricObject>>(new Map());
   const isModifyingRef = useRef(false);
 
-  const CANVAS_WIDTH = 800;
-  const CANVAS_HEIGHT = 600;
+  const CANVAS_WIDTH = canvasSize.width;
+  const CANVAS_HEIGHT = canvasSize.height;
   const SCALE = Math.min(CANVAS_WIDTH / floorPlanWidth, CANVAS_HEIGHT / floorPlanHeight);
 
   // Sync state with initialZones/initialFurniture when they change (e.g., after save/reload)
@@ -69,6 +79,63 @@ export function ZoneEditor({
     setHistory([{ zones: initialZones, furniture: initialFurniture }]);
     setHistoryIndex(0);
   }, [JSON.stringify(initialZones), JSON.stringify(initialFurniture)]);
+
+  // Handle responsive canvas sizing
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.clientWidth;
+        const containerHeight = containerRef.current.clientHeight;
+
+        // On mobile, use viewport dimensions if container is too small
+        const isMobile = window.innerWidth < 768;
+        const availableWidth = containerWidth > 0 ? containerWidth : window.innerWidth;
+        const availableHeight = containerHeight > 0 ? containerHeight : window.innerHeight * 0.6;
+
+        // Reserve space for padding
+        const padding = isMobile ? 16 : 32;
+        const maxWidth = Math.min(availableWidth - padding, isMobile ? 500 : 800);
+        const maxHeight = Math.min(availableHeight - padding, isMobile ? 400 : 600);
+
+        // Maintain aspect ratio based on floor plan
+        const aspectRatio = floorPlanWidth / floorPlanHeight;
+        let newWidth = maxWidth;
+        let newHeight = newWidth / aspectRatio;
+
+        if (newHeight > maxHeight) {
+          newHeight = maxHeight;
+          newWidth = newHeight * aspectRatio;
+        }
+
+        // Ensure minimum size
+        newWidth = Math.max(newWidth, isMobile ? 280 : 400);
+        newHeight = Math.max(newHeight, isMobile ? 200 : 300);
+
+        setCanvasSize({ width: newWidth, height: newHeight });
+      }
+    };
+
+    // Initial update with a small delay to ensure DOM is ready
+    const timeoutId = setTimeout(updateCanvasSize, 100);
+
+    const resizeObserver = containerRef.current
+      ? new ResizeObserver(updateCanvasSize)
+      : null;
+
+    if (containerRef.current && resizeObserver) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    window.addEventListener('resize', updateCanvasSize);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      window.removeEventListener('resize', updateCanvasSize);
+    };
+  }, [floorPlanWidth, floorPlanHeight]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -87,36 +154,87 @@ export function ZoneEditor({
     };
   }, []);
 
+  // Update canvas dimensions when size changes
+  useEffect(() => {
+    if (!fabricCanvas) return;
+
+    fabricCanvas.setDimensions({
+      width: CANVAS_WIDTH,
+      height: CANVAS_HEIGHT,
+    });
+
+    fabricCanvas.renderAll();
+  }, [fabricCanvas, canvasSize, CANVAS_WIDTH, CANVAS_HEIGHT]);
+
   // Draw grid
   useEffect(() => {
     if (!fabricCanvas) return;
 
-    const gridSpacing = gridSize * SCALE;
-    const ctx = fabricCanvas.getContext();
-    
-    fabricCanvas.on('after:render', () => {
-      ctx.strokeStyle = '#e0e0e0';
-      ctx.lineWidth = 1;
+    try {
+      const isMobile = window.innerWidth < 768;
 
-      // Vertical lines
-      for (let x = 0; x <= CANVAS_WIDTH; x += gridSpacing) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, CANVAS_HEIGHT);
-        ctx.stroke();
+      // Adjust grid spacing based on screen size
+      // On mobile, use larger grid spacing for better visibility
+      const baseGridSpacing = gridSize * SCALE;
+      let gridSpacing = baseGridSpacing;
+
+      // If grid spacing is too small on mobile, increase it
+      if (isMobile && baseGridSpacing < 30) {
+        // Multiply the spacing to make it more visible
+        const multiplier = Math.ceil(30 / baseGridSpacing);
+        gridSpacing = baseGridSpacing * multiplier;
+      } else if (!isMobile && baseGridSpacing < 20) {
+        // On desktop, also ensure minimum spacing
+        const multiplier = Math.ceil(20 / baseGridSpacing);
+        gridSpacing = baseGridSpacing * multiplier;
       }
 
-      // Horizontal lines
-      for (let y = 0; y <= CANVAS_HEIGHT; y += gridSpacing) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(CANVAS_WIDTH, y);
-        ctx.stroke();
-      }
-    });
+      const ctx = fabricCanvas.getContext();
 
-    fabricCanvas.renderAll();
-  }, [fabricCanvas, gridSize]);
+      if (!ctx) return;
+
+      const renderGrid = () => {
+        ctx.save();
+
+        // Different grid styles for mobile vs desktop
+        if (isMobile) {
+          ctx.strokeStyle = '#d0d0d0'; // Slightly darker for mobile
+          ctx.lineWidth = 0.5;
+        } else {
+          ctx.strokeStyle = '#e0e0e0';
+          ctx.lineWidth = 1;
+        }
+
+        // Vertical lines
+        for (let x = 0; x <= CANVAS_WIDTH; x += gridSpacing) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, CANVAS_HEIGHT);
+          ctx.stroke();
+        }
+
+        // Horizontal lines
+        for (let y = 0; y <= CANVAS_HEIGHT; y += gridSpacing) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(CANVAS_WIDTH, y);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      };
+
+      fabricCanvas.on('after:render', renderGrid);
+
+      fabricCanvas.renderAll();
+
+      return () => {
+        fabricCanvas.off('after:render', renderGrid);
+      };
+    } catch (error) {
+      console.error('Error setting up grid:', error);
+    }
+  }, [fabricCanvas, gridSize, CANVAS_WIDTH, CANVAS_HEIGHT, SCALE]);
 
   // Render zones and furniture on canvas - smart update instead of full recreate
   useEffect(() => {
@@ -565,29 +683,86 @@ export function ZoneEditor({
         isSaving={isSaving}
       />
 
-      <div className="flex flex-1 overflow-hidden">
-        <FurniturePalette
-          selectedType={selectedFurnitureType}
-          onSelectType={(type) => {
-            setSelectedFurnitureType(type);
-            setActiveTool("furniture");
-          }}
-          isActive={activeTool === "furniture"}
-        />
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden relative">
+        {/* Furniture Palette - Mobile: Overlay / Desktop: Sidebar */}
+        <div className={`${showFurniturePalette ? 'fixed inset-x-0 bottom-0 z-20 lg:relative lg:inset-auto' : 'hidden'} lg:block bg-background lg:bg-transparent`}>
+          <div className="lg:w-auto max-h-[60vh] lg:max-h-full overflow-y-auto lg:overflow-visible">
+            <FurniturePalette
+              selectedType={selectedFurnitureType}
+              onSelectType={(type) => {
+                setSelectedFurnitureType(type);
+                setActiveTool("furniture");
+                setShowFurniturePalette(false); // Auto-close on mobile after selection
+              }}
+              isActive={activeTool === "furniture"}
+            />
+          </div>
+        </div>
 
-        <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
-          <div className="border rounded-lg shadow-lg overflow-hidden">
+        {/* Canvas Area */}
+        <div
+          ref={containerRef}
+          className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-auto"
+          style={{ minHeight: '400px' }}
+        >
+          <div className="border rounded-lg shadow-lg overflow-hidden touch-none">
             <canvas ref={canvasRef} />
           </div>
         </div>
 
-        <ZonePropertiesPanel
-          zones={zones}
-          selectedZoneId={selectedZoneId}
-          onZoneSelect={setSelectedZoneId}
-          onZoneUpdate={handleZoneUpdate}
-          onZoneDelete={handleZoneDelete}
+        {/* Properties Panel - Mobile: Overlay / Desktop: Sidebar */}
+        <div className={`${showPropertiesPanel ? 'fixed inset-x-0 bottom-0 z-20 lg:relative lg:inset-auto' : 'hidden'} lg:block bg-background lg:bg-transparent`}>
+          <div className="lg:w-auto max-h-[60vh] lg:max-h-full overflow-y-auto lg:overflow-visible">
+            <ZonePropertiesPanel
+              zones={zones}
+              selectedZoneId={selectedZoneId}
+              onZoneSelect={setSelectedZoneId}
+              onZoneUpdate={handleZoneUpdate}
+              onZoneDelete={handleZoneDelete}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Backdrop Overlay */}
+      {(showFurniturePalette || showPropertiesPanel) && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-10"
+          onClick={() => {
+            setShowFurniturePalette(false);
+            setShowPropertiesPanel(false);
+          }}
         />
+      )}
+
+      {/* Mobile Panel Toggles */}
+      <div className="lg:hidden fixed bottom-4 right-4 flex flex-col gap-2 z-30">
+        <button
+          onClick={() => {
+            setShowFurniturePalette(!showFurniturePalette);
+            setShowPropertiesPanel(false);
+          }}
+          className={`${showFurniturePalette ? 'bg-primary' : 'bg-secondary'} text-primary-foreground rounded-full p-3 shadow-lg hover:opacity-90 transition-all`}
+          title="Toggle Furniture Palette"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <line x1="9" y1="3" x2="9" y2="21"/>
+          </svg>
+        </button>
+        <button
+          onClick={() => {
+            setShowPropertiesPanel(!showPropertiesPanel);
+            setShowFurniturePalette(false);
+          }}
+          className={`${showPropertiesPanel ? 'bg-primary' : 'bg-secondary'} text-primary-foreground rounded-full p-3 shadow-lg hover:opacity-90 transition-all`}
+          title="Toggle Properties Panel"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v6m0 6v6m7-7h-6m-6 0H1"/>
+          </svg>
+        </button>
       </div>
     </div>
   );
