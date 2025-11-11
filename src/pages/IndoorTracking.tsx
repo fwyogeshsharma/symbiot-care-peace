@@ -70,14 +70,15 @@ export default function IndoorTracking() {
         .select('*')
         .eq('elderly_person_id', selectedPersonId)
         .maybeSingle();
-      
+
       if (error) throw error;
       if (!data) return null;
-      
+
       // Transform the data to match FloorPlan type
       return {
         ...data,
-        zones: (data.zones as any) || []
+        zones: (data.zones as any) || [],
+        furniture: (data.furniture as any) || []
       };
     },
     enabled: !!selectedPersonId
@@ -223,6 +224,24 @@ export default function IndoorTracking() {
                 onPositionChange={setCurrentPositionIndex}
                 currentIndex={currentPositionIndex}
               />
+
+              {positionEvents.length === 0 && (
+                <div className="mt-4 p-4 bg-muted rounded-lg text-sm">
+                  <p className="font-medium mb-2">No movement data available</p>
+                  <p className="text-muted-foreground">
+                    To see movement tracking, go to the Dashboard and click "Populate Device Data"
+                    for a worker-wearable device to generate sample position data.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3"
+                    onClick={() => navigate('/dashboard')}
+                  >
+                    Go to Dashboard
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 

@@ -12,6 +12,16 @@ export interface Zone {
   color: string;
 }
 
+export interface FurnitureItem {
+  id: string;
+  type: 'bed' | 'chair' | 'table' | 'sofa' | 'desk' | 'toilet' | 'sink' | 'door';
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+}
+
 export interface FloorPlan {
   id: string;
   elderly_person_id: string;
@@ -20,6 +30,7 @@ export interface FloorPlan {
   height: number;
   grid_size: number;
   zones: Zone[];
+  furniture?: FurnitureItem[];
   image_url?: string;
   created_at: string;
   updated_at: string;
@@ -259,9 +270,21 @@ export const processPositionData = (
     // Calculate distance
     if (index > 0) {
       const prev = rawData[index - 1].value as Position;
-      const dx = position.x - prev.x;
-      const dy = position.y - prev.y;
-      totalDistance += Math.sqrt(dx * dx + dy * dy);
+      // Validate that coordinates are valid numbers
+      if (
+        typeof position.x === 'number' &&
+        typeof position.y === 'number' &&
+        typeof prev.x === 'number' &&
+        typeof prev.y === 'number' &&
+        !isNaN(position.x) &&
+        !isNaN(position.y) &&
+        !isNaN(prev.x) &&
+        !isNaN(prev.y)
+      ) {
+        const dx = position.x - prev.x;
+        const dy = position.y - prev.y;
+        totalDistance += Math.sqrt(dx * dx + dy * dy);
+      }
     }
     
     // Track speed

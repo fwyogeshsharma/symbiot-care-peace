@@ -19,10 +19,18 @@ export const FloorPlanGrid = ({
 }: FloorPlanGridProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Calculate scale to fit the canvas in viewport (matching editor behavior)
-  const CANVAS_WIDTH = 800;
-  const CANVAS_HEIGHT = 600;
+  // Use full card width with square grid cells
+  const CANVAS_WIDTH = 900;
+  const CANVAS_HEIGHT = 900;
+
+  // Use same scale for both dimensions to maintain square grid cells
   const scale = Math.min(CANVAS_WIDTH / floorPlan.width, CANVAS_HEIGHT / floorPlan.height);
+  const scaleX = scale;
+  const scaleY = scale;
+
+  // Calculate actual floor plan dimensions on canvas
+  const floorPlanPixelWidth = floorPlan.width * scale;
+  const floorPlanPixelHeight = floorPlan.height * scale;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -35,28 +43,34 @@ export const FloorPlanGrid = ({
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
-    // Clear canvas
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    // Clear canvas and set background
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Draw grid
+    // Draw grid filling entire canvas with square cells
     if (showGrid) {
-      ctx.strokeStyle = 'hsl(var(--muted))';
-      ctx.lineWidth = 0.5;
-      for (let x = 0; x <= floorPlan.width; x += floorPlan.grid_size) {
+      const gridSpacing = floorPlan.grid_size * scale;
+      ctx.strokeStyle = '#e0e0e0';
+      ctx.lineWidth = 1;
+
+      // Vertical lines - fill entire canvas width
+      for (let x = 0; x <= CANVAS_WIDTH; x += gridSpacing) {
         ctx.beginPath();
-        ctx.moveTo(x * scale, 0);
-        ctx.lineTo(x * scale, CANVAS_HEIGHT);
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, CANVAS_HEIGHT);
         ctx.stroke();
       }
-      for (let y = 0; y <= floorPlan.height; y += floorPlan.grid_size) {
+
+      // Horizontal lines - fill entire canvas height
+      for (let y = 0; y <= CANVAS_HEIGHT; y += gridSpacing) {
         ctx.beginPath();
-        ctx.moveTo(0, y * scale);
-        ctx.lineTo(CANVAS_WIDTH, y * scale);
+        ctx.moveTo(0, y);
+        ctx.lineTo(CANVAS_WIDTH, y);
         ctx.stroke();
       }
     }
 
-    // Draw zones
+    // Draw zones with separate X and Y scaling
     floorPlan.zones.forEach(zone => {
       ctx.fillStyle = zone.color + '20'; // 20 = alpha for transparency
       ctx.strokeStyle = zone.color;
@@ -64,8 +78,8 @@ export const FloorPlanGrid = ({
 
       ctx.beginPath();
       zone.coordinates.forEach((coord, index) => {
-        const x = coord.x * scale;
-        const y = coord.y * scale;
+        const x = coord.x * scaleX;
+        const y = coord.y * scaleY;
         if (index === 0) {
           ctx.moveTo(x, y);
         } else {
@@ -77,8 +91,8 @@ export const FloorPlanGrid = ({
       ctx.stroke();
 
       // Draw zone label
-      const centerX = zone.coordinates.reduce((sum, c) => sum + c.x, 0) / zone.coordinates.length * scale;
-      const centerY = zone.coordinates.reduce((sum, c) => sum + c.y, 0) / zone.coordinates.length * scale;
+      const centerX = zone.coordinates.reduce((sum, c) => sum + c.x, 0) / zone.coordinates.length * scaleX;
+      const centerY = zone.coordinates.reduce((sum, c) => sum + c.y, 0) / zone.coordinates.length * scaleY;
       ctx.fillStyle = 'hsl(var(--foreground))';
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
@@ -86,17 +100,63 @@ export const FloorPlanGrid = ({
       ctx.fillText(zone.name, centerX, centerY);
     });
 
-    // Draw trail
+    // Draw furniture
+    const furnitureColors = {
+      bed: '#ef4444',
+      chair: '#f59e0b',
+      table: '#84cc16',
+      sofa: '#06b6d4',
+      desk: '#8b5cf6',
+      toilet: '#ec4899',
+      sink: '#14b8a6',
+      door: '#6b7280',
+    };
+
+    if (floorPlan.furniture && floorPlan.furniture.length > 0) {
+      floorPlan.furniture.forEach(item => {
+        ctx.save();
+
+        const x = item.x * scaleX;
+        const y = item.y * scaleY;
+        const width = item.width * scaleX;
+        const height = item.height * scaleY;
+
+        // Translate to the center of the furniture for rotation
+        ctx.translate(x + width / 2, y + height / 2);
+        ctx.rotate((item.rotation * Math.PI) / 180);
+        ctx.translate(-(x + width / 2), -(y + height / 2));
+
+        // Draw furniture rectangle
+        ctx.fillStyle = furnitureColors[item.type] + '80';
+        ctx.strokeStyle = furnitureColors[item.type];
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(x, y, width, height, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        // Draw furniture label
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.type.toUpperCase(), x + width / 2, y + height / 2);
+
+        ctx.restore();
+      });
+    }
+
+    // Draw trail with separate X and Y scaling
     if (trail.length > 0) {
       const validTrail = trail.filter(pos => typeof pos.x === 'number' && typeof pos.y === 'number');
-      
+
       if (validTrail.length > 0) {
         ctx.strokeStyle = 'hsl(var(--primary))';
         ctx.lineWidth = 2;
         ctx.beginPath();
         validTrail.forEach((pos, index) => {
-          const x = pos.x * scale;
-          const y = pos.y * scale;
+          const x = pos.x * scaleX;
+          const y = pos.y * scaleY;
           if (index === 0) {
             ctx.moveTo(x, y);
           } else {
@@ -110,16 +170,16 @@ export const FloorPlanGrid = ({
           const opacity = 0.3 + (index / validTrail.length) * 0.7;
           ctx.fillStyle = `hsla(var(--primary) / ${opacity})`;
           ctx.beginPath();
-          ctx.arc(pos.x * scale, pos.y * scale, 3, 0, Math.PI * 2);
+          ctx.arc(pos.x * scaleX, pos.y * scaleY, 3, 0, Math.PI * 2);
           ctx.fill();
         });
       }
     }
 
-    // Draw current position
+    // Draw current position with separate X and Y scaling
     if (currentPosition && typeof currentPosition.x === 'number' && typeof currentPosition.y === 'number') {
-      const x = currentPosition.x * scale;
-      const y = currentPosition.y * scale;
+      const x = currentPosition.x * scaleX;
+      const y = currentPosition.y * scaleY;
 
       // Pulsing circle animation
       const time = Date.now() / 500;
@@ -158,27 +218,33 @@ export const FloorPlanGrid = ({
       if (!ctx) return;
 
       // Redraw everything to show the pulsing effect
-      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      ctx.fillStyle = '#f0f0f0';
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-      // Redraw grid
+      // Redraw grid filling entire canvas with square cells
       if (showGrid) {
-        ctx.strokeStyle = 'hsl(var(--muted))';
-        ctx.lineWidth = 0.5;
-        for (let x = 0; x <= floorPlan.width; x += floorPlan.grid_size) {
+        const gridSpacing = floorPlan.grid_size * scale;
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 1;
+
+        // Vertical lines - fill entire canvas width
+        for (let x = 0; x <= CANVAS_WIDTH; x += gridSpacing) {
           ctx.beginPath();
-          ctx.moveTo(x * scale, 0);
-          ctx.lineTo(x * scale, CANVAS_HEIGHT);
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, CANVAS_HEIGHT);
           ctx.stroke();
         }
-        for (let y = 0; y <= floorPlan.height; y += floorPlan.grid_size) {
+
+        // Horizontal lines - fill entire canvas height
+        for (let y = 0; y <= CANVAS_HEIGHT; y += gridSpacing) {
           ctx.beginPath();
-          ctx.moveTo(0, y * scale);
-          ctx.lineTo(CANVAS_WIDTH, y * scale);
+          ctx.moveTo(0, y);
+          ctx.lineTo(CANVAS_WIDTH, y);
           ctx.stroke();
         }
       }
 
-      // Redraw zones
+      // Redraw zones with separate X and Y scaling
       floorPlan.zones.forEach(zone => {
         ctx.fillStyle = zone.color + '20';
         ctx.strokeStyle = zone.color;
@@ -186,8 +252,8 @@ export const FloorPlanGrid = ({
 
         ctx.beginPath();
         zone.coordinates.forEach((coord, index) => {
-          const x = coord.x * scale;
-          const y = coord.y * scale;
+          const x = coord.x * scaleX;
+          const y = coord.y * scaleY;
           if (index === 0) {
             ctx.moveTo(x, y);
           } else {
@@ -198,8 +264,8 @@ export const FloorPlanGrid = ({
         ctx.fill();
         ctx.stroke();
 
-        const centerX = zone.coordinates.reduce((sum, c) => sum + c.x, 0) / zone.coordinates.length * scale;
-        const centerY = zone.coordinates.reduce((sum, c) => sum + c.y, 0) / zone.coordinates.length * scale;
+        const centerX = zone.coordinates.reduce((sum, c) => sum + c.x, 0) / zone.coordinates.length * scaleX;
+        const centerY = zone.coordinates.reduce((sum, c) => sum + c.y, 0) / zone.coordinates.length * scaleY;
         ctx.fillStyle = 'hsl(var(--foreground))';
         ctx.font = '14px sans-serif';
         ctx.textAlign = 'center';
@@ -207,7 +273,50 @@ export const FloorPlanGrid = ({
         ctx.fillText(zone.name, centerX, centerY);
       });
 
-      // Redraw trail
+      // Redraw furniture with separate X and Y scaling
+      const furnitureColors = {
+        bed: '#ef4444',
+        chair: '#f59e0b',
+        table: '#84cc16',
+        sofa: '#06b6d4',
+        desk: '#8b5cf6',
+        toilet: '#ec4899',
+        sink: '#14b8a6',
+        door: '#6b7280',
+      };
+
+      if (floorPlan.furniture && floorPlan.furniture.length > 0) {
+        floorPlan.furniture.forEach(item => {
+          ctx.save();
+
+          const x = item.x * scaleX;
+          const y = item.y * scaleY;
+          const width = item.width * scaleX;
+          const height = item.height * scaleY;
+
+          ctx.translate(x + width / 2, y + height / 2);
+          ctx.rotate((item.rotation * Math.PI) / 180);
+          ctx.translate(-(x + width / 2), -(y + height / 2));
+
+          ctx.fillStyle = furnitureColors[item.type] + '80';
+          ctx.strokeStyle = furnitureColors[item.type];
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(x, y, width, height, 4);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = 'white';
+          ctx.font = 'bold 10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(item.type.toUpperCase(), x + width / 2, y + height / 2);
+
+          ctx.restore();
+        });
+      }
+
+      // Redraw trail with separate X and Y scaling
       if (trail.length > 0) {
         const validTrail = trail.filter(pos => typeof pos.x === 'number' && typeof pos.y === 'number');
 
@@ -216,8 +325,8 @@ export const FloorPlanGrid = ({
           ctx.lineWidth = 2;
           ctx.beginPath();
           validTrail.forEach((pos, index) => {
-            const x = pos.x * scale;
-            const y = pos.y * scale;
+            const x = pos.x * scaleX;
+            const y = pos.y * scaleY;
             if (index === 0) {
               ctx.moveTo(x, y);
             } else {
@@ -230,16 +339,16 @@ export const FloorPlanGrid = ({
             const opacity = 0.3 + (index / validTrail.length) * 0.7;
             ctx.fillStyle = `hsla(var(--primary) / ${opacity})`;
             ctx.beginPath();
-            ctx.arc(pos.x * scale, pos.y * scale, 3, 0, Math.PI * 2);
+            ctx.arc(pos.x * scaleX, pos.y * scaleY, 3, 0, Math.PI * 2);
             ctx.fill();
           });
         }
       }
 
-      // Draw current position with animation
+      // Draw current position with animation and separate X and Y scaling
       if (currentPosition && typeof currentPosition.x === 'number' && typeof currentPosition.y === 'number') {
-        const x = currentPosition.x * scale;
-        const y = currentPosition.y * scale;
+        const x = currentPosition.x * scaleX;
+        const y = currentPosition.y * scaleY;
 
         const time = Date.now() / 500;
         const pulseRadius = 8 + Math.sin(time) * 3;

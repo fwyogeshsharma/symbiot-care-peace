@@ -26,10 +26,14 @@ export const MovementMetrics = ({ data }: MovementMetricsProps) => {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {data.totalDistance.toFixed(1)}m
+            {isNaN(data.totalDistance) || !isFinite(data.totalDistance)
+              ? '0.0'
+              : data.totalDistance.toFixed(1)}m
           </div>
           <p className="text-xs text-muted-foreground">
-            {(data.totalDistance / 1000).toFixed(2)}km traveled
+            {isNaN(data.totalDistance) || !isFinite(data.totalDistance)
+              ? '0.00'
+              : (data.totalDistance / 1000).toFixed(2)}km traveled
           </p>
         </CardContent>
       </Card>
@@ -41,10 +45,14 @@ export const MovementMetrics = ({ data }: MovementMetricsProps) => {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {data.averageSpeed.toFixed(2)} m/s
+            {isNaN(data.averageSpeed) || !isFinite(data.averageSpeed)
+              ? '0.00'
+              : data.averageSpeed.toFixed(2)} m/s
           </div>
           <p className="text-xs text-muted-foreground">
-            {(data.averageSpeed * 3.6).toFixed(1)} km/h
+            {isNaN(data.averageSpeed) || !isFinite(data.averageSpeed)
+              ? '0.0'
+              : (data.averageSpeed * 3.6).toFixed(1)} km/h
           </p>
         </CardContent>
       </Card>
@@ -97,7 +105,7 @@ export const MovementMetrics = ({ data }: MovementMetricsProps) => {
                     <div
                       className="h-full bg-primary"
                       style={{
-                        width: `${(stats.duration / totalDuration) * 100}%`
+                        width: totalDuration > 0 ? `${(stats.duration / totalDuration) * 100}%` : '0%'
                       }}
                     />
                   </div>
