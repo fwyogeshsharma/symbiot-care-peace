@@ -52,8 +52,6 @@ export function ZoneEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [history, setHistory] = useState<{ zones: Zone[], furniture: FurnitureItem[] }[]>([{ zones: initialZones, furniture: initialFurniture }]);
   const [historyIndex, setHistoryIndex] = useState(0);
-  const [polygonPoints, setPolygonPoints] = useState<Array<{ x: number; y: number }>>([]);
-  const [tempLines, setTempLines] = useState<FabricObject[]>([]);
   const zoneObjectsRef = useRef<Map<string, Polygon>>(new Map());
   const furnitureObjectsRef = useRef<Map<string, FabricObject>>(new Map());
   const isModifyingRef = useRef(false);
@@ -315,41 +313,6 @@ export function ZoneEditor({
         setZones(newState.zones);
         setActiveTool("select");
         toast.success("Rectangle zone created");
-      } else if (activeTool === "polygon") {
-        const pointer = fabricCanvas.getPointer(e.e);
-        const newPoint = { x: pointer.x, y: pointer.y };
-        
-        const newPoints = [...polygonPoints, newPoint];
-        setPolygonPoints(newPoints);
-
-        // Draw temporary line
-        if (newPoints.length > 1) {
-          const lastPoint = newPoints[newPoints.length - 2];
-          const line = new Rect({
-            left: Math.min(lastPoint.x, newPoint.x),
-            top: Math.min(lastPoint.y, newPoint.y),
-            width: Math.abs(newPoint.x - lastPoint.x) || 1,
-            height: Math.abs(newPoint.y - lastPoint.y) || 1,
-            fill: 'transparent',
-            stroke: '#3b82f6',
-            strokeWidth: 2,
-            selectable: false,
-          });
-          fabricCanvas.add(line);
-          setTempLines([...tempLines, line]);
-        }
-
-        // Complete polygon on double click or when close to first point
-        if (newPoints.length > 2) {
-          const firstPoint = newPoints[0];
-          const distance = Math.sqrt(
-            Math.pow(newPoint.x - firstPoint.x, 2) + Math.pow(newPoint.y - firstPoint.y, 2)
-          );
-          
-          if (distance < 10) {
-            completePolygon(newPoints);
-          }
-        }
       }
     };
 
@@ -385,7 +348,7 @@ export function ZoneEditor({
       fabricCanvas.off('mouse:down', handleMouseDown);
       fabricCanvas.off('mouse:down', handleObjectClick);
     };
-  }, [fabricCanvas, activeTool, zones, furniture, polygonPoints, tempLines, selectedFurnitureType]);
+  }, [fabricCanvas, activeTool, zones, furniture, selectedFurnitureType]);
 
   // Handle object modifications (zones and furniture)
   useEffect(() => {
@@ -486,26 +449,6 @@ export function ZoneEditor({
       fabricCanvas.off('object:modified', handleObjectModified);
     };
   }, [fabricCanvas, zones, furniture, SCALE]);
-
-  const completePolygon = (points: Array<{ x: number; y: number }>) => {
-    // Clear temp lines
-    tempLines.forEach(line => fabricCanvas?.remove(line));
-    setTempLines([]);
-
-    const newZone: Zone = {
-      id: `zone_${Date.now()}`,
-      name: `Zone ${zones.length + 1}`,
-      color: '#3b82f6',
-      coordinates: points.map(p => ({ x: p.x / SCALE, y: p.y / SCALE })),
-    };
-
-    const newState = { zones: [...zones, newZone], furniture };
-    addToHistory(newState);
-    setZones(newState.zones);
-    setPolygonPoints([]);
-    setActiveTool("select");
-    toast.success("Polygon zone created");
-  };
 
   const addToHistory = (newState: { zones: Zone[], furniture: FurnitureItem[] }) => {
     const newHistory = history.slice(0, historyIndex + 1);

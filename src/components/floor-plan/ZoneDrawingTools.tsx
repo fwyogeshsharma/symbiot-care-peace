@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Square, Pentagon, MousePointer, Trash2, Undo2, Redo2, Save } from "lucide-react";
+import { Square, MousePointer, Trash2, Undo2, Redo2, Save } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-export type DrawingTool = "select" | "rectangle" | "polygon" | "delete" | "furniture";
+export type DrawingTool = "select" | "rectangle" | "delete" | "furniture";
 
 interface ZoneDrawingToolsProps {
   activeTool: DrawingTool;
@@ -45,14 +45,6 @@ export function ZoneDrawingTools({
           title="Draw Rectangle"
         >
           <Square className="h-4 w-4" />
-        </Button>
-        <Button
-          variant={activeTool === "polygon" ? "default" : "outline"}
-          size="sm"
-          onClick={() => onToolChange("polygon")}
-          title="Draw Polygon"
-        >
-          <Pentagon className="h-4 w-4" />
         </Button>
         <Button
           variant={activeTool === "delete" ? "destructive" : "outline"}
