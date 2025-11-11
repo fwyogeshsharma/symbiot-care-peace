@@ -21,6 +21,7 @@ import FloorPlanManagement from "./pages/FloorPlanManagement";
 import FloorPlanEditor from "./pages/FloorPlanEditor";
 import Alerts from "./pages/Alerts";
 import PlatformMetrics from "./pages/PlatformMetrics";
+import Pricing from "./pages/Pricing";
 
 const queryClient = new QueryClient();
 
@@ -138,6 +139,7 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route path="/pricing" element={<Pricing />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
