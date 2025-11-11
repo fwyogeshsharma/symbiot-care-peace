@@ -45,11 +45,11 @@ const DeviceStatusPage = () => {
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-bold">Devices</h1>
-                <HelpTooltip 
+                <h1 className="text-2xl sm:text-3xl font-bold">Devices</h1>
+                <HelpTooltip
                   title="Device Status Guide"
                   content={
                     <div className="space-y-2">
@@ -64,26 +64,28 @@ const DeviceStatusPage = () => {
                   }
                 />
               </div>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Monitor and manage all connected devices
               </p>
             </div>
-            
+
             {(userRole === 'admin' || userRole === 'super_admin') && (
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row w-full sm:w-auto">
                 <Button
                   variant="outline"
                   onClick={() => navigate('/platform-metrics')}
+                  className="w-full sm:w-auto"
                 >
                   <BarChart3 className="w-4 h-4 mr-2" />
-                  Platform Metrics
+                  <span className="sm:inline">Platform Metrics</span>
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/admin/device-types')}
+                  className="w-full sm:w-auto"
                 >
                   <Settings className="w-4 h-4 mr-2" />
-                  Device Types
+                  <span className="sm:inline">Device Types</span>
                 </Button>
               </div>
             )}
