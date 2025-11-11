@@ -261,7 +261,7 @@ export default function DataSharing({ userId }: DataSharingProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Share form */}
-        <div className="space-y-4 p-4 border rounded-lg">
+        <div className="space-y-4 p-4 border rounded-lg" data-tour="data-sharing-form">
           <h3 className="font-semibold flex items-center gap-2">
             <UserPlus className="h-4 w-4" />
             Grant Access
@@ -299,7 +299,7 @@ export default function DataSharing({ userId }: DataSharingProps) {
         </div>
 
         {/* Shared users list */}
-        <div className="space-y-4">
+        <div className="space-y-4" data-tour="data-sharing-list">
           <h3 className="font-semibold">Current Access</h3>
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading...</p>
@@ -320,7 +320,7 @@ export default function DataSharing({ userId }: DataSharingProps) {
                       {user.relationship && ` • ${user.relationship}`}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2" data-tour="data-sharing-actions">
                     <Button
                       variant="ghost"
                       size="sm"

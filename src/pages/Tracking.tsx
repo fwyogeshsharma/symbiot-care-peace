@@ -19,6 +19,7 @@ import ElderlyList from '@/components/dashboard/ElderlyList';
 import { Calendar, MapPin, Navigation } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import {
   Select,
   SelectContent,
@@ -31,6 +32,7 @@ import { getDateRangePreset } from '@/lib/movementUtils';
 export default function Tracking() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const shouldShowTour = useShouldShowTour();
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
@@ -286,6 +288,7 @@ export default function Tracking() {
 
   return (
     <div className="min-h-screen bg-background">
+      <OnboardingTour runTour={shouldShowTour} />
       <Header showBackButton title="Tracking" subtitle="Indoor and outdoor positioning system" />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
@@ -303,13 +306,14 @@ export default function Tracking() {
                 variant="outline"
                 size="sm"
                 onClick={() => navigate('/floor-plan-management')}
+                data-tour="floor-plan-manager"
               >
                 <MapPin className="h-4 w-4 mr-2" />
                 Floor Plans
               </Button>
 
               <Select value={selectedPreset} onValueChange={handlePresetChange}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px]" data-tour="tracking-date-range">
                   <Calendar className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Select period" />
                 </SelectTrigger>
@@ -331,7 +335,7 @@ export default function Tracking() {
 
           {/* Indoor/Outdoor Tabs */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'indoor' | 'outdoor')}>
-            <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsList className="grid w-full max-w-md grid-cols-2" data-tour="tracking-tabs">
               <TabsTrigger value="indoor">
                 <MapPin className="h-4 w-4 mr-2" />
                 Indoor Tracking
@@ -354,7 +358,7 @@ export default function Tracking() {
               ) : (
                 <>
                   <div className="grid gap-6 lg:grid-cols-3">
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-2" data-tour="tracking-floor-plan">
                       <FloorPlanGrid
                         floorPlan={floorPlan}
                         currentPosition={currentPosition}
@@ -363,7 +367,7 @@ export default function Tracking() {
                       />
                     </div>
 
-                    <div>
+                    <div data-tour="tracking-playback">
                       <MovementPlayback
                         positions={positionEvents}
                         onPositionChange={setCurrentPositionIndex}
@@ -394,12 +398,14 @@ export default function Tracking() {
                     places={geofencePlaces} 
                   />
 
-                  <MapView
-                    center={mapCenter}
-                    currentPosition={currentGPSPosition}
-                    geofencePlaces={geofencePlaces}
-                    gpsTrail={gpsTrail}
-                  />
+                  <div data-tour="tracking-map">
+                    <MapView
+                      center={mapCenter}
+                      currentPosition={currentGPSPosition}
+                      geofencePlaces={geofencePlaces}
+                      gpsTrail={gpsTrail}
+                    />
+                  </div>
 
                   <div className="grid gap-6 lg:grid-cols-2">
                     <GeofenceEventsTimeline
@@ -409,7 +415,9 @@ export default function Tracking() {
                       places={geofencePlaces}
                     />
 
-                    <GeofenceManager elderlyPersonId={selectedPersonId!} />
+                    <div data-tour="tracking-geofence">
+                      <GeofenceManager elderlyPersonId={selectedPersonId!} />
+                    </div>
                   </div>
                 </>
               )}
