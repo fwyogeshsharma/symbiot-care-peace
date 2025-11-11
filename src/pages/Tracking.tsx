@@ -29,6 +29,7 @@ import { getDateRangePreset } from '@/lib/movementUtils';
 
 export default function Tracking() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
@@ -175,7 +176,7 @@ export default function Tracking() {
         .gte('timestamp', dateRange.start)
         .lte('timestamp', dateRange.end)
         .order('timestamp', { ascending: false });
-      
+
       if (error) throw error;
       return data as any;
     },
