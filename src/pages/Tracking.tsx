@@ -30,7 +30,6 @@ import { getDateRangePreset } from '@/lib/movementUtils';
 
 export default function Tracking() {
   const navigate = useNavigate();
-  const { userRole } = useAuth();
   const queryClient = useQueryClient();
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
