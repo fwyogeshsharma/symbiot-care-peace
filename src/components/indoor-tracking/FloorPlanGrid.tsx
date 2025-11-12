@@ -18,6 +18,7 @@ export const FloorPlanGrid = ({
   showHeatmap = false
 }: FloorPlanGridProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
 
   // Use full card width with square grid cells
   const CANVAS_WIDTH = 900;
@@ -31,6 +32,30 @@ export const FloorPlanGrid = ({
   // Calculate actual floor plan dimensions on canvas
   const floorPlanPixelWidth = floorPlan.width * scale;
   const floorPlanPixelHeight = floorPlan.height * scale;
+
+  // Load background image if available
+  useEffect(() => {
+    if (!floorPlan.image_url) {
+      setBackgroundImage(null);
+      return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      setBackgroundImage(img);
+    };
+    img.onerror = (error) => {
+      console.error('Failed to load background image:', error);
+      setBackgroundImage(null);
+    };
+    img.src = floorPlan.image_url;
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [floorPlan.image_url]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -46,6 +71,26 @@ export const FloorPlanGrid = ({
     // Clear canvas and set background
     ctx.fillStyle = '#f0f0f0';
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Draw background image if loaded
+    if (backgroundImage) {
+      const imgAspectRatio = backgroundImage.width / backgroundImage.height;
+      const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
+
+      let scale;
+      if (imgAspectRatio > canvasAspectRatio) {
+        scale = CANVAS_WIDTH / backgroundImage.width;
+      } else {
+        scale = CANVAS_HEIGHT / backgroundImage.height;
+      }
+
+      const scaledWidth = backgroundImage.width * scale;
+      const scaledHeight = backgroundImage.height * scale;
+
+      ctx.globalAlpha = 0.7;
+      ctx.drawImage(backgroundImage, 0, 0, scaledWidth, scaledHeight);
+      ctx.globalAlpha = 1.0;
+    }
 
     // Draw grid filling entire canvas with square cells
     if (showGrid) {
@@ -101,7 +146,7 @@ export const FloorPlanGrid = ({
     });
 
     // Draw furniture
-    const furnitureColors = {
+    const furnitureColors: Record<string, string> = {
       bed: '#ef4444',
       chair: '#f59e0b',
       table: '#84cc16',
@@ -203,7 +248,7 @@ export const FloorPlanGrid = ({
       ctx.arc(x, y, 4, 0, Math.PI * 2);
       ctx.fill();
     }
-  }, [floorPlan, currentPosition, trail, showGrid, scale]);
+  }, [floorPlan, currentPosition, trail, showGrid, scale, backgroundImage]);
 
   // Animation loop for pulsing effect
   useEffect(() => {
@@ -220,6 +265,26 @@ export const FloorPlanGrid = ({
       // Redraw everything to show the pulsing effect
       ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Redraw background image if loaded
+      if (backgroundImage) {
+        const imgAspectRatio = backgroundImage.width / backgroundImage.height;
+        const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
+
+        let imgScale;
+        if (imgAspectRatio > canvasAspectRatio) {
+          imgScale = CANVAS_WIDTH / backgroundImage.width;
+        } else {
+          imgScale = CANVAS_HEIGHT / backgroundImage.height;
+        }
+
+        const scaledWidth = backgroundImage.width * imgScale;
+        const scaledHeight = backgroundImage.height * imgScale;
+
+        ctx.globalAlpha = 0.7;
+        ctx.drawImage(backgroundImage, 0, 0, scaledWidth, scaledHeight);
+        ctx.globalAlpha = 1.0;
+      }
 
       // Redraw grid filling entire canvas with square cells
       if (showGrid) {
@@ -379,7 +444,7 @@ export const FloorPlanGrid = ({
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [currentPosition, floorPlan, trail, showGrid, scale]);
+  }, [currentPosition, floorPlan, trail, showGrid, scale, backgroundImage, scaleX, scaleY]);
 
   return (
     <Card className="p-4">
