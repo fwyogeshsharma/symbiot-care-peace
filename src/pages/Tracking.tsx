@@ -26,10 +26,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { getDateRangePreset } from '@/lib/movementUtils';
+import {useAuth} from "@/contexts/AuthContext.tsx";
 
 export default function Tracking() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { userRole } = useAuth();
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));

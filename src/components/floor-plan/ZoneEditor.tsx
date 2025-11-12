@@ -65,6 +65,7 @@ export function ZoneEditor({
   const zoneObjectsRef = useRef<Map<string, Polygon>>(new Map());
   const furnitureObjectsRef = useRef<Map<string, FabricObject>>(new Map());
   const isModifyingRef = useRef(false);
+  const backgroundImageRef = useRef<FabricImage | null>(null);
 
   const CANVAS_WIDTH = canvasSize.width;
   const CANVAS_HEIGHT = canvasSize.height;
@@ -173,21 +174,9 @@ export function ZoneEditor({
     try {
       const isMobile = window.innerWidth < 768;
 
-      // Adjust grid spacing based on screen size
-      // On mobile, use larger grid spacing for better visibility
-      const baseGridSpacing = gridSize * SCALE;
-      let gridSpacing = baseGridSpacing;
-
-      // If grid spacing is too small on mobile, increase it
-      if (isMobile && baseGridSpacing < 30) {
-        // Multiply the spacing to make it more visible
-        const multiplier = Math.ceil(30 / baseGridSpacing);
-        gridSpacing = baseGridSpacing * multiplier;
-      } else if (!isMobile && baseGridSpacing < 20) {
-        // On desktop, also ensure minimum spacing
-        const multiplier = Math.ceil(20 / baseGridSpacing);
-        gridSpacing = baseGridSpacing * multiplier;
-      }
+      // Calculate grid spacing based on floor plan dimensions
+      // This ensures correct number of divisions (e.g., 10m floor with 1m grid = 10 boxes)
+      const gridSpacing = gridSize * SCALE;
 
       const ctx = fabricCanvas.getContext();
 
@@ -196,13 +185,17 @@ export function ZoneEditor({
       const renderGrid = () => {
         ctx.save();
 
-        // Different grid styles for mobile vs desktop
-        if (isMobile) {
-          ctx.strokeStyle = '#d0d0d0'; // Slightly darker for mobile
-          ctx.lineWidth = 0.5;
+        // Make grid more visible based on spacing size
+        // Smaller grids get thicker lines for visibility
+        if (gridSpacing < 20) {
+          ctx.strokeStyle = '#c0c0c0'; // Darker for small grids
+          ctx.lineWidth = isMobile ? 1 : 1.5;
+        } else if (gridSpacing < 40) {
+          ctx.strokeStyle = '#d0d0d0';
+          ctx.lineWidth = isMobile ? 0.75 : 1;
         } else {
           ctx.strokeStyle = '#e0e0e0';
-          ctx.lineWidth = 1;
+          ctx.lineWidth = isMobile ? 0.5 : 0.75;
         }
 
         // Vertical lines
@@ -235,6 +228,66 @@ export function ZoneEditor({
       console.error('Error setting up grid:', error);
     }
   }, [fabricCanvas, gridSize, CANVAS_WIDTH, CANVAS_HEIGHT, SCALE]);
+
+  // Load and display background image
+  useEffect(() => {
+    if (!fabricCanvas || !imageUrl) return;
+
+    // Remove existing background image if any
+    if (backgroundImageRef.current) {
+      fabricCanvas.remove(backgroundImageRef.current);
+      backgroundImageRef.current = null;
+    }
+
+    // Load the new background image
+    FabricImage.fromURL(imageUrl, {
+      crossOrigin: 'anonymous',
+    })
+      .then((img) => {
+        if (!fabricCanvas || !img) return;
+
+        // Scale the image to fit the canvas while maintaining aspect ratio
+        const imgAspectRatio = (img.width || 1) / (img.height || 1);
+        const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
+
+        let scale;
+        if (imgAspectRatio > canvasAspectRatio) {
+          // Image is wider than canvas
+          scale = CANVAS_WIDTH / (img.width || 1);
+        } else {
+          // Image is taller than canvas
+          scale = CANVAS_HEIGHT / (img.height || 1);
+        }
+
+        img.set({
+          scaleX: scale,
+          scaleY: scale,
+          left: 0,
+          top: 0,
+          selectable: false,
+          evented: false,
+          opacity: 0.7,
+        });
+
+        backgroundImageRef.current = img;
+        fabricCanvas.add(img);
+        fabricCanvas.sendObjectToBack(img);
+        fabricCanvas.renderAll();
+
+        toast.success("Background image loaded");
+      })
+      .catch((error) => {
+        console.error('Error loading background image:', error);
+        toast.error("Failed to load background image");
+      });
+
+    return () => {
+      if (backgroundImageRef.current && fabricCanvas) {
+        fabricCanvas.remove(backgroundImageRef.current);
+        backgroundImageRef.current = null;
+      }
+    };
+  }, [fabricCanvas, imageUrl, CANVAS_WIDTH, CANVAS_HEIGHT]);
 
   // Render zones and furniture on canvas - smart update instead of full recreate
   useEffect(() => {
