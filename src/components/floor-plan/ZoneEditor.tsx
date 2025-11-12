@@ -55,6 +55,7 @@ export function ZoneEditor({
   const zoneObjectsRef = useRef<Map<string, Polygon>>(new Map());
   const furnitureObjectsRef = useRef<Map<string, FabricObject>>(new Map());
   const isModifyingRef = useRef(false);
+  const backgroundImageRef = useRef<FabricImage | null>(null);
 
   const CANVAS_WIDTH = 800;
   const CANVAS_HEIGHT = 600;
@@ -86,6 +87,74 @@ export function ZoneEditor({
       canvas.dispose();
     };
   }, []);
+
+  // Load background image
+  useEffect(() => {
+    if (!fabricCanvas || !imageUrl) {
+      // Remove existing background image if imageUrl is cleared
+      if (backgroundImageRef.current && fabricCanvas) {
+        fabricCanvas.remove(backgroundImageRef.current);
+        backgroundImageRef.current = null;
+        fabricCanvas.renderAll();
+      }
+      return;
+    }
+
+    // Remove existing background image before loading new one
+    if (backgroundImageRef.current) {
+      fabricCanvas.remove(backgroundImageRef.current);
+      backgroundImageRef.current = null;
+    }
+
+    FabricImage.fromURL(imageUrl, {
+      crossOrigin: 'anonymous',
+    })
+      .then((img) => {
+        if (!fabricCanvas || !img) return;
+
+        // Calculate scale to fit image within canvas while maintaining aspect ratio
+        const imgAspectRatio = (img.width || 1) / (img.height || 1);
+        const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
+
+        let scale;
+        if (imgAspectRatio > canvasAspectRatio) {
+          // Image is wider than canvas
+          scale = CANVAS_WIDTH / (img.width || 1);
+        } else {
+          // Image is taller than canvas
+          scale = CANVAS_HEIGHT / (img.height || 1);
+        }
+
+        // Set image properties
+        img.set({
+          scaleX: scale,
+          scaleY: scale,
+          left: 0,
+          top: 0,
+          selectable: false,
+          evented: false,
+          opacity: 0.7,
+        });
+
+        backgroundImageRef.current = img;
+        fabricCanvas.add(img);
+        fabricCanvas.sendObjectToBack(img);
+        fabricCanvas.renderAll();
+
+        toast.success("Background image loaded");
+      })
+      .catch((error) => {
+        console.error('Error loading background image:', error);
+        toast.error("Failed to load background image");
+      });
+
+    return () => {
+      if (backgroundImageRef.current && fabricCanvas) {
+        fabricCanvas.remove(backgroundImageRef.current);
+        backgroundImageRef.current = null;
+      }
+    };
+  }, [fabricCanvas, imageUrl, CANVAS_WIDTH, CANVAS_HEIGHT]);
 
   // Draw grid
   useEffect(() => {
