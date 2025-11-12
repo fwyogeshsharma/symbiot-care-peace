@@ -736,6 +736,301 @@ export type Database = {
           },
         ]
       }
+      ilq_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          affected_components: string[] | null
+          alert_type: string
+          created_at: string | null
+          current_score: number | null
+          description: string
+          elderly_person_id: string
+          id: string
+          ilq_score_id: string | null
+          previous_score: number | null
+          score_change: number | null
+          severity: string
+          status: string | null
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          affected_components?: string[] | null
+          alert_type: string
+          created_at?: string | null
+          current_score?: number | null
+          description: string
+          elderly_person_id: string
+          id?: string
+          ilq_score_id?: string | null
+          previous_score?: number | null
+          score_change?: number | null
+          severity: string
+          status?: string | null
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          affected_components?: string[] | null
+          alert_type?: string
+          created_at?: string | null
+          current_score?: number | null
+          description?: string
+          elderly_person_id?: string
+          id?: string
+          ilq_score_id?: string | null
+          previous_score?: number | null
+          score_change?: number | null
+          severity?: string
+          status?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ilq_alerts_acknowledged_by_fkey"
+            columns: ["acknowledged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ilq_alerts_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ilq_alerts_ilq_score_id_fkey"
+            columns: ["ilq_score_id"]
+            isOneToOne: false
+            referencedRelation: "ilq_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ilq_benchmarks: {
+        Row: {
+          age_range: string
+          avg_score: number
+          gender: string | null
+          id: string
+          last_updated: string | null
+          median_score: number
+          sample_size: number | null
+          std_deviation: number | null
+        }
+        Insert: {
+          age_range: string
+          avg_score: number
+          gender?: string | null
+          id?: string
+          last_updated?: string | null
+          median_score: number
+          sample_size?: number | null
+          std_deviation?: number | null
+        }
+        Update: {
+          age_range?: string
+          avg_score?: number
+          gender?: string | null
+          id?: string
+          last_updated?: string | null
+          median_score?: number
+          sample_size?: number | null
+          std_deviation?: number | null
+        }
+        Relationships: []
+      }
+      ilq_configurations: {
+        Row: {
+          cognitive_function_weight: number | null
+          created_at: string | null
+          description: string | null
+          elderly_person_id: string | null
+          emergency_response_weight: number | null
+          environmental_safety_weight: number | null
+          health_vitals_weight: number | null
+          id: string
+          is_active: boolean | null
+          is_global: boolean | null
+          name: string
+          normalization_ranges: Json
+          physical_activity_weight: number | null
+          social_engagement_weight: number | null
+          thresholds: Json
+          updated_at: string | null
+        }
+        Insert: {
+          cognitive_function_weight?: number | null
+          created_at?: string | null
+          description?: string | null
+          elderly_person_id?: string | null
+          emergency_response_weight?: number | null
+          environmental_safety_weight?: number | null
+          health_vitals_weight?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_global?: boolean | null
+          name: string
+          normalization_ranges?: Json
+          physical_activity_weight?: number | null
+          social_engagement_weight?: number | null
+          thresholds?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          cognitive_function_weight?: number | null
+          created_at?: string | null
+          description?: string | null
+          elderly_person_id?: string | null
+          emergency_response_weight?: number | null
+          environmental_safety_weight?: number | null
+          health_vitals_weight?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_global?: boolean | null
+          name?: string
+          normalization_ranges?: Json
+          physical_activity_weight?: number | null
+          social_engagement_weight?: number | null
+          thresholds?: Json
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ilq_configurations_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ilq_scores: {
+        Row: {
+          cognitive_function_score: number | null
+          computation_timestamp: string
+          confidence_level: number | null
+          created_at: string | null
+          data_points_analyzed: number
+          detailed_metrics: Json | null
+          elderly_person_id: string
+          emergency_response_score: number | null
+          environmental_safety_score: number | null
+          health_vitals_score: number | null
+          id: string
+          physical_activity_score: number | null
+          score: number
+          social_engagement_score: number | null
+          time_window_hours: number
+          triggered_alerts: string[] | null
+        }
+        Insert: {
+          cognitive_function_score?: number | null
+          computation_timestamp?: string
+          confidence_level?: number | null
+          created_at?: string | null
+          data_points_analyzed: number
+          detailed_metrics?: Json | null
+          elderly_person_id: string
+          emergency_response_score?: number | null
+          environmental_safety_score?: number | null
+          health_vitals_score?: number | null
+          id?: string
+          physical_activity_score?: number | null
+          score: number
+          social_engagement_score?: number | null
+          time_window_hours: number
+          triggered_alerts?: string[] | null
+        }
+        Update: {
+          cognitive_function_score?: number | null
+          computation_timestamp?: string
+          confidence_level?: number | null
+          created_at?: string | null
+          data_points_analyzed?: number
+          detailed_metrics?: Json | null
+          elderly_person_id?: string
+          emergency_response_score?: number | null
+          environmental_safety_score?: number | null
+          health_vitals_score?: number | null
+          id?: string
+          physical_activity_score?: number | null
+          score?: number
+          social_engagement_score?: number | null
+          time_window_hours?: number
+          triggered_alerts?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ilq_scores_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ilq_trends: {
+        Row: {
+          avg_score: number | null
+          change_percentage: number | null
+          created_at: string | null
+          data_points_count: number | null
+          elderly_person_id: string
+          id: string
+          max_score: number | null
+          min_score: number | null
+          period_end: string
+          period_start: string
+          period_type: string
+          score_variance: number | null
+          trend_direction: string | null
+        }
+        Insert: {
+          avg_score?: number | null
+          change_percentage?: number | null
+          created_at?: string | null
+          data_points_count?: number | null
+          elderly_person_id: string
+          id?: string
+          max_score?: number | null
+          min_score?: number | null
+          period_end: string
+          period_start: string
+          period_type: string
+          score_variance?: number | null
+          trend_direction?: string | null
+        }
+        Update: {
+          avg_score?: number | null
+          change_percentage?: number | null
+          created_at?: string | null
+          data_points_count?: number | null
+          elderly_person_id?: string
+          id?: string
+          max_score?: number | null
+          min_score?: number | null
+          period_end?: string
+          period_start?: string
+          period_type?: string
+          score_variance?: number | null
+          trend_direction?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ilq_trends_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_metrics: {
         Row: {
           created_at: string
