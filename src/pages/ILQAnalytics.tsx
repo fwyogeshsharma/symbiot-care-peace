@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Activity, TrendingUp, AlertCircle, BarChart3, RefreshCw } from 'lucide-react';
+import { Activity, TrendingUp, AlertCircle, BarChart3, RefreshCw, Download, Mail } from 'lucide-react';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
@@ -84,6 +84,39 @@ export default function ILQAnalytics() {
     }
   };
 
+  const downloadReport = async () => {
+    if (!selectedElderlyPerson) return;
+    
+    try {
+      toast.info('Generating PDF report...');
+      
+      const { data, error } = await supabase.functions.invoke('ilq-report-generator', {
+        body: { 
+          elderly_person_id: selectedElderlyPerson,
+          period_days: parseInt(timeRange),
+        },
+      });
+      
+      if (error) throw error;
+      
+      // Convert HTML to downloadable file
+      const blob = new Blob([data.html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ILQ-Report-${new Date().toISOString().split('T')[0]}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast.success('Report downloaded successfully!');
+    } catch (error: any) {
+      console.error('Error generating report:', error);
+      toast.error(error.message || 'Failed to generate report');
+    }
+  };
+
   // Auto-select first elderly person
   if (elderlyPersons && elderlyPersons.length > 0 && !selectedElderlyPerson) {
     setSelectedElderlyPerson(elderlyPersons[0].id);
@@ -139,6 +172,11 @@ export default function ILQAnalytics() {
           <Button onClick={computeILQ} disabled={!selectedElderlyPerson}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Compute ILQ
+          </Button>
+          
+          <Button onClick={downloadReport} disabled={!selectedElderlyPerson || !ilqHistory || ilqHistory.length === 0} variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Download Report
           </Button>
         </div>
       </div>
