@@ -12,7 +12,7 @@ import { useState } from "react";
 const floorPlanSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   width: z.number().positive("Width must be positive").max(100, "Width must be less than 100m"),
-  height: z.number().positive("Height must be positive").max(100, "Height must be less than 100m"),
+  height: z.number().positive("Length must be positive").max(100, "Length must be less than 100m"),
   grid_size: z.number().positive("Grid size must be positive").max(5, "Grid size must be less than 5m"),
   image: z.instanceof(FileList).optional(),
 });
@@ -155,12 +155,12 @@ export function FloorPlanForm({ open, onOpenChange, elderlyPersonId, floorPlan, 
                 name="height"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Height (meters)</FormLabel>
+                    <FormLabel>Length (meters)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         step="0.1"
-                        {...field} 
+                        {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value))}
                       />
                     </FormControl>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -33,6 +33,13 @@ export default function FloorPlanManagement() {
     },
     enabled: !!user?.id,
   });
+
+  // Automatically select the first person if there's only one
+  useEffect(() => {
+    if (elderlyPersons && elderlyPersons.length === 1 && !selectedPersonId) {
+      setSelectedPersonId(elderlyPersons[0].id);
+    }
+  }, [elderlyPersons, selectedPersonId]);
 
   const { data: floorPlans, isLoading } = useQuery({
     queryKey: ['floor-plans', selectedPersonId],
