@@ -22,6 +22,7 @@ import FloorPlanEditor from "./pages/FloorPlanEditor";
 import Alerts from "./pages/Alerts";
 import PlatformMetrics from "./pages/PlatformMetrics";
 import Pricing from "./pages/Pricing";
+import ILQAnalytics from "./pages/ILQAnalytics";
 
 const queryClient = new QueryClient();
 
@@ -140,6 +141,14 @@ const App = () => (
               } 
             />
             <Route path="/pricing" element={<Pricing />} />
+            <Route 
+              path="/ilq-analytics" 
+              element={
+                <ProtectedRoute>
+                  <ILQAnalytics />
+                </ProtectedRoute>
+              } 
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

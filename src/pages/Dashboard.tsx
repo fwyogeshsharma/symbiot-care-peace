@@ -13,6 +13,7 @@ import { MedicationManagement } from '@/components/dashboard/MedicationManagemen
 import Header from '@/components/layout/Header';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
+import { ILQWidget } from '@/components/dashboard/ILQWidget';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -280,6 +281,11 @@ const Dashboard = () => {
         <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column - Elderly Persons & Devices */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+            {selectedPersonId && (
+              <div data-tour="ilq-widget">
+                <ILQWidget elderlyPersonId={selectedPersonId} />
+              </div>
+            )}
             <div data-tour="elderly-list">
               <ElderlyList 
                 elderlyPersons={elderlyPersons || []} 
