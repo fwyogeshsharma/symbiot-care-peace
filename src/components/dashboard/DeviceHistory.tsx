@@ -43,8 +43,13 @@ const DeviceHistory = ({ device, open, onOpenChange }: DeviceHistoryProps) => {
       if (dataType === 'seat_occupied' && 'status' in value) return value.status;
       if (dataType === 'bed_occupied' && 'status' in value) return value.status;
       if (dataType === 'fall_detected' && 'detected' in value) return value.detected ? 'Fall Detected!' : 'No Fall';
+      if (dataType === 'motion_detected' && 'value' in value) return value.value ? 'Motion Detected' : 'No Motion';
       // Fallback for unknown object structures
       return JSON.stringify(value);
+    }
+    // Handle motion_detected with numeric or boolean values
+    if (dataType === 'motion_detected') {
+      return value ? 'Motion Detected' : 'No Motion';
     }
     return String(value);
   };
@@ -58,6 +63,7 @@ const DeviceHistory = ({ device, open, onOpenChange }: DeviceHistoryProps) => {
       activity: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
       door_status: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
       fall_detected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+      motion_detected: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
     };
     return colors[dataType] || 'bg-muted text-muted-foreground';
   };

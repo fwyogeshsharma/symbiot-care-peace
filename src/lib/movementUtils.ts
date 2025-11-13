@@ -38,15 +38,29 @@ export const processMovementData = (rawData: any[]): ProcessedMovementData => {
     const location = item.devices?.location || 'Unknown';
     const timestamp = new Date(item.recorded_at);
     const hour = format(timestamp, 'HH:00');
-    
+
+    // Handle motion_detected data type specially
+    let status = 'active';
+    let duration;
+
+    if (item.data_type === 'motion_detected') {
+      // motion_detected values can be boolean or numeric
+      const value = item.value?.value !== undefined ? item.value.value : item.value;
+      status = value ? 'Motion Detected' : 'No Motion';
+    } else {
+      // For other activity types, use status field if available
+      status = item.value?.status || 'active';
+      duration = item.value?.duration;
+    }
+
     events.push({
       id: item.id,
       timestamp,
       location,
       deviceName: item.devices?.device_name || '',
       deviceType: item.devices?.device_type || '',
-      status: item.value?.status || 'active',
-      duration: item.value?.duration,
+      status,
+      duration,
     });
 
     // Count events per location
@@ -92,27 +106,27 @@ export const getDateRangePreset = (preset: 'today' | 'last7days' | 'last30days')
 // Calculate dwell time per location
 export const calculateDwellTimes = (events: MovementEvent[]): Record<string, number> => {
   const dwellTimes: Record<string, number> = {};
-  
+
   // Sort events by timestamp
   const sortedEvents = [...events].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-  
+
   for (let i = 0; i < sortedEvents.length - 1; i++) {
     const currentEvent = sortedEvents[i];
     const nextEvent = sortedEvents[i + 1];
-    
+
     // Calculate time spent at this location (until next event)
     const duration = (nextEvent.timestamp.getTime() - currentEvent.timestamp.getTime()) / 60000; // Convert to minutes
-    
+
     const location = currentEvent.location;
     dwellTimes[location] = (dwellTimes[location] || 0) + duration;
   }
-  
+
   // Handle the last event (assume 5 minute dwell if no next event)
   if (sortedEvents.length > 0) {
     const lastEvent = sortedEvents[sortedEvents.length - 1];
     const location = lastEvent.location;
     dwellTimes[location] = (dwellTimes[location] || 0) + 5;
   }
-  
+
   return dwellTimes;
 };
