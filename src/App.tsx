@@ -23,6 +23,7 @@ import Alerts from "./pages/Alerts";
 import PlatformMetrics from "./pages/PlatformMetrics";
 import Pricing from "./pages/Pricing";
 import ILQAnalytics from "./pages/ILQAnalytics";
+import InvestorInfo from "./pages/InvestorInfo";
 
 const queryClient = new QueryClient();
 
@@ -141,13 +142,14 @@ const App = () => (
               } 
             />
             <Route path="/pricing" element={<Pricing />} />
-            <Route 
-              path="/ilq-analytics" 
+            <Route path="/investor-info" element={<InvestorInfo />} />
+            <Route
+              path="/ilq-analytics"
               element={
                 <ProtectedRoute>
                   <ILQAnalytics />
                 </ProtectedRoute>
-              } 
+              }
             />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
