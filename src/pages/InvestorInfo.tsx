@@ -163,8 +163,8 @@ const InvestorInfo = () => {
       icon: DollarSign,
       items: [
         {
-          title: "85% Lower Than Nursing Homes",
-          description: "SymBIoT subscription at $99-299/month vs $8,000+/month for nursing home care"
+          title: "99% Lower Than Nursing Homes",
+          description: "SymBIoT subscription at $25/month vs $8,000+/month for nursing home care"
         },
         {
           title: "Reduce Hospital Readmissions",
@@ -279,7 +279,7 @@ const InvestorInfo = () => {
             Transforming Elder Care with <span className="text-primary">AI & IoT</span>
           </h1>
           <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
-            A comprehensive platform that enables seniors to age safely at home while reducing costs by 85%
+            A comprehensive platform that enables seniors to age safely at home while reducing costs by 99%
             compared to nursing homes - powered by breakthrough AI and IoT technology.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
@@ -486,9 +486,9 @@ const InvestorInfo = () => {
         })}
 
         <div className="mt-12 text-center bg-white/20 backdrop-blur-sm rounded-2xl p-8 max-w-3xl mx-auto border-2 border-white/40 shadow-xl">
-          <p className="text-4xl font-bold mb-2 text-white">$80,000+ Saved Per Year</p>
+          <p className="text-4xl font-bold mb-2 text-white">$95,000+ Saved Per Year</p>
           <p className="text-white/95 text-lg">
-            Average family saves by choosing SymBIoT ($299/month) over nursing home care ($8,000+/month)
+            Average family saves by choosing SymBIoT ($25/month) over nursing home care ($8,000+/month)
             while maintaining better quality of life
           </p>
         </div>
@@ -571,7 +571,7 @@ const InvestorInfo = () => {
                 <CardDescription>Individual & Family Plans</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold text-primary mb-2">$99-299</p>
+                <p className="text-3xl font-bold text-primary mb-2">$25</p>
                 <p className="text-sm text-muted-foreground">per month</p>
               </CardContent>
             </Card>
@@ -584,7 +584,7 @@ const InvestorInfo = () => {
                 <CardDescription>Assisted Living & Healthcare</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold text-primary mb-2">$49-79</p>
+                <p className="text-3xl font-bold text-primary mb-2">$20</p>
                 <p className="text-sm text-muted-foreground">per resident/month</p>
               </CardContent>
             </Card>
@@ -594,7 +594,7 @@ const InvestorInfo = () => {
                 <CardDescription>Insurance & Employers</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold text-primary mb-2">$29-49</p>
+                <p className="text-3xl font-bold text-primary mb-2">$15</p>
                 <p className="text-sm text-muted-foreground">per member/month</p>
               </CardContent>
             </Card>
@@ -637,7 +637,7 @@ const InvestorInfo = () => {
       {/* Footer */}
       <footer className="border-t py-8 bg-white dark:bg-blue-950">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2024 SymBIoT. All rights reserved. Peace of Mind for Your Loved Ones.</p>
+          <p>&copy; 2025 SymBIoT. All rights reserved. Peace of Mind for Your Loved Ones.</p>
         </div>
       </footer>
     </div>
