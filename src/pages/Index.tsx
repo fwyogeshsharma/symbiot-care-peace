@@ -36,7 +36,7 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
-              {!user && <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="hidden sm:inline-flex">
+              {!user && <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
                   Login
                 </Button>}
               <Button onClick={handleGetStarted} size="sm">
