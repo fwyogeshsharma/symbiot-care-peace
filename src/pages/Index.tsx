@@ -41,7 +41,7 @@ const Index = () => {
                 </Button>}
               <Button onClick={handleGetStarted} size="sm">
                 <span className="hidden sm:inline">{user ? "Go to Dashboard" : "Get Started"}</span>
-                <span className="sm:hidden">{user ? "Dashboard" : "Start"}</span>
+                <span className="sm:hidden">{user ? "Dashboard" : "Get Started"}</span>
               </Button>
             </div>
           </div>
