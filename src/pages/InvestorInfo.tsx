@@ -252,7 +252,7 @@ const InvestorInfo = () => {
       <nav className="border-b bg-white/95 dark:bg-blue-950/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-blue-950/80 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Heart className="h-6 w-6 text-primary" />
+            <Activity className="h-6 w-6 text-primary" />
             <span className="font-bold text-xl">SymBIoT</span>
           </div>
           <div className="flex gap-4">
