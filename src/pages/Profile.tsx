@@ -7,11 +7,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { restartTour } from '@/components/help/OnboardingTour';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import DataSharing from '@/components/dashboard/DataSharing';
 
 const Profile = () => {
   const { user, userRole, signOut } = useAuth();
@@ -123,145 +125,164 @@ const Profile = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-2xl">
-        <Card className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <User className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-xl sm:text-2xl font-bold truncate">{profile?.full_name || 'User'}</h2>
-                {userRole && (
-                  <Badge className={`${getRoleColor(userRole)} capitalize mt-1`}>
-                    {userRole}
-                  </Badge>
+      <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-4xl">
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="data-sharing" className="flex items-center gap-2">
+              <Share2 className="w-4 h-4" />
+              Data Sharing
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="profile" className="space-y-6">
+            <Card className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <User className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-bold truncate">{profile?.full_name || 'User'}</h2>
+                    {userRole && (
+                      <Badge className={`${getRoleColor(userRole)} capitalize mt-1`}>
+                        {userRole}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                {!isEditing && (
+                  <Button onClick={() => setIsEditing(true)} variant="outline" size="sm" className="shrink-0">
+                    <span className="hidden sm:inline">Edit Profile</span>
+                    <span className="sm:hidden">Edit</span>
+                  </Button>
                 )}
               </div>
-            </div>
-            {!isEditing && (
-              <Button onClick={() => setIsEditing(true)} variant="outline" size="sm" className="shrink-0">
-                <span className="hidden sm:inline">Edit Profile</span>
-                <span className="sm:hidden">Edit</span>
-              </Button>
-            )}
-          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={user?.email || ''}
-                  disabled
-                  className="bg-muted"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Email cannot be changed
-                </p>
-              </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={user?.email || ''}
+                      disabled
+                      className="bg-muted"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Email cannot be changed
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="full_name" className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  Full Name
-                </Label>
-                <Input
-                  id="full_name"
-                  type="text"
-                  value={formData.full_name}
-                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                  disabled={!isEditing}
-                  placeholder="Enter your full name"
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="full_name" className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Full Name
+                    </Label>
+                    <Input
+                      id="full_name"
+                      type="text"
+                      value={formData.full_name}
+                      onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                      disabled={!isEditing}
+                      placeholder="Enter your full name"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  Phone Number
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  disabled={!isEditing}
-                  placeholder="Enter your phone number"
-                />
-              </div>
-            </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      Phone Number
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      disabled={!isEditing}
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                </div>
 
-            {isEditing && (
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button
-                  type="submit"
-                  className="flex-1"
-                  disabled={updateProfileMutation.isPending}
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1 sm:flex-none"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setFormData({
-                      full_name: profile?.full_name || '',
-                      phone: profile?.phone || '',
-                    });
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-          </form>
-        </Card>
+                {isEditing && (
+                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                    <Button
+                      type="submit"
+                      className="flex-1"
+                      disabled={updateProfileMutation.isPending}
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 sm:flex-none"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setFormData({
+                          full_name: profile?.full_name || '',
+                          phone: profile?.phone || '',
+                        });
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                )}
+              </form>
+            </Card>
 
-        {/* Additional Actions */}
-        <Card className="p-4 sm:p-6 mt-6">
-          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={restartTour}
-            >
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Restart Onboarding Tour
-            </Button>
-            <Separator />
-            {userRole === 'super_admin' && (
-              <>
+            {/* Additional Actions */}
+            <Card className="p-4 sm:p-6">
+              <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+              <div className="space-y-3">
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => navigate('/admin/user-management')}
+                  onClick={restartTour}
                 >
-                  <Shield className="w-4 h-4 mr-2" />
-                  User Management
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  Restart Onboarding Tour
                 </Button>
                 <Separator />
-              </>
-            )}
-            <Button
-              variant="outline"
-              className="w-full justify-start text-destructive hover:text-destructive"
-              onClick={signOut}
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
-        </Card>
+                {userRole === 'super_admin' && (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => navigate('/admin/user-management')}
+                    >
+                      <Shield className="w-4 h-4 mr-2" />
+                      User Management
+                    </Button>
+                    <Separator />
+                  </>
+                )}
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-destructive hover:text-destructive"
+                  onClick={signOut}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="data-sharing">
+            {user && <DataSharing userId={user.id} />}
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
