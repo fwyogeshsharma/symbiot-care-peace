@@ -61,9 +61,9 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
     <>
       <Button
         data-tour="nav-health"
-        variant={isActive('/health') ? 'default' : 'ghost'}
+        variant={isActive('/dashboard') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/health')}
+        onClick={() => navigate('/dashboard')}
         className={cn(isMobile && 'w-full justify-start')}
       >
         <Heart className="w-4 h-4 mr-2" />
