@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { CalendarIcon, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { celsiusToFahrenheit } from '@/lib/unitConversions';
 
 interface HealthMetricsChartsProps {
   open: boolean;
@@ -87,9 +88,16 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
         }
       }
 
+      let numericValue = typeof value === 'number' ? value : parseFloat(value) || 0;
+
+      // Convert temperature from Celsius to Fahrenheit
+      if (dataType === 'temperature') {
+        numericValue = celsiusToFahrenheit(numericValue);
+      }
+
       return {
         timestamp: format(new Date(item.recorded_at), 'MMM dd HH:mm'),
-        value: typeof value === 'number' ? value : parseFloat(value) || 0,
+        value: numericValue,
         fullDate: new Date(item.recorded_at),
       };
     });
@@ -365,7 +373,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
             <TabsContent value="temperature" className="mt-4">
               <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-4">Body Temperature Over Time</h3>
-                {renderChart('temperature', 'Temperature', 'hsl(var(--warning))', '°C')}
+                {renderChart('temperature', 'Temperature', 'hsl(var(--warning))', '°F')}
               </Card>
             </TabsContent>
 

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Thermometer, Droplets, Wind, AlertCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { celsiusToFahrenheit } from '@/lib/unitConversions';
 
 interface EnvironmentalSensorsProps {
   selectedPersonId: string | null;
@@ -79,12 +80,14 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
   const humidity = getHumidity();
   const airQuality = getAirQuality();
 
-  const getTempStatus = (temp: number | null) => {
-    if (temp === null) return { color: 'text-muted-foreground', label: 'No data', gradient: 'from-muted to-muted' };
-    if (temp < 18) return { color: 'text-info', label: 'Cold', gradient: 'from-info/20 to-info/5' };
-    if (temp < 22) return { color: 'text-success', label: 'Cool', gradient: 'from-success/20 to-success/5' };
-    if (temp < 26) return { color: 'text-success', label: 'Comfortable', gradient: 'from-success/20 to-success/5' };
-    if (temp < 30) return { color: 'text-warning', label: 'Warm', gradient: 'from-warning/20 to-warning/5' };
+  const getTempStatus = (tempCelsius: number | null) => {
+    if (tempCelsius === null) return { color: 'text-muted-foreground', label: 'No data', gradient: 'from-muted to-muted' };
+    const temp = celsiusToFahrenheit(tempCelsius);
+    // Converted ranges: 64°F, 72°F, 79°F, 86°F
+    if (temp < 64) return { color: 'text-info', label: 'Cold', gradient: 'from-info/20 to-info/5' };
+    if (temp < 72) return { color: 'text-success', label: 'Cool', gradient: 'from-success/20 to-success/5' };
+    if (temp < 79) return { color: 'text-success', label: 'Comfortable', gradient: 'from-success/20 to-success/5' };
+    if (temp < 86) return { color: 'text-warning', label: 'Warm', gradient: 'from-warning/20 to-warning/5' };
     return { color: 'text-destructive', label: 'Hot', gradient: 'from-destructive/20 to-destructive/5' };
   };
 
@@ -184,9 +187,9 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
                   {temperature !== null ? (
                     <>
                       <p className={cn("text-3xl font-bold", tempStatus.color)}>
-                        {temperature.toFixed(1)}°
+                        {celsiusToFahrenheit(temperature).toFixed(1)}°
                       </p>
-                      <p className="text-xs text-muted-foreground">Celsius</p>
+                      <p className="text-xs text-muted-foreground">Fahrenheit</p>
                     </>
                   ) : (
                     <p className="text-xl text-muted-foreground">—</p>
@@ -197,12 +200,12 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
               {/* Temperature Progress Bar */}
               {temperature !== null && (
                 <div className="relative h-2 bg-background/50 rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className={cn(
                       "absolute top-0 left-0 h-full rounded-full transition-all duration-500",
                       "bg-gradient-to-r from-info via-success to-destructive"
                     )}
-                    style={{ width: `${Math.min(Math.max((temperature / 40) * 100, 0), 100)}%` }}
+                    style={{ width: `${Math.min(Math.max((celsiusToFahrenheit(temperature) / 104) * 100, 0), 100)}%` }}
                   />
                 </div>
               )}
