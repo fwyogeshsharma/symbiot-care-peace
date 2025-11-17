@@ -17,7 +17,10 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
 
       const { data, error } = await supabase
         .from('device_data')
-        .select('*')
+        .select(`
+          *,
+          devices!inner(device_name, device_type, device_types!inner(category))
+        `)
         .eq('elderly_person_id', selectedPersonId)
         .in('data_type', ['temperature', 'humidity', 'air_quality'])
         .order('recorded_at', { ascending: false })
@@ -25,8 +28,21 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
 
       if (error) throw error;
 
+      // Filter to only environmental sensors (exclude medical devices)
+      const environmentalOnly = data.filter((item: any) => {
+        const deviceCategory = item.devices?.device_types?.category;
+        const deviceType = item.devices?.device_type;
+
+        // Include if device category is ENVIRONMENTAL or device type is environmental sensor
+        return deviceCategory === 'ENVIRONMENTAL' ||
+               deviceCategory === 'Environmental Sensor' ||
+               deviceType === 'environmental' ||
+               deviceType === 'temp_sensor' ||
+               deviceType === 'environmental_sensor';
+      });
+
       // Group by data_type and get latest value
-      const grouped = data.reduce((acc, item) => {
+      const grouped = environmentalOnly.reduce((acc, item) => {
         if (!acc[item.data_type]) {
           acc[item.data_type] = item;
         }

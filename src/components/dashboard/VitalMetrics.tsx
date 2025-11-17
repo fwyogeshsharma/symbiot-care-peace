@@ -32,12 +32,25 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
 
       if (error) throw error;
 
-      // Filter for health-related data
+      // Filter for health-related data (exclude environmental sensors for temperature)
       const healthData = data.filter((item: any) => {
         const deviceType = item.devices?.device_type;
         const deviceCategory = item.devices?.device_types?.category;
         const dataType = item.data_type;
-        
+
+        // Special handling for temperature: exclude environmental sensors
+        if (dataType === 'temperature') {
+          const isEnvironmental =
+            deviceCategory === 'ENVIRONMENTAL' ||
+            deviceCategory === 'Environmental Sensor' ||
+            deviceType === 'environmental' ||
+            deviceType === 'temp_sensor' ||
+            deviceType === 'environmental_sensor';
+
+          // Only include temperature from medical/health devices
+          return !isEnvironmental && (isHealthDevice(deviceType, deviceCategory) || isHealthDataType(dataType));
+        }
+
         return isHealthDevice(deviceType, deviceCategory) || isHealthDataType(dataType);
       });
 
@@ -226,7 +239,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       blood_sugar: 'Blood Sugar',
       oxygen_saturation: 'Oxygen Level',
       oxygen_level: 'Oxygen Level',
-      temperature: 'Temperature',
+      temperature: 'Body Temperature',
       steps: 'Steps Today',
       activity: 'Activity Level',
       sleep_quality: 'Sleep Quality',

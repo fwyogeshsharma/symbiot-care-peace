@@ -49,11 +49,31 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
   const processChartData = (dataType: string) => {
     if (!historicalData) return [];
 
-    const filtered = historicalData.filter((item: any) => item.data_type === dataType);
-    
+    const filtered = historicalData.filter((item: any) => {
+      if (item.data_type !== dataType) return false;
+
+      // Special handling for temperature: exclude environmental sensors
+      if (dataType === 'temperature') {
+        const deviceCategory = item.devices?.device_types?.category;
+        const deviceType = item.devices?.device_type;
+
+        const isEnvironmental =
+          deviceCategory === 'ENVIRONMENTAL' ||
+          deviceCategory === 'Environmental Sensor' ||
+          deviceType === 'environmental' ||
+          deviceType === 'temp_sensor' ||
+          deviceType === 'environmental_sensor';
+
+        // Only include temperature from medical/health devices
+        return !isEnvironmental;
+      }
+
+      return true;
+    });
+
     return filtered.map((item: any) => {
       let value = item.value;
-      
+
       // Extract numeric value from different formats
       if (typeof value === 'object' && value !== null) {
         if ('value' in value) {
@@ -62,6 +82,8 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           value = value.bpm;
         } else if ('count' in value) {
           value = value.count;
+        } else if ('celsius' in value) {
+          value = value.celsius;
         }
       }
 
