@@ -141,6 +141,18 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         if (bodyFat < 15 || bodyFat > 30) return 'text-warning';
         return 'text-success';
 
+      case 'sleep_quality':
+        const sleepQuality = typeof value === 'object' ? (value.quality || value.value) : value;
+        if (sleepQuality >= 80) return 'text-success';
+        if (sleepQuality >= 60) return 'text-warning';
+        return 'text-destructive';
+
+      case 'sleep_stage':
+        const stage = typeof value === 'object' ? value.value : value;
+        if (stage === 'deep' || stage === 'rem') return 'text-success';
+        if (stage === 'light') return 'text-info';
+        return 'text-muted-foreground';
+
       default:
         return 'text-foreground';
     }
@@ -186,11 +198,16 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         return activity;
       
       case 'sleep_quality':
-        const quality = typeof value === 'object' ? value.value : value;
-        return `${quality}%`;
-      
+        const quality = typeof value === 'object' ? (value.quality || value.value) : value;
+        const duration = value?.duration || value?.hours;
+        if (duration) {
+          return `${Math.round(quality)}% (${duration.toFixed(1)}h)`;
+        }
+        return `${Math.round(quality)}%`;
+
       case 'sleep_stage':
-        return typeof value === 'object' ? value.value : value;
+        const stage = typeof value === 'object' ? value.value : value;
+        return String(stage).charAt(0).toUpperCase() + String(stage).slice(1);
       
       case 'medication_taken':
         const taken = typeof value === 'object' ? value.value : value;

@@ -77,7 +77,9 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
 
       // Extract numeric value from different formats
       if (typeof value === 'object' && value !== null) {
-        if ('value' in value) {
+        if ('quality' in value && dataType === 'sleep_quality') {
+          value = value.quality;
+        } else if ('value' in value) {
           value = value.value;
         } else if ('bpm' in value) {
           value = value.bpm;
@@ -341,11 +343,12 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           </div>
         ) : (
           <Tabs defaultValue="heart_rate" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
               <TabsTrigger value="heart_rate">Heart Rate</TabsTrigger>
               <TabsTrigger value="blood_pressure">Blood Pressure</TabsTrigger>
               <TabsTrigger value="oxygen">Oxygen</TabsTrigger>
               <TabsTrigger value="temperature">Temperature</TabsTrigger>
+              <TabsTrigger value="sleep_quality">Sleep</TabsTrigger>
               <TabsTrigger value="panic_sos">Panic/SOS</TabsTrigger>
             </TabsList>
 
@@ -374,6 +377,13 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
               <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-4">Body Temperature Over Time</h3>
                 {renderChart('temperature', 'Temperature', 'hsl(var(--warning))', '°F')}
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="sleep_quality" className="mt-4">
+              <Card className="p-4">
+                <h3 className="text-lg font-semibold mb-4">Sleep Quality Over Time</h3>
+                {renderChart('sleep_quality', 'Sleep Quality', 'hsl(var(--info))', '%')}
               </Card>
             </TabsContent>
 
