@@ -64,16 +64,29 @@ const Alerts = () => {
   const { data: alerts, isLoading } = useQuery({
     queryKey: ['all-alerts', user?.id, dateRange],
     queryFn: async () => {
+      if (!user?.id) return [];
+      
+      // First get accessible elderly persons
+      const { data: accessiblePersons, error: personsError } = await supabase
+        .rpc('get_accessible_elderly_persons', { _user_id: user.id });
+      
+      if (personsError) throw personsError;
+      if (!accessiblePersons || accessiblePersons.length === 0) return [];
+      
+      const elderlyIds = accessiblePersons.map((p: any) => p.id);
       const startDate = subDays(new Date(), parseInt(dateRange)).toISOString();
+      
       const { data, error } = await supabase
         .from('alerts')
         .select('*, elderly_persons(full_name)')
+        .in('elderly_person_id', elderlyIds)
         .gte('created_at', startDate)
         .order('created_at', { ascending: false });
+      
       if (error) throw error;
       return data as Alert[];
     },
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   // Real-time subscription
