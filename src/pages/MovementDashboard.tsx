@@ -10,6 +10,8 @@ import { IdealProfileManager } from "@/components/dashboard/IdealProfileManager"
 import { ILQWidget } from "@/components/dashboard/ILQWidget";
 import { ILQHistoryChart } from "@/components/dashboard/ILQHistoryChart";
 import ElderlyList from "@/components/dashboard/ElderlyList";
+import HomeHubCard from "@/components/dashboard/HomeHubCard";
+import SmartPhoneCard from "@/components/dashboard/SmartPhoneCard";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import {
@@ -194,6 +196,14 @@ export default function MovementDashboard() {
         {selectedPersonId && (
           <div data-tour="ilq-widget-activity">
             <ILQWidget elderlyPersonId={selectedPersonId} />
+          </div>
+        )}
+
+        {/* Home Hub and Smart Phone Cards */}
+        {selectedPersonId && (
+          <div className="grid gap-6 lg:grid-cols-2">
+            <HomeHubCard selectedPersonId={selectedPersonId} />
+            <SmartPhoneCard selectedPersonId={selectedPersonId} />
           </div>
         )}
 
