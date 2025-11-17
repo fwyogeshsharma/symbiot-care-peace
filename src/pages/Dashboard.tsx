@@ -14,11 +14,26 @@ import Header from '@/components/layout/Header';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
+import { AlertNotificationDialog } from '@/components/dashboard/AlertNotificationDialog';
+import { toast } from 'sonner';
+
+interface Alert {
+  id: string;
+  alert_type: string;
+  severity: string;
+  title: string;
+  description: string;
+  status: string;
+  created_at: string;
+  elderly_person_id: string;
+  elderly_persons?: { full_name: string };
+}
 
 const Dashboard = () => {
   const { user } = useAuth();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const [newAlert, setNewAlert] = useState<Alert | null>(null);
   const shouldShowTour = useShouldShowTour();
 
   // Fetch elderly persons based on role
@@ -136,6 +151,13 @@ const Dashboard = () => {
   const avgHeartRate = calculateAvgHeartRate();
   const activityLevel = calculateActivityLevel();
 
+  // Request notification permissions on mount
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
   // Subscribe to real-time updates
   useEffect(() => {
     if (!user) return;
@@ -161,8 +183,21 @@ const Dashboard = () => {
           schema: 'public',
           table: 'alerts'
         },
-        (payload) => {
+        async (payload) => {
           console.log('New alert:', payload);
+
+          // Fetch the full alert with elderly person data
+          const { data: alertData } = await supabase
+            .from('alerts')
+            .select('*, elderly_persons(full_name)')
+            .eq('id', payload.new.id)
+            .single();
+
+          if (alertData) {
+            setNewAlert(alertData as Alert);
+            toast.error(`New ${alertData.severity} alert: ${alertData.title}`);
+          }
+
           refetchAlerts();
         }
       )
@@ -172,6 +207,28 @@ const Dashboard = () => {
       supabase.removeChannel(channel);
     };
   }, [user, refetchAlerts]);
+
+  const handleAcknowledgeAlert = async (alertId: string) => {
+    const { error } = await supabase
+      .from('alerts')
+      .update({
+        status: 'acknowledged',
+        acknowledged_at: new Date().toISOString(),
+        acknowledged_by: user?.id
+      })
+      .eq('id', alertId);
+
+    if (error) {
+      toast.error('Failed to acknowledge alert');
+    } else {
+      toast.success('Alert acknowledged');
+      refetchAlerts();
+    }
+  };
+
+  const handleCloseAlertDialog = () => {
+    setNewAlert(null);
+  };
 
   if (elderlyLoading) {
     return (
@@ -187,6 +244,11 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
+      <AlertNotificationDialog
+        newAlert={newAlert}
+        onClose={handleCloseAlertDialog}
+        onAcknowledge={handleAcknowledgeAlert}
+      />
       <Header />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">

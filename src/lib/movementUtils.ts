@@ -14,6 +14,12 @@ export interface ProcessedMovementData {
   events: MovementEvent[];
   locationStats: Record<string, number>;
   hourlyActivity: Record<string, number>;
+  doorStats?: {
+    totalEvents: number;
+    openCount: number;
+    closedCount: number;
+    openRatio: number;
+  };
 }
 
 export const LOCATION_COLORS: Record<string, string> = {
@@ -33,13 +39,15 @@ export const processMovementData = (rawData: any[]): ProcessedMovementData => {
   const events: MovementEvent[] = [];
   const locationStats: Record<string, number> = {};
   const hourlyActivity: Record<string, number> = {};
+  let doorOpenCount = 0;
+  let doorClosedCount = 0;
 
   rawData?.forEach((item) => {
     const location = item.devices?.location || 'Unknown';
     const timestamp = new Date(item.recorded_at);
     const hour = format(timestamp, 'HH:00');
 
-    // Handle motion_detected data type specially
+    // Handle different data types specially
     let status = 'active';
     let duration;
 
@@ -47,6 +55,19 @@ export const processMovementData = (rawData: any[]): ProcessedMovementData => {
       // motion_detected values can be boolean or numeric
       const value = item.value?.value !== undefined ? item.value.value : item.value;
       status = value ? 'Motion Detected' : 'No Motion';
+    } else if (item.data_type === 'door_status') {
+      // door_status has values "open" or "closed"
+      const value = item.value?.value !== undefined ? item.value.value : item.value;
+      if (typeof value === 'string') {
+        status = value === 'open' ? 'Door Opened' : 'Door Closed';
+        if (value === 'open') doorOpenCount++;
+        else doorClosedCount++;
+      } else {
+        status = value ? 'Door Opened' : 'Door Closed';
+        if (value) doorOpenCount++;
+        else doorClosedCount++;
+      }
+      duration = item.value?.duration;
     } else {
       // For other activity types, use status field if available
       status = item.value?.status || 'active';
@@ -73,7 +94,16 @@ export const processMovementData = (rawData: any[]): ProcessedMovementData => {
   // Sort events by timestamp
   events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
-  return { events, locationStats, hourlyActivity };
+  // Calculate door statistics
+  const totalDoorEvents = doorOpenCount + doorClosedCount;
+  const doorStats = totalDoorEvents > 0 ? {
+    totalEvents: totalDoorEvents,
+    openCount: doorOpenCount,
+    closedCount: doorClosedCount,
+    openRatio: doorOpenCount / totalDoorEvents,
+  } : undefined;
+
+  return { events, locationStats, hourlyActivity, doorStats };
 };
 
 export const getDefaultDateRange = () => ({

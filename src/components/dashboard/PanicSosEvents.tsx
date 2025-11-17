@@ -25,6 +25,7 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
           id,
           recorded_at,
           value,
+          data_type,
           device_id,
           devices!inner(
             device_name,
@@ -33,7 +34,7 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
             elderly_persons(full_name)
           )
         `)
-        .eq('devices.device_type', 'panic_sos')
+        .eq('devices.device_type', 'emergency_button')
         .order('recorded_at', { ascending: false });
 
       if (selectedPersonId) {

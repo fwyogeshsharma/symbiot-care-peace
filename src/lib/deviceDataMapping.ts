@@ -41,6 +41,9 @@ export const HEALTH_DATA_TYPES = [
   'humidity',
   'fall_detected',
   'impact_force',
+  'weight',
+  'bmi',
+  'body_fat',
 ] as const;
 
 // Data types that represent position
@@ -85,9 +88,18 @@ export const getDeviceCategory = (deviceTypeCode: string): string => {
     pulse_oximeter: DEVICE_CATEGORIES.MEDICAL,
     sleep_monitor: DEVICE_CATEGORIES.SLEEP,
     medication_dispenser: DEVICE_CATEGORIES.MEDICATION,
+    medication: DEVICE_CATEGORIES.MEDICATION,
     temp_sensor: DEVICE_CATEGORIES.ENVIRONMENTAL,
+    environmental: DEVICE_CATEGORIES.ENVIRONMENTAL,
+    commercial_scale: DEVICE_CATEGORIES.HEALTH,
+    bed_pad: DEVICE_CATEGORIES.HEALTH,
+    chair_seat: DEVICE_CATEGORIES.HEALTH,
+    toilet_seat: DEVICE_CATEGORIES.HEALTH,
+    smart_phone: DEVICE_CATEGORIES.POSITION_TRACKING,
+    medical: DEVICE_CATEGORIES.MEDICAL,
+    emergency_button: DEVICE_CATEGORIES.SAFETY,
   };
-  
+
   return categoryMap[deviceTypeCode] || 'Other';
 };
 

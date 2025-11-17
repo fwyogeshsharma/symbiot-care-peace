@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Activity, Droplet, Thermometer, Wind, Moon, Pill, Footprints, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Heart, Activity, Droplet, Thermometer, Wind, Moon, Pill, Footprints, AlertTriangle, TrendingUp, Scale } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -72,6 +72,9 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       humidity: Wind,
       fall_detected: AlertTriangle,
       impact_force: AlertTriangle,
+      weight: Scale,
+      bmi: Scale,
+      body_fat: Droplet,
     };
     return iconMap[type] || Activity;
   };
@@ -111,7 +114,17 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       case 'medication_taken':
         const taken = typeof value === 'object' ? value.value : value;
         return taken ? 'text-success' : 'text-warning';
-      
+
+      case 'bmi':
+        const bmi = typeof value === 'object' ? value.value : value;
+        if (bmi < 18.5 || bmi > 25) return 'text-warning';
+        return 'text-success';
+
+      case 'body_fat':
+        const bodyFat = typeof value === 'object' ? value.value : value;
+        if (bodyFat < 15 || bodyFat > 30) return 'text-warning';
+        return 'text-success';
+
       default:
         return 'text-foreground';
     }
@@ -185,7 +198,19 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       case 'impact_force':
         const force = typeof value === 'object' ? value.value : value;
         return `${force.toFixed(1)} G`;
-      
+
+      case 'weight':
+        const weight = typeof value === 'object' ? value.value : value;
+        return `${weight.toFixed(1)} kg`;
+
+      case 'bmi':
+        const bmi = typeof value === 'object' ? value.value : value;
+        return `${bmi.toFixed(1)}`;
+
+      case 'body_fat':
+        const bodyFat = typeof value === 'object' ? value.value : value;
+        return `${bodyFat.toFixed(1)}%`;
+
       default:
         if (typeof value === 'object' && value.value !== undefined) {
           return value.value;
@@ -211,6 +236,9 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       humidity: 'Room Humidity',
       fall_detected: 'Fall Status',
       impact_force: 'Impact Force',
+      weight: 'Weight',
+      bmi: 'BMI',
+      body_fat: 'Body Fat',
     };
     return nameMap[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
