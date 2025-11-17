@@ -8,6 +8,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Health from "./pages/Health";
 import Profile from "./pages/Profile";
 import DeviceStatusPage from "./pages/DeviceStatusPage";
 import DataSharingPage from "./pages/DataSharingPage";
@@ -37,21 +38,29 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route 
-              path="/dashboard" 
+            <Route
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/profile" 
+            <Route
+              path="/health"
+              element={
+                <ProtectedRoute>
+                  <Health />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
               element={
                 <ProtectedRoute>
                   <Profile />
                 </ProtectedRoute>
-              } 
+              }
             />
             <Route 
               path="/device-status" 

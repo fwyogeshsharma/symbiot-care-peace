@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, Heart } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -59,6 +59,16 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
 
   const NavButtons = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
+      <Button
+        data-tour="nav-health"
+        variant={isActive('/health') ? 'default' : 'ghost'}
+        size={isMobile ? 'default' : 'sm'}
+        onClick={() => navigate('/health')}
+        className={cn(isMobile && 'w-full justify-start')}
+      >
+        <Heart className="w-4 h-4 mr-2" />
+        Health
+      </Button>
       <Button
         data-tour="nav-activity"
         variant={isActive('/movement-dashboard') ? 'default' : 'ghost'}
