@@ -2,6 +2,8 @@
  * GPS Utilities for processing GPS data and calculating distances
  */
 
+import { metersToFeet, kilometersToMiles } from './unitConversions';
+
 export interface GPSCoordinate {
   latitude: number;
   longitude: number;
@@ -46,15 +48,17 @@ export function calculateTotalDistance(coordinates: GPSCoordinate[]): number {
 }
 
 /**
- * Format distance for display
+ * Format distance for display (in imperial units)
  * @param meters Distance in meters
- * @returns Formatted string
+ * @returns Formatted string in feet or miles
  */
 export function formatDistance(meters: number): string {
-  if (meters < 1000) {
-    return `${Math.round(meters)}m`;
+  const feet = metersToFeet(meters);
+  if (feet < 528) { // Less than 0.1 miles (528 feet)
+    return `${Math.round(feet)} ft`;
   }
-  return `${(meters / 1000).toFixed(2)}km`;
+  const miles = kilometersToMiles(meters / 1000);
+  return `${miles.toFixed(2)} mi`;
 }
 
 /**

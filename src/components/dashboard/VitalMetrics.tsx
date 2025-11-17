@@ -7,6 +7,7 @@ import { isHealthDevice, isHealthDataType } from '@/lib/deviceDataMapping';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import HealthMetricsCharts from './HealthMetricsCharts';
+import { celsiusToFahrenheit } from '@/lib/unitConversions';
 
 interface VitalMetricsProps {
   selectedPersonId?: string | null;
@@ -96,7 +97,9 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       
       case 'temperature':
         const temp = typeof value === 'object' ? value.value : value;
-        if (temp < 36.1 || temp > 37.2) return 'text-warning';
+        const tempF = celsiusToFahrenheit(temp);
+        // Normal range: 97°F - 99°F (converted from 36.1°C - 37.2°C)
+        if (tempF < 97 || tempF > 99) return 'text-warning';
         return 'text-success';
       
       case 'blood_sugar':
@@ -140,8 +143,9 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         return `${Math.round(o2)}%`;
       
       case 'temperature':
-        const temp = typeof value === 'object' ? value.value : value;
-        return `${temp.toFixed(1)}°C`;
+        const tempC = typeof value === 'object' ? value.value : value;
+        const tempF = celsiusToFahrenheit(tempC);
+        return `${tempF.toFixed(1)}°F`;
       
       case 'blood_sugar':
         const bs = typeof value === 'object' ? value.value : value;

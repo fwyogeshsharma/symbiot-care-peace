@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from 'sonner';
 import { Plus, Trash2, Edit, MapPin } from 'lucide-react';
 import { GeofencePlace, getPlaceTypeOptions, getPlaceTypeColor } from '@/lib/geofenceUtils';
+import { metersToFeet, feetToMeters } from '@/lib/unitConversions';
 
 interface GeofenceManagerProps {
   elderlyPersonId: string;
@@ -27,7 +28,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
     place_type: 'home',
     latitude: '',
     longitude: '',
-    radius_meters: '100',
+    radius_meters: '328', // 100 meters converted to feet
     address: '',
     color: '#3b82f6',
     notes: '',
@@ -117,7 +118,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
       place_type: 'home',
       latitude: '',
       longitude: '',
-      radius_meters: '100',
+      radius_meters: '328', // 100 meters in feet
       address: '',
       color: '#3b82f6',
       notes: '',
@@ -132,7 +133,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
       place_type: place.place_type,
       latitude: place.latitude.toString(),
       longitude: place.longitude.toString(),
-      radius_meters: place.radius_meters.toString(),
+      radius_meters: Math.round(metersToFeet(place.radius_meters)).toString(),
       address: place.address || '',
       color: place.color,
       notes: place.notes || '',
@@ -184,7 +185,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
       place_type: formData.place_type,
       latitude: parseFloat(formData.latitude),
       longitude: parseFloat(formData.longitude),
-      radius_meters: parseInt(formData.radius_meters),
+      radius_meters: Math.round(feetToMeters(parseInt(formData.radius_meters))),
       address: formData.address || null,
       color: formData.color,
       notes: formData.notes || null,
@@ -274,13 +275,13 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="radius">Radius (meters)</Label>
+                  <Label htmlFor="radius">Radius (feet)</Label>
                   <Input
                     id="radius"
                     type="number"
                     value={formData.radius_meters}
                     onChange={(e) => setFormData({ ...formData, radius_meters: e.target.value })}
-                    placeholder="100"
+                    placeholder="328"
                     required
                   />
                 </div>
@@ -363,7 +364,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                   <div>
                     <div className="font-medium">{place.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      {place.place_type} • {place.radius_meters}m radius
+                      {place.place_type} • {Math.round(metersToFeet(place.radius_meters))} ft radius
                     </div>
                   </div>
                 </div>
