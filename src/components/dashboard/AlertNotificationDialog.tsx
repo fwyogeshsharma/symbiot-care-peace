@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Bell, X } from 'lucide-react';
+import { AlertTriangle, Bell } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -89,26 +89,16 @@ export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: Al
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-full ${getSeverityColor(newAlert.severity)}`}>
-                {getSeverityIcon(newAlert.severity)}
-              </div>
-              <div>
-                <DialogTitle className="text-lg">New Alert</DialogTitle>
-                <DialogDescription className="text-sm">
-                  {format(new Date(newAlert.created_at), 'PPp')}
-                </DialogDescription>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-full ${getSeverityColor(newAlert.severity)}`}>
+              {getSeverityIcon(newAlert.severity)}
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleClose}
-              className="h-6 w-6 rounded-full"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            <div>
+              <DialogTitle className="text-lg">New Alert</DialogTitle>
+              <DialogDescription className="text-sm">
+                {format(new Date(newAlert.created_at), 'PPp')}
+              </DialogDescription>
+            </div>
           </div>
         </DialogHeader>
 

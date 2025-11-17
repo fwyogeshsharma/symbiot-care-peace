@@ -34,8 +34,14 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
         const deviceCategory = item.devices?.device_types?.category;
         const deviceType = item.devices?.device_type;
 
-        // Include if device category is ENVIRONMENTAL or device type is environmental sensor
-        return deviceCategory === 'ENVIRONMENTAL' ||
+        // Air quality always comes from environmental sensors, so include it regardless
+        if (item.data_type === 'air_quality') {
+          return true;
+        }
+
+        // For temperature and humidity, filter by device category/type to exclude medical devices
+        return deviceCategory === 'environment' ||
+               deviceCategory === 'ENVIRONMENTAL' ||
                deviceCategory === 'Environmental Sensor' ||
                deviceType === 'environmental' ||
                deviceType === 'temp_sensor' ||
@@ -53,6 +59,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
       return Object.values(grouped);
     },
     enabled: !!selectedPersonId,
+    refetchInterval: 10000, // Refetch every 10 seconds
   });
 
   const getTemperature = () => {
@@ -72,7 +79,9 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
   const getAirQuality = () => {
     const aqData = environmentalData?.find(d => d.data_type === 'air_quality');
     if (!aqData) return null;
-    const value = typeof aqData.value === 'object' ? aqData.value.value : aqData.value;
+    const value = typeof aqData.value === 'object'
+      ? (aqData.value.aqi || aqData.value.value)
+      : aqData.value;
     return Number(value);
   };
 
