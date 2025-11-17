@@ -17,7 +17,7 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
   const [showCharts, setShowCharts] = useState(false);
 
   const { data: panicEvents, isLoading } = useQuery({
-    queryKey: ['panic-sos-events', selectedPersonId],
+    queryKey: ['panic-sos-events', selectedPersonId, showAll],
     queryFn: async () => {
       let query = supabase
         .from('device_data')
