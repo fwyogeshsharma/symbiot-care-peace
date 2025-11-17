@@ -56,7 +56,7 @@ export function GeofenceEventsTimeline({
         {events.length === 0 ? (
           <p className="text-muted-foreground text-sm">No location events in this time period.</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
             {events.map((event) => (
               <div key={event.id} className="flex items-start gap-4 pb-4 border-b border-border last:border-0">
                 <div
