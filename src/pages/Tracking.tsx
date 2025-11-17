@@ -282,9 +282,13 @@ export default function Tracking() {
   // Process outdoor tracking data
   const gpsTrail = activeTab === 'outdoor' ? processGPSTrail(gpsData) : [];
   const currentGPSPosition = gpsData.length > 0 ? gpsData[gpsData.length - 1] : undefined;
-  const mapCenter: [number, number] = currentGPSPosition 
+
+  // Determine map center: use current GPS position, first geofence, or default location
+  const mapCenter: [number, number] = currentGPSPosition
     ? [currentGPSPosition.latitude, currentGPSPosition.longitude]
-    : [40.7128, -74.0060]; // Default to NYC
+    : geofencePlaces.length > 0
+      ? [geofencePlaces[0].latitude, geofencePlaces[0].longitude]
+      : [40.7128, -74.0060]; // Default to NYC
 
   return (
     <div className="min-h-screen bg-background">
@@ -383,21 +387,21 @@ export default function Tracking() {
 
             {/* Outdoor GPS Tab */}
             <TabsContent value="outdoor" className="space-y-6">
-              {gpsData.length === 0 ? (
+              {gpsData.length === 0 && geofencePlaces.length === 0 ? (
                 <>
                   <div className="text-center py-8 bg-muted/30 rounded-lg border-2 border-dashed">
                     <Navigation className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                    <h2 className="text-2xl font-bold mb-2">No GPS Data Available</h2>
+                    <h2 className="text-2xl font-bold mb-2">No GPS Data or Geofences</h2>
                     <p className="text-muted-foreground mb-4">
                       Register a GPS device to see outdoor tracking and real-time location data
                     </p>
                     <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                      But first, set up your geofences below! Geofences define important places and safe zones
+                      Set up your geofences below! Geofences define important places and safe zones
                       for location-based alerts.
                     </p>
                   </div>
 
-                  {/* Show Geofence Manager even without GPS data */}
+                  {/* Show Geofence Manager when no data */}
                   <div className="grid gap-6 lg:grid-cols-2">
                     <div className="lg:col-span-2" data-tour="tracking-geofence">
                       <GeofenceManager elderlyPersonId={selectedPersonId!} />
@@ -406,30 +410,60 @@ export default function Tracking() {
                 </>
               ) : (
                 <>
-                  <GPSMetrics
-                    gpsData={gpsData}
-                    events={geofenceEvents}
-                    places={geofencePlaces}
-                  />
-
-                  <div data-tour="tracking-map">
-                    <MapView
-                      center={mapCenter}
-                      currentPosition={currentGPSPosition}
-                      geofencePlaces={geofencePlaces}
-                      gpsTrail={gpsTrail}
-                    />
-                  </div>
-
-                  <div className="grid gap-6 lg:grid-cols-2">
-                    <GeofenceEventsTimeline
-                      elderlyPersonId={selectedPersonId!}
-                      startDate={new Date(dateRange.start)}
-                      endDate={new Date(dateRange.end)}
+                  {/* Show GPS Metrics only if GPS data exists */}
+                  {gpsData.length > 0 && (
+                    <GPSMetrics
+                      gpsData={gpsData}
+                      events={geofenceEvents}
                       places={geofencePlaces}
                     />
+                  )}
 
-                    <div data-tour="tracking-geofence">
+                  {/* Show map with geofences (and GPS trail if available) */}
+                  {geofencePlaces.length > 0 && (
+                    <>
+                      {gpsData.length === 0 && (
+                        <div className="mb-4 p-4 bg-info/10 border border-info/20 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <MapPin className="w-5 h-5 text-info mt-0.5" />
+                            <div>
+                              <h3 className="font-semibold text-info">Geofences Configured</h3>
+                              <p className="text-sm text-muted-foreground">
+                                Your geofences are displayed on the map below. Register a GPS device to see real-time tracking.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <div data-tour="tracking-map">
+                        <MapView
+                          center={mapCenter}
+                          currentPosition={currentGPSPosition}
+                          geofencePlaces={geofencePlaces}
+                          gpsTrail={gpsTrail}
+                          zoom={geofencePlaces.length === 1 ? 15 : 13}
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    {/* Show geofence events timeline only if GPS data exists */}
+                    {gpsData.length > 0 && geofenceEvents.length > 0 && (
+                      <GeofenceEventsTimeline
+                        elderlyPersonId={selectedPersonId!}
+                        startDate={new Date(dateRange.start)}
+                        endDate={new Date(dateRange.end)}
+                        places={geofencePlaces}
+                      />
+                    )}
+
+                    {/* Always show Geofence Manager */}
+                    <div
+                      className={gpsData.length === 0 || geofenceEvents.length === 0 ? "lg:col-span-2" : ""}
+                      data-tour="tracking-geofence"
+                    >
                       <GeofenceManager elderlyPersonId={selectedPersonId!} />
                     </div>
                   </div>
