@@ -349,9 +349,21 @@ const Alerts = () => {
                   fill="hsl(var(--primary))"
                   dataKey="value"
                 >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={`hsl(var(--chart-${(index % 5) + 1}))`} />
-                  ))}
+                  {pieData.map((entry, index) => {
+                    // Red shades from light to dark
+                    const redShades = [
+                      '#fca5a5', // light red
+                      '#f87171', // lighter red
+                      '#ef4444', // red
+                      '#dc2626', // darker red
+                      '#b91c1c', // dark red
+                      '#991b1b', // very dark red
+                      '#7f1d1d', // darkest red
+                    ];
+                    return (
+                      <Cell key={`cell-${index}`} fill={redShades[index % redShades.length]} />
+                    );
+                  })}
                 </Pie>
                 <Tooltip />
               </PieChart>
