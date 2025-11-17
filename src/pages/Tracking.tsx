@@ -384,18 +384,32 @@ export default function Tracking() {
             {/* Outdoor GPS Tab */}
             <TabsContent value="outdoor" className="space-y-6">
               {gpsData.length === 0 ? (
-                <div className="text-center py-12">
-                  <h2 className="text-2xl font-bold mb-4">No GPS Data Available</h2>
-                  <p className="text-muted-foreground">
-                    Register a GPS device to see outdoor tracking
-                  </p>
-                </div>
+                <>
+                  <div className="text-center py-8 bg-muted/30 rounded-lg border-2 border-dashed">
+                    <Navigation className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                    <h2 className="text-2xl font-bold mb-2">No GPS Data Available</h2>
+                    <p className="text-muted-foreground mb-4">
+                      Register a GPS device to see outdoor tracking and real-time location data
+                    </p>
+                    <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                      But first, set up your geofences below! Geofences define important places and safe zones
+                      for location-based alerts.
+                    </p>
+                  </div>
+
+                  {/* Show Geofence Manager even without GPS data */}
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    <div className="lg:col-span-2" data-tour="tracking-geofence">
+                      <GeofenceManager elderlyPersonId={selectedPersonId!} />
+                    </div>
+                  </div>
+                </>
               ) : (
                 <>
-                  <GPSMetrics 
-                    gpsData={gpsData} 
-                    events={geofenceEvents} 
-                    places={geofencePlaces} 
+                  <GPSMetrics
+                    gpsData={gpsData}
+                    events={geofenceEvents}
+                    places={geofencePlaces}
                   />
 
                   <div data-tour="tracking-map">

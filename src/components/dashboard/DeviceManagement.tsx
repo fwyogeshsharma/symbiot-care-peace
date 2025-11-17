@@ -5,14 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Key, Copy, CheckCircle, Bed, Armchair, Droplet, Scale, Smartphone, LucideIcon } from 'lucide-react';
+import { Plus, Key, Copy, CheckCircle, Bed, Armchair, Droplet, Scale, Smartphone, LucideIcon, MapPin, AlertTriangle } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useDeviceTypes } from '@/hooks/useDeviceTypes';
 import { useDeviceTypeDataConfigs } from '@/hooks/useDeviceTypeDataConfigs';
@@ -28,9 +30,11 @@ const DeviceManagement = () => {
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
   const [generateFakeData, setGenerateFakeData] = useState(false);
+  const [showGeofenceAlert, setShowGeofenceAlert] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Fetch device types from database
   const { data: deviceTypes = [] } = useDeviceTypes();
@@ -219,9 +223,9 @@ const DeviceManagement = () => {
     setShowApiKey(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!deviceName || !deviceType || !deviceId) {
       toast({
         title: "Missing information",
@@ -262,6 +266,29 @@ const DeviceManagement = () => {
         variant: "destructive",
       });
       return;
+    }
+
+    // Check if device type is GPS-related and validate geofences
+    const gpsDeviceTypes = ['smart_phone', 'gps', 'worker_wearable', 'phone', 'mobile'];
+    const isGPSDevice = gpsDeviceTypes.includes(validation.data.device_type.toLowerCase());
+
+    if (isGPSDevice) {
+      // Check for existing geofences
+      const { data: geofences, error: geofenceError } = await supabase
+        .from('geofence_places')
+        .select('id')
+        .eq('elderly_person_id', userElderlyPerson.id)
+        .eq('is_active', true)
+        .limit(1);
+
+      if (geofenceError) {
+        console.error('Error checking geofences:', geofenceError);
+      }
+
+      if (!geofences || geofences.length === 0) {
+        setShowGeofenceAlert(true);
+        return;
+      }
     }
 
     addDeviceMutation.mutate({
@@ -496,6 +523,52 @@ Body:
           </TabsContent>
         </Tabs>
       </DialogContent>
+
+      {/* Geofence Requirement Alert */}
+      <AlertDialog open={showGeofenceAlert} onOpenChange={setShowGeofenceAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-warning" />
+              </div>
+              <AlertDialogTitle className="text-xl">Geofences Required</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="space-y-3 pt-2">
+              <p className="text-base">
+                GPS devices require at least one geofence to be set up before registration.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Geofences define safe zones and important places (like home, work, or medical facilities).
+                They enable location-based alerts when the person enters or exits these areas.
+              </p>
+              <div className="bg-muted/50 p-3 rounded-lg mt-3">
+                <p className="text-sm font-medium mb-1">To add geofences:</p>
+                <ol className="text-sm text-muted-foreground space-y-1 ml-4 list-decimal">
+                  <li>Go to <span className="font-medium">Tracking</span> in the navigation</li>
+                  <li>Select <span className="font-medium">Outdoor Tracking</span> tab</li>
+                  <li>Use the <span className="font-medium">Geofence Manager</span> to add places</li>
+                  <li>Return here to register your GPS device</li>
+                </ol>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowGeofenceAlert(false);
+                setOpen(false);
+                navigate('/tracking');
+              }}
+              className="gap-2"
+            >
+              <MapPin className="w-4 h-4" />
+              Go to Tracking
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 };
