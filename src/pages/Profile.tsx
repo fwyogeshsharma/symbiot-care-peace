@@ -232,33 +232,33 @@ const Profile = () => {
           <div className="space-y-3">
             <Button
               variant="outline"
-              className="w-full justify-start"
+              className="w-full justify-start overflow-hidden"
               onClick={restartTour}
             >
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Restart Onboarding Tour
+              <HelpCircle className="w-4 h-4 mr-2 shrink-0" />
+              <span className="truncate">Restart Onboarding Tour</span>
             </Button>
             <Separator />
             {userRole === 'super_admin' && (
               <>
                 <Button
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start overflow-hidden"
                   onClick={() => navigate('/admin/user-management')}
                 >
-                  <Shield className="w-4 h-4 mr-2" />
-                  User Management
+                  <Shield className="w-4 h-4 mr-2 shrink-0" />
+                  <span className="truncate">User Management</span>
                 </Button>
                 <Separator />
               </>
             )}
             <Button
               variant="outline"
-              className="w-full justify-start text-destructive hover:text-destructive"
+              className="w-full justify-start text-destructive hover:text-destructive overflow-hidden"
               onClick={signOut}
             >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
+              <LogOut className="w-4 h-4 mr-2 shrink-0" />
+              <span className="truncate">Sign Out</span>
             </Button>
           </div>
         </Card>
