@@ -20,7 +20,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
         .from('device_data')
         .select('*')
         .eq('elderly_person_id', selectedPersonId)
-        .in('data_type', ['temperature', 'humidity', 'air_quality'])
+        .in('data_type', ['temperature', 'humidity', 'aqi'])
         .order('recorded_at', { ascending: false })
         .limit(10);
 
@@ -54,7 +54,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
   };
 
   const getAirQuality = () => {
-    const aqData = environmentalData?.find(d => d.data_type === 'air_quality');
+    const aqData = environmentalData?.find(d => d.data_type === 'aqi');
     if (!aqData) return null;
     const value = typeof aqData.value === 'object' ? aqData.value.value : aqData.value;
     return Number(value);
