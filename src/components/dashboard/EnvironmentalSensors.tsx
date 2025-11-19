@@ -23,7 +23,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
           devices!inner(device_name, device_type, device_types!inner(category))
         `)
         .eq('elderly_person_id', selectedPersonId)
-        .in('data_type', ['temperature', 'humidity', 'air_quality'])
+        .in('data_type', ['temperature', 'humidity', 'aqi'])
         .order('recorded_at', { ascending: false })
         .limit(10);
 
@@ -35,7 +35,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
         const deviceType = item.devices?.device_type;
 
         // Air quality always comes from environmental sensors, so include it regardless
-        if (item.data_type === 'air_quality') {
+        if (item.data_type === 'aqi') {
           return true;
         }
 
@@ -77,7 +77,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
   };
 
   const getAirQuality = () => {
-    const aqData = environmentalData?.find(d => d.data_type === 'air_quality');
+    const aqData = environmentalData?.find(d => d.data_type === 'aqi');
     if (!aqData) return null;
     const value = typeof aqData.value === 'object'
       ? (aqData.value.aqi || aqData.value.value)
