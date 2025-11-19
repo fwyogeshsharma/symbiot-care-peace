@@ -3,12 +3,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ILQWidgetProps {
   elderlyPersonId: string;
 }
 
 export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
+  const { userRole } = useAuth();
   const { data: latestScore, isLoading } = useQuery({
     queryKey: ['ilq-score-latest', elderlyPersonId],
     queryFn: async () => {
@@ -100,12 +102,14 @@ export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
             <Activity className="h-5 w-5" />
             ILQ Score
           </span>
-          <Link 
-            to="/ilq-analytics" 
-            className="text-sm font-normal text-primary hover:underline"
-          >
-            View Details
-          </Link>
+          {userRole === 'super_admin' && (
+            <Link
+              to="/ilq-analytics"
+              className="text-sm font-normal text-primary hover:underline"
+            >
+              View Details
+            </Link>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent>

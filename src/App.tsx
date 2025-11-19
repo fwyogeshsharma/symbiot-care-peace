@@ -146,7 +146,7 @@ const App = () => (
             <Route
               path="/ilq-analytics"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="super_admin">
                   <ILQAnalytics />
                 </ProtectedRoute>
               }
