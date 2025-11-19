@@ -311,44 +311,44 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           </div>
         ) : (
           <Tabs defaultValue="heart_rate" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
-              <TabsTrigger value="heart_rate">Heart Rate</TabsTrigger>
-              <TabsTrigger value="blood_pressure">Blood Pressure</TabsTrigger>
-              <TabsTrigger value="oxygen">Oxygen</TabsTrigger>
-              <TabsTrigger value="temperature">Temperature</TabsTrigger>
-              <TabsTrigger value="panic_sos">Panic/SOS</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto p-1 mb-6 border border-border bg-muted/50">
+              <TabsTrigger value="heart_rate" className="text-xs sm:text-sm py-2">Heart Rate</TabsTrigger>
+              <TabsTrigger value="blood_pressure" className="text-xs sm:text-sm py-2">Blood Pressure</TabsTrigger>
+              <TabsTrigger value="oxygen" className="text-xs sm:text-sm py-2">Oxygen</TabsTrigger>
+              <TabsTrigger value="temperature" className="text-xs sm:text-sm py-2">Temperature</TabsTrigger>
+              <TabsTrigger value="panic_sos" className="text-xs sm:text-sm py-2">Panic/SOS</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="heart_rate" className="mt-4">
-              <Card className="p-4">
+            <TabsContent value="heart_rate" className="mt-0">
+              <Card className="p-4 border border-border">
                 <h3 className="text-lg font-semibold mb-4">Heart Rate Over Time</h3>
                 {renderChart('heart_rate', 'Heart Rate', 'hsl(var(--success))', 'bpm')}
               </Card>
             </TabsContent>
 
-            <TabsContent value="blood_pressure" className="mt-4">
-              <Card className="p-4">
+            <TabsContent value="blood_pressure" className="mt-0">
+              <Card className="p-4 border border-border">
                 <h3 className="text-lg font-semibold mb-4">Blood Pressure Over Time</h3>
                 {renderBloodPressureChart()}
               </Card>
             </TabsContent>
 
-            <TabsContent value="oxygen" className="mt-4">
-              <Card className="p-4">
+            <TabsContent value="oxygen" className="mt-0">
+              <Card className="p-4 border border-border">
                 <h3 className="text-lg font-semibold mb-4">Oxygen Saturation Over Time</h3>
                 {renderChart('oxygen_saturation', 'Oxygen Level', 'hsl(var(--primary))', '%')}
               </Card>
             </TabsContent>
 
-            <TabsContent value="temperature" className="mt-4">
-              <Card className="p-4">
+            <TabsContent value="temperature" className="mt-0">
+              <Card className="p-4 border border-border">
                 <h3 className="text-lg font-semibold mb-4">Body Temperature Over Time</h3>
                 {renderChart('temperature', 'Temperature', 'hsl(var(--warning))', '°C')}
               </Card>
             </TabsContent>
 
-            <TabsContent value="panic_sos" className="mt-4">
-              <Card className="p-4">
+            <TabsContent value="panic_sos" className="mt-0">
+              <Card className="p-4 border border-border">
                 <h3 className="text-lg font-semibold mb-4">Panic/SOS Events Over Time</h3>
                 {renderPanicSosChart()}
               </Card>

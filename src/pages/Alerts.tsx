@@ -329,18 +329,20 @@ const Alerts = () => {
                 <Pie
                   data={pieData}
                   cx="50%"
-                  cy="50%"
+                  cy="40%"
                   labelLine={false}
                   label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                  outerRadius={80}
+                  outerRadius={70}
                   fill="hsl(var(--primary))"
                   dataKey="value"
                 >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={`hsl(var(--chart-${(index % 5) + 1}))`} />
-                  ))}
+                  {pieData.map((entry, index) => {
+                    const redShades = ['#dc2626', '#ef4444', '#f87171', '#fca5a5', '#fecaca'];
+                    return <Cell key={`cell-${index}`} fill={redShades[index % redShades.length]} />;
+                  })}
                 </Pie>
                 <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
               </PieChart>
             </ResponsiveContainer>
           </Card>
