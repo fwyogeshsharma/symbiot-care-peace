@@ -39,6 +39,7 @@ export const HEALTH_DATA_TYPES = [
   'steps',
   'activity',
   'humidity',
+  'air_quality',
   'fall_detected',
   'impact_force',
 ] as const;
