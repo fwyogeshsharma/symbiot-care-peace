@@ -9,6 +9,7 @@ import { Activity, TrendingUp, AlertCircle, BarChart3, RefreshCw, Download, Mail
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { InfoButton } from '@/components/help/InfoButton';
 
 export default function ILQAnalytics() {
   const [selectedElderlyPerson, setSelectedElderlyPerson] = useState<string>('');
@@ -143,21 +144,38 @@ export default function ILQAnalytics() {
   ] : [];
 
   return (
-    <div className="min-h-screen bg-background p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-background p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Activity className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <Activity className="h-6 w-6 sm:h-8 sm:w-8" />
             ILQ Analytics
+            <InfoButton
+              title="About ILQ Analytics"
+              content={
+                <div className="space-y-2">
+                  <p>This comprehensive dashboard provides in-depth analysis of the Independent Living Quotient score.</p>
+                  <p className="text-xs">Use this page to:</p>
+                  <ul className="list-disc list-inside space-y-1 text-xs">
+                    <li>Track ILQ score trends over time</li>
+                    <li>Analyze individual component breakdowns</li>
+                    <li>Monitor alerts and score changes</li>
+                    <li>Generate detailed PDF reports</li>
+                    <li>Compute new ILQ scores on-demand</li>
+                  </ul>
+                </div>
+              }
+              side="bottom"
+            />
           </h1>
           <p className="text-muted-foreground mt-1">
             Independent Living Quotient - Comprehensive Independence Assessment
           </p>
         </div>
         
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
           <Select value={selectedElderlyPerson} onValueChange={setSelectedElderlyPerson}>
-            <SelectTrigger className="w-[250px]">
+            <SelectTrigger className="w-full sm:w-[250px]">
               <SelectValue placeholder="Select person" />
             </SelectTrigger>
             <SelectContent>
@@ -168,21 +186,25 @@ export default function ILQAnalytics() {
               ))}
             </SelectContent>
           </Select>
-          
-          <Button onClick={computeILQ} disabled={!selectedElderlyPerson}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Compute ILQ
-          </Button>
-          
-          <Button onClick={downloadReport} disabled={!selectedElderlyPerson || !ilqHistory || ilqHistory.length === 0} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Download Report
-          </Button>
+
+          <div className="flex gap-3 sm:gap-4">
+            <Button onClick={computeILQ} disabled={!selectedElderlyPerson} className="flex-1 sm:flex-initial">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Compute ILQ</span>
+              <span className="sm:hidden">Compute</span>
+            </Button>
+
+            <Button onClick={downloadReport} disabled={!selectedElderlyPerson || !ilqHistory || ilqHistory.length === 0} variant="outline" className="flex-1 sm:flex-initial">
+              <Download className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Download Report</span>
+              <span className="sm:hidden">Report</span>
+            </Button>
+          </div>
         </div>
       </div>
 
       {selectedElderlyPerson && (
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
           <ILQWidget elderlyPersonId={selectedElderlyPerson} />
           
           <Card>
@@ -190,6 +212,12 @@ export default function ILQAnalytics() {
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
                 7-Day Trend
+                <InfoButton
+                  title="ILQ Trend Analysis"
+                  content="Shows the change in ILQ score over the past 7 days. Positive values indicate improvement, negative values suggest attention is needed."
+                  side="bottom"
+                  className="scale-90"
+                />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -217,6 +245,12 @@ export default function ILQAnalytics() {
               <CardTitle className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
                 Active Alerts
+                <InfoButton
+                  title="ILQ Alerts"
+                  content="Displays active alerts triggered by significant changes in ILQ scores or component values. Alerts help identify areas requiring immediate attention."
+                  side="bottom"
+                  className="scale-90"
+                />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -248,13 +282,13 @@ export default function ILQAnalytics() {
           <TabsContent value="history" className="space-y-4">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
                     <CardTitle>ILQ Score History</CardTitle>
                     <CardDescription>Track independence levels over time</CardDescription>
                   </div>
                   <Select value={timeRange} onValueChange={setTimeRange}>
-                    <SelectTrigger className="w-[150px]">
+                    <SelectTrigger className="w-full sm:w-[150px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -267,24 +301,24 @@ export default function ILQAnalytics() {
               </CardHeader>
               <CardContent>
                 {historyLoading ? (
-                  <div className="h-80 flex items-center justify-center">
+                  <div className="h-64 sm:h-80 flex items-center justify-center">
                     <p className="text-muted-foreground">Loading chart...</p>
                   </div>
                 ) : chartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={400}>
+                  <ResponsiveContainer width="100%" height={300} className="sm:h-[400px]">
                     <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis domain={[0, 100]} />
+                      <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                      <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
                       <Tooltip />
-                      <Legend />
+                      <Legend wrapperStyle={{ fontSize: '12px' }} />
                       <Line type="monotone" dataKey="score" stroke="hsl(var(--primary))" strokeWidth={3} name="ILQ Score" />
                       <Line type="monotone" dataKey="health" stroke="#10b981" strokeWidth={2} name="Health" />
                       <Line type="monotone" dataKey="activity" stroke="#3b82f6" strokeWidth={2} name="Activity" />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-80 flex items-center justify-center">
+                  <div className="h-64 sm:h-80 flex items-center justify-center">
                     <p className="text-muted-foreground">No historical data available</p>
                   </div>
                 )}
@@ -293,27 +327,33 @@ export default function ILQAnalytics() {
           </TabsContent>
 
           <TabsContent value="components">
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5" />
                     Component Analysis
+                    <InfoButton
+                      title="Component Radar Chart"
+                      content="Visual representation of all ILQ components on a scale of 0-100. Larger areas indicate better performance across multiple dimensions of independent living."
+                      side="bottom"
+                      className="scale-90"
+                    />
                   </CardTitle>
                   <CardDescription>Latest score breakdown across all dimensions</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {radarData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={400}>
+                    <ResponsiveContainer width="100%" height={300} className="sm:h-[400px]">
                       <RadarChart data={radarData}>
                         <PolarGrid />
-                        <PolarAngleAxis dataKey="component" />
-                        <PolarRadiusAxis domain={[0, 100]} />
+                        <PolarAngleAxis dataKey="component" tick={{ fontSize: 11 }} />
+                        <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
                         <Radar name="Score" dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
                       </RadarChart>
                     </ResponsiveContainer>
                   ) : (
-                    <div className="h-80 flex items-center justify-center">
+                    <div className="h-64 sm:h-80 flex items-center justify-center">
                       <p className="text-muted-foreground">No component data available</p>
                     </div>
                   )}
@@ -322,7 +362,15 @@ export default function ILQAnalytics() {
               
               <Card>
                 <CardHeader>
-                  <CardTitle>Component Details</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    Component Details
+                    <InfoButton
+                      title="Component Weightings"
+                      content="Each component contributes differently to the overall ILQ score. The percentages shown indicate each component's weight in the final calculation."
+                      side="bottom"
+                      className="scale-90"
+                    />
+                  </CardTitle>
                   <CardDescription>Understanding each dimension</CardDescription>
                 </CardHeader>
                 <CardContent>
