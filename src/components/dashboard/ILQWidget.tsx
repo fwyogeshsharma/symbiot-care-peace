@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { InfoButton } from '@/components/help/InfoButton';
 
 interface ILQWidgetProps {
   elderlyPersonId: string;
@@ -101,6 +102,31 @@ export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
           <span className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
             ILQ Score
+            <InfoButton
+              title="Independent Living Quotient (ILQ)"
+              content={
+                <div className="space-y-2">
+                  <p>The ILQ score measures the ability to live independently based on multiple factors:</p>
+                  <ul className="list-disc list-inside space-y-1 text-xs">
+                    <li><strong>Health Vitals (30%):</strong> Heart rate, blood pressure, temperature</li>
+                    <li><strong>Physical Activity (25%):</strong> Steps, movement patterns, mobility</li>
+                    <li><strong>Cognitive Function (15%):</strong> Routine adherence, medication compliance</li>
+                    <li><strong>Environmental Safety (15%):</strong> Home safety conditions</li>
+                    <li><strong>Emergency Response (10%):</strong> Response to alerts</li>
+                    <li><strong>Social Engagement (5%):</strong> Social interactions</li>
+                  </ul>
+                  <p className="text-xs mt-2"><strong>Score Ranges:</strong></p>
+                  <ul className="list-disc list-inside space-y-1 text-xs">
+                    <li>85-100: Excellent independence</li>
+                    <li>70-84: Good independence</li>
+                    <li>55-69: Fair, needs some support</li>
+                    <li>40-54: Poor, needs regular assistance</li>
+                    <li>0-39: Critical, needs immediate attention</li>
+                  </ul>
+                </div>
+              }
+              side="bottom"
+            />
           </span>
           {userRole === 'super_admin' && (
             <Link
@@ -139,19 +165,51 @@ export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
           {/* Component Breakdown */}
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="bg-muted/50 rounded p-2">
-              <div className="text-xs text-muted-foreground">Health</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                Health
+                <InfoButton
+                  title="Health Vitals (30%)"
+                  content="Monitors heart rate, blood pressure, temperature, and other vital signs to assess overall health status."
+                  side="top"
+                  className="scale-75"
+                />
+              </div>
               <div className="font-semibold">{getScoreValue(current.health_vitals_score)?.toFixed(0) || 'N/A'}</div>
             </div>
             <div className="bg-muted/50 rounded p-2">
-              <div className="text-xs text-muted-foreground">Activity</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                Activity
+                <InfoButton
+                  title="Physical Activity (25%)"
+                  content="Tracks daily steps, movement patterns, and mobility to ensure adequate physical activity levels."
+                  side="top"
+                  className="scale-75"
+                />
+              </div>
               <div className="font-semibold">{getScoreValue(current.physical_activity_score)?.toFixed(0) || 'N/A'}</div>
             </div>
             <div className="bg-muted/50 rounded p-2">
-              <div className="text-xs text-muted-foreground">Cognitive</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                Cognitive
+                <InfoButton
+                  title="Cognitive Function (15%)"
+                  content="Assesses routine adherence, medication compliance, and cognitive engagement patterns."
+                  side="top"
+                  className="scale-75"
+                />
+              </div>
               <div className="font-semibold">{getScoreValue(current.cognitive_function_score)?.toFixed(0) || 'N/A'}</div>
             </div>
             <div className="bg-muted/50 rounded p-2">
-              <div className="text-xs text-muted-foreground">Safety</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                Safety
+                <InfoButton
+                  title="Environmental Safety (15%)"
+                  content="Monitors home environment safety, fall detection, and potential hazards."
+                  side="top"
+                  className="scale-75"
+                />
+              </div>
               <div className="font-semibold">{getScoreValue(current.environmental_safety_score)?.toFixed(0) || 'N/A'}</div>
             </div>
           </div>

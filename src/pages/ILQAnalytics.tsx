@@ -145,35 +145,37 @@ export default function ILQAnalytics() {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6 space-y-4 sm:space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-            <Activity className="h-6 w-6 sm:h-8 sm:w-8" />
-            ILQ Analytics
-            <InfoButton
-              title="About ILQ Analytics"
-              content={
-                <div className="space-y-2">
-                  <p>This comprehensive dashboard provides in-depth analysis of the Independent Living Quotient score.</p>
-                  <p className="text-xs">Use this page to:</p>
-                  <ul className="list-disc list-inside space-y-1 text-xs">
-                    <li>Track ILQ score trends over time</li>
-                    <li>Analyze individual component breakdowns</li>
-                    <li>Monitor alerts and score changes</li>
-                    <li>Generate detailed PDF reports</li>
-                    <li>Compute new ILQ scores on-demand</li>
-                  </ul>
-                </div>
-              }
-              side="bottom"
-            />
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Independent Living Quotient - Comprehensive Independence Assessment
-          </p>
+      <div className="flex flex-col gap-4 w-full">
+        <div className="flex items-start gap-2 w-full">
+          <Activity className="h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0 mt-1" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-bold">ILQ Analytics</h1>
+              <InfoButton
+                title="About ILQ Analytics"
+                content={
+                  <div className="space-y-2">
+                    <p>This comprehensive dashboard provides in-depth analysis of the Independent Living Quotient score.</p>
+                    <p className="text-xs">Use this page to:</p>
+                    <ul className="list-disc list-inside space-y-1 text-xs">
+                      <li>Track ILQ score trends over time</li>
+                      <li>Analyze individual component breakdowns</li>
+                      <li>Monitor alerts and score changes</li>
+                      <li>Generate detailed PDF reports</li>
+                      <li>Compute new ILQ scores on-demand</li>
+                    </ul>
+                  </div>
+                }
+                side="bottom"
+              />
+            </div>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+              Independent Living Quotient - Comprehensive Independence Assessment
+            </p>
+          </div>
         </div>
-        
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
           <Select value={selectedElderlyPerson} onValueChange={setSelectedElderlyPerson}>
             <SelectTrigger className="w-full sm:w-[250px]">
               <SelectValue placeholder="Select person" />
@@ -273,10 +275,19 @@ export default function ILQAnalytics() {
 
       {selectedElderlyPerson && (
         <Tabs defaultValue="history" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="history">Historical Trends</TabsTrigger>
-            <TabsTrigger value="components">Component Breakdown</TabsTrigger>
-            <TabsTrigger value="alerts">Alerts History</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="history" className="text-xs sm:text-sm py-2">
+              <span className="hidden sm:inline">Historical Trends</span>
+              <span className="sm:hidden">Trends</span>
+            </TabsTrigger>
+            <TabsTrigger value="components" className="text-xs sm:text-sm py-2">
+              <span className="hidden sm:inline">Component Breakdown</span>
+              <span className="sm:hidden">Components</span>
+            </TabsTrigger>
+            <TabsTrigger value="alerts" className="text-xs sm:text-sm py-2">
+              <span className="hidden sm:inline">Alerts History</span>
+              <span className="sm:hidden">Alerts</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="history" className="space-y-4">
@@ -305,18 +316,26 @@ export default function ILQAnalytics() {
                     <p className="text-muted-foreground">Loading chart...</p>
                   </div>
                 ) : chartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300} className="sm:h-[400px]">
-                    <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                      <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-                      <Tooltip />
-                      <Legend wrapperStyle={{ fontSize: '12px' }} />
-                      <Line type="monotone" dataKey="score" stroke="hsl(var(--primary))" strokeWidth={3} name="ILQ Score" />
-                      <Line type="monotone" dataKey="health" stroke="#10b981" strokeWidth={2} name="Health" />
-                      <Line type="monotone" dataKey="activity" stroke="#3b82f6" strokeWidth={2} name="Activity" />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  <div className="w-full overflow-x-auto">
+                    <ResponsiveContainer width="100%" height={300} className="sm:h-[400px]">
+                      <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="date"
+                          tick={{ fontSize: 10 }}
+                          angle={-45}
+                          textAnchor="end"
+                          height={60}
+                        />
+                        <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
+                        <Tooltip />
+                        <Legend wrapperStyle={{ fontSize: '11px' }} />
+                        <Line type="monotone" dataKey="score" stroke="hsl(var(--primary))" strokeWidth={2} name="ILQ Score" />
+                        <Line type="monotone" dataKey="health" stroke="#10b981" strokeWidth={1.5} name="Health" />
+                        <Line type="monotone" dataKey="activity" stroke="#3b82f6" strokeWidth={1.5} name="Activity" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
                 ) : (
                   <div className="h-64 sm:h-80 flex items-center justify-center">
                     <p className="text-muted-foreground">No historical data available</p>
@@ -344,14 +363,16 @@ export default function ILQAnalytics() {
                 </CardHeader>
                 <CardContent>
                   {radarData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300} className="sm:h-[400px]">
-                      <RadarChart data={radarData}>
-                        <PolarGrid />
-                        <PolarAngleAxis dataKey="component" tick={{ fontSize: 11 }} />
-                        <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
-                        <Radar name="Score" dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
-                      </RadarChart>
-                    </ResponsiveContainer>
+                    <div className="w-full overflow-x-auto">
+                      <ResponsiveContainer width="100%" height={280} className="sm:h-[400px]">
+                        <RadarChart data={radarData}>
+                          <PolarGrid />
+                          <PolarAngleAxis dataKey="component" tick={{ fontSize: 9 }} />
+                          <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8 }} />
+                          <Radar name="Score" dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                    </div>
                   ) : (
                     <div className="h-64 sm:h-80 flex items-center justify-center">
                       <p className="text-muted-foreground">No component data available</p>
@@ -374,25 +395,25 @@ export default function ILQAnalytics() {
                   <CardDescription>Understanding each dimension</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {latestScore && (
                       <>
-                        <div className="border-l-4 border-green-500 pl-4">
-                          <h4 className="font-semibold">Health Vitals (30%)</h4>
-                          <p className="text-sm text-muted-foreground">Heart rate, blood pressure, temperature</p>
-                          <p className="text-2xl font-bold mt-1">{(latestScore.health_vitals_score ? (typeof latestScore.health_vitals_score === 'string' ? parseFloat(latestScore.health_vitals_score) : latestScore.health_vitals_score) : 0).toFixed(0)}</p>
+                        <div className="border-l-4 border-green-500 pl-3 sm:pl-4 py-1">
+                          <h4 className="font-semibold text-sm sm:text-base">Health Vitals (30%)</h4>
+                          <p className="text-xs sm:text-sm text-muted-foreground">Heart rate, blood pressure, temperature</p>
+                          <p className="text-xl sm:text-2xl font-bold mt-1">{(latestScore.health_vitals_score ? (typeof latestScore.health_vitals_score === 'string' ? parseFloat(latestScore.health_vitals_score) : latestScore.health_vitals_score) : 0).toFixed(0)}</p>
                         </div>
-                        
-                        <div className="border-l-4 border-blue-500 pl-4">
-                          <h4 className="font-semibold">Physical Activity (25%)</h4>
-                          <p className="text-sm text-muted-foreground">Steps, movement patterns, mobility</p>
-                          <p className="text-2xl font-bold mt-1">{(latestScore.physical_activity_score ? (typeof latestScore.physical_activity_score === 'string' ? parseFloat(latestScore.physical_activity_score) : latestScore.physical_activity_score) : 0).toFixed(0)}</p>
+
+                        <div className="border-l-4 border-blue-500 pl-3 sm:pl-4 py-1">
+                          <h4 className="font-semibold text-sm sm:text-base">Physical Activity (25%)</h4>
+                          <p className="text-xs sm:text-sm text-muted-foreground">Steps, movement patterns, mobility</p>
+                          <p className="text-xl sm:text-2xl font-bold mt-1">{(latestScore.physical_activity_score ? (typeof latestScore.physical_activity_score === 'string' ? parseFloat(latestScore.physical_activity_score) : latestScore.physical_activity_score) : 0).toFixed(0)}</p>
                         </div>
-                        
-                        <div className="border-l-4 border-purple-500 pl-4">
-                          <h4 className="font-semibold">Cognitive Function (15%)</h4>
-                          <p className="text-sm text-muted-foreground">Routine adherence, medication compliance</p>
-                          <p className="text-2xl font-bold mt-1">{(latestScore.cognitive_function_score ? (typeof latestScore.cognitive_function_score === 'string' ? parseFloat(latestScore.cognitive_function_score) : latestScore.cognitive_function_score) : 0).toFixed(0)}</p>
+
+                        <div className="border-l-4 border-purple-500 pl-3 sm:pl-4 py-1">
+                          <h4 className="font-semibold text-sm sm:text-base">Cognitive Function (15%)</h4>
+                          <p className="text-xs sm:text-sm text-muted-foreground">Routine adherence, medication compliance</p>
+                          <p className="text-xl sm:text-2xl font-bold mt-1">{(latestScore.cognitive_function_score ? (typeof latestScore.cognitive_function_score === 'string' ? parseFloat(latestScore.cognitive_function_score) : latestScore.cognitive_function_score) : 0).toFixed(0)}</p>
                         </div>
                       </>
                     )}
@@ -409,15 +430,15 @@ export default function ILQAnalytics() {
                 <CardDescription>All alerts related to ILQ score changes</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {ilqAlerts && ilqAlerts.length > 0 ? (
                     ilqAlerts.map(alert => (
-                      <div key={alert.id} className="border rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-1">
-                            <h4 className="font-semibold">{alert.title}</h4>
-                            <p className="text-sm text-muted-foreground">{alert.description}</p>
-                            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
+                      <div key={alert.id} className="border rounded-lg p-3 sm:p-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                          <div className="space-y-1 flex-1">
+                            <h4 className="font-semibold text-sm sm:text-base">{alert.title}</h4>
+                            <p className="text-xs sm:text-sm text-muted-foreground">{alert.description}</p>
+                            <div className="flex flex-wrap gap-2 sm:gap-4 text-xs text-muted-foreground mt-2">
                               <span>Severity: <strong>{alert.severity}</strong></span>
                               <span>Status: <strong>{alert.status}</strong></span>
                               {alert.score_change && (
@@ -425,7 +446,7 @@ export default function ILQAnalytics() {
                               )}
                             </div>
                           </div>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
                             {new Date(alert.created_at).toLocaleString()}
                           </span>
                         </div>
