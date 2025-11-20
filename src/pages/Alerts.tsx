@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import Header from '@/components/layout/Header';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, subDays } from 'date-fns';
-import { HelpTooltip } from '@/components/help/HelpTooltip';
+import { InfoButton } from '@/components/help/InfoButton';
 import { EmptyState } from '@/components/help/EmptyState';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 
@@ -196,7 +196,7 @@ const Alerts = () => {
               <div>
                 <div className="flex items-center gap-1 mb-1">
                   <p className="text-sm text-muted-foreground">Total Alerts</p>
-                  <HelpTooltip content="Total number of alerts in the selected time period, including active, acknowledged, and resolved alerts." />
+                  <InfoButton content="Total number of alerts in the selected time period, including active, acknowledged, and resolved alerts." side="top" />
                 </div>
                 <p className="text-3xl font-bold">{totalAlerts}</p>
               </div>
@@ -229,9 +229,10 @@ const Alerts = () => {
               <div>
                 <div className="flex items-center gap-1 mb-1">
                   <p className="text-sm text-muted-foreground">Avg Response</p>
-                  <HelpTooltip 
+                  <InfoButton
                     title="Response Time"
                     content="Average time taken to acknowledge alerts. Lower response times indicate faster attention to critical issues."
+                    side="top"
                   />
                 </div>
                 <p className="text-3xl font-bold">{Math.round(avgResponseTime)}</p>
@@ -389,7 +390,7 @@ const Alerts = () => {
         <Card className="p-6" data-tour="alert-timeline">
           <div className="flex items-center gap-2 mb-4">
             <h3 className="text-lg font-semibold">Alert Timeline</h3>
-            <HelpTooltip 
+            <InfoButton
               title="Alert Severity Levels"
               content={
                 <div className="space-y-2">
@@ -399,6 +400,7 @@ const Alerts = () => {
                   <div><strong className="text-muted-foreground">Low:</strong> Informational (e.g., routine notifications)</div>
                 </div>
               }
+              side="bottom"
             />
           </div>
           {filteredAlerts.length === 0 ? (

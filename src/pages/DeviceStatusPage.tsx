@@ -8,7 +8,7 @@ import ElderlyList from '@/components/dashboard/ElderlyList';
 import { Button } from '@/components/ui/button';
 import { Settings, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { HelpTooltip } from '@/components/help/HelpTooltip';
+import { InfoButton } from '@/components/help/InfoButton';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { PairingApprovalPanel } from '@/components/pairing/PairingApprovalPanel';
 
@@ -49,7 +49,7 @@ const DeviceStatusPage = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl sm:text-3xl font-bold">Devices</h1>
-                <HelpTooltip
+                <InfoButton
                   title="Device Status Guide"
                   content={
                     <div className="space-y-2">
@@ -62,6 +62,7 @@ const DeviceStatusPage = () => {
                       <p className="text-xs mt-2">Click on any device card to view detailed information and history.</p>
                     </div>
                   }
+                  side="bottom"
                 />
               </div>
               <p className="text-muted-foreground text-sm sm:text-base">

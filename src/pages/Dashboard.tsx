@@ -12,7 +12,7 @@ import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
 import Header from '@/components/layout/Header';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
-import { HelpTooltip } from '@/components/help/HelpTooltip';
+import { InfoButton } from '@/components/help/InfoButton';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
 
 const Dashboard = () => {
@@ -197,7 +197,7 @@ const Dashboard = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">Monitored Persons</p>
-                  <HelpTooltip content="Total number of elderly persons you are currently monitoring. This includes all individuals assigned to your care." />
+                  <InfoButton content="Total number of elderly persons you are currently monitoring. This includes all individuals assigned to your care." side="top" />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">{elderlyPersons?.length || 0}</p>
               </div>
@@ -212,7 +212,7 @@ const Dashboard = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">Active Alerts</p>
-                  <HelpTooltip content="Alerts requiring attention. These may include vital sign anomalies, panic button activations, geofence violations, or device issues. Click on alerts to acknowledge and resolve them." />
+                  <InfoButton content="Alerts requiring attention. These may include vital sign anomalies, panic button activations, geofence violations, or device issues. Click on alerts to acknowledge and resolve them." side="top" />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">{alerts?.length || 0}</p>
               </div>
@@ -227,9 +227,10 @@ const Dashboard = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">Avg Heart Rate</p>
-                  <HelpTooltip 
+                  <InfoButton
                     title="Heart Rate Monitoring"
                     content="Average heart rate from recent readings. Normal resting heart rate: 60-100 bpm. Alerts are triggered for values outside safe ranges."
+                    side="top"
                   />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">
@@ -252,7 +253,7 @@ const Dashboard = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">Activity Level</p>
-                  <HelpTooltip 
+                  <InfoButton
                     title="Activity Level Guide"
                     content={
                       <div className="space-y-1">
@@ -261,6 +262,7 @@ const Dashboard = () => {
                         <div><strong>Low:</strong> &lt;4,000 steps/day</div>
                       </div>
                     }
+                    side="top"
                   />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">

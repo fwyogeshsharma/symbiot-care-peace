@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Settings, Plus, Trash2, CheckCircle, Camera, Edit } from 'lucide-react';
 import { ProcessedMovementData, calculateDwellTimes } from '@/lib/movementUtils';
-import { HelpTooltip } from '@/components/help/HelpTooltip';
+import { InfoButton } from '@/components/help/InfoButton';
 import { EmptyState } from '@/components/help/EmptyState';
 
 interface IdealProfileManagerProps {
@@ -190,7 +190,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
               <Settings className="w-5 h-5" />
               Ideal Profile Management
             </CardTitle>
-            <HelpTooltip
+            <InfoButton
               title="What are Ideal Profiles?"
               content={
                 <div className="space-y-2">
@@ -205,6 +205,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
                   <p className="text-xs mt-2">The system will alert you when actual dwell times deviate significantly from the ideal ranges.</p>
                 </div>
               }
+              side="bottom"
             />
           </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {

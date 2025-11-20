@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, TrendingDown, TrendingUp, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { ProcessedMovementData, calculateDwellTimes } from "@/lib/movementUtils";
-import { HelpTooltip } from "@/components/help/HelpTooltip";
+import { InfoButton } from "@/components/help/InfoButton";
 
 interface DwellTimeAnalysisProps {
   data: ProcessedMovementData;
@@ -87,7 +87,7 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
               <Clock className="w-5 h-5" />
               Dwell Time Analysis
             </CardTitle>
-            <HelpTooltip 
+            <InfoButton
               title="Understanding Dwell Times"
               content={
                 <div className="space-y-2">
@@ -108,6 +108,7 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
                   </div>
                 </div>
               }
+              side="bottom"
             />
           </div>
           {idealProfile && (
