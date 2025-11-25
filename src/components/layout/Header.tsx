@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, Heart } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, Heart, LayoutDashboard } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -109,6 +109,18 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         <Wifi className="w-4 h-4 mr-2" />
         Devices
       </Button>
+      {(userRole === 'super_admin' || userRole === 'admin') && (
+        <Button
+          data-tour="nav-admin"
+          variant={isActive('/admin/dashboard') ? 'default' : 'ghost'}
+          size={isMobile ? 'default' : 'sm'}
+          onClick={() => navigate('/admin/dashboard')}
+          className={cn(isMobile && 'w-full justify-start')}
+        >
+          <LayoutDashboard className="w-4 h-4 mr-2" />
+          Admin
+        </Button>
+      )}
       <Button
         data-tour="user-menu"
         variant={isActive('/profile') ? 'default' : 'ghost'}

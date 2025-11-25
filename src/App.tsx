@@ -18,6 +18,7 @@ import DeviceTypesManagement from "./pages/admin/DeviceTypesManagement";
 import DeviceTypeDataConfigs from "./pages/admin/DeviceTypeDataConfigs";
 import DeviceModelsManagement from "./pages/admin/DeviceModelsManagement";
 import UserManagement from "./pages/admin/UserManagement";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import FloorPlanManagement from "./pages/FloorPlanManagement";
 import FloorPlanEditor from "./pages/FloorPlanEditor";
 import Alerts from "./pages/Alerts";
@@ -119,12 +120,20 @@ const App = () => (
               }
             />
             <Route
-              path="/admin/user-management" 
+              path="/admin/user-management"
               element={
                 <ProtectedRoute>
                   <UserManagement />
                 </ProtectedRoute>
-              } 
+              }
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
             />
             <Route 
               path="/floor-plan-management" 
