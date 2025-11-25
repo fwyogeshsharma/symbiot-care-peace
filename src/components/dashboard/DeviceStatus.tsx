@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSampleDataPoints } from '@/lib/sampleDataGenerator';
 import { useAllDeviceTypes } from '@/hooks/useDeviceTypes';
+import { useDeviceCompanies } from '@/hooks/useDeviceCompanies';
 
 interface DeviceStatusProps {
   selectedPersonId?: string | null;
@@ -34,6 +35,9 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   
   // Fetch all device types for the edit dialog
   const { data: allDeviceTypes = [] } = useAllDeviceTypes();
+
+  // Fetch device companies
+  const { data: deviceCompanies = [] } = useDeviceCompanies();
   
   const { data: devices } = useQuery({
     queryKey: ['devices', selectedPersonId],
@@ -42,13 +46,13 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
       if (!selectedPersonId) {
         return [];
       }
-      
+
       const { data, error } = await supabase
         .from('devices')
-        .select('*, elderly_persons(full_name)')
+        .select('*, elderly_persons(full_name), device_companies(id, name, code)')
         .eq('elderly_person_id', selectedPersonId)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -307,6 +311,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
         device_name: editDevice.device_name,
         device_type: editDevice.device_type,
         location: editDevice.location,
+        company_id: editDevice.company_id || null,
       },
     });
   };
@@ -452,6 +457,15 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                     onClick={() => setSelectedDevice(device)}
                   >
                     📍 {device.location}
+                  </p>
+                )}
+
+                {device.device_companies?.name && (
+                  <p
+                    className="text-xs text-muted-foreground mt-1 cursor-pointer truncate"
+                    onClick={() => setSelectedDevice(device)}
+                  >
+                    🏭 {device.device_companies.name}
                   </p>
                 )}
               </div>
@@ -608,6 +622,26 @@ Body:
                   onChange={(e) => setEditDevice({ ...editDevice, location: e.target.value })}
                   placeholder="e.g., Bedroom, Living Room"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-company">Company/Manufacturer</Label>
+                <Select
+                  value={editDevice.company_id || ''}
+                  onValueChange={(value) => setEditDevice({ ...editDevice, company_id: value || null })}
+                >
+                  <SelectTrigger id="edit-company">
+                    <SelectValue placeholder="Select company (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {deviceCompanies.map((company) => (
+                      <SelectItem key={company.id} value={company.id}>
+                        {company.name}
+                        {company.description && ` (${company.description})`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex gap-2">

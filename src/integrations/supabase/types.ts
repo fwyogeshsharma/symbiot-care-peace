@@ -141,6 +141,42 @@ export type Database = {
           },
         ]
       }
+      device_companies: {
+        Row: {
+          id: string
+          code: string
+          name: string
+          description: string | null
+          logo_url: string | null
+          website: string | null
+          is_active: boolean | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          code: string
+          name: string
+          description?: string | null
+          logo_url?: string | null
+          website?: string | null
+          is_active?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          code?: string
+          name?: string
+          description?: string | null
+          logo_url?: string | null
+          website?: string | null
+          is_active?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       device_data: {
         Row: {
           created_at: string
@@ -388,6 +424,7 @@ export type Database = {
         Row: {
           api_key: string
           battery_level: number | null
+          company_id: string | null
           created_at: string
           device_id: string
           device_name: string
@@ -402,6 +439,7 @@ export type Database = {
         Insert: {
           api_key?: string
           battery_level?: number | null
+          company_id?: string | null
           created_at?: string
           device_id: string
           device_name: string
@@ -416,6 +454,7 @@ export type Database = {
         Update: {
           api_key?: string
           battery_level?: number | null
+          company_id?: string | null
           created_at?: string
           device_id?: string
           device_name?: string
@@ -428,6 +467,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "devices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "device_companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "devices_elderly_person_id_fkey"
             columns: ["elderly_person_id"]

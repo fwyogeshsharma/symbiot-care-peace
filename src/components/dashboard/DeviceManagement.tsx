@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { z } from 'zod';
 import { useDeviceTypes } from '@/hooks/useDeviceTypes';
 import { useDeviceTypeDataConfigs } from '@/hooks/useDeviceTypeDataConfigs';
+import { useDeviceCompanies } from '@/hooks/useDeviceCompanies';
 import { generateSampleDataPoints } from '@/lib/sampleDataGenerator';
 import { DeviceDiscovery } from '@/components/pairing/DeviceDiscovery';
 
@@ -25,6 +26,7 @@ const DeviceManagement = () => {
   const [deviceType, setDeviceType] = useState('');
   const [deviceId, setDeviceId] = useState('');
   const [location, setLocation] = useState('');
+  const [companyId, setCompanyId] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
   const [generateFakeData, setGenerateFakeData] = useState(false);
@@ -34,7 +36,10 @@ const DeviceManagement = () => {
 
   // Fetch device types from database
   const { data: deviceTypes = [] } = useDeviceTypes();
-  
+
+  // Fetch device companies from database
+  const { data: deviceCompanies = [] } = useDeviceCompanies();
+
   // Fetch data configs for selected device type
   const { data: dataConfigs = [] } = useDeviceTypeDataConfigs(deviceType);
 
@@ -270,6 +275,7 @@ const DeviceManagement = () => {
       device_id: validation.data.device_id,
       elderly_person_id: userElderlyPerson.id,
       location: validation.data.location || null,
+      company_id: companyId || null,
       status: 'active',
     });
   };
@@ -281,6 +287,7 @@ const DeviceManagement = () => {
       setDeviceType('');
       setDeviceId('');
       setLocation('');
+      setCompanyId('');
       setApiKey('');
       setShowApiKey(false);
     }
@@ -291,6 +298,7 @@ const DeviceManagement = () => {
     setDeviceType('');
     setDeviceId('');
     setLocation('');
+    setCompanyId('');
     setApiKey('');
     setShowApiKey(false);
     setGenerateFakeData(false);
@@ -365,6 +373,27 @@ const DeviceManagement = () => {
                       </SelectItem>
                     );
                   })}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="device-company">Company/Manufacturer</Label>
+              <Select value={companyId} onValueChange={setCompanyId}>
+                <SelectTrigger id="device-company">
+                  <SelectValue placeholder="Select company (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {deviceCompanies.map((company) => (
+                    <SelectItem key={company.id} value={company.id}>
+                      <span>{company.name}</span>
+                      {company.description && (
+                        <span className="text-muted-foreground text-xs ml-2">
+                          ({company.description})
+                        </span>
+                      )}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
