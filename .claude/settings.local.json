@@ -4,7 +4,8 @@
       "Bash(npx supabase:*)",
       "Bash(psql:*)",
       "Bash(npm run type-check:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

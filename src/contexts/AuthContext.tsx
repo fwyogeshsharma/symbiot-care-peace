@@ -116,19 +116,50 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    
-    if (!error) {
+
+    if (!error && data.user) {
+      // Log session start
+      await supabase.from('session_logs').insert({
+        user_id: data.user.id,
+        login_at: new Date().toISOString(),
+      });
       navigate('/dashboard');
     }
-    
+
     return { error };
   };
 
   const signOut = async () => {
+    // Update session log with logout time
+    if (user) {
+      const { data: latestSession } = await supabase
+        .from('session_logs')
+        .select('id, login_at')
+        .eq('user_id', user.id)
+        .is('logout_at', null)
+        .order('login_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (latestSession) {
+        const loginAt = new Date(latestSession.login_at);
+        const logoutAt = new Date();
+        const durationMinutes = Math.round((logoutAt.getTime() - loginAt.getTime()) / 60000);
+
+        await supabase
+          .from('session_logs')
+          .update({
+            logout_at: logoutAt.toISOString(),
+            session_duration_minutes: durationMinutes,
+          })
+          .eq('id', latestSession.id);
+      }
+    }
+
     await supabase.auth.signOut();
     setUserRole(null);
     navigate('/auth');

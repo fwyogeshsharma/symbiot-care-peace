@@ -2,61 +2,104 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, LogIn, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { format, subDays, eachDayOfInterval, startOfDay, differenceInMinutes } from 'date-fns';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { format, subDays, eachDayOfInterval, startOfDay, endOfDay } from 'date-fns';
 
 export function PlatformMetricsCard() {
   const { data: sessionData, isLoading } = useQuery({
     queryKey: ['platform-session-metrics'],
     queryFn: async () => {
-      // Get auth audit logs for login sessions
-      // Note: In a real implementation, you'd have a session_logs table
-      // For now, we'll simulate with available data
+      // Get session logs from database
+      const sevenDaysAgo = subDays(new Date(), 6);
+      const fourteenDaysAgo = subDays(new Date(), 13);
 
-      // Get profiles with last sign in (if available)
-      const { data: profiles, error } = await supabase
-        .from('profiles')
-        .select('id, created_at, updated_at');
+      // Get sessions for last 7 days
+      const { data: recentSessions, error: recentError } = await supabase
+        .from('session_logs')
+        .select('id, user_id, login_at, logout_at, session_duration_minutes')
+        .gte('login_at', sevenDaysAgo.toISOString())
+        .order('login_at', { ascending: true });
 
-      if (error) throw error;
+      if (recentError) {
+        console.error('Error fetching session logs:', recentError);
+        // Return empty data if table doesn't exist yet
+        return {
+          totalSessions: 0,
+          avgSessionLength: 0,
+          dailySessionsData: [],
+          sessionTrend: 0,
+          activeUsersToday: 0,
+        };
+      }
 
-      // Simulate session data based on profile activity
-      // In production, you'd track actual login/logout events
-      const totalSessions = profiles?.length ? profiles.length * 15 : 0; // Simulated avg sessions per user
-      const avgSessionLength = 24; // Simulated average session in minutes
+      // Get sessions for previous 7 days (for trend calculation)
+      const { data: previousSessions } = await supabase
+        .from('session_logs')
+        .select('id')
+        .gte('login_at', fourteenDaysAgo.toISOString())
+        .lt('login_at', sevenDaysAgo.toISOString());
 
-      // Generate chart data for last 7 days (simulated)
+      // Group sessions by day
       const last7Days = eachDayOfInterval({
-        start: subDays(new Date(), 6),
+        start: sevenDaysAgo,
         end: new Date(),
       });
 
-      const dailySessionsData = last7Days.map((day, index) => {
-        // Simulate varying session counts
-        const baseSessions = Math.floor((profiles?.length || 5) * (0.5 + Math.random() * 0.8));
+      const dailySessionsData = last7Days.map(day => {
+        const dayStart = startOfDay(day);
+        const dayEnd = endOfDay(day);
+        const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+
+        const daySessions = recentSessions?.filter(s => {
+          const loginDate = new Date(s.login_at);
+          return loginDate >= dayStart && loginDate <= dayEnd;
+        }) || [];
+
+        // Calculate average duration for completed sessions
+        const completedSessions = daySessions.filter(s => s.session_duration_minutes !== null);
+        const avgDuration = completedSessions.length > 0
+          ? Math.round(completedSessions.reduce((sum, s) => sum + (s.session_duration_minutes || 0), 0) / completedSessions.length)
+          : 0;
+
         return {
           date: format(day, 'EEE'),
-          sessions: baseSessions,
-          avgDuration: Math.floor(15 + Math.random() * 30),
+          fullDate: format(day, 'MMM dd'),
+          sessions: daySessions.length,
+          avgDuration,
+          isToday,
         };
       });
 
-      // Calculate totals from simulated data
-      const weekSessions = dailySessionsData.reduce((sum, d) => sum + d.sessions, 0);
-      const weekAvgDuration = Math.floor(dailySessionsData.reduce((sum, d) => sum + d.avgDuration, 0) / 7);
+      // Calculate totals
+      const totalSessions = recentSessions?.length || 0;
+      const previousTotalSessions = previousSessions?.length || 0;
 
-      // Calculate trend (compare this week vs "last week")
-      const lastWeekSessions = weekSessions * (0.8 + Math.random() * 0.3);
-      const sessionTrend = lastWeekSessions > 0
-        ? ((weekSessions - lastWeekSessions) / lastWeekSessions) * 100
+      // Calculate average session length (only from completed sessions)
+      const completedSessions = recentSessions?.filter(s => s.session_duration_minutes !== null) || [];
+      const avgSessionLength = completedSessions.length > 0
+        ? Math.round(completedSessions.reduce((sum, s) => sum + (s.session_duration_minutes || 0), 0) / completedSessions.length)
         : 0;
 
+      // Calculate trend
+      const sessionTrend = previousTotalSessions > 0
+        ? ((totalSessions - previousTotalSessions) / previousTotalSessions) * 100
+        : totalSessions > 0 ? 100 : 0;
+
+      // Count unique active users today
+      const todayStart = startOfDay(new Date());
+      const todaySessions = recentSessions?.filter(s => new Date(s.login_at) >= todayStart) || [];
+      const activeUsersToday = new Set(todaySessions.map(s => s.user_id)).size;
+
+      // Today's sessions count
+      const todaySessionsCount = todaySessions.length;
+
       return {
-        totalSessions: weekSessions,
-        avgSessionLength: weekAvgDuration,
+        totalSessions,
+        avgSessionLength,
         dailySessionsData,
         sessionTrend,
-        activeUsersToday: Math.floor((profiles?.length || 0) * 0.3),
+        activeUsersToday,
+        todaySessionsCount,
       };
     },
     refetchInterval: 10000, // Auto-refresh every 10 seconds
@@ -105,9 +148,9 @@ export function PlatformMetricsCard() {
       <CardContent>
         <div className="space-y-4">
           {/* Main Metrics */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-3">
             <div>
-              <div className="text-2xl font-bold text-foreground">
+              <div className="text-xl font-bold text-foreground">
                 {sessionData?.totalSessions.toLocaleString()}
               </div>
               <div className="text-xs text-muted-foreground">
@@ -115,7 +158,7 @@ export function PlatformMetricsCard() {
               </div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-foreground">
+              <div className="text-xl font-bold text-foreground">
                 {sessionData?.avgSessionLength}m
               </div>
               <div className="text-xs text-muted-foreground">
@@ -123,17 +166,25 @@ export function PlatformMetricsCard() {
               </div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-xl font-bold text-green-600">
+                {sessionData?.todaySessionsCount || 0}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Today Sessions
+              </div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-indigo-600">
                 {sessionData?.activeUsersToday}
               </div>
               <div className="text-xs text-muted-foreground">
-                Active Today
+                Active Users
               </div>
             </div>
           </div>
 
           {/* Chart - Daily Sessions */}
-          <div className="h-40 mt-4">
+          <div className="h-36 mt-4">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={sessionData?.dailySessionsData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -148,6 +199,7 @@ export function PlatformMetricsCard() {
                   fontSize={10}
                   tickLine={false}
                   width={30}
+                  allowDecimals={false}
                 />
                 <Tooltip
                   contentStyle={{
@@ -157,17 +209,25 @@ export function PlatformMetricsCard() {
                     fontSize: '12px',
                   }}
                   formatter={(value: number, name: string) => [
-                    name === 'sessions' ? `${value} sessions` : `${value} min`,
-                    name === 'sessions' ? 'Login Sessions' : 'Avg Duration'
+                    `${value} sessions`,
+                    'Login Sessions'
                   ]}
+                  labelFormatter={(label, payload) => {
+                    const item = payload?.[0]?.payload;
+                    return item?.fullDate || label;
+                  }}
                 />
-                <Bar dataKey="sessions" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="sessions"
+                  fill="hsl(var(--primary))"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
           <div className="text-xs text-center text-muted-foreground">
-            Daily login sessions over the past week
+            Login sessions over the past 7 days (updates in real-time for today)
           </div>
         </div>
       </CardContent>
