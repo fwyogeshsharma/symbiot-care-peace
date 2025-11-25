@@ -10,6 +10,7 @@ import * as Icons from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useDeviceTypes } from "@/hooks/useDeviceTypes";
+import { useDeviceCompanies } from "@/hooks/useDeviceCompanies";
 
 interface DeviceDiscoveryProps {
   elderlyPersonId: string;
@@ -19,11 +20,13 @@ interface DeviceDiscoveryProps {
 export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryProps) => {
   const [deviceId, setDeviceId] = useState("");
   const [deviceType, setDeviceType] = useState("");
+  const [companyId, setCompanyId] = useState("");
   const [loading, setLoading] = useState(false);
   const [pairingCode, setPairingCode] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'pending' | 'verified' | 'paired' | 'expired' | 'rejected'>('idle');
   const [requestId, setRequestId] = useState<string | null>(null);
   const { data: deviceTypes = [] } = useDeviceTypes();
+  const { data: deviceCompanies = [] } = useDeviceCompanies();
 
   const getIconComponent = (iconName: string | null): LucideIcon | null => {
     if (!iconName) return null;
@@ -43,6 +46,7 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
         body: {
           deviceId: deviceId.trim(),
           deviceType: deviceType || undefined,
+          companyId: companyId || undefined,
           elderlyPersonId,
           networkInfo: {
             timestamp: new Date().toISOString(),
@@ -235,6 +239,27 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
                   </SelectItem>
                 );
               })}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="company">Company/Manufacturer (Optional)</Label>
+          <Select value={companyId} onValueChange={setCompanyId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select company" />
+            </SelectTrigger>
+            <SelectContent>
+              {deviceCompanies.map((company) => (
+                <SelectItem key={company.id} value={company.id}>
+                  <span>{company.name}</span>
+                  {company.description && (
+                    <span className="text-muted-foreground text-xs ml-2">
+                      ({company.description})
+                    </span>
+                  )}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

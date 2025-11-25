@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSampleDataPoints } from '@/lib/sampleDataGenerator';
 import { useAllDeviceTypes } from '@/hooks/useDeviceTypes';
+import { useDeviceCompanies } from '@/hooks/useDeviceCompanies';
 
 interface DeviceStatusProps {
   selectedPersonId?: string | null;
@@ -34,6 +35,9 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   
   // Fetch all device types for the edit dialog
   const { data: allDeviceTypes = [] } = useAllDeviceTypes();
+
+  // Fetch device companies
+  const { data: deviceCompanies = [] } = useDeviceCompanies();
   
   const { data: devices } = useQuery({
     queryKey: ['devices', selectedPersonId],
@@ -42,13 +46,13 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
       if (!selectedPersonId) {
         return [];
       }
-      
+
       const { data, error } = await supabase
         .from('devices')
-        .select('*, elderly_persons(full_name)')
+        .select('*, elderly_persons(full_name), device_companies(id, name, code)')
         .eq('elderly_person_id', selectedPersonId)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -307,6 +311,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
         device_name: editDevice.device_name,
         device_type: editDevice.device_type,
         location: editDevice.location,
+        company_id: editDevice.company_id || null,
       },
     });
   };
@@ -320,15 +325,15 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   };
 
   return (
-    <Card className="p-6">
+    <Card className="p-3 sm:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Device Status</h3>
+        <h3 className="text-base sm:text-lg font-semibold">Device Status</h3>
       </div>
-      
+
       <div className="mb-4">
         <DeviceManagement />
       </div>
-      
+
       {!devices || devices.length === 0 ? (
         <p className="text-muted-foreground text-center py-8">
           No devices registered yet
@@ -338,36 +343,39 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
           {devices.map((device) => {
             const dataCount = dataCounts[device.id] || 0;
             const hasNoData = dataCount === 0;
-            
+
             return (
-              <div 
+              <div
                 key={device.id}
                 className="border rounded-lg p-3 hover:bg-muted/30 transition-colors"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div 
-                    className="flex items-center gap-2 cursor-pointer flex-1"
+                {/* Mobile: Stack layout / Desktop: Row layout */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                  <div
+                    className="flex items-center gap-2 cursor-pointer flex-1 min-w-0"
                     onClick={() => setSelectedDevice(device)}
                   >
                     {device.status === 'active' ? (
-                      <Wifi className="w-4 h-4 text-success" />
+                      <Wifi className="w-4 h-4 text-success flex-shrink-0" />
                     ) : (
-                      <WifiOff className="w-4 h-4 text-muted-foreground" />
+                      <WifiOff className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                     )}
-                    <span className="font-medium text-sm">{device.device_name}</span>
+                    <span className="font-medium text-sm truncate">{device.device_name}</span>
                     {hasNoData ? (
-                      <Badge variant="outline" className="text-xs border-warning text-warning">
+                      <Badge variant="outline" className="text-xs border-warning text-warning flex-shrink-0">
                         No Data
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs hidden sm:inline-flex flex-shrink-0">
                         {dataCount} records
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge 
-                      variant="outline" 
+
+                  {/* Action buttons row */}
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                    <Badge
+                      variant="outline"
                       className={`${getStatusColor(device.status)} text-xs capitalize`}
                     >
                       {device.status}
@@ -378,7 +386,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                           <Button
                             variant={hasNoData ? "default" : "ghost"}
                             size="sm"
-                            className={hasNoData ? "h-7 text-xs" : "h-7 w-7"}
+                            className="h-7 px-2 sm:px-3"
                             onClick={(e) => {
                               e.stopPropagation();
                               generateDataMutation.mutate(device);
@@ -390,7 +398,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                             ) : (
                               <>
                                 <Wand2 className="w-3.5 h-3.5" />
-                                {hasNoData && <span className="ml-1">Generate Data</span>}
+                                {hasNoData && <span className="ml-1 hidden sm:inline">Generate Data</span>}
                               </>
                             )}
                           </Button>
@@ -424,37 +432,53 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                     </Button>
                   </div>
                 </div>
-              
-              <div 
-                className="flex items-center justify-between text-xs text-muted-foreground cursor-pointer"
-                onClick={() => setSelectedDevice(device)}
-              >
-                <span>{device.elderly_persons?.full_name || 'Unassigned'}</span>
-                <div className="flex items-center gap-1">
-                  {getBatteryIcon(device.battery_level)}
-                  {device.battery_level && <span>{device.battery_level}%</span>}
-                </div>
-              </div>
-              
-              {device.location && (
-                <p 
-                  className="text-xs text-muted-foreground mt-1 cursor-pointer"
+
+                <div
+                  className="flex items-center justify-between text-xs text-muted-foreground cursor-pointer"
                   onClick={() => setSelectedDevice(device)}
                 >
-                  📍 {device.location}
-                </p>
-              )}
-            </div>
-          );
+                  <span className="truncate">{device.elderly_persons?.full_name || 'Unassigned'}</span>
+                  <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                    {getBatteryIcon(device.battery_level)}
+                    {device.battery_level && <span>{device.battery_level}%</span>}
+                  </div>
+                </div>
+
+                {/* Show record count on mobile */}
+                {!hasNoData && (
+                  <div className="text-xs text-muted-foreground mt-1 sm:hidden">
+                    {dataCount} records
+                  </div>
+                )}
+
+                {device.location && (
+                  <p
+                    className="text-xs text-muted-foreground mt-1 cursor-pointer truncate"
+                    onClick={() => setSelectedDevice(device)}
+                  >
+                    📍 {device.location}
+                  </p>
+                )}
+
+                {device.device_companies?.name && (
+                  <p
+                    className="text-xs text-muted-foreground mt-1 cursor-pointer truncate"
+                    onClick={() => setSelectedDevice(device)}
+                  >
+                    🏭 {device.device_companies.name}
+                  </p>
+                )}
+              </div>
+            );
           })}
         </div>
       )}
 
       <Dialog open={!!selectedDevice} onOpenChange={() => setSelectedDevice(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Device API Details</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">Device API Details</DialogTitle>
+            <DialogDescription className="text-sm">
               Use these details to send data from your IoT device
             </DialogDescription>
           </DialogHeader>
@@ -462,18 +486,19 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
           {selectedDevice && (
             <div className="space-y-4">
               <div>
-                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                <h4 className="font-semibold mb-2 flex flex-col sm:flex-row sm:items-center gap-2 text-sm sm:text-base">
                   <span>API Key</span>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs w-fit">
                     Save this securely
                   </Badge>
                 </h4>
-                <div className="bg-muted p-3 rounded-md flex items-center justify-between">
-                  <code className="text-sm">{selectedDevice.api_key}</code>
+                <div className="bg-muted p-3 rounded-md flex items-center justify-between gap-2">
+                  <code className="text-xs sm:text-sm break-all">{selectedDevice.api_key}</code>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={copyApiKey}
+                    className="flex-shrink-0"
                   >
                     {copiedApiKey ? (
                       <Check className="w-4 h-4 text-success" />
@@ -488,17 +513,17 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2">API Endpoint</h4>
-                <div className="bg-muted p-3 rounded-md">
-                  <code className="text-sm break-all">
+                <h4 className="font-semibold mb-2 text-sm sm:text-base">API Endpoint</h4>
+                <div className="bg-muted p-3 rounded-md overflow-x-auto">
+                  <code className="text-xs sm:text-sm break-all">
                     https://wiyfcvypeifbdaqnfgrr.supabase.co/functions/v1/device-ingest
                   </code>
                 </div>
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2">Example Request</h4>
-                <div className="bg-muted p-3 rounded-md">
+                <h4 className="font-semibold mb-2 text-sm sm:text-base">Example Request</h4>
+                <div className="bg-muted p-3 rounded-md overflow-x-auto">
                   <pre className="text-xs overflow-x-auto">
 {`POST /device-ingest
 Headers:
@@ -597,6 +622,26 @@ Body:
                   onChange={(e) => setEditDevice({ ...editDevice, location: e.target.value })}
                   placeholder="e.g., Bedroom, Living Room"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-company">Company/Manufacturer</Label>
+                <Select
+                  value={editDevice.company_id || ''}
+                  onValueChange={(value) => setEditDevice({ ...editDevice, company_id: value || null })}
+                >
+                  <SelectTrigger id="edit-company">
+                    <SelectValue placeholder="Select company (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {deviceCompanies.map((company) => (
+                      <SelectItem key={company.id} value={company.id}>
+                        {company.name}
+                        {company.description && ` (${company.description})`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex gap-2">
