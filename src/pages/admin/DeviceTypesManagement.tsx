@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Edit, Settings } from 'lucide-react';
+import { Plus, Edit, Settings, Smartphone } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAllDeviceTypes, DeviceType } from '@/hooks/useDeviceTypes';
@@ -315,13 +315,22 @@ const DeviceTypesManagement = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={() => handleEdit(type)}>
+                          <Button variant="outline" size="sm" onClick={() => handleEdit(type)} title="Edit Device Type">
                             <Edit className="w-4 h-4" />
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => navigate(`/admin/device-types/${type.id}/models`)}
+                            title="Manage Device Models"
+                          >
+                            <Smartphone className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => navigate(`/admin/device-types/${type.id}/configs`)}
+                            title="Data Configurations"
                           >
                             <Settings className="w-4 h-4" />
                           </Button>

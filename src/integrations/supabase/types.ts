@@ -177,6 +177,72 @@ export type Database = {
         }
         Relationships: []
       }
+      device_models: {
+        Row: {
+          id: string
+          device_type_id: string
+          company_id: string | null
+          manufacturer: string | null
+          code: string
+          name: string
+          description: string | null
+          model_number: string | null
+          image_url: string | null
+          specifications: Json | null
+          supported_data_types: string[] | null
+          is_active: boolean | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          device_type_id: string
+          company_id?: string | null
+          manufacturer?: string | null
+          code: string
+          name: string
+          description?: string | null
+          model_number?: string | null
+          image_url?: string | null
+          specifications?: Json | null
+          supported_data_types?: string[] | null
+          is_active?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          device_type_id?: string
+          company_id?: string | null
+          manufacturer?: string | null
+          code?: string
+          name?: string
+          description?: string | null
+          model_number?: string | null
+          image_url?: string | null
+          specifications?: Json | null
+          supported_data_types?: string[] | null
+          is_active?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_models_device_type_id_fkey"
+            columns: ["device_type_id"]
+            isOneToOne: false
+            referencedRelation: "device_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "device_models_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "device_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       device_data: {
         Row: {
           created_at: string

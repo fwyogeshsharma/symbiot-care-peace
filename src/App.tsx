@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Tracking from "./pages/Tracking";
 import DeviceTypesManagement from "./pages/admin/DeviceTypesManagement";
 import DeviceTypeDataConfigs from "./pages/admin/DeviceTypeDataConfigs";
+import DeviceModelsManagement from "./pages/admin/DeviceModelsManagement";
 import UserManagement from "./pages/admin/UserManagement";
 import FloorPlanManagement from "./pages/FloorPlanManagement";
 import FloorPlanEditor from "./pages/FloorPlanEditor";
@@ -100,15 +101,23 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            <Route 
-              path="/admin/device-types/:deviceTypeId/configs" 
+            <Route
+              path="/admin/device-types/:deviceTypeId/configs"
               element={
                 <ProtectedRoute>
                   <DeviceTypeDataConfigs />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
+            <Route
+              path="/admin/device-types/:deviceTypeId/models"
+              element={
+                <ProtectedRoute>
+                  <DeviceModelsManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/user-management" 
               element={
                 <ProtectedRoute>
