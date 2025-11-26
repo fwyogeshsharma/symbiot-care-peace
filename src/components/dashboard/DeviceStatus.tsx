@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { generateSampleDataPoints } from '@/lib/sampleDataGenerator';
+import { generateSampleDataPoints, generateSampleDataFromModelSpecs } from '@/lib/sampleDataGenerator';
 import { useAllDeviceTypes } from '@/hooks/useDeviceTypes';
 import { useAllDeviceCompanies } from '@/hooks/useDeviceCompanies';
 
@@ -147,71 +147,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   const generateDataMutation = useMutation({
     mutationFn: async (device: any) => {
       const now = new Date();
-      const sampleData = [];
-      
-      // Special handling for worker-wearable devices with position data
-      if (device.device_type === 'worker_wearable') {
-        const { getDefaultFloorPlan, generateIndoorMovementPath } = await import('@/lib/positionUtils');
-        
-        // Check if floor plan exists
-        const { data: existingFloorPlan } = await supabase
-          .from('floor_plans')
-          .select('*')
-          .eq('elderly_person_id', device.elderly_person_id)
-          .maybeSingle();
-        
-        let floorPlan = existingFloorPlan;
-        
-        // Create floor plan if it doesn't exist
-        if (!existingFloorPlan) {
-          const defaultFloorPlan = getDefaultFloorPlan(device.elderly_person_id);
-          const { data: newFloorPlan } = await supabase
-            .from('floor_plans')
-            .insert([{
-              ...defaultFloorPlan,
-              furniture: defaultFloorPlan.furniture as any,
-              zones: defaultFloorPlan.zones as any
-            }])
-            .select('*')
-            .single();
-          
-          floorPlan = newFloorPlan;
-        }
-        
-        if (floorPlan) {
-          // Generate 24 hours of indoor movement data
-          const startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-          const positions = generateIndoorMovementPath(
-            floorPlan.zones as any,
-            { width: floorPlan.width, height: floorPlan.height },
-            startTime,
-            24,
-            30 // position every 30 seconds
-          );
-          
-          // Create position data records
-          positions.forEach((position, index) => {
-            const recordedAt = new Date(startTime.getTime() + index * 30 * 1000);
-            sampleData.push({
-              device_id: device.id,
-              elderly_person_id: device.elderly_person_id,
-              data_type: 'position',
-              value: position,
-              unit: 'meters',
-              recorded_at: recordedAt.toISOString(),
-            });
-          });
-        }
-      } else {
-      
-      // Use database-driven data configs for other device types
-      const { data: deviceTypeDataConfigs } = await supabase
-        .from('device_type_data_configs')
-        .select(`
-          *,
-          device_types!inner(code)
-        `)
-        .eq('device_types.code', device.device_type);
+      const sampleData: any[] = [];
 
       // Fetch geofences for GPS devices
       const { data: geofences } = await supabase
@@ -220,16 +156,104 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
         .eq('elderly_person_id', device.elderly_person_id)
         .eq('is_active', true);
 
-      if (deviceTypeDataConfigs && deviceTypeDataConfigs.length > 0) {
-        const generatedData = generateSampleDataPoints(
-          deviceTypeDataConfigs as any,
-          device,
-          168, // 7 days
-          2, // every 2 hours
-          geofences || []
-        );
-        sampleData.push(...generatedData);
+      // Check if device has a model with specifications
+      if (device.model_id) {
+        const { data: deviceModel } = await supabase
+          .from('device_models')
+          .select('specifications, supported_data_types')
+          .eq('id', device.model_id)
+          .single();
+
+        if (deviceModel?.specifications && Object.keys(deviceModel.specifications).length > 0) {
+          console.log('Generating data from model specifications:', deviceModel.specifications);
+          const modelData = generateSampleDataFromModelSpecs(
+            deviceModel.specifications as any,
+            deviceModel.supported_data_types || [],
+            device,
+            168, // 7 days
+            2, // every 2 hours
+            geofences || []
+          );
+          sampleData.push(...modelData);
+        }
       }
+
+      // If no model data was generated, use the default logic
+      if (sampleData.length === 0) {
+        // Special handling for worker-wearable devices with position data
+        if (device.device_type === 'worker_wearable') {
+          const { getDefaultFloorPlan, generateIndoorMovementPath } = await import('@/lib/positionUtils');
+
+          // Check if floor plan exists
+          const { data: existingFloorPlan } = await supabase
+            .from('floor_plans')
+            .select('*')
+            .eq('elderly_person_id', device.elderly_person_id)
+            .maybeSingle();
+
+          let floorPlan = existingFloorPlan;
+
+          // Create floor plan if it doesn't exist
+          if (!existingFloorPlan) {
+            const defaultFloorPlan = getDefaultFloorPlan(device.elderly_person_id);
+            const { data: newFloorPlan } = await supabase
+              .from('floor_plans')
+              .insert([{
+                ...defaultFloorPlan,
+                furniture: defaultFloorPlan.furniture as any,
+                zones: defaultFloorPlan.zones as any
+              }])
+              .select('*')
+              .single();
+
+            floorPlan = newFloorPlan;
+          }
+
+          if (floorPlan) {
+            // Generate 24 hours of indoor movement data
+            const startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const positions = generateIndoorMovementPath(
+              floorPlan.zones as any,
+              { width: floorPlan.width, height: floorPlan.height },
+              startTime,
+              24,
+              30 // position every 30 seconds
+            );
+
+            // Create position data records
+            positions.forEach((position, index) => {
+              const recordedAt = new Date(startTime.getTime() + index * 30 * 1000);
+              sampleData.push({
+                device_id: device.id,
+                elderly_person_id: device.elderly_person_id,
+                data_type: 'position',
+                value: position,
+                unit: 'meters',
+                recorded_at: recordedAt.toISOString(),
+              });
+            });
+          }
+        } else {
+          // Use database-driven data configs for other device types
+          const { data: deviceTypeDataConfigs } = await supabase
+            .from('device_type_data_configs')
+            .select(`
+              *,
+              device_types!inner(code)
+            `)
+            .eq('device_types.code', device.device_type);
+
+          if (deviceTypeDataConfigs && deviceTypeDataConfigs.length > 0) {
+            const generatedData = generateSampleDataPoints(
+              deviceTypeDataConfigs as any,
+              device,
+              168, // 7 days
+              2, // every 2 hours
+              geofences || []
+            );
+            sampleData.push(...generatedData);
+          }
+        }
       }
 
       // Insert sample data
@@ -237,7 +261,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
         const { error } = await supabase
           .from('device_data')
           .insert(sampleData);
-        
+
         if (error) throw error;
       }
     },

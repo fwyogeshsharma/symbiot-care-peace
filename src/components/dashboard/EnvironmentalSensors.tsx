@@ -5,6 +5,7 @@ import { Thermometer, Droplets, Wind, AlertCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
+import { extractNumericValue } from '@/lib/valueExtractor';
 
 interface EnvironmentalSensorsProps {
   selectedPersonId: string | null;
@@ -65,24 +66,19 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
   const getTemperature = () => {
     const tempData = environmentalData?.find(d => d.data_type === 'temperature');
     if (!tempData) return null;
-    const value = typeof tempData.value === 'object' ? tempData.value.value : tempData.value;
-    return Number(value);
+    return extractNumericValue(tempData.value, 'temperature');
   };
 
   const getHumidity = () => {
     const humidityData = environmentalData?.find(d => d.data_type === 'humidity');
     if (!humidityData) return null;
-    const value = typeof humidityData.value === 'object' ? humidityData.value.value : humidityData.value;
-    return Number(value);
+    return extractNumericValue(humidityData.value, 'humidity');
   };
 
   const getAirQuality = () => {
     const aqData = environmentalData?.find(d => d.data_type === 'aqi');
     if (!aqData) return null;
-    const value = typeof aqData.value === 'object'
-      ? (aqData.value.aqi || aqData.value.value)
-      : aqData.value;
-    return Number(value);
+    return extractNumericValue(aqData.value, 'aqi');
   };
 
   const temperature = getTemperature();

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import HealthMetricsCharts from './HealthMetricsCharts';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
+import { extractNumericValue, extractBloodPressure, extractBooleanValue, extractStringValue } from '@/lib/valueExtractor';
 
 interface VitalMetricsProps {
   selectedPersonId?: string | null;
@@ -74,8 +75,12 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       heart_rate: Heart,
       blood_pressure: Activity,
       blood_sugar: Droplet,
+      glucose: Droplet,
+      blood_glucose: Droplet,
       oxygen_saturation: Wind,
       oxygen_level: Wind,
+      blood_oxygen: Wind,
+      spo2: Wind,
       temperature: Thermometer,
       steps: Footprints,
       activity: Activity,
@@ -83,12 +88,31 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       sleep_stage: Moon,
       medication_taken: Pill,
       next_dose_time: Pill,
-      humidity: Wind,
+      humidity: Droplet,
       fall_detected: AlertTriangle,
       impact_force: AlertTriangle,
       weight: Scale,
       bmi: Scale,
       body_fat: Droplet,
+      pressure: Wind,
+      barometric_pressure: Wind,
+      pm2_5: Wind,
+      pm25: Wind,
+      pm1_0: Wind,
+      pm1: Wind,
+      pm10: Wind,
+      pm10_0: Wind,
+      aqi: Wind,
+      air_quality_index: Wind,
+      co2: Wind,
+      carbon_dioxide: Wind,
+      voc: Wind,
+      volatile_organic_compounds: Wind,
+      noise: Activity,
+      sound_level: Activity,
+      light: Activity,
+      illuminance: Activity,
+      respiratory_rate: Wind,
     };
     return iconMap[type] || Activity;
   };
@@ -96,62 +120,104 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   const getVitalColor = (type: string, value: any) => {
     switch (type) {
       case 'heart_rate':
-        const hr = typeof value === 'object' ? value.value : value;
+        const hr = extractNumericValue(value, type);
+        if (hr === null) return 'text-foreground';
         if (hr < 60 || hr > 100) return 'text-warning';
         return 'text-success';
-      
+
       case 'blood_pressure':
-        const sys = value.systolic || value.value?.systolic;
-        if (sys > 140 || sys < 90) return 'text-warning';
+        const bp = extractBloodPressure(value);
+        if (!bp) return 'text-foreground';
+        if (bp.systolic > 140 || bp.systolic < 90) return 'text-warning';
         return 'text-success';
-      
+
       case 'oxygen_saturation':
       case 'oxygen_level':
-        const o2 = typeof value === 'object' ? value.value : value;
+      case 'blood_oxygen':
+      case 'spo2':
+        const o2 = extractNumericValue(value, type);
+        if (o2 === null) return 'text-foreground';
         if (o2 < 95) return 'text-warning';
         return 'text-success';
-      
+
       case 'temperature':
-        const temp = typeof value === 'object' ? value.value : value;
+        const temp = extractNumericValue(value, type);
+        if (temp === null) return 'text-foreground';
         const tempF = celsiusToFahrenheit(temp);
         // Normal range: 97°F - 99°F (converted from 36.1°C - 37.2°C)
         if (tempF < 97 || tempF > 99) return 'text-warning';
         return 'text-success';
-      
+
       case 'blood_sugar':
-        const bs = typeof value === 'object' ? value.value : value;
+      case 'glucose':
+      case 'blood_glucose':
+        const bs = extractNumericValue(value, type);
+        if (bs === null) return 'text-foreground';
         if (bs < 70 || bs > 140) return 'text-warning';
         return 'text-success';
-      
+
       case 'fall_detected':
-        const fallen = typeof value === 'object' ? value.value : value;
+        const fallen = extractBooleanValue(value, type);
         return fallen ? 'text-destructive' : 'text-success';
-      
+
       case 'medication_taken':
-        const taken = typeof value === 'object' ? value.value : value;
+        const taken = extractBooleanValue(value, type);
         return taken ? 'text-success' : 'text-warning';
 
       case 'bmi':
-        const bmi = typeof value === 'object' ? value.value : value;
+        const bmi = extractNumericValue(value, type);
+        if (bmi === null) return 'text-foreground';
         if (bmi < 18.5 || bmi > 25) return 'text-warning';
         return 'text-success';
 
       case 'body_fat':
-        const bodyFat = typeof value === 'object' ? value.value : value;
+        const bodyFat = extractNumericValue(value, type);
+        if (bodyFat === null) return 'text-foreground';
         if (bodyFat < 15 || bodyFat > 30) return 'text-warning';
         return 'text-success';
 
       case 'sleep_quality':
-        const sleepQuality = typeof value === 'object' ? (value.quality || value.value) : value;
+        const sleepQuality = extractNumericValue(value, type);
+        if (sleepQuality === null) return 'text-foreground';
         if (sleepQuality >= 80) return 'text-success';
         if (sleepQuality >= 60) return 'text-warning';
         return 'text-destructive';
 
       case 'sleep_stage':
-        const stage = typeof value === 'object' ? value.value : value;
+        const stage = extractStringValue(value, type);
         if (stage === 'deep' || stage === 'rem') return 'text-success';
         if (stage === 'light') return 'text-info';
         return 'text-muted-foreground';
+
+      case 'aqi':
+      case 'air_quality_index':
+        const aqi = extractNumericValue(value, type);
+        if (aqi === null) return 'text-foreground';
+        if (aqi <= 50) return 'text-success';
+        if (aqi <= 100) return 'text-warning';
+        return 'text-destructive';
+
+      case 'pm2_5':
+      case 'pm25':
+        const pm25 = extractNumericValue(value, type);
+        if (pm25 === null) return 'text-foreground';
+        if (pm25 <= 12) return 'text-success';
+        if (pm25 <= 35) return 'text-warning';
+        return 'text-destructive';
+
+      case 'co2':
+      case 'carbon_dioxide':
+        const co2 = extractNumericValue(value, type);
+        if (co2 === null) return 'text-foreground';
+        if (co2 <= 800) return 'text-success';
+        if (co2 <= 1000) return 'text-warning';
+        return 'text-destructive';
+
+      case 'humidity':
+        const hum = extractNumericValue(value, type);
+        if (hum === null) return 'text-foreground';
+        if (hum >= 30 && hum <= 60) return 'text-success';
+        return 'text-warning';
 
       default:
         return 'text-foreground';
@@ -160,59 +226,68 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
 
   const formatValue = (value: any, type: string) => {
     if (value === null || value === undefined) return 'N/A';
-    
+
     switch (type) {
       case 'blood_pressure':
-        if (value.systolic && value.diastolic) {
-          return `${Math.round(value.systolic)}/${Math.round(value.diastolic)} mmHg`;
-        }
-        if (value.value?.systolic && value.value?.diastolic) {
-          return `${Math.round(value.value.systolic)}/${Math.round(value.value.diastolic)} mmHg`;
+        const bp = extractBloodPressure(value);
+        if (bp) {
+          return `${Math.round(bp.systolic)}/${Math.round(bp.diastolic)} mmHg`;
         }
         return 'N/A';
-      
+
       case 'heart_rate':
-        const hr = typeof value === 'object' ? value.value : value;
+        const hr = extractNumericValue(value, type);
+        if (hr === null) return 'N/A';
         return `${Math.round(hr)} bpm`;
-      
+
       case 'oxygen_saturation':
       case 'oxygen_level':
-        const o2 = typeof value === 'object' ? value.value : value;
+      case 'blood_oxygen':
+      case 'spo2':
+        const o2 = extractNumericValue(value, type);
+        if (o2 === null) return 'N/A';
         return `${Math.round(o2)}%`;
-      
+
       case 'temperature':
-        const tempC = typeof value === 'object' ? value.value : value;
+        const tempC = extractNumericValue(value, type);
+        if (tempC === null) return 'N/A';
         const tempF = celsiusToFahrenheit(tempC);
         return `${tempF.toFixed(1)}°F`;
-      
+
       case 'blood_sugar':
-        const bs = typeof value === 'object' ? value.value : value;
+      case 'glucose':
+      case 'blood_glucose':
+        const bs = extractNumericValue(value, type);
+        if (bs === null) return 'N/A';
         return `${Math.round(bs)} mg/dL`;
-      
+
       case 'steps':
-        const steps = typeof value === 'object' ? value.value : value;
+        const steps = extractNumericValue(value, type);
+        if (steps === null) return 'N/A';
         return `${steps.toLocaleString()} steps`;
-      
+
       case 'activity':
-        const activity = typeof value === 'object' ? value.value : value;
-        return activity;
-      
+        const activity = extractStringValue(value, type);
+        return activity || 'N/A';
+
       case 'sleep_quality':
-        const quality = typeof value === 'object' ? (value.quality || value.value) : value;
-        const duration = value?.duration || value?.hours;
+        const quality = extractNumericValue(value, type);
+        if (quality === null) return 'N/A';
+        const duration = value?.duration || value?.hours || value?.duration_hours;
         if (duration) {
-          return `${Math.round(quality)}% (${duration.toFixed(1)}h)`;
+          return `${Math.round(quality)}% (${Number(duration).toFixed(1)}h)`;
         }
         return `${Math.round(quality)}%`;
 
       case 'sleep_stage':
-        const stage = typeof value === 'object' ? value.value : value;
+        const stage = extractStringValue(value, type);
+        if (!stage) return 'N/A';
         return String(stage).charAt(0).toUpperCase() + String(stage).slice(1);
-      
+
       case 'medication_taken':
-        const taken = typeof value === 'object' ? value.value : value;
+        const taken = extractBooleanValue(value, type);
         return taken ? 'Yes' : 'No';
-      
+
       case 'next_dose_time':
         const time = typeof value === 'object' ? value.value : value;
         try {
@@ -220,36 +295,106 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         } catch {
           return time;
         }
-      
+
       case 'humidity':
-        const humidity = typeof value === 'object' ? value.value : value;
+        const humidity = extractNumericValue(value, type);
+        if (humidity === null) return 'N/A';
         return `${Math.round(humidity)}%`;
-      
+
       case 'fall_detected':
-        const fallen = typeof value === 'object' ? value.value : value;
+        const fallen = extractBooleanValue(value, type);
         return fallen ? 'Fall Detected!' : 'No Falls';
-      
+
       case 'impact_force':
-        const force = typeof value === 'object' ? value.value : value;
+        const force = extractNumericValue(value, type);
+        if (force === null) return 'N/A';
         return `${force.toFixed(1)} G`;
 
       case 'weight':
-        const weight = typeof value === 'object' ? value.value : value;
+        const weight = extractNumericValue(value, type);
+        if (weight === null) return 'N/A';
         return `${weight.toFixed(1)} kg`;
 
       case 'bmi':
-        const bmi = typeof value === 'object' ? value.value : value;
-        return `${bmi.toFixed(1)}`;
+        const bmiVal = extractNumericValue(value, type);
+        if (bmiVal === null) return 'N/A';
+        return `${bmiVal.toFixed(1)}`;
 
       case 'body_fat':
-        const bodyFat = typeof value === 'object' ? value.value : value;
+        const bodyFat = extractNumericValue(value, type);
+        if (bodyFat === null) return 'N/A';
         return `${bodyFat.toFixed(1)}%`;
 
+      case 'pressure':
+      case 'barometric_pressure':
+        const pressure = extractNumericValue(value, type);
+        if (pressure === null) return 'N/A';
+        return `${pressure.toFixed(1)} hPa`;
+
+      case 'pm2_5':
+      case 'pm25':
+        const pm25 = extractNumericValue(value, type);
+        if (pm25 === null) return 'N/A';
+        return `${pm25.toFixed(1)} µg/m³`;
+
+      case 'pm1_0':
+      case 'pm1':
+        const pm1 = extractNumericValue(value, type);
+        if (pm1 === null) return 'N/A';
+        return `${pm1.toFixed(1)} µg/m³`;
+
+      case 'pm10':
+      case 'pm10_0':
+        const pm10 = extractNumericValue(value, type);
+        if (pm10 === null) return 'N/A';
+        return `${pm10.toFixed(1)} µg/m³`;
+
+      case 'aqi':
+      case 'air_quality_index':
+        const aqi = extractNumericValue(value, type);
+        const category = extractStringValue(value, type);
+        if (aqi === null) return 'N/A';
+        return category ? `${Math.round(aqi)} (${category})` : `${Math.round(aqi)}`;
+
+      case 'co2':
+      case 'carbon_dioxide':
+        const co2 = extractNumericValue(value, type);
+        if (co2 === null) return 'N/A';
+        return `${Math.round(co2)} ppm`;
+
+      case 'voc':
+      case 'volatile_organic_compounds':
+        const voc = extractNumericValue(value, type);
+        if (voc === null) return 'N/A';
+        return `${Math.round(voc)} ppb`;
+
+      case 'noise':
+      case 'sound_level':
+        const noise = extractNumericValue(value, type);
+        if (noise === null) return 'N/A';
+        return `${noise.toFixed(1)} dB`;
+
+      case 'light':
+      case 'illuminance':
+        const light = extractNumericValue(value, type);
+        if (light === null) return 'N/A';
+        return `${Math.round(light)} lux`;
+
+      case 'respiratory_rate':
+        const respRate = extractNumericValue(value, type);
+        if (respRate === null) return 'N/A';
+        return `${Math.round(respRate)} bpm`;
+
       default:
-        if (typeof value === 'object' && value.value !== undefined) {
-          return value.value;
-        }
-        return value;
+        // Try to extract numeric value first
+        const numericVal = extractNumericValue(value, type);
+        if (numericVal !== null) return numericVal;
+
+        // Then try string value
+        const strVal = extractStringValue(value, type);
+        if (strVal !== null) return strVal;
+
+        return 'N/A';
     }
   };
 
@@ -258,8 +403,12 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       heart_rate: 'Heart Rate',
       blood_pressure: 'Blood Pressure',
       blood_sugar: 'Blood Sugar',
+      glucose: 'Blood Sugar',
+      blood_glucose: 'Blood Sugar',
       oxygen_saturation: 'Oxygen Level',
       oxygen_level: 'Oxygen Level',
+      blood_oxygen: 'Oxygen Level',
+      spo2: 'Oxygen Level',
       temperature: 'Body Temperature',
       steps: 'Steps Today',
       activity: 'Activity Level',
@@ -267,12 +416,31 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       sleep_stage: 'Sleep Stage',
       medication_taken: 'Medication Taken',
       next_dose_time: 'Next Dose',
-      humidity: 'Room Humidity',
+      humidity: 'Humidity',
       fall_detected: 'Fall Status',
       impact_force: 'Impact Force',
       weight: 'Weight',
       bmi: 'BMI',
       body_fat: 'Body Fat',
+      pressure: 'Barometric Pressure',
+      barometric_pressure: 'Barometric Pressure',
+      pm2_5: 'PM 2.5',
+      pm25: 'PM 2.5',
+      pm1_0: 'PM 1.0',
+      pm1: 'PM 1.0',
+      pm10: 'PM 10',
+      pm10_0: 'PM 10',
+      aqi: 'Air Quality Index',
+      air_quality_index: 'Air Quality Index',
+      co2: 'CO₂ Level',
+      carbon_dioxide: 'CO₂ Level',
+      voc: 'VOC Level',
+      volatile_organic_compounds: 'VOC Level',
+      noise: 'Noise Level',
+      sound_level: 'Noise Level',
+      light: 'Light Level',
+      illuminance: 'Light Level',
+      respiratory_rate: 'Respiratory Rate',
     };
     return nameMap[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
