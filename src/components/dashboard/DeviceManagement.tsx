@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useDeviceTypes } from '@/hooks/useDeviceTypes';
 import { useDeviceTypeDataConfigs } from '@/hooks/useDeviceTypeDataConfigs';
-import { useDeviceCompanies } from '@/hooks/useDeviceCompanies';
+import { useDeviceCompaniesWithModels } from '@/hooks/useDeviceCompanies';
 import { generateSampleDataPoints } from '@/lib/sampleDataGenerator';
 import { DeviceDiscovery } from '@/components/pairing/DeviceDiscovery';
 
@@ -41,8 +41,8 @@ const DeviceManagement = () => {
   // Fetch device types from database
   const { data: deviceTypes = [] } = useDeviceTypes();
 
-  // Fetch device companies from database
-  const { data: deviceCompanies = [] } = useDeviceCompanies();
+  // Fetch device companies that have device models
+  const { data: deviceCompanies = [] } = useDeviceCompaniesWithModels();
 
   // Fetch data configs for selected device type
   const { data: dataConfigs = [] } = useDeviceTypeDataConfigs(deviceType);
