@@ -17,7 +17,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSampleDataPoints } from '@/lib/sampleDataGenerator';
 import { useAllDeviceTypes } from '@/hooks/useDeviceTypes';
-import { useDeviceCompaniesWithModels } from '@/hooks/useDeviceCompanies';
+import { useAllDeviceCompanies } from '@/hooks/useDeviceCompanies';
 
 interface DeviceStatusProps {
   selectedPersonId?: string | null;
@@ -36,8 +36,8 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   // Fetch all device types for the edit dialog
   const { data: allDeviceTypes = [] } = useAllDeviceTypes();
 
-  // Fetch device companies that have device models
-  const { data: deviceCompanies = [] } = useDeviceCompaniesWithModels();
+  // Fetch all device companies
+  const { data: deviceCompanies = [] } = useAllDeviceCompanies();
   
   const { data: devices } = useQuery({
     queryKey: ['devices', selectedPersonId],

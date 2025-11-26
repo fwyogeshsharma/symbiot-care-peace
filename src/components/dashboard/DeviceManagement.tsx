@@ -18,7 +18,8 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useDeviceTypes } from '@/hooks/useDeviceTypes';
 import { useDeviceTypeDataConfigs } from '@/hooks/useDeviceTypeDataConfigs';
-import { useDeviceCompaniesWithModels } from '@/hooks/useDeviceCompanies';
+import { useAllDeviceCompanies } from '@/hooks/useDeviceCompanies';
+import { useDeviceModelsByCompany } from '@/hooks/useDeviceModels';
 import { generateSampleDataPoints } from '@/lib/sampleDataGenerator';
 import { DeviceDiscovery } from '@/components/pairing/DeviceDiscovery';
 
@@ -29,6 +30,7 @@ const DeviceManagement = () => {
   const [deviceId, setDeviceId] = useState('');
   const [location, setLocation] = useState('');
   const [companyId, setCompanyId] = useState('');
+  const [modelId, setModelId] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
   const [generateFakeData, setGenerateFakeData] = useState(false);
@@ -41,8 +43,11 @@ const DeviceManagement = () => {
   // Fetch device types from database
   const { data: deviceTypes = [] } = useDeviceTypes();
 
-  // Fetch device companies that have device models
-  const { data: deviceCompanies = [] } = useDeviceCompaniesWithModels();
+  // Fetch all device companies
+  const { data: deviceCompanies = [] } = useAllDeviceCompanies();
+
+  // Fetch device models for selected company
+  const { data: deviceModels = [] } = useDeviceModelsByCompany(companyId);
 
   // Fetch data configs for selected device type
   const { data: dataConfigs = [] } = useDeviceTypeDataConfigs(deviceType);
@@ -303,6 +308,7 @@ const DeviceManagement = () => {
       elderly_person_id: userElderlyPerson.id,
       location: validation.data.location || null,
       company_id: companyId || null,
+      model_id: modelId || null,
       status: 'active',
     });
   };
@@ -315,10 +321,16 @@ const DeviceManagement = () => {
       setDeviceId('');
       setLocation('');
       setCompanyId('');
+      setModelId('');
       setApiKey('');
       setShowApiKey(false);
     }
   }, [open]);
+
+  // Reset model when company changes
+  useEffect(() => {
+    setModelId('');
+  }, [companyId]);
 
   const resetForm = () => {
     setDeviceName('');
@@ -326,6 +338,7 @@ const DeviceManagement = () => {
     setDeviceId('');
     setLocation('');
     setCompanyId('');
+    setModelId('');
     setApiKey('');
     setShowApiKey(false);
     setGenerateFakeData(false);
@@ -424,6 +437,32 @@ const DeviceManagement = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {companyId && deviceModels.length > 0 && (
+              <div className="space-y-2">
+                <Label htmlFor="device-model">Device Model</Label>
+                <Select value={modelId} onValueChange={setModelId}>
+                  <SelectTrigger id="device-model">
+                    <SelectValue placeholder="Select model (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {deviceModels.map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        <span>{model.name}</span>
+                        {model.model_number && (
+                          <span className="text-muted-foreground text-xs ml-2">
+                            ({model.model_number})
+                          </span>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Select the specific model of your device
+                </p>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="device-id">Device ID *</Label>
