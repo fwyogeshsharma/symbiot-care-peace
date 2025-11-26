@@ -3,17 +3,26 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Share2 } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Share2, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { restartTour } from '@/components/help/OnboardingTour';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DataSharing from '@/components/dashboard/DataSharing';
+
+type UserRole = 'elderly' | 'caregiver' | 'relative';
+
+const EDITABLE_ROLES: { value: UserRole; label: string }[] = [
+  { value: 'elderly', label: 'Elderly' },
+  { value: 'caregiver', label: 'Caregiver' },
+  { value: 'relative', label: 'Relative' },
+];
 
 const Profile = () => {
   const { user, userRole, signOut } = useAuth();
@@ -41,6 +50,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     phone: profile?.phone || '',
+    role: userRole || '',
   });
 
   // Update form when profile loads
@@ -49,27 +59,23 @@ const Profile = () => {
       setFormData({
         full_name: profile.full_name || '',
         phone: profile.phone || '',
+        role: userRole || '',
       });
     }
-  }, [profile]);
+  }, [profile, userRole]);
 
   // Update profile mutation
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: { full_name: string; phone: string }) => {
       const { error } = await supabase
         .from('profiles')
         .update(data)
         .eq('id', user?.id);
-      
+
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully.",
-      });
-      setIsEditing(false);
     },
     onError: (error: any) => {
       toast({
@@ -80,10 +86,73 @@ const Profile = () => {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Update user role mutation
+  const updateRoleMutation = useMutation({
+    mutationFn: async (newRole: string) => {
+      // Only allow changing to elderly, caregiver, or relative
+      if (!['elderly', 'caregiver', 'relative'].includes(newRole)) {
+        throw new Error('Invalid role');
+      }
+
+      // First, delete existing non-admin roles
+      const { error: deleteError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', user?.id)
+        .in('role', ['elderly', 'caregiver', 'relative']);
+
+      if (deleteError) throw deleteError;
+
+      // Then insert the new role
+      const { error: insertError } = await supabase
+        .from('user_roles')
+        .insert({ user_id: user?.id, role: newRole });
+
+      if (insertError) throw insertError;
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to update role",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfileMutation.mutate(formData);
+
+    const profileData = { full_name: formData.full_name, phone: formData.phone };
+    const roleChanged = formData.role !== userRole &&
+                        ['elderly', 'caregiver', 'relative'].includes(formData.role);
+
+    try {
+      // Update profile
+      await updateProfileMutation.mutateAsync(profileData);
+
+      // Update role if changed (only for non-admin roles)
+      if (roleChanged) {
+        await updateRoleMutation.mutateAsync(formData.role);
+        toast({
+          title: "Profile updated",
+          description: "Your profile and role have been updated. Refreshing...",
+        });
+        // Reload to refresh auth context with new role
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        toast({
+          title: "Profile updated",
+          description: "Your profile has been updated successfully.",
+        });
+        setIsEditing(false);
+      }
+    } catch (error) {
+      // Error handling is done in individual mutations
+    }
   };
+
+  // Check if user can edit their role (not admin/super_admin)
+  const canEditRole = userRole && ['elderly', 'caregiver', 'relative'].includes(userRole);
 
   const getRoleColor = (role: string | null) => {
     switch (role) {
@@ -210,6 +279,48 @@ const Profile = () => {
                       placeholder="Enter your phone number"
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="role" className="flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Profile Type
+                    </Label>
+                    {canEditRole ? (
+                      <>
+                        <Select
+                          value={formData.role}
+                          onValueChange={(value) => setFormData({ ...formData, role: value })}
+                          disabled={!isEditing}
+                        >
+                          <SelectTrigger id="role">
+                            <SelectValue placeholder="Select your profile type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {EDITABLE_ROLES.map((role) => (
+                              <SelectItem key={role.value} value={role.value}>
+                                {role.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          Your profile type determines your role in the system
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <Input
+                          id="role"
+                          value={userRole ? userRole.charAt(0).toUpperCase() + userRole.slice(1) : ''}
+                          disabled
+                          className="bg-muted capitalize"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Admin roles cannot be changed from this page
+                        </p>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {isEditing && (
@@ -217,10 +328,10 @@ const Profile = () => {
                     <Button
                       type="submit"
                       className="flex-1"
-                      disabled={updateProfileMutation.isPending}
+                      disabled={updateProfileMutation.isPending || updateRoleMutation.isPending}
                     >
                       <Save className="w-4 h-4 mr-2" />
-                      {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
+                      {updateProfileMutation.isPending || updateRoleMutation.isPending ? 'Saving...' : 'Save Changes'}
                     </Button>
                     <Button
                       type="button"
@@ -231,6 +342,7 @@ const Profile = () => {
                         setFormData({
                           full_name: profile?.full_name || '',
                           phone: profile?.phone || '',
+                          role: userRole || '',
                         });
                       }}
                     >
