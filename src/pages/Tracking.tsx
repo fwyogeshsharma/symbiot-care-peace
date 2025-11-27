@@ -8,6 +8,7 @@ import { MapView } from '@/components/outdoor-tracking/MapView';
 import { GeofenceManager } from '@/components/outdoor-tracking/GeofenceManager';
 import { GeofenceEventsTimeline } from '@/components/outdoor-tracking/GeofenceEventsTimeline';
 import { GPSMetrics } from '@/components/outdoor-tracking/GPSMetrics';
+import CameraGrid from '@/components/camera/CameraGrid';
 import { processPositionData } from '@/lib/positionUtils';
 import { processGPSTrail, GPSCoordinate } from '@/lib/gpsUtils';
 import { GeofencePlace } from '@/lib/geofenceUtils';
@@ -16,7 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/layout/Header';
 import ElderlyList from '@/components/dashboard/ElderlyList';
-import { Calendar, MapPin, Navigation } from 'lucide-react';
+import { Calendar, MapPin, Navigation, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
@@ -37,7 +38,7 @@ export default function Tracking() {
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
   const [selectedPreset, setSelectedPreset] = useState<string>('today');
-  const [activeTab, setActiveTab] = useState<'indoor' | 'outdoor'>('indoor');
+  const [activeTab, setActiveTab] = useState<'indoor' | 'outdoor' | 'camera'>('indoor');
 
   // Fetch current user
   const { data: user } = useQuery({
@@ -337,16 +338,20 @@ export default function Tracking() {
             onSelectPerson={setSelectedPersonId}
           />
 
-          {/* Indoor/Outdoor Tabs */}
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'indoor' | 'outdoor')}>
-            <TabsList className="grid w-full max-w-md grid-cols-2" data-tour="tracking-tabs">
+          {/* Indoor/Outdoor/Camera Tabs */}
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'indoor' | 'outdoor' | 'camera')}>
+            <TabsList className="grid w-full max-w-xl grid-cols-3" data-tour="tracking-tabs">
               <TabsTrigger value="indoor">
                 <MapPin className="h-4 w-4 mr-2" />
-                Indoor Tracking
+                Indoor
               </TabsTrigger>
               <TabsTrigger value="outdoor">
                 <Navigation className="h-4 w-4 mr-2" />
-                Outdoor Tracking
+                Outdoor
+              </TabsTrigger>
+              <TabsTrigger value="camera">
+                <Camera className="h-4 w-4 mr-2" />
+                Cameras
               </TabsTrigger>
             </TabsList>
 
@@ -469,6 +474,11 @@ export default function Tracking() {
                   </div>
                 </>
               )}
+            </TabsContent>
+
+            {/* Camera Monitoring Tab */}
+            <TabsContent value="camera" className="space-y-6">
+              <CameraGrid title="Security Cameras" />
             </TabsContent>
           </Tabs>
         </div>

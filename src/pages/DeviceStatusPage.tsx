@@ -100,7 +100,7 @@ const DeviceStatusPage = () => {
           <div className="mb-6">
             <PairingApprovalPanel />
           </div>
-          
+
           <div data-tour="device-status-cards">
             <DeviceStatus selectedPersonId={selectedPersonId} />
           </div>

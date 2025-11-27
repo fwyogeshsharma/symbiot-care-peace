@@ -1,0 +1,21 @@
+# go2rtc Configuration - Public Demo Cameras
+
+streams:
+  # Public Demo Camera (IPVM)
+  demo_camera: rtsp://demo:demo@ipvmdemo.dyndns.org:5541/onvif-media/media.amp?profile=profile_1_h264&sessiontimeout=60&streamtype=unicast
+
+# API settings
+api:
+  listen: ":1984"
+  origin: "*"
+
+# WebRTC settings
+webrtc:
+  listen: ":8555"
+
+# RTSP server
+rtsp:
+  listen: ":8554"
+
+log:
+  level: info
