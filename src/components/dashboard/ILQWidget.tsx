@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { ILQInfoDialog } from './ILQInfoDialog';
 
 interface ILQWidgetProps {
   elderlyPersonId: string;
@@ -32,7 +33,8 @@ export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            Independent Living Quotient (ILQ)
+            ILQ Score
+            <ILQInfoDialog />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -50,7 +52,8 @@ export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            Independent Living Quotient (ILQ)
+            ILQ Score
+            <ILQInfoDialog />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -101,6 +104,7 @@ export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
           <span className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
             ILQ Score
+            <ILQInfoDialog />
           </span>
           {userRole === 'super_admin' && (
             <Link

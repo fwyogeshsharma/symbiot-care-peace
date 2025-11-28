@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp } from 'lucide-react';
+import { ILQInfoDialog } from './ILQInfoDialog';
 
 interface ILQHistoryChartProps {
   elderlyPersonId: string;
@@ -41,6 +42,7 @@ export function ILQHistoryChart({ elderlyPersonId, days = 30 }: ILQHistoryChartP
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
             ILQ Trend
+            <ILQInfoDialog />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -59,6 +61,7 @@ export function ILQHistoryChart({ elderlyPersonId, days = 30 }: ILQHistoryChartP
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
             ILQ Trend
+            <ILQInfoDialog />
           </CardTitle>
           <CardDescription>Last {days} days</CardDescription>
         </CardHeader>
@@ -77,6 +80,7 @@ export function ILQHistoryChart({ elderlyPersonId, days = 30 }: ILQHistoryChartP
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
           ILQ Trend
+          <ILQInfoDialog />
         </CardTitle>
         <CardDescription>Independence score over last {days} days</CardDescription>
       </CardHeader>

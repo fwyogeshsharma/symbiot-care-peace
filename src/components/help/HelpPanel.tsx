@@ -140,14 +140,14 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
                       <Button
                         key={link.path}
                         variant="outline"
-                        className="h-auto flex-col items-start p-3 text-left"
+                        className="h-auto flex-col items-start p-3 text-left w-full overflow-hidden"
                         onClick={() => handleQuickLink(link.path)}
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          {Icon && <Icon className="w-4 h-4" />}
-                          <span className="text-sm font-medium">{link.title}</span>
+                        <div className="flex items-center gap-2 mb-1 w-full">
+                          {Icon && <Icon className="w-4 h-4 shrink-0" />}
+                          <span className="text-sm font-medium break-words">{link.title}</span>
                         </div>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-muted-foreground break-words w-full">
                           {link.description}
                         </span>
                       </Button>
