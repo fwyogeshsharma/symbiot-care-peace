@@ -1,15 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ILQInfoDialog } from './ILQInfoDialog';
 
 interface ILQWidgetProps {
   elderlyPersonId: string;
+  hideViewDetails?: boolean;
 }
 
-export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
+export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidgetProps) {
   const { data: latestScore, isLoading } = useQuery({
     queryKey: ['ilq-score-latest', elderlyPersonId],
     queryFn: async () => {
@@ -65,9 +66,7 @@ export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
   }
 
   const current = latestScore[0];
-  const previous = latestScore[1];
   const score = typeof current.score === 'string' ? parseFloat(current.score) : current.score;
-  const trend = previous ? (typeof current.score === 'string' ? parseFloat(current.score) : current.score) - (typeof previous.score === 'string' ? parseFloat(previous.score) : previous.score) : 0;
 
   const getScoreValue = (val: any) => {
     if (!val) return null;
@@ -89,12 +88,6 @@ export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
     return 'Critical';
   };
 
-  const getTrendIcon = () => {
-    if (trend > 1) return <TrendingUp className="h-4 w-4 text-green-600" />;
-    if (trend < -1) return <TrendingDown className="h-4 w-4 text-red-600" />;
-    return <Minus className="h-4 w-4 text-muted-foreground" />;
-  };
-
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader>
@@ -104,25 +97,22 @@ export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
             ILQ Score
             <ILQInfoDialog />
           </span>
-          <Link
-            to="/ilq-analytics"
-            className="text-sm font-normal text-primary hover:underline"
-          >
-            View Details
-          </Link>
+          {!hideViewDetails && (
+            <Link
+              to="/ilq-analytics"
+              className="text-sm font-normal text-primary hover:underline"
+            >
+              View Details
+            </Link>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {/* Main Score Display */}
           <div className="flex items-center justify-center">
-            <div className="relative">
-              <div className={`text-6xl font-bold ${getScoreColor(score)}`}>
-                {score.toFixed(0)}
-              </div>
-              <div className="absolute -bottom-1 -right-8">
-                {getTrendIcon()}
-              </div>
+            <div className={`text-6xl font-bold ${getScoreColor(score)}`}>
+              {score.toFixed(0)}
             </div>
           </div>
 

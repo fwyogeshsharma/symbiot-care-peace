@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Activity, TrendingUp, AlertCircle, BarChart3, RefreshCw, Download, Mail } from 'lucide-react';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
-import { ILQInfoDialog } from '@/components/dashboard/ILQInfoDialog';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { useElderly } from '@/contexts/ElderlyContext';
@@ -199,7 +198,6 @@ export default function ILQAnalytics() {
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Activity className="h-8 w-8" />
               ILQ Analytics
-              <ILQInfoDialog />
             </h1>
             <p className="text-muted-foreground mt-1">
               Independent Living Quotient - Comprehensive Independence Assessment
@@ -243,7 +241,7 @@ export default function ILQAnalytics() {
 
         {selectedPersonId && (
           <div className="grid gap-6 md:grid-cols-3">
-            <ILQWidget elderlyPersonId={selectedPersonId} />
+            <ILQWidget elderlyPersonId={selectedPersonId} hideViewDetails />
           
           <Card>
             <CardHeader>
