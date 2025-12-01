@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { ILQInfoDialog } from './ILQInfoDialog';
 
 interface ILQWidgetProps {
@@ -11,7 +10,6 @@ interface ILQWidgetProps {
 }
 
 export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
-  const { userRole } = useAuth();
   const { data: latestScore, isLoading } = useQuery({
     queryKey: ['ilq-score-latest', elderlyPersonId],
     queryFn: async () => {
@@ -106,14 +104,12 @@ export function ILQWidget({ elderlyPersonId }: ILQWidgetProps) {
             ILQ Score
             <ILQInfoDialog />
           </span>
-          {userRole === 'super_admin' && (
-            <Link
-              to="/ilq-analytics"
-              className="text-sm font-normal text-primary hover:underline"
-            >
-              View Details
-            </Link>
-          )}
+          <Link
+            to="/ilq-analytics"
+            className="text-sm font-normal text-primary hover:underline"
+          >
+            View Details
+          </Link>
         </CardTitle>
       </CardHeader>
       <CardContent>

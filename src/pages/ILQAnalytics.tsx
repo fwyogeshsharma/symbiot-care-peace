@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,96 +10,136 @@ import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import { ILQInfoDialog } from '@/components/dashboard/ILQInfoDialog';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { useElderly } from '@/contexts/ElderlyContext';
+import Header from '@/components/layout/Header';
 
 export default function ILQAnalytics() {
-  const [selectedElderlyPerson, setSelectedElderlyPerson] = useState<string>('');
+  const queryClient = useQueryClient();
+  const { elderlyPersons, selectedPersonId, setSelectedPersonId, isLoading: elderlyLoading } = useElderly();
   const [timeRange, setTimeRange] = useState<string>('30');
-
-  const { data: elderlyPersons } = useQuery({
-    queryKey: ['elderly-persons'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('elderly_persons')
-        .select('*')
-        .eq('status', 'active')
-        .order('full_name');
-      if (error) throw error;
-      return data;
-    },
-  });
+  const [isAutoRefreshing, setIsAutoRefreshing] = useState(true);
+  const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const { data: ilqHistory, isLoading: historyLoading, refetch } = useQuery({
-    queryKey: ['ilq-history', selectedElderlyPerson, timeRange],
+    queryKey: ['ilq-history', selectedPersonId, timeRange],
     queryFn: async () => {
-      if (!selectedElderlyPerson) return null;
-      
+      if (!selectedPersonId) return null;
+
       const daysAgo = new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString();
       const { data, error } = await supabase
         .from('ilq_scores')
         .select('*')
-        .eq('elderly_person_id', selectedElderlyPerson)
+        .eq('elderly_person_id', selectedPersonId)
         .gte('computation_timestamp', daysAgo)
         .order('computation_timestamp', { ascending: true });
-      
+
       if (error) throw error;
       return data;
     },
-    enabled: !!selectedElderlyPerson,
+    enabled: !!selectedPersonId,
   });
 
   const { data: ilqAlerts } = useQuery({
-    queryKey: ['ilq-alerts', selectedElderlyPerson],
+    queryKey: ['ilq-alerts', selectedPersonId],
     queryFn: async () => {
-      if (!selectedElderlyPerson) return null;
-      
+      if (!selectedPersonId) return null;
+
       const { data, error } = await supabase
         .from('ilq_alerts')
         .select('*')
-        .eq('elderly_person_id', selectedElderlyPerson)
+        .eq('elderly_person_id', selectedPersonId)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
-    enabled: !!selectedElderlyPerson,
+    enabled: !!selectedPersonId,
   });
 
-  const computeILQ = async () => {
-    if (!selectedElderlyPerson) return;
-    
+  // Auto-refresh compute every 10 seconds
+  useEffect(() => {
+    if (isAutoRefreshing && selectedPersonId) {
+      autoRefreshIntervalRef.current = setInterval(() => {
+        computeILQ(true); // Silent mode for auto-refresh
+      }, 10000);
+    }
+
+    return () => {
+      if (autoRefreshIntervalRef.current) {
+        clearInterval(autoRefreshIntervalRef.current);
+      }
+    };
+  }, [isAutoRefreshing, selectedPersonId]);
+
+  // Subscribe to real-time ILQ score updates
+  useEffect(() => {
+    if (!selectedPersonId) return;
+
+    const channel = supabase
+      .channel('ilq-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'ilq_scores',
+          filter: `elderly_person_id=eq.${selectedPersonId}`,
+        },
+        () => {
+          // Refetch data on new ILQ scores
+          queryClient.invalidateQueries({ queryKey: ['ilq-history', selectedPersonId] });
+          queryClient.invalidateQueries({ queryKey: ['ilq-score-latest', selectedPersonId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedPersonId, queryClient]);
+
+  const computeILQ = async (silent = false) => {
+    if (!selectedPersonId) return;
+
     try {
-      toast.info('Computing ILQ score...');
-      
+      if (!silent) {
+        toast.info('Computing ILQ score...');
+      }
+
       const { data, error } = await supabase.functions.invoke('ilq-compute', {
-        body: { elderly_person_id: selectedElderlyPerson },
+        body: { elderly_person_id: selectedPersonId },
       });
-      
+
       if (error) throw error;
-      
-      toast.success(`ILQ computed successfully: ${data.ilq_score}`);
+
+      if (!silent) {
+        toast.success(`ILQ computed successfully: ${data.ilq_score}`);
+      }
       refetch();
     } catch (error: any) {
       console.error('Error computing ILQ:', error);
-      toast.error(error.message || 'Failed to compute ILQ');
+      if (!silent) {
+        toast.error(error.message || 'Failed to compute ILQ');
+      }
     }
   };
 
   const downloadReport = async () => {
-    if (!selectedElderlyPerson) return;
-    
+    if (!selectedPersonId) return;
+
     try {
       toast.info('Generating PDF report...');
-      
+
       const { data, error } = await supabase.functions.invoke('ilq-report-generator', {
-        body: { 
-          elderly_person_id: selectedElderlyPerson,
+        body: {
+          elderly_person_id: selectedPersonId,
           period_days: parseInt(timeRange),
         },
       });
-      
+
       if (error) throw error;
-      
+
       // Convert HTML to downloadable file
       const blob = new Blob([data.html], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
@@ -110,7 +150,7 @@ export default function ILQAnalytics() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
+
       toast.success('Report downloaded successfully!');
     } catch (error: any) {
       console.error('Error generating report:', error);
@@ -118,9 +158,16 @@ export default function ILQAnalytics() {
     }
   };
 
-  // Auto-select first elderly person
-  if (elderlyPersons && elderlyPersons.length > 0 && !selectedElderlyPerson) {
-    setSelectedElderlyPerson(elderlyPersons[0].id);
+  // Show loading state
+  if (elderlyLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header showBackButton title="ILQ Analytics" subtitle="Independent Living Quotient" />
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
   }
 
   const chartData = ilqHistory?.map(score => ({
@@ -144,48 +191,59 @@ export default function ILQAnalytics() {
   ] : [];
 
   return (
-    <div className="min-h-screen bg-background p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Activity className="h-8 w-8" />
-            ILQ Analytics
-            <ILQInfoDialog />
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Independent Living Quotient - Comprehensive Independence Assessment
-          </p>
-        </div>
-        
-        <div className="flex gap-4">
-          <Select value={selectedElderlyPerson} onValueChange={setSelectedElderlyPerson}>
-            <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="Select person" />
-            </SelectTrigger>
-            <SelectContent>
-              {elderlyPersons?.map(person => (
-                <SelectItem key={person.id} value={person.id}>
-                  {person.full_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Button onClick={computeILQ} disabled={!selectedElderlyPerson}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Compute ILQ
-          </Button>
-          
-          <Button onClick={downloadReport} disabled={!selectedElderlyPerson || !ilqHistory || ilqHistory.length === 0} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Download Report
-          </Button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Header showBackButton title="ILQ Analytics" subtitle="Independent Living Quotient" />
+      <main className="container mx-auto p-6 space-y-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Activity className="h-8 w-8" />
+              ILQ Analytics
+              <ILQInfoDialog />
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Independent Living Quotient - Comprehensive Independence Assessment
+            </p>
+          </div>
 
-      {selectedElderlyPerson && (
-        <div className="grid gap-6 md:grid-cols-3">
-          <ILQWidget elderlyPersonId={selectedElderlyPerson} />
+          <div className="flex flex-wrap gap-4">
+            <Select value={selectedPersonId || ''} onValueChange={setSelectedPersonId}>
+              <SelectTrigger className="w-[250px]">
+                <SelectValue placeholder="Select person" />
+              </SelectTrigger>
+              <SelectContent>
+                {elderlyPersons?.map(person => (
+                  <SelectItem key={person.id} value={person.id}>
+                    {person.full_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Button onClick={() => computeILQ(false)} disabled={!selectedPersonId}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${isAutoRefreshing ? 'animate-spin' : ''}`} />
+              Compute ILQ
+            </Button>
+
+            <Button
+              onClick={() => setIsAutoRefreshing(!isAutoRefreshing)}
+              variant={isAutoRefreshing ? 'default' : 'outline'}
+              title={isAutoRefreshing ? 'Auto-refresh is ON (every 10s)' : 'Auto-refresh is OFF'}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              {isAutoRefreshing ? 'Auto: ON' : 'Auto: OFF'}
+            </Button>
+
+            <Button onClick={downloadReport} disabled={!selectedPersonId || !ilqHistory || ilqHistory.length === 0} variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Download Report
+            </Button>
+          </div>
+        </div>
+
+        {selectedPersonId && (
+          <div className="grid gap-6 md:grid-cols-3">
+            <ILQWidget elderlyPersonId={selectedPersonId} />
           
           <Card>
             <CardHeader>
@@ -236,11 +294,11 @@ export default function ILQAnalytics() {
               </div>
             </CardContent>
           </Card>
-        </div>
-      )}
+          </div>
+        )}
 
-      {selectedElderlyPerson && (
-        <Tabs defaultValue="history" className="space-y-4">
+        {selectedPersonId && (
+          <Tabs defaultValue="history" className="space-y-4">
           <TabsList>
             <TabsTrigger value="history">Historical Trends</TabsTrigger>
             <TabsTrigger value="components">Component Breakdown</TabsTrigger>
@@ -391,9 +449,10 @@ export default function ILQAnalytics() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
-      )}
+            </TabsContent>
+          </Tabs>
+        )}
+      </main>
     </div>
   );
 }

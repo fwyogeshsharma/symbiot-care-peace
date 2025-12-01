@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useElderly } from '@/contexts/ElderlyContext';
 import { Card } from '@/components/ui/card';
 import { Heart, Activity, AlertTriangle, Users } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -31,25 +32,10 @@ interface Alert {
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { elderlyPersons, selectedPersonId, setSelectedPersonId, isLoading: elderlyLoading } = useElderly();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
-  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [newAlert, setNewAlert] = useState<Alert | null>(null);
   const shouldShowTour = useShouldShowTour();
-
-  // Fetch elderly persons based on role
-  const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
-    queryKey: ['elderly-persons', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [];
-      
-      const { data, error } = await supabase
-        .rpc('get_accessible_elderly_persons', { _user_id: user.id });
-      
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!user?.id,
-  });
 
   // Fetch active alerts
   const { data: alerts, refetch: refetchAlerts } = useQuery({

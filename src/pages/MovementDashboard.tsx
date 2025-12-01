@@ -25,43 +25,14 @@ import { processMovementData, getDateRangePreset } from "@/lib/movementUtils";
 import { isActivityDevice, isActivityDataType } from "@/lib/deviceDataMapping";
 import { checkDwellTimeDeviations } from "@/lib/dwellTimeAlerts";
 import { OnboardingTour, useShouldShowTour } from "@/components/help/OnboardingTour";
+import { useElderly } from "@/contexts/ElderlyContext";
 
 export default function MovementDashboard() {
   const queryClient = useQueryClient();
+  const { elderlyPersons, selectedPersonId, setSelectedPersonId, isLoading: elderlyLoading } = useElderly();
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
   const [selectedPreset, setSelectedPreset] = useState<string>('today');
-  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const shouldShowTour = useShouldShowTour();
-
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      return user;
-    },
-  });
-
-  // Fetch all accessible elderly persons
-  const { data: elderlyPersons = [], isLoading: elderlyLoading } = useQuery({
-    queryKey: ['elderly-persons', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [];
-      
-      const { data, error } = await supabase
-        .rpc('get_accessible_elderly_persons', { _user_id: user.id });
-      
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!user?.id,
-  });
-
-  // Auto-select first person if none selected
-  useEffect(() => {
-    if (elderlyPersons.length > 0 && !selectedPersonId) {
-      setSelectedPersonId(elderlyPersons[0].id);
-    }
-  }, [elderlyPersons, selectedPersonId]);
 
   const { data: rawMovementData = [], isLoading } = useQuery({
     queryKey: ['movement-data', selectedPersonId, dateRange],
