@@ -111,3 +111,35 @@ export const useDeviceModelsByCompany = (companyId?: string) => {
     staleTime: 1000 * 60 * 30,
   });
 };
+
+export const useDeviceModelsByCompanyAndDeviceType = (companyId?: string, deviceTypeId?: string) => {
+  return useQuery({
+    queryKey: ['device-models-by-company-and-device-type', companyId, deviceTypeId],
+    queryFn: async () => {
+      let query = supabase
+        .from('device_models')
+        .select(`
+          *,
+          device_types(id, code, name, icon),
+          device_companies(id, code, name)
+        `)
+        .eq('is_active', true)
+        .order('name');
+
+      if (companyId) {
+        query = query.eq('company_id', companyId);
+      }
+
+      if (deviceTypeId) {
+        query = query.eq('device_type_id', deviceTypeId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      return data as DeviceModel[];
+    },
+    enabled: !!companyId && !!deviceTypeId,
+    staleTime: 1000 * 60 * 30,
+  });
+};

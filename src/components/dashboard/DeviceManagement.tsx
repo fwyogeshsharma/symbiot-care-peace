@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,8 +18,8 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useDeviceTypes } from '@/hooks/useDeviceTypes';
 import { useDeviceTypeDataConfigs } from '@/hooks/useDeviceTypeDataConfigs';
-import { useAllDeviceCompanies } from '@/hooks/useDeviceCompanies';
-import { useDeviceModelsByCompany } from '@/hooks/useDeviceModels';
+import { useDeviceCompaniesByDeviceType } from '@/hooks/useDeviceCompanies';
+import { useDeviceModelsByCompanyAndDeviceType } from '@/hooks/useDeviceModels';
 import { generateSampleDataPoints, generateSampleDataFromModelSpecs } from '@/lib/sampleDataGenerator';
 import { DeviceDiscovery } from '@/components/pairing/DeviceDiscovery';
 
@@ -43,11 +43,18 @@ const DeviceManagement = () => {
   // Fetch device types from database
   const { data: deviceTypes = [] } = useDeviceTypes();
 
-  // Fetch all device companies
-  const { data: deviceCompanies = [] } = useAllDeviceCompanies();
+  // Get the device type ID from the selected device type code
+  const selectedDeviceTypeId = useMemo(() => {
+    if (!deviceType) return undefined;
+    const foundType = deviceTypes.find(t => t.code === deviceType);
+    return foundType?.id;
+  }, [deviceType, deviceTypes]);
 
-  // Fetch device models for selected company
-  const { data: deviceModels = [] } = useDeviceModelsByCompany(companyId);
+  // Fetch companies that have models for the selected device type
+  const { data: deviceCompanies = [] } = useDeviceCompaniesByDeviceType(selectedDeviceTypeId);
+
+  // Fetch device models for selected company and device type
+  const { data: deviceModels = [] } = useDeviceModelsByCompanyAndDeviceType(companyId, selectedDeviceTypeId);
 
   // Fetch data configs for selected device type
   const { data: dataConfigs = [] } = useDeviceTypeDataConfigs(deviceType);
@@ -352,6 +359,12 @@ const DeviceManagement = () => {
     }
   }, [open]);
 
+  // Reset company and model when device type changes
+  useEffect(() => {
+    setCompanyId('');
+    setModelId('');
+  }, [deviceType]);
+
   // Reset model when company changes
   useEffect(() => {
     setModelId('');
@@ -442,26 +455,28 @@ const DeviceManagement = () => {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="device-company">Company/Manufacturer</Label>
-              <Select value={companyId} onValueChange={setCompanyId}>
-                <SelectTrigger id="device-company">
-                  <SelectValue placeholder="Select company (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {deviceCompanies.map((company) => (
-                    <SelectItem key={company.id} value={company.id}>
-                      <span>{company.name}</span>
-                      {company.description && (
-                        <span className="text-muted-foreground text-xs ml-2">
-                          ({company.description})
-                        </span>
-                      )}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {deviceType && deviceCompanies.length > 0 && (
+              <div className="space-y-2">
+                <Label htmlFor="device-company">Company/Manufacturer</Label>
+                <Select value={companyId} onValueChange={setCompanyId}>
+                  <SelectTrigger id="device-company">
+                    <SelectValue placeholder="Select company (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {deviceCompanies.map((company) => (
+                      <SelectItem key={company.id} value={company.id}>
+                        <span>{company.name}</span>
+                        {company.description && (
+                          <span className="text-muted-foreground text-xs ml-2">
+                            ({company.description})
+                          </span>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {companyId && deviceModels.length > 0 && (
               <div className="space-y-2">
