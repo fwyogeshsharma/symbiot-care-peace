@@ -7,6 +7,13 @@ import { cn } from '@/lib/utils';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
 import { extractNumericValue } from '@/lib/valueExtractor';
 
+// Check if temperature unit is Fahrenheit
+const isTemperatureFahrenheit = (unit: string | null | undefined): boolean => {
+  if (!unit) return false;
+  const normalizedUnit = unit.toLowerCase().trim();
+  return normalizedUnit === '°f' || normalizedUnit === 'f' || normalizedUnit === 'fahrenheit';
+};
+
 interface EnvironmentalSensorsProps {
   selectedPersonId: string | null;
 }
@@ -63,10 +70,12 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
     refetchInterval: 10000, // Refetch every 10 seconds
   });
 
-  const getTemperature = () => {
+  const getTemperature = (): { value: number; unit: string | null } | null => {
     const tempData = environmentalData?.find(d => d.data_type === 'temperature');
     if (!tempData) return null;
-    return extractNumericValue(tempData.value, 'temperature');
+    const value = extractNumericValue(tempData.value, 'temperature');
+    if (value === null) return null;
+    return { value, unit: tempData.unit };
   };
 
   const getHumidity = () => {
@@ -81,18 +90,28 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
     return extractNumericValue(aqData.value, 'aqi');
   };
 
-  const temperature = getTemperature();
+  const temperatureData = getTemperature();
   const humidity = getHumidity();
   const airQuality = getAirQuality();
 
-  const getTempStatus = (tempCelsius: number | null) => {
-    if (tempCelsius === null) return { color: 'text-muted-foreground', label: 'No data', gradient: 'from-muted to-muted' };
-    const temp = celsiusToFahrenheit(tempCelsius);
-    // Converted ranges: 64°F, 72°F, 79°F, 86°F
-    if (temp < 64) return { color: 'text-info', label: 'Cold', gradient: 'from-info/20 to-info/5' };
-    if (temp < 72) return { color: 'text-success', label: 'Cool', gradient: 'from-success/20 to-success/5' };
-    if (temp < 79) return { color: 'text-success', label: 'Comfortable', gradient: 'from-success/20 to-success/5' };
-    if (temp < 86) return { color: 'text-warning', label: 'Warm', gradient: 'from-warning/20 to-warning/5' };
+  // Get temperature in Fahrenheit (convert if needed)
+  const getTemperatureInFahrenheit = (): number | null => {
+    if (!temperatureData) return null;
+    // If already in Fahrenheit, use as-is; otherwise convert from Celsius
+    return isTemperatureFahrenheit(temperatureData.unit)
+      ? temperatureData.value
+      : celsiusToFahrenheit(temperatureData.value);
+  };
+
+  const temperatureFahrenheit = getTemperatureInFahrenheit();
+
+  const getTempStatus = (tempF: number | null) => {
+    if (tempF === null) return { color: 'text-muted-foreground', label: 'No data', gradient: 'from-muted to-muted' };
+    // Ranges in Fahrenheit: 64°F, 72°F, 79°F, 86°F
+    if (tempF < 64) return { color: 'text-info', label: 'Cold', gradient: 'from-info/20 to-info/5' };
+    if (tempF < 72) return { color: 'text-success', label: 'Cool', gradient: 'from-success/20 to-success/5' };
+    if (tempF < 79) return { color: 'text-success', label: 'Comfortable', gradient: 'from-success/20 to-success/5' };
+    if (tempF < 86) return { color: 'text-warning', label: 'Warm', gradient: 'from-warning/20 to-warning/5' };
     return { color: 'text-destructive', label: 'Hot', gradient: 'from-destructive/20 to-destructive/5' };
   };
 
@@ -112,7 +131,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
     return { color: 'text-destructive', label: 'Hazardous', gradient: 'from-destructive/20 to-destructive/5' };
   };
 
-  const tempStatus = getTempStatus(temperature);
+  const tempStatus = getTempStatus(temperatureFahrenheit);
   const humidityStatus = getHumidityStatus(humidity);
   const airQualityStatus = getAirQualityStatus(airQuality);
 
@@ -152,7 +171,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
     );
   }
 
-  const hasData = temperature !== null || humidity !== null || airQuality !== null;
+  const hasData = temperatureFahrenheit !== null || humidity !== null || airQuality !== null;
 
   return (
     <Card>
@@ -189,10 +208,10 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
                   </div>
                 </div>
                 <div className="text-right">
-                  {temperature !== null ? (
+                  {temperatureFahrenheit !== null ? (
                     <>
                       <p className={cn("text-3xl font-bold", tempStatus.color)}>
-                        {celsiusToFahrenheit(temperature).toFixed(1)}°
+                        {temperatureFahrenheit.toFixed(1)}°
                       </p>
                       <p className="text-xs text-muted-foreground">Fahrenheit</p>
                     </>
@@ -203,14 +222,14 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
               </div>
               
               {/* Temperature Progress Bar */}
-              {temperature !== null && (
+              {temperatureFahrenheit !== null && (
                 <div className="relative h-2 bg-background/50 rounded-full overflow-hidden">
                   <div
                     className={cn(
                       "absolute top-0 left-0 h-full rounded-full transition-all duration-500",
                       "bg-gradient-to-r from-info via-success to-destructive"
                     )}
-                    style={{ width: `${Math.min(Math.max((celsiusToFahrenheit(temperature) / 104) * 100, 0), 100)}%` }}
+                    style={{ width: `${Math.min(Math.max((temperatureFahrenheit / 104) * 100, 0), 100)}%` }}
                   />
                 </div>
               )}

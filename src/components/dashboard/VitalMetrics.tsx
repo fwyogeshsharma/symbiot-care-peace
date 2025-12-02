@@ -10,6 +10,13 @@ import HealthMetricsCharts from './HealthMetricsCharts';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
 import { extractNumericValue, extractBloodPressure, extractBooleanValue, extractStringValue } from '@/lib/valueExtractor';
 
+// Check if temperature unit is Fahrenheit
+const isTemperatureFahrenheit = (unit: string | null | undefined): boolean => {
+  if (!unit) return false;
+  const normalizedUnit = unit.toLowerCase().trim();
+  return normalizedUnit === '°f' || normalizedUnit === 'f' || normalizedUnit === 'fahrenheit';
+};
+
 interface VitalMetricsProps {
   selectedPersonId?: string | null;
 }
@@ -141,10 +148,14 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         return 'text-success';
 
       case 'temperature':
+        // Note: unit is not available in this function, so we handle it in formatValue
+        // This function uses Fahrenheit thresholds assuming conversion happens elsewhere
         const temp = extractNumericValue(value, type);
         if (temp === null) return 'text-foreground';
-        const tempF = celsiusToFahrenheit(temp);
-        // Normal range: 97°F - 99°F (converted from 36.1°C - 37.2°C)
+        // Assume value is in Celsius for body temp, convert to Fahrenheit for comparison
+        // If unit is already Fahrenheit, the formatValue will handle it correctly
+        const tempF = temp < 50 ? celsiusToFahrenheit(temp) : temp; // Heuristic: if < 50, likely Celsius
+        // Normal range: 97°F - 99°F
         if (tempF < 97 || tempF > 99) return 'text-warning';
         return 'text-success';
 
@@ -224,7 +235,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
     }
   };
 
-  const formatValue = (value: any, type: string) => {
+  const formatValue = (value: any, type: string, unit?: string | null) => {
     if (value === null || value === undefined) return 'N/A';
 
     switch (type) {
@@ -249,10 +260,11 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         return `${Math.round(o2)}%`;
 
       case 'temperature':
-        const tempC = extractNumericValue(value, type);
-        if (tempC === null) return 'N/A';
-        const tempF = celsiusToFahrenheit(tempC);
-        return `${tempF.toFixed(1)}°F`;
+        const tempVal = extractNumericValue(value, type);
+        if (tempVal === null) return 'N/A';
+        // If unit is already Fahrenheit, don't convert
+        const tempFinal = isTemperatureFahrenheit(unit) ? tempVal : celsiusToFahrenheit(tempVal);
+        return `${tempFinal.toFixed(1)}°F`;
 
       case 'blood_sugar':
       case 'glucose':
@@ -519,7 +531,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
                 </div>
                 <div className="text-right">
                   <p className={`font-semibold ${color}`}>
-                    {formatValue(item.value, item.data_type)}
+                    {formatValue(item.value, item.data_type, item.unit)}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {format(new Date(item.recorded_at), 'MMM d, HH:mm')}
