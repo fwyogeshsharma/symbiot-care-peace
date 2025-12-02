@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, MapPin, Clock, TrendingUp, DoorOpen } from "lucide-react";
+import { Activity, MapPin, Clock, TrendingUp } from "lucide-react";
 import { ProcessedMovementData } from "@/lib/movementUtils";
 
 interface MovementSummaryProps {
@@ -11,15 +11,15 @@ export const MovementSummary = ({ data }: MovementSummaryProps) => {
   const mostActiveLocation = Object.entries(data.locationStats).sort(
     ([, a], [, b]) => b - a
   )[0];
-
+  
   const uniqueLocations = Object.keys(data.locationStats).length;
-
-  const recentActivity = data.events.length > 0
+  
+  const recentActivity = data.events.length > 0 
     ? new Date(data.events[data.events.length - 1].timestamp).toLocaleTimeString()
     : 'No activity';
 
   return (
-    <div className="grid gap-4 md:grid-cols-5">
+    <div className="grid gap-4 md:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-base font-semibold">Total Movements</CardTitle>
@@ -67,24 +67,6 @@ export const MovementSummary = ({ data }: MovementSummaryProps) => {
           <p className="text-xs text-muted-foreground">Most recent event</p>
         </CardContent>
       </Card>
-
-      {data.doorStats && (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-base font-semibold">Door Activity</CardTitle>
-            <DoorOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{data.doorStats.totalEvents}</div>
-            <p className="text-xs text-muted-foreground">
-              Open: {data.doorStats.openCount} | Closed: {data.doorStats.closedCount}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Ratio: {(data.doorStats.openRatio * 100).toFixed(0)}% open
-            </p>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };

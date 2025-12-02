@@ -3,21 +3,24 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { MovementEvent, getLocationColor } from "@/lib/movementUtils";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 interface MovementTimelineProps {
   events: MovementEvent[];
 }
 
 export const MovementTimeline = ({ events }: MovementTimelineProps) => {
+  const { t } = useTranslation();
+
   if (events.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Movement Timeline</CardTitle>
+          <CardTitle>{t('movement.timeline.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-center py-8">
-            No movement data available for the selected period
+            {t('movement.timeline.noData')}
           </p>
         </CardContent>
       </Card>
@@ -27,7 +30,7 @@ export const MovementTimeline = ({ events }: MovementTimelineProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Movement Timeline</CardTitle>
+        <CardTitle>{t('movement.timeline.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[500px] pr-4">
@@ -69,7 +72,7 @@ export const MovementTimeline = ({ events }: MovementTimelineProps) => {
                       {event.deviceName} - {event.status}
                       {event.duration && (
                         <span className="ml-2">
-                          ({Math.round(event.duration / 60000)} min)
+                          ({Math.round(event.duration / 60000)} {t('movement.timeline.min')})
                         </span>
                       )}
                     </div>

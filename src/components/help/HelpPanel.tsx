@@ -8,9 +8,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Search, X, ExternalLink, LayoutDashboard, Activity, AlertTriangle, Wifi, MapPin, HelpCircle, ArrowRight, Play } from 'lucide-react';
-import { helpTopics, quickLinks, categorizeTopics, searchHelpTopics, HelpTopic } from '@/data/help-content';
+import { helpTopics, quickLinks, categorizeTopics, searchHelpTopics, HelpTopic, getTranslatedHelpTopics, getTranslatedQuickLinks } from '@/data/help-content';
 import { restartTour } from './OnboardingTour';
 import { HelpTopicCard } from './HelpTopicCard';
+import { useTranslation } from 'react-i18next';
 
 interface HelpPanelProps {
   open: boolean;
@@ -29,24 +30,30 @@ const iconMap: Record<string, any> = {
 export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredTopics, setFilteredTopics] = useState<HelpTopic[]>(helpTopics);
+
+  // Get translated help topics and quick links
+  const translatedTopics = getTranslatedHelpTopics(t);
+  const translatedQuickLinks = getTranslatedQuickLinks(t);
+
+  const [filteredTopics, setFilteredTopics] = useState<HelpTopic[]>(translatedTopics);
   const [contextTopics, setContextTopics] = useState<HelpTopic[]>([]);
 
   // Get context-aware topics based on current page
   useEffect(() => {
     const currentPath = location.pathname;
-    const relevant = helpTopics.filter(topic => 
+    const relevant = translatedTopics.filter(topic =>
       topic.relatedPages?.includes(currentPath)
     );
     setContextTopics(relevant);
-  }, [location.pathname]);
+  }, [location.pathname, translatedTopics]);
 
   // Filter topics based on search
   useEffect(() => {
-    const results = searchHelpTopics(searchQuery, helpTopics);
+    const results = searchHelpTopics(searchQuery, translatedTopics);
     setFilteredTopics(results);
-  }, [searchQuery]);
+  }, [searchQuery, translatedTopics]);
 
   const categorizedTopics = categorizeTopics(filteredTopics);
 
@@ -62,13 +69,13 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
 
   const getPageTitle = () => {
     const path = location.pathname;
-    if (path === '/dashboard' || path === '/') return 'Dashboard Help';
-    if (path === '/movement-dashboard') return 'Activity Monitoring Help';
-    if (path === '/alerts') return 'Alerts Management Help';
-    if (path === '/device-status') return 'Device Monitoring Help';
-    if (path === '/tracking' || path === '/indoor-tracking') return 'Location Tracking Help';
-    if (path === '/data-sharing') return 'Data Sharing Help';
-    return 'Help & Support';
+    if (path === '/dashboard' || path === '/') return t('help.pageTitle.dashboard');
+    if (path === '/movement-dashboard') return t('help.pageTitle.activity');
+    if (path === '/alerts') return t('help.pageTitle.alerts');
+    if (path === '/device-status') return t('help.pageTitle.devices');
+    if (path === '/tracking' || path === '/indoor-tracking') return t('help.pageTitle.tracking');
+    if (path === '/data-sharing') return t('help.pageTitle.dataSharing');
+    return t('help.pageTitle.default');
   };
 
   return (
@@ -77,7 +84,7 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
         <SheetHeader className="p-6 pb-4">
           <SheetTitle className="text-2xl">{getPageTitle()}</SheetTitle>
           <SheetDescription>
-            Find answers and learn how to use SymBIoT effectively
+            {t('help.description')}
           </SheetDescription>
         </SheetHeader>
 
@@ -85,7 +92,7 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search help topics..."
+              placeholder={t('help.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-10"
@@ -107,7 +114,7 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
             {!searchQuery && contextTopics.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <h3 className="font-semibold">Relevant to this page</h3>
+                  <h3 className="font-semibold">{t('help.relevantToPage')}</h3>
                   <Badge variant="secondary" className="text-xs">
                     {contextTopics.length}
                   </Badge>
@@ -132,22 +139,22 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
             {/* Quick Links */}
             {!searchQuery && (
               <div>
-                <h3 className="font-semibold mb-3">Quick Actions</h3>
+                <h3 className="font-semibold mb-3">{t('help.quickActions')}</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {quickLinks.map((link) => {
+                  {translatedQuickLinks.map((link) => {
                     const Icon = iconMap[link.icon || 'HelpCircle'];
                     return (
                       <Button
                         key={link.path}
                         variant="outline"
-                        className="h-auto flex-col items-start p-3 text-left w-full overflow-hidden"
+                        className="h-auto flex-col items-start p-3 text-left w-full overflow-hidden whitespace-normal"
                         onClick={() => handleQuickLink(link.path)}
                       >
-                        <div className="flex items-center gap-2 mb-1 w-full">
-                          {Icon && <Icon className="w-4 h-4 shrink-0" />}
-                          <span className="text-sm font-medium break-words">{link.title}</span>
+                        <div className="flex items-start gap-2 mb-1 w-full">
+                          {Icon && <Icon className="w-4 h-4 shrink-0 mt-0.5" />}
+                          <span className="text-sm font-medium break-words leading-tight">{link.title}</span>
                         </div>
-                        <span className="text-xs text-muted-foreground break-words w-full">
+                        <span className="text-xs text-muted-foreground break-words w-full leading-tight">
                           {link.description}
                         </span>
                       </Button>
@@ -162,21 +169,21 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
             {searchQuery ? (
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <h3 className="font-semibold">Search Results</h3>
+                  <h3 className="font-semibold">{t('help.searchResults')}</h3>
                   <Badge variant="secondary" className="text-xs">
                     {filteredTopics.length}
                   </Badge>
                 </div>
                 {filteredTopics.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-muted-foreground">No results found for "{searchQuery}"</p>
+                    <p className="text-muted-foreground">{t('help.noResults')} "{searchQuery}"</p>
                     <Button
                       variant="link"
                       size="sm"
                       onClick={() => setSearchQuery('')}
                       className="mt-2"
                     >
-                      Clear search
+                      {t('help.clearSearch')}
                     </Button>
                   </div>
                 ) : (
@@ -197,7 +204,7 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
               </div>
             ) : (
               <div>
-                <h3 className="font-semibold mb-3">Browse by Topic</h3>
+                <h3 className="font-semibold mb-3">{t('help.browseByTopic')}</h3>
                 <Accordion type="multiple" className="w-full">
                   {Object.entries(categorizedTopics).map(([category, topics]) => (
                     <AccordionItem key={category} value={category}>
@@ -233,11 +240,11 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
             {/* Footer */}
             <div className="pt-6 border-t">
               <div className="text-sm text-muted-foreground">
-                <p className="mb-2">Need more help?</p>
+                <p className="mb-2">{t('help.needMoreHelp')}</p>
                 <Button variant="outline" size="sm" className="w-full" asChild>
                   <a href="mailto:support@symbiot.com">
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    Contact Support
+                    {t('help.contactSupport')}
                   </a>
                 </Button>
               </div>

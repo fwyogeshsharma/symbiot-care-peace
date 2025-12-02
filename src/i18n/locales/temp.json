@@ -1,0 +1,644 @@
+{
+  "common": {
+    "symbiot": "SymBIoT",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "copyright": "© 2025 SymBIoT. All rights reserved. Peace of Mind for Your Loved Ones."
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "alerts": "Alerts",
+    "tracking": "Tracking",
+    "devices": "Devices",
+    "dataSharing": "Data Sharing",
+    "movement": "Movement",
+    "floorPlans": "Floor Plans",
+    "analytics": "Analytics",
+    "metrics": "Metrics",
+    "pricing": "Pricing",
+    "investorInfo": "Investor Info",
+    "admin": "Admin",
+    "userManagement": "User Management",
+    "deviceTypes": "Device Types",
+    "signOut": "Sign Out",
+    "signIn": "Sign In",
+    "getStarted": "Get Started"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "createAccount": "Create Account",
+    "welcome": "Welcome Back",
+    "getStarted": "Get Started with SymBIoT"
+  },
+  "investorInfo": {
+    "badge": {
+      "investorOverview": "Investor Overview",
+      "theProblem": "The Problem",
+      "currentSolutions": "Current Solutions",
+      "ourSolution": "The SymBIoT Solution",
+      "techInnovation": "Technology Innovation",
+      "theImpact": "The Impact",
+      "marketOpportunity": "Market Opportunity",
+      "perfectTiming": "Perfect Timing",
+      "businessModel": "Business Model"
+    },
+    "hero": {
+      "title": "Transforming Elder Care with",
+      "titleAccent": "AI & IoT",
+      "subtitle": "A comprehensive platform that enables seniors to age safely at home while reducing costs by 99% compared to nursing homes - powered by breakthrough AI and IoT technology.",
+      "scheduleDemo": "Schedule a Demo",
+      "readFullStory": "Read Full Story"
+    },
+    "problem": {
+      "title": "The Elder Care Crisis",
+      "subtitle": "As our population ages, families face impossible choices between affordability, safety, and independence. The current system is broken.",
+      "delayedResponse": {
+        "title": "Delayed Emergency Response",
+        "description": "Falls and medical emergencies often go undetected for hours, leading to worse outcomes and higher healthcare costs."
+      },
+      "escalatingCosts": {
+        "title": "Escalating Care Costs",
+        "description": "Nursing home care averages $100,000+/year. Families struggle to afford quality care while seniors lose independence."
+      },
+      "caregiverBurnout": {
+        "title": "Caregiver Burnout",
+        "description": "47 million family caregivers face constant stress, unable to monitor loved ones remotely, leading to work disruption and health issues."
+      },
+      "fragmentedInfo": {
+        "title": "Fragmented Information",
+        "description": "Healthcare providers, family members, and caregivers lack a unified view of the senior's health and activity patterns."
+      }
+    },
+    "currentSolutions": {
+      "title": "Existing Solutions Fall Short",
+      "subtitle": "The market has tried to address these problems, but existing solutions are either too expensive, too limited, or compromise on independence and quality of life.",
+      "medicalAlerts": {
+        "title": "Medical Alert Systems",
+        "limitations": [
+          "Require manual activation (seniors often can't press button during falls)",
+          "No predictive analytics or trend detection",
+          "Limited to emergency response only",
+          "No activity or vital monitoring"
+        ]
+      },
+      "homeHealthAides": {
+        "title": "Home Health Aides",
+        "limitations": [
+          "Cost $25-50/hour, $200,000+/year for 24/7 care",
+          "Inconsistent care quality and high turnover",
+          "No coverage during off-hours",
+          "Limited to physical presence, no data insights"
+        ]
+      },
+      "nursingHomes": {
+        "title": "Nursing Homes",
+        "limitations": [
+          "Average $100,000+/year in costs",
+          "Loss of independence and familiar environment",
+          "Increased depression and cognitive decline",
+          "Waitlists and availability issues"
+        ]
+      },
+      "fitnessTrackers": {
+        "title": "Basic Fitness Trackers",
+        "limitations": [
+          "Consumer-grade, not healthcare certified",
+          "No HIPAA compliance or data sharing controls",
+          "Limited alert capabilities",
+          "No integration with caregiving workflows"
+        ]
+      }
+    },
+    "solution": {
+      "title": "A Better Way to Care",
+      "subtitle": "SymBIoT combines AI-powered analytics, IoT sensors, and intelligent automation to provide comprehensive, affordable monitoring that keeps seniors safe at home.",
+      "vitalMonitoring": {
+        "title": "Continuous Vital Monitoring",
+        "description": "24/7 tracking of heart rate, blood pressure, oxygen levels, and temperature with AI-powered anomaly detection.",
+        "improvement": "Catches health issues hours or days before they become emergencies"
+      },
+      "activityRecognition": {
+        "title": "Intelligent Activity Recognition",
+        "description": "AI analyzes movement patterns, detects falls automatically, identifies behavioral changes that signal cognitive decline.",
+        "improvement": "No button pressing required - system detects problems automatically"
+      },
+      "tracking": {
+        "title": "Indoor + Outdoor Tracking",
+        "description": "GPS tracking outdoors with custom floor plan mapping indoors. Geofencing alerts for wandering or unsafe zones.",
+        "improvement": "Complete location awareness unlike GPS-only or indoor-only systems"
+      },
+      "smartAlerts": {
+        "title": "Smart Predictive Alerts",
+        "description": "AI learns normal patterns and alerts caregivers to deviations before they become critical. Reduces false alarms by 70%.",
+        "improvement": "Proactive intervention vs reactive emergency response"
+      },
+      "analytics": {
+        "title": "ILQ Analytics & Reporting",
+        "description": "Independent Living Quotient scores track trends over time. Comprehensive reports for healthcare providers and family.",
+        "improvement": "Data-driven care decisions vs gut feeling and anecdotal evidence"
+      },
+      "coordination": {
+        "title": "Unified Care Coordination",
+        "description": "Role-based platform connecting seniors, family, caregivers, and doctors with secure data sharing and communication.",
+        "improvement": "Everyone on the same page vs fragmented phone calls and texts"
+      }
+    },
+    "technology": {
+      "title": "How AI & IoT Make This Possible Now",
+      "subtitle": "Recent breakthroughs in artificial intelligence and Internet of Things technology enable comprehensive elder care monitoring at a price point that wasn't possible even 3 years ago.",
+      "ai": {
+        "title": "AI & Machine Learning",
+        "description": "Modern AI can now recognize patterns, predict health events, and reduce false alarms - technology that didn't exist 5 years ago at this price point and accuracy."
+      },
+      "iot": {
+        "title": "Affordable IoT Sensors",
+        "description": "Medical-grade sensors are now 90% cheaper than in 2015. Wearables and home sensors can continuously monitor vitals at consumer-friendly prices."
+      },
+      "5g": {
+        "title": "5G & Edge Computing",
+        "description": "Real-time data processing with millisecond latency enables instant fall detection and emergency alerts impossible with older networks."
+      },
+      "cloud": {
+        "title": "Cloud Infrastructure",
+        "description": "HIPAA-compliant cloud platforms like Supabase enable secure, scalable data storage and real-time synchronization across devices at fraction of historical costs."
+      }
+    },
+    "impact": {
+      "title": "Cost Savings & Better Living",
+      "subtitle": "SymBIoT delivers measurable financial benefits while dramatically improving quality of life for seniors and peace of mind for families.",
+      "costSavings": {
+        "title": "Cost Savings",
+        "lowerCost": {
+          "title": "99% Lower Than Nursing Homes",
+          "description": "SymBIoT subscription at $25/month vs $8,000+/month for nursing home care"
+        },
+        "reduceReadmissions": {
+          "title": "Reduce Hospital Readmissions",
+          "description": "Early detection prevents 40% of emergency room visits, saving $2,000-10,000 per incident"
+        },
+        "optimizeCaregiver": {
+          "title": "Optimize Caregiver Time",
+          "description": "Professional caregivers visit only when needed vs scheduled visits, reducing costs by 50%"
+        },
+        "insurance": {
+          "title": "Insurance Premium Reductions",
+          "description": "Proactive monitoring can qualify families for lower long-term care insurance premiums"
+        }
+      },
+      "qualityOfLife": {
+        "title": "Quality of Life",
+        "ageInPlace": {
+          "title": "Age in Place Safely",
+          "description": "Seniors maintain independence in their own homes, proven to improve mental health and longevity"
+        },
+        "peaceOfMind": {
+          "title": "Peace of Mind for Families",
+          "description": "Family caregivers sleep better knowing they'll be alerted immediately to any issues, reducing stress and burnout"
+        },
+        "fasterResponse": {
+          "title": "Faster Emergency Response",
+          "description": "Automatic fall detection and alerts reduce response time from hours to minutes, preventing complications"
+        },
+        "dignity": {
+          "title": "Preserved Dignity & Autonomy",
+          "description": "Seniors live independently with invisible safety net vs constant supervision or institutional care"
+        }
+      },
+      "savingsHighlight": "$95,000+ Saved Per Year",
+      "savingsDescription": "Average family saves by choosing SymBIoT ($25/month) over nursing home care ($8,000+/month) while maintaining better quality of life"
+    },
+    "market": {
+      "title": "Massive Market Opportunity",
+      "subtitle": "Aging demographics and technology adoption create a perfect storm for disruption",
+      "adults65": {
+        "stat": "54M+",
+        "label": "Adults 65+ in US",
+        "context": "Growing by 10,000/day through 2030"
+      },
+      "marketSize": {
+        "stat": "$460B",
+        "label": "Elder Care Market",
+        "context": "8.5% CAGR through 2030"
+      },
+      "ageAtHome": {
+        "stat": "90%",
+        "label": "Want to Age at Home",
+        "context": "Current solutions too expensive or inadequate"
+      },
+      "caregivers": {
+        "stat": "47M",
+        "label": "Family Caregivers",
+        "context": "Lost productivity costs economy $500B/year"
+      }
+    },
+    "whyNow": {
+      "title": "Why Now?",
+      "subtitle": "Multiple converging trends create an unprecedented opportunity for SymBIoT",
+      "techConvergence": {
+        "title": "Technology Convergence",
+        "description": "AI, IoT, 5G, and cloud infrastructure have matured to the point where comprehensive remote monitoring is both technically feasible and economically viable for the mass market."
+      },
+      "demographic": {
+        "title": "Demographic Crisis",
+        "description": "Baby boomers entering elder care years while younger generations have fewer children and live farther apart - traditional family caregiving model is breaking down."
+      },
+      "regulatory": {
+        "title": "Regulatory Momentum",
+        "description": "Medicare and insurance companies increasingly cover remote patient monitoring. Recent CMS reimbursement codes make our business model more attractive to healthcare providers."
+      },
+      "covid": {
+        "title": "COVID-19 Acceleration",
+        "description": "Pandemic normalized telehealth and remote monitoring. Families now actively seek tech solutions to stay connected with elderly loved ones."
+      }
+    },
+    "businessModel": {
+      "title": "Scalable SaaS Model",
+      "subtitle": "Multiple revenue streams with strong unit economics",
+      "b2c": {
+        "title": "B2C",
+        "description": "Individual & Family Plans",
+        "price": "$25",
+        "period": "per month"
+      },
+      "b2b": {
+        "title": "B2B",
+        "description": "Assisted Living & Healthcare",
+        "price": "$20",
+        "period": "per resident/month",
+        "badge": "Primary Focus"
+      },
+      "b2b2c": {
+        "title": "B2B2C",
+        "description": "Insurance & Employers",
+        "price": "$15",
+        "period": "per member/month"
+      }
+    },
+    "cta": {
+      "title": "Join Us in Transforming Elder Care",
+      "subtitle": "SymBIoT is positioned at the intersection of massive demographic trends and breakthrough technology. Let's discuss how you can be part of this transformation.",
+      "scheduleDemo": "Schedule a Demo",
+      "contactInvestment": "Contact Investment Team"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to SymBIoT",
+    "overview": "Overview",
+    "recentAlerts": "Recent Alerts",
+    "vitalSigns": "Vital Signs",
+    "activity": "Activity"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "noAlerts": "No alerts at this time",
+    "critical": "Critical",
+    "warning": "Warning",
+    "info": "Info",
+    "resolved": "Resolved"
+  },
+  "devices": {
+    "title": "Devices",
+    "status": "Device Status",
+    "online": "Online",
+    "offline": "Offline",
+    "battery": "Battery",
+    "lastSeen": "Last Seen"
+  },
+  "tracking": {
+    "title": "Tracking",
+    "location": "Current Location",
+    "indoor": "Indoor Tracking",
+    "outdoor": "Outdoor Tracking",
+    "safeZones": "Safe Zones",
+    "geofencing": "Geofencing"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "chooseP lan": "Choose Your Plan",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perMonth": "per month",
+    "perYear": "per year"
+  },
+  "profile": {
+    "title": "Profile",
+    "personalInfo": "Personal Information",
+    "settings": "Settings",
+    "preferences": "Preferences",
+    "notifications": "Notifications"
+  },
+  "index": {
+    "tagline": "Peace of Mind",
+    "login": "Login",
+    "goToDashboard": "Go to Dashboard",
+    "dashboard": "Dashboard",
+    "start": "Start",
+    "hero": {
+      "title": "Peace of Mind for Your Loved Ones",
+      "subtitle": "Advanced IoT health monitoring that keeps families connected and elderly loved ones safe, independent, and thriving at home.",
+      "knowMore": "Know More"
+    },
+    "features": {
+      "title": "Comprehensive Care, Simplified",
+      "subtitle": "Monitor health, activity, and environment with AI-powered insights that alert you to what matters most.",
+      "realTimeVitals": {
+        "title": "Real-Time Vitals",
+        "description": "Monitor heart rate, blood pressure, oxygen levels, and more with wearable and non-invasive sensors."
+      },
+      "activityTracking": {
+        "title": "Activity Tracking",
+        "description": "Automatic detection of daily routines, movement patterns, and activity levels to spot changes early."
+      },
+      "smartAlerts": {
+        "title": "Smart Alerts",
+        "description": "Intelligent notifications for falls, missed medications, irregular vitals, or unusual behavior patterns."
+      },
+      "privacyFirst": {
+        "title": "Privacy First",
+        "description": "HIPAA and GDPR compliant with encrypted data storage and role-based access control for family members."
+      },
+      "predictiveAnalytics": {
+        "title": "Predictive Analytics",
+        "description": "AI-powered insights that predict potential health issues before they become emergencies."
+      },
+      "familyCollaboration": {
+        "title": "Family Collaboration",
+        "description": "Coordinate care with family members, caregivers, and healthcare providers on one secure platform."
+      }
+    },
+    "cta": {
+      "title": "Ready to Bring Peace of Mind Home?",
+      "subtitle": "Join thousands of families who trust SymBIoT to keep their loved ones safe and independent.",
+      "getStartedToday": "Get Started Today"
+    },
+    "footer": {
+      "copyright": "© 2025 SymBIoT. All rights reserved. Version: 1.0.6",
+      "tagline": "Bringing families and technology together for better care."
+    }
+  }
+}
+{
+  "common": {
+    "symbiot": "SymBIoT",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "select": "Select",
+    "all": "All",
+    "none": "None",
+    "apply": "Apply",
+    "reset": "Reset",
+    "copyright": "© 2025 SymBIoT. All rights reserved. Peace of Mind for Your Loved Ones."
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "alerts": "Alerts",
+    "tracking": "Tracking",
+    "devices": "Devices",
+    "dataSharing": "Data Sharing",
+    "movement": "Movement",
+    "floorPlans": "Floor Plans",
+    "analytics": "Analytics",
+    "metrics": "Metrics",
+    "pricing": "Pricing",
+    "investorInfo": "Investor Info",
+    "admin": "Admin",
+    "userManagement": "User Management",
+    "deviceTypes": "Device Types",
+    "signOut": "Sign Out",
+    "signIn": "Sign In",
+    "getStarted": "Get Started"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "role": "Role",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "sendResetLink": "Send Reset Link",
+    "backToLogin": "Back to Login",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "createAccount": "Create Account",
+    "welcome": "Welcome Back",
+    "welcomeNew": "Create Your Account",
+    "getStarted": "Get Started with SymBIoT",
+    "selectRole": "Select your role",
+    "roles": {
+      "elderly": "Elderly Person",
+      "caregiver": "Caregiver",
+      "relative": "Family Member",
+      "admin": "Administrator"
+    },
+    "validation": {
+      "invalidEmail": "Invalid email address",
+      "passwordMin": "Password must be at least 6 characters",
+      "passwordMatch": "Passwords don't match",
+      "nameMin": "Name must be at least 2 characters",
+      "phoneMin": "Phone number must be at least 10 digits",
+      "phoneInvalid": "Invalid phone number format"
+    },
+    "messages": {
+      "checkEmail": "Check your email for reset link",
+      "passwordReset": "Password reset successfully",
+      "loginSuccess": "Welcome back!",
+      "signupSuccess": "Account created successfully!"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to SymBIoT",
+    "overview": "Overview",
+    "recentAlerts": "Recent Alerts",
+    "vitalSigns": "Vital Signs",
+    "activity": "Activity",
+    "quickActions": "Quick Actions",
+    "viewAll": "View All",
+    "noData": "No data available"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "noAlerts": "No alerts at this time",
+    "critical": "Critical",
+    "warning": "Warning",
+    "info": "Info",
+    "resolved": "Resolved",
+    "unresolved": "Unresolved",
+    "markResolved": "Mark as Resolved",
+    "viewDetails": "View Details",
+    "filterBy": "Filter by",
+    "sortBy": "Sort by",
+    "date": "Date",
+    "severity": "Severity",
+    "type": "Type"
+  },
+  "devices": {
+    "title": "Devices",
+    "status": "Device Status",
+    "online": "Online",
+    "offline": "Offline",
+    "battery": "Battery",
+    "lastSeen": "Last Seen",
+    "addDevice": "Add Device",
+    "removeDevice": "Remove Device",
+    "deviceName": "Device Name",
+    "deviceType": "Device Type",
+    "location": "Location"
+  },
+  "tracking": {
+    "title": "Tracking",
+    "location": "Current Location",
+    "indoor": "Indoor Tracking",
+    "outdoor": "Outdoor Tracking",
+    "safeZones": "Safe Zones",
+    "geofencing": "Geofencing",
+    "history": "Location History",
+    "realTime": "Real-Time",
+    "addZone": "Add Safe Zone",
+    "editZone": "Edit Zone",
+    "deleteZone": "Delete Zone"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "choosePlan": "Choose Your Plan",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "selectPlan": "Select Plan",
+    "currentPlan": "Current Plan",
+    "upgrade": "Upgrade",
+    "features": "Features",
+    "included": "Included"
+  },
+  "profile": {
+    "title": "Profile",
+    "personalInfo": "Personal Information",
+    "settings": "Settings",
+    "preferences": "Preferences",
+    "notifications": "Notifications",
+    "security": "Security",
+    "privacy": "Privacy",
+    "changePassword": "Change Password",
+    "updateProfile": "Update Profile",
+    "saveChanges": "Save Changes"
+  },
+  "dataSharing": {
+    "title": "Data Sharing",
+    "shareWith": "Share With",
+    "permissions": "Permissions",
+    "addRecipient": "Add Recipient",
+    "removeAccess": "Remove Access",
+    "viewOnly": "View Only",
+    "fullAccess": "Full Access",
+    "customAccess": "Custom Access"
+  },
+  "movement": {
+    "title": "Movement Dashboard",
+    "activityLevel": "Activity Level",
+    "steps": "Steps",
+    "distance": "Distance",
+    "duration": "Duration",
+    "patterns": "Movement Patterns",
+    "today": "Today",
+    "week": "This Week",
+    "month": "This Month"
+  },
+  "floorPlans": {
+    "title": "Floor Plans",
+    "create": "Create Floor Plan",
+    "edit": "Edit Floor Plan",
+    "delete": "Delete Floor Plan",
+    "upload": "Upload Image",
+    "zones": "Zones",
+    "addZone": "Add Zone",
+    "furniture": "Furniture",
+    "sensors": "Sensors"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "ilq": "Independent Living Quotient",
+    "trends": "Trends",
+    "reports": "Reports",
+    "insights": "Insights",
+    "generateReport": "Generate Report",
+    "exportData": "Export Data",
+    "dateRange": "Date Range",
+    "from": "From",
+    "to": "To"
+  },
+  "platformMetrics": {
+    "title": "Platform Metrics",
+    "users": "Users",
+    "devices": "Devices",
+    "alerts": "Alerts",
+    "uptime": "Uptime",
+    "performance": "Performance"
+  },
+  "admin": {
+    "title": "Administration",
+    "userManagement": "User Management",
+    "deviceTypes": "Device Types",
+    "configurations": "Configurations",
+    "logs": "Logs",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "permissions": "Permissions"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "message": "The page you're looking for doesn't exist.",
+    "goHome": "Go to Home",
+    "goBack": "Go Back"
+  }
+}

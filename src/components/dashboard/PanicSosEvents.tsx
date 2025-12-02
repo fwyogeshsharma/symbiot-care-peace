@@ -7,6 +7,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { PanicSosCharts } from './PanicSosCharts';
+import { useTranslation } from 'react-i18next';
 
 interface PanicSosEventsProps {
   selectedPersonId?: string | null;
@@ -15,6 +16,7 @@ interface PanicSosEventsProps {
 const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
   const [showAll, setShowAll] = useState(false);
   const [showCharts, setShowCharts] = useState(false);
+  const { t } = useTranslation();
 
   const { data: panicEvents, isLoading } = useQuery({
     queryKey: ['panic-sos-events', selectedPersonId, showAll],
@@ -65,9 +67,9 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
   const getEventDescription = (value: any) => {
     const val = value as any;
     if (val?.message) return val.message;
-    if (val?.type === 'fall_detected') return 'Fall detected';
-    if (val?.button_pressed) return 'SOS button pressed';
-    return 'Emergency alert';
+    if (val?.type === 'fall_detected') return t('panicSos.descriptions.fallDetected');
+    if (val?.button_pressed) return t('panicSos.descriptions.sosPressed');
+    return t('panicSos.descriptions.emergency');
   };
 
   if (isLoading) {
@@ -76,11 +78,11 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-destructive" />
-            Panic/SOS Events
+            {t('panicSos.title')}
           </h3>
         </div>
         <div className="text-center py-8 text-muted-foreground">
-          Loading events...
+          {t('panicSos.loading')}
         </div>
       </Card>
     );
@@ -92,22 +94,22 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-destructive" />
-            Panic/SOS Events
+            {t('panicSos.title')}
           </h3>
           <div className="flex items-center gap-2">
             {panicEvents && panicEvents.length > 0 && (
               <>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setShowCharts(true)}
                   className="gap-2"
                 >
                   <TrendingUp className="h-4 w-4" />
-                  View Charts
+                  {t('panicSos.viewCharts')}
                 </Button>
                 <Badge variant="outline" className="border-destructive text-destructive">
-                  {panicEvents.length} {panicEvents.length === 1 ? 'event' : 'events'}
+                  {panicEvents.length} {panicEvents.length === 1 ? t('panicSos.event') : t('panicSos.events')}
                 </Badge>
               </>
             )}
@@ -118,10 +120,10 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
         <div className="text-center py-8">
           <AlertCircle className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
           <p className="text-muted-foreground text-sm">
-            No panic/SOS events recorded
+            {t('panicSos.noEvents')}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Emergency button presses will appear here
+            {t('panicSos.noEventsHint')}
           </p>
         </div>
       ) : (
@@ -147,7 +149,7 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
                         <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                           <User className="w-3 h-3" />
                           <span className="truncate">
-                            {elderlyPerson?.full_name || 'Unknown'}
+                            {elderlyPerson?.full_name || t('panicSos.unknown')}
                           </span>
                         </div>
                       </div>
@@ -171,7 +173,7 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
 
                   {device?.device_name && (
                     <p className="text-xs text-muted-foreground mt-1 truncate">
-                      Device: {device.device_name}
+                      {t('panicSos.device')}: {device.device_name}
                     </p>
                   )}
                 </div>
@@ -186,7 +188,7 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
                 size="sm"
                 onClick={() => setShowAll(!showAll)}
               >
-                {showAll ? 'Show Less' : 'Show More'}
+                {showAll ? t('panicSos.showLess') : t('panicSos.showMore')}
               </Button>
             </div>
           )}

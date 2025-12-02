@@ -2,11 +2,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, Heart, LayoutDashboard } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { HelpPanel } from '@/components/help/HelpPanel';
+import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -19,6 +20,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [helpPanelOpen, setHelpPanelOpen] = useState(false);
+  const { t } = useTranslation();
 
   // Keyboard shortcut to open help panel (F1)
   useEffect(() => {
@@ -66,8 +68,8 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         onClick={() => navigate('/dashboard')}
         className={cn(isMobile && 'w-full justify-start')}
       >
-        <Heart className="w-4 h-4 mr-2" />
-        Health
+        <HeartPulse className="w-4 h-4 mr-2" />
+        {t('nav.health')}
       </Button>
       <Button
         data-tour="nav-activity"
@@ -77,7 +79,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         className={cn(isMobile && 'w-full justify-start')}
       >
         <Activity className="w-4 h-4 mr-2" />
-        Activity
+        {t('nav.movement')}
       </Button>
       <Button
         data-tour="nav-alerts"
@@ -87,7 +89,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         className={cn(isMobile && 'w-full justify-start')}
       >
         <AlertTriangle className="w-4 h-4 mr-2" />
-        Alerts
+        {t('nav.alerts')}
       </Button>
       <Button
         data-tour="nav-tracking"
@@ -97,7 +99,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         className={cn(isMobile && 'w-full justify-start')}
       >
         <MapPin className="w-4 h-4 mr-2" />
-        Tracking
+        {t('nav.tracking')}
       </Button>
       <Button
         data-tour="nav-devices"
@@ -107,20 +109,8 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         className={cn(isMobile && 'w-full justify-start')}
       >
         <Wifi className="w-4 h-4 mr-2" />
-        Devices
+        {t('nav.devices')}
       </Button>
-      {(userRole === 'super_admin' || userRole === 'admin') && (
-        <Button
-          data-tour="nav-admin"
-          variant={isActive('/admin/dashboard') ? 'default' : 'ghost'}
-          size={isMobile ? 'default' : 'sm'}
-          onClick={() => navigate('/admin/dashboard')}
-          className={cn(isMobile && 'w-full justify-start')}
-        >
-          <LayoutDashboard className="w-4 h-4 mr-2" />
-          Admin
-        </Button>
-      )}
       <Button
         data-tour="user-menu"
         variant={isActive('/profile') ? 'default' : 'ghost'}
@@ -129,7 +119,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         className={cn(isMobile && 'w-full justify-start')}
       >
         <User className="w-4 h-4 mr-2" />
-        Profile
+        {t('nav.profile')}
       </Button>
     </>
   );
@@ -162,10 +152,10 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
             >
               <div className="min-w-0">
                 <h1 className="text-base sm:text-xl font-bold text-foreground truncate">
-                  {title || 'SymBIoT'}
+                  {title || t('common.symbiot')}
                 </h1>
                 <p className="text-xs text-muted-foreground hidden sm:block truncate">
-                  {subtitle || 'Peace of Mind'}
+                  {subtitle || t('index.tagline')}
                 </p>
               </div>
             </Button>
@@ -187,7 +177,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
               title="Help & Support (F1)"
             >
               <HelpCircle className="w-4 h-4" />
-              <span className="hidden xl:inline">Help</span>
+              <span className="hidden xl:inline">{t('nav.help')}</span>
             </Button>
           </div>
 

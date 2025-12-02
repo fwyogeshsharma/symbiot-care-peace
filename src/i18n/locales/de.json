@@ -1,0 +1,913 @@
+{
+  "common": {
+    "symbiot": "SymBIoT",
+    "loading": "Laden...",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "close": "Schließen",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "submit": "Absenden",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "confirm": "Bestätigen",
+    "yes": "Ja",
+    "no": "Nein",
+    "copyright": "© 2025 SymBIoT. Alle Rechte vorbehalten. Seelenfrieden für Ihre Lieben."
+  },
+  "healthMetrics": {
+    "title": "Gesundheitsmetriken",
+    "viewCharts": "Diagramme Anzeigen",
+    "noData": "Noch keine Gesundheitsdaten verfügbar",
+    "types": {
+      "heart_rate": "Herzfrequenz",
+      "blood_pressure": "Blutdruck",
+      "blood_sugar": "Blutzucker",
+      "oxygen_level": "Sauerstoffgehalt",
+      "temperature": "Körpertemperatur",
+      "steps": "Schritte Heute",
+      "activity": "Aktivitätsniveau",
+      "sleep_quality": "Schlafqualität",
+      "sleep_stage": "Schlafphase",
+      "medication_taken": "Medikament Eingenommen",
+      "next_dose_time": "Nächste Dosis",
+      "humidity": "Luftfeuchtigkeit",
+      "fall_detected": "Sturzstatus",
+      "impact_force": "Aufprallkraft",
+      "weight": "Gewicht",
+      "bmi": "BMI",
+      "body_fat": "Körperfett",
+      "barometric_pressure": "Luftdruck",
+      "air_quality_index": "Luftqualitätsindex",
+      "co2_level": "CO₂-Gehalt",
+      "voc_level": "VOC-Gehalt",
+      "noise_level": "Geräuschpegel",
+      "light_level": "Lichtstärke",
+      "respiratory_rate": "Atemfrequenz"
+    },
+    "values": {
+      "fallDetected": "Sturz Erkannt!",
+      "noFalls": "Keine Stürze",
+      "steps": "Schritte"
+    }
+  },
+  "panicSos": {
+    "title": "Panik/SOS-Ereignisse",
+    "loading": "Ereignisse werden geladen...",
+    "noEvents": "Keine Panik/SOS-Ereignisse aufgezeichnet",
+    "noEventsHint": "Notfall-Tastenbetätigungen werden hier angezeigt",
+    "viewCharts": "Diagramme Anzeigen",
+    "showMore": "Mehr Anzeigen",
+    "showLess": "Weniger Anzeigen",
+    "event": "Ereignis",
+    "events": "Ereignisse",
+    "unknown": "Unbekannt",
+    "device": "Gerät",
+    "descriptions": {
+      "fallDetected": "Sturz erkannt",
+      "sosPressed": "SOS-Taste gedrückt",
+      "emergency": "Notfallalarm"
+    }
+  },
+  "environmental": {
+    "title": "Umgebungssensoren",
+    "selectPerson": "Wählen Sie eine Person aus, um Umgebungsdaten anzuzeigen",
+    "noData": "Keine Umgebungsdaten verfügbar",
+    "temperature": "Temperatur",
+    "humidity": "Luftfeuchtigkeit",
+    "airQuality": "Luftqualität",
+    "fahrenheit": "Fahrenheit",
+    "relative": "Relativ",
+    "aqi": "LQI",
+    "status": {
+      "noData": "Keine Daten",
+      "cold": "Kalt",
+      "cool": "Kühl",
+      "comfortable": "Angenehm",
+      "warm": "Warm",
+      "hot": "Heiß",
+      "dry": "Trocken",
+      "humid": "Feucht",
+      "good": "Gut",
+      "moderate": "Mäßig",
+      "unhealthySensitive": "Ungesund für Empfindliche",
+      "unhealthy": "Ungesund",
+      "hazardous": "Gefährlich"
+    }
+  },
+  "medication": {
+    "title": "Medikamentenverwaltung",
+    "selectPerson": "Wählen Sie eine Person aus, um Medikamentendaten anzuzeigen",
+    "compliance": "7-Tage-Einhaltung",
+    "latestDose": "Letzte Dosis",
+    "nextDose": "Nächste Dosis",
+    "taken": "Eingenommen",
+    "missed": "Verpasst",
+    "notScheduled": "Nicht geplant",
+    "todaysDoses": "Heutige Dosen",
+    "noDosesToday": "Heute keine Dosen aufgezeichnet",
+    "recentActivity": "Letzte Aktivität",
+    "noRecentActivity": "Keine kürzliche Aktivität"
+  },
+  "dataSharing": {
+    "title": "Datenfreigabe",
+    "subtitle": "Datenzugriff verwalten",
+    "description": "Teilen Sie Überwachungsdaten mit Familienmitgliedern oder anderen Betreuern. Der Zugriff wird auf alle Ihre überwachten Personen gewährt.",
+    "grantAccess": "Zugriff Gewähren",
+    "grantingAccess": "Gewähre Zugriff...",
+    "userEmail": "Benutzer-E-Mail",
+    "emailPlaceholder": "benutzer@beispiel.com",
+    "relationship": "Beziehung",
+    "relationshipOptional": "Beziehung (Optional)",
+    "relationshipPlaceholder": "z.B., Familie, Freund, Betreuer",
+    "currentAccess": "Aktueller Zugriff",
+    "loading": "Laden...",
+    "noDataSharing": "Keine Datenfreigabe aktiv",
+    "monitoring": "Überwachung",
+    "editAccess": "Zugriff Bearbeiten",
+    "updateRelationshipFor": "Beziehung aktualisieren für",
+    "updatingAccess": "Aktualisiere...",
+    "updateAccess": "Zugriff Aktualisieren",
+    "toasts": {
+      "accessGranted": "Zugriff gewährt",
+      "userCanView": "Benutzer kann jetzt Überwachungsdaten einsehen",
+      "failedToShare": "Freigabe fehlgeschlagen",
+      "accessUpdated": "Zugriff aktualisiert",
+      "relationshipUpdated": "Beziehung wurde erfolgreich aktualisiert",
+      "failedToUpdate": "Aktualisierung fehlgeschlagen",
+      "accessRevoked": "Zugriff widerrufen",
+      "userCanNoLongerView": "Benutzer kann Überwachungsdaten nicht mehr einsehen",
+      "failedToRevoke": "Widerruf fehlgeschlagen"
+    },
+    "errors": {
+      "noElderlyPersons": "Keine älteren Personen zum Teilen gefunden",
+      "userNotFound": "Benutzer mit dieser E-Mail nicht gefunden",
+      "accessAlreadyGranted": "Zugriff für alle Personen bereits an diesen Benutzer gewährt"
+    }
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "newPassword": "Neues Passwort",
+    "confirmNewPassword": "Neues Passwort bestätigen",
+    "fullName": "Vollständiger Name",
+    "phone": "Telefonnummer",
+    "role": "Rolle",
+    "forgotPassword": "Passwort vergessen?",
+    "resetPassword": "Passwort zurücksetzen",
+    "sendResetLink": "Link zum Zurücksetzen senden",
+    "backToLogin": "Zurück zur Anmeldung",
+    "noAccount": "Kein Konto? Registrieren",
+    "hasAccount": "Bereits ein Konto? Anmelden",
+    "createAccount": "Konto erstellen",
+    "welcome": "Willkommen zurück",
+    "welcomeNew": "Erstellen Sie Ihr Konto",
+    "getStarted": "Starten Sie mit SymBIoT",
+    "selectRole": "Wählen Sie Ihre Rolle",
+    "roles": {
+      "elderly": "Ältere Person",
+      "caregiver": "Pflegekraft",
+      "relative": "Familienmitglied",
+      "admin": "Administrator"
+    },
+    "validation": {
+      "invalidEmail": "Ungültige E-Mail-Adresse",
+      "passwordMin": "Das Passwort muss mindestens 6 Zeichen haben",
+      "passwordMatch": "Passwörter stimmen nicht überein",
+      "nameMin": "Der Name muss mindestens 2 Zeichen haben",
+      "phoneMin": "Die Telefonnummer muss mindestens 10 Ziffern haben",
+      "phoneInvalid": "Ungültiges Telefonnummernformat"
+    }
+  },
+  "nav": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "health": "Gesundheit",
+    "profile": "Profil",
+    "alerts": "Warnungen",
+    "tracking": "Verfolgung",
+    "devices": "Geräte",
+    "dataSharing": "Datenaustausch",
+    "movement": "Aktivität",
+    "floorPlans": "Grundrisse",
+    "analytics": "Analytik",
+    "metrics": "Metriken",
+    "pricing": "Preise",
+    "investorInfo": "Investoreninfo",
+    "admin": "Admin",
+    "userManagement": "Benutzerverwaltung",
+    "deviceTypes": "Gerätetypen",
+    "signOut": "Abmelden",
+    "signIn": "Anmelden",
+    "getStarted": "Loslegen",
+    "help": "Hilfe"
+  },
+  "index": {
+    "tagline": "Seelenfrieden",
+    "login": "Anmelden",
+    "goToDashboard": "Zum Dashboard",
+    "dashboard": "Dashboard",
+    "start": "Start",
+    "hero": {
+      "title": "Seelenfrieden für Ihre Lieben",
+      "subtitle": "Fortschrittliche IoT-Gesundheitsüberwachung, die Familien verbindet und ältere Menschen sicher, unabhängig und glücklich zu Hause hält.",
+      "knowMore": "Mehr Erfahren"
+    },
+    "features": {
+      "title": "Umfassende Pflege, Vereinfacht",
+      "subtitle": "Überwachen Sie Gesundheit, Aktivität und Umgebung mit KI-gestützten Einblicken, die Sie auf das Wichtigste aufmerksam machen.",
+      "realTimeVitals": {
+        "title": "Echtzeitvitalwerte",
+        "description": "Überwachen Sie Herzfrequenz, Blutdruck, Sauerstoffwerte und mehr mit tragbaren und nicht-invasiven Sensoren."
+      },
+      "activityTracking": {
+        "title": "Aktivitätsverfolgung",
+        "description": "Automatische Erkennung täglicher Routinen, Bewegungsmuster und Aktivitätsniveaus, um Veränderungen frühzeitig zu erkennen."
+      },
+      "smartAlerts": {
+        "title": "Intelligente Warnungen",
+        "description": "Intelligente Benachrichtigungen bei Stürzen, vergessenen Medikamenten, unregelmäßigen Vitalwerten oder ungewöhnlichen Verhaltensmustern."
+      },
+      "privacyFirst": {
+        "title": "Datenschutz Zuerst",
+        "description": "HIPAA- und DSGVO-konform mit verschlüsselter Datenspeicherung und rollenbasierter Zugriffskontrolle für Familienmitglieder."
+      },
+      "predictiveAnalytics": {
+        "title": "Vorhersageanalyse",
+        "description": "KI-gestützte Einblicke, die potenzielle Gesundheitsprobleme vorhersagen, bevor sie zu Notfällen werden."
+      },
+      "familyCollaboration": {
+        "title": "Familienzusammenarbeit",
+        "description": "Koordinieren Sie die Pflege mit Familienmitgliedern, Pflegekräften und Gesundheitsdienstleistern auf einer sicheren Plattform."
+      }
+    },
+    "cta": {
+      "title": "Bereit, Seelenfrieden Nach Hause zu Bringen?",
+      "subtitle": "Schließen Sie sich Tausenden von Familien an, die SymBIoT vertrauen, um ihre Lieben sicher und unabhängig zu halten.",
+      "getStartedToday": "Heute Beginnen"
+    },
+    "footer": {
+      "copyright": "© 2025 SymBIoT. Alle Rechte vorbehalten. Version: 1.0.6",
+      "tagline": "Familien und Technologie für bessere Pflege zusammenbringen."
+    }
+  },
+  "movement": {
+    "title": "Aktivitäts-Dashboard",
+    "subtitle": "Aktivitätsmuster im Zeitverlauf verfolgen",
+    "description": "Aktivitätsmuster im Zeitverlauf verfolgen und visualisieren",
+    "selectPeriod": "Zeitraum auswählen",
+    "activityLevel": "Aktivitätslevel",
+    "steps": "Schritte",
+    "distance": "Distanz",
+    "duration": "Dauer",
+    "patterns": "Bewegungsmuster",
+    "today": "Heute",
+    "last7days": "Letzte 7 Tage",
+    "last30days": "Letzte 30 Tage",
+    "week": "Diese Woche",
+    "month": "Dieser Monat",
+    "summary": {
+      "totalMovements": "Gesamtbewegungen",
+      "sensorEventsDetected": "Sensor-Ereignisse erkannt",
+      "mostActiveLocation": "Aktivster Standort",
+      "events": "Ereignisse",
+      "locationsVisited": "Besuchte Standorte",
+      "differentAreas": "Verschiedene Bereiche",
+      "lastActivity": "Letzte Aktivität",
+      "mostRecentEvent": "Neuestes Ereignis",
+      "noActivity": "Keine Aktivität"
+    },
+    "timeline": {
+      "title": "Bewegungszeitleiste",
+      "noData": "Keine Bewegungsdaten für den ausgewählten Zeitraum verfügbar",
+      "min": "Min"
+    },
+    "elderlyList": {
+      "title": "Überwachte Personen",
+      "noIndividuals": "Es werden noch keine Personen überwacht.",
+      "condition": "Zustand",
+      "conditions": "Zustände"
+    },
+    "heatmap": {
+      "activityByLocation": "Aktivität nach Standort",
+      "activityByHour": "Aktivität nach Stunde",
+      "events": "Ereignisse",
+      "peakHour": "Spitzenstunde",
+      "totalEvents": "Gesamtereignisse",
+      "activeHours": "Aktive Stunden",
+      "noLocationData": "Keine Standortdaten verfügbar",
+      "noHourlyData": "Keine stündlichen Daten verfügbar"
+    },
+    "dwellTime": {
+      "title": "Verweilzeitanalyse",
+      "helpTitle": "Verweilzeiten Verstehen",
+      "helpDescription": "Die Verweilzeit ist die Zeit, die an jedem Ort/jeder Zone verbracht wird.",
+      "helpNormal": "Normal: Im idealen Bereich",
+      "helpWarning": "Warnung: 10-20% Abweichung",
+      "helpAlert": "Alarm: >20% Abweichung oder außerhalb des Bereichs",
+      "comparingTo": "Vergleichen mit",
+      "activeProfile": "Aktives Profil",
+      "noProfile": "Kein Profil",
+      "totalDwellTime": "Gesamtverweilzeit",
+      "averagePerLocation": "Durchschnitt pro Standort",
+      "locationsVisited": "Besuchte Standorte",
+      "actualVsIdeal": "Tatsächliche vs Ideale Verweilzeit nach Standort",
+      "minutes": "Minuten",
+      "min": "Min",
+      "actual": "Tatsächlich",
+      "ideal": "Ideal",
+      "range": "Bereich",
+      "deviation": "Abweichung",
+      "detailedBreakdown": "Detaillierte Aufschlüsselung",
+      "alert": "Alarm",
+      "warning": "Warnung",
+      "normal": "Normal",
+      "noIdealProfile": "Kein Idealprofil Festgelegt",
+      "createIdealProfile": "Erstellen Sie ein Idealprofil, um Abweichungen zu verfolgen und Benachrichtigungen zu erhalten"
+    },
+    "idealProfile": {
+      "title": "Idealprofil-Verwaltung",
+      "helpTitle": "Was sind Idealprofile?",
+      "helpDescription": "Idealprofile definieren Basis-Aktivitätsmuster zur Überwachung von Abweichungen.",
+      "helpHowToUse": "Wie zu verwenden:",
+      "helpStep1": "Erstellen Sie ein Profil mit einem beschreibenden Namen",
+      "helpStep2": "Verwenden Sie \"Aktuelles als Basis verwenden\", um aktuelle Aktivität zu erfassen",
+      "helpStep3": "Passen Sie Min/Max-Schwellenwerte für jeden Standort an",
+      "helpStep4": "Aktivieren Sie das Profil, um die Überwachung zu starten",
+      "helpAlertInfo": "Das System benachrichtigt Sie, wenn die tatsächlichen Verweilzeiten erheblich von den idealen Bereichen abweichen.",
+      "newProfile": "Neues Profil",
+      "editProfile": "Idealprofil Bearbeiten",
+      "createProfile": "Idealprofil Erstellen",
+      "profileName": "Profilname",
+      "profileNamePlaceholder": "z.B. Wochentagsroutine, Wochenendmuster",
+      "notes": "Notizen",
+      "notesPlaceholder": "Optionale Notizen zu diesem Profil...",
+      "baselineDwellTimes": "Basis-Verweilzeiten (Minuten)",
+      "useCurrentBaseline": "Aktuelles als Basis Verwenden",
+      "noBaselineData": "Keine Basisdaten. Klicken Sie auf \"Aktuelles als Basis verwenden\", um zu beginnen.",
+      "min": "Min",
+      "ideal": "Ideal",
+      "max": "Max",
+      "cancel": "Abbrechen",
+      "saving": "Speichern...",
+      "update": "Aktualisieren",
+      "create": "Erstellen",
+      "active": "Aktiv",
+      "activate": "Aktivieren",
+      "locationsConfigured": "Standorte konfiguriert",
+      "noProfilesYet": "Noch keine Idealprofile",
+      "noProfilesDescription": "Erstellen Sie ein Idealprofil, um Basis-Aktivitätsmuster festzulegen und Benachrichtigungen bei Abweichungen zu erhalten. Verwenden Sie die Schaltfläche 'Neues Profil' oben, um zu beginnen.",
+      "profileUpdated": "Profil aktualisiert",
+      "profileCreated": "Profil erstellt",
+      "profileDeleted": "Profil gelöscht",
+      "profileActivated": "Profil aktiviert",
+      "failedToSave": "Profil konnte nicht gespeichert werden",
+      "failedToDelete": "Profil konnte nicht gelöscht werden",
+      "failedToActivate": "Profil konnte nicht aktiviert werden",
+      "profileNameRequired": "Profilname ist erforderlich",
+      "baselineRequired": "Basisdaten sind erforderlich",
+      "noCurrentData": "Keine aktuellen Daten verfügbar",
+      "baselineSet": "Basis von aktueller Aktivität festgelegt"
+    }
+  },
+  "investorInfo": {
+    "badge": {
+      "investorOverview": "Investorenübersicht",
+      "theProblem": "Das Problem",
+      "currentSolutions": "Aktuelle Lösungen",
+      "ourSolution": "Die SymBIoT-Lösung",
+      "techInnovation": "Technologische Innovation",
+      "theImpact": "Die Auswirkung",
+      "marketOpportunity": "Marktchance",
+      "perfectTiming": "Perfektes Timing",
+      "businessModel": "Geschäftsmodell"
+    },
+    "hero": {
+      "title": "Transformation der Altenpflege mit",
+      "titleAccent": "KI & IoT",
+      "subtitle": "Eine umfassende Plattform, die es Senioren ermöglicht, sicher zu Hause zu altern und dabei die Kosten im Vergleich zu Pflegeheimen um 99% zu senken - angetrieben durch bahnbrechende KI- und IoT-Technologie.",
+      "scheduleDemo": "Demo Vereinbaren",
+      "readFullStory": "Vollständige Geschichte Lesen"
+    },
+    "problem": {
+      "title": "Die Altenpflege-Krise",
+      "subtitle": "Während unsere Bevölkerung altert, stehen Familien vor unmöglichen Entscheidungen zwischen Erschwinglichkeit, Sicherheit und Unabhängigkeit. Das aktuelle System ist kaputt.",
+      "delayedResponse": {
+        "title": "Verzögerte Notfallreaktion",
+        "description": "Stürze und medizinische Notfälle bleiben oft stundenlang unentdeckt, was zu schlechteren Ergebnissen und höheren Gesundheitskosten führt."
+      },
+      "escalatingCosts": {
+        "title": "Eskalierende Pflegekosten",
+        "description": "Pflegeheimversorgung kostet durchschnittlich 100.000 €+/Jahr. Familien haben Schwierigkeiten, sich qualitativ hochwertige Pflege zu leisten, während Senioren ihre Unabhängigkeit verlieren."
+      },
+      "caregiverBurnout": {
+        "title": "Pflegekraft-Burnout",
+        "description": "47 Millionen familiäre Pflegekräfte leiden unter ständigem Stress, können ihre Angehörigen nicht aus der Ferne überwachen, was zu Arbeitsunterbrechungen und Gesundheitsproblemen führt."
+      },
+      "fragmentedInfo": {
+        "title": "Fragmentierte Informationen",
+        "description": "Gesundheitsdienstleister, Familienmitglieder und Pflegekräfte fehlt eine einheitliche Sicht auf die Gesundheit und Aktivitätsmuster des Seniors."
+      }
+    },
+    "currentSolutions": {
+      "title": "Bestehende Lösungen Greifen Zu Kurz",
+      "subtitle": "Der Markt hat versucht, diese Probleme anzugehen, aber bestehende Lösungen sind entweder zu teuer, zu begrenzt oder beeinträchtigen die Unabhängigkeit und Lebensqualität.",
+      "medicalAlerts": {
+        "title": "Medizinische Alarmsysteme",
+        "limitations": [
+          "Erfordern manuelle Aktivierung (Senioren können oft keinen Knopf bei Stürzen drücken)",
+          "Keine prädiktive Analytik oder Trenderkennung",
+          "Beschränkt auf Notfallreaktion nur",
+          "Keine Aktivitäts- oder Vitalüberwachung"
+        ]
+      },
+      "homeHealthAides": {
+        "title": "Häusliche Pflegehilfen",
+        "limitations": [
+          "Kosten 25-50 €/Stunde, 200.000 €+/Jahr für 24/7-Pflege",
+          "Inkonsistente Pflegequalität und hohe Fluktuation",
+          "Keine Abdeckung außerhalb der Arbeitszeiten",
+          "Beschränkt auf physische Anwesenheit, keine Dateneinblicke"
+        ]
+      },
+      "nursingHomes": {
+        "title": "Pflegeheime",
+        "limitations": [
+          "Durchschnittlich 100.000 €+/Jahr an Kosten",
+          "Verlust von Unabhängigkeit und vertrauter Umgebung",
+          "Erhöhte Depression und kognitiver Abbau",
+          "Wartelisten und Verfügbarkeitsprobleme"
+        ]
+      },
+      "fitnessTrackers": {
+        "title": "Basis-Fitness-Tracker",
+        "limitations": [
+          "Verbraucherqualität, nicht gesundheitszertifiziert",
+          "Keine HIPAA-Konformität oder Datenaustauschkontrollen",
+          "Begrenzte Alarmfunktionen",
+          "Keine Integration mit Pflegeworkflows"
+        ]
+      }
+    },
+    "solution": {
+      "title": "Ein Besserer Weg Zu Pflegen",
+      "subtitle": "SymBIoT kombiniert KI-gestützte Analytik, IoT-Sensoren und intelligente Automatisierung, um umfassende, erschwingliche Überwachung zu bieten, die Senioren sicher zu Hause hält.",
+      "vitalMonitoring": {
+        "title": "Kontinuierliche Vitalüberwachung",
+        "description": "24/7-Überwachung von Herzfrequenz, Blutdruck, Sauerstoffwerten und Temperatur mit KI-gestützter Anomalieerkennung.",
+        "improvement": "Erkennt Gesundheitsprobleme Stunden oder Tage bevor sie zu Notfällen werden"
+      },
+      "activityRecognition": {
+        "title": "Intelligente Aktivitätserkennung",
+        "description": "KI analysiert Bewegungsmuster, erkennt automatisch Stürze, identifiziert Verhaltensänderungen, die auf kognitiven Abbau hinweisen.",
+        "improvement": "Kein Knopfdruck erforderlich - System erkennt Probleme automatisch"
+      },
+      "tracking": {
+        "title": "Innen- + Außenverfolgung",
+        "description": "GPS-Tracking im Freien mit benutzerdefinierter Grundrisskartierung in Innenräumen. Geofencing-Warnungen bei Umherwandern oder unsicheren Zonen.",
+        "improvement": "Vollständiges Standortbewusstsein im Gegensatz zu reinen GPS- oder Innensystemen"
+      },
+      "smartAlerts": {
+        "title": "Intelligente Vorhersagealarmierungen",
+        "description": "KI lernt normale Muster und warnt Pflegekräfte vor Abweichungen, bevor sie kritisch werden. Reduziert Fehlalarme um 70%.",
+        "improvement": "Proaktive Intervention vs. reaktive Notfallreaktion"
+      },
+      "analytics": {
+        "title": "ILQ-Analytik & Berichterstattung",
+        "description": "Independent Living Quotient-Scores verfolgen Trends im Zeitverlauf. Umfassende Berichte für Gesundheitsdienstleister und Familie.",
+        "improvement": "Datengetriebene Pflegeentscheidungen vs. Bauchgefühl und anekdotische Beweise"
+      },
+      "coordination": {
+        "title": "Vereinheitlichte Pflegekoordination",
+        "description": "Rollenbasierte Plattform, die Senioren, Familie, Pflegekräfte und Ärzte mit sicherem Datenaustausch und Kommunikation verbindet.",
+        "improvement": "Alle auf dem gleichen Stand vs. fragmentierte Telefonate und Textnachrichten"
+      }
+    },
+    "technology": {
+      "title": "Wie KI & IoT Dies Jetzt Möglich Machen",
+      "subtitle": "Jüngste Durchbrüche in künstlicher Intelligenz und Internet-der-Dinge-Technologie ermöglichen umfassende Altenpflege-Überwachung zu einem Preis, der noch vor 3 Jahren nicht möglich war.",
+      "ai": {
+        "title": "KI & Maschinelles Lernen",
+        "description": "Moderne KI kann jetzt Muster erkennen, Gesundheitsereignisse vorhersagen und Fehlalarme reduzieren - Technologie, die es vor 5 Jahren zu diesem Preis und dieser Genauigkeit nicht gab."
+      },
+      "iot": {
+        "title": "Erschwingliche IoT-Sensoren",
+        "description": "Medizinische Sensoren sind jetzt 90% günstiger als 2015. Wearables und Heimsensoren können kontinuierlich Vitalwerte zu verbraucherfreundlichen Preisen überwachen."
+      },
+      "5g": {
+        "title": "5G & Edge Computing",
+        "description": "Echtzeit-Datenverarbeitung mit Millisekunden-Latenz ermöglicht sofortige Sturzerkennung und Notfallwarnungen, die mit älteren Netzwerken unmöglich waren."
+      },
+      "cloud": {
+        "title": "Cloud-Infrastruktur",
+        "description": "HIPAA-konforme Cloud-Plattformen wie Supabase ermöglichen sichere, skalierbare Datenspeicherung und Echtzeit-Synchronisation über Geräte hinweg zu einem Bruchteil der historischen Kosten."
+      }
+    },
+    "impact": {
+      "title": "Kosteneinsparungen & Besseres Leben",
+      "subtitle": "SymBIoT liefert messbare finanzielle Vorteile und verbessert gleichzeitig die Lebensqualität für Senioren und den Seelenfrieden für Familien dramatisch.",
+      "costSavings": {
+        "title": "Kosteneinsparungen",
+        "lowerCost": {
+          "title": "99% Günstiger Als Pflegeheime",
+          "description": "SymBIoT-Abonnement für 25 €/Monat vs. 8.000 €+/Monat für Pflegeheimversorgung"
+        },
+        "reduceReadmissions": {
+          "title": "Krankenhauswiederaufnahmen Reduzieren",
+          "description": "Früherkennung verhindert 40% der Notaufnahmebesuche, spart 2.000-10.000 € pro Vorfall"
+        },
+        "optimizeCaregiver": {
+          "title": "Pflegekraft-Zeit Optimieren",
+          "description": "Professionelle Pflegekräfte besuchen nur bei Bedarf vs. geplante Besuche, reduziert Kosten um 50%"
+        },
+        "insurance": {
+          "title": "Versicherungsprämien-Reduktionen",
+          "description": "Proaktive Überwachung kann Familien für niedrigere Langzeitpflegeversicherungsprämien qualifizieren"
+        }
+      },
+      "qualityOfLife": {
+        "title": "Lebensqualität",
+        "ageInPlace": {
+          "title": "Sicher Zu Hause Altern",
+          "description": "Senioren behalten ihre Unabhängigkeit in ihren eigenen Häusern, nachweislich verbessert dies die psychische Gesundheit und Langlebigkeit"
+        },
+        "peaceOfMind": {
+          "title": "Seelenfrieden für Familien",
+          "description": "Familiäre Pflegekräfte schlafen besser, weil sie wissen, dass sie sofort über Probleme benachrichtigt werden, reduziert Stress und Burnout"
+        },
+        "fasterResponse": {
+          "title": "Schnellere Notfallreaktion",
+          "description": "Automatische Sturzerkennung und Warnungen reduzieren die Reaktionszeit von Stunden auf Minuten, verhindern Komplikationen"
+        },
+        "dignity": {
+          "title": "Bewahrte Würde & Autonomie",
+          "description": "Senioren leben unabhängig mit unsichtbarem Sicherheitsnetz vs. ständiger Überwachung oder institutioneller Pflege"
+        }
+      },
+      "savingsHighlight": "95.000 €+ Pro Jahr Gespart",
+      "savingsDescription": "Durchschnittliche Familie spart, indem sie SymBIoT (25 €/Monat) anstelle von Pflegeheimversorgung (8.000 €+/Monat) wählt und dabei eine bessere Lebensqualität beibehält"
+    },
+    "market": {
+      "title": "Massive Marktchance",
+      "subtitle": "Alternde Bevölkerungsstruktur und Technologieakzeptanz schaffen perfekten Sturm für Disruption",
+      "adults65": {
+        "stat": "54M+",
+        "label": "Erwachsene 65+ in den USA",
+        "context": "Wachstum um 10.000/Tag bis 2030"
+      },
+      "marketSize": {
+        "stat": "460 Mrd. $",
+        "label": "Altenpflege-Markt",
+        "context": "8,5% CAGR bis 2030"
+      },
+      "ageAtHome": {
+        "stat": "90%",
+        "label": "Möchten Zu Hause Altern",
+        "context": "Aktuelle Lösungen zu teuer oder unzureichend"
+      },
+      "caregivers": {
+        "stat": "47M",
+        "label": "Familiäre Pflegekräfte",
+        "context": "Produktivitätsverluste kosten Wirtschaft 500 Mrd. $/Jahr"
+      }
+    },
+    "whyNow": {
+      "title": "Warum Jetzt?",
+      "subtitle": "Mehrere konvergierende Trends schaffen eine beispiellose Chance für SymBIoT",
+      "techConvergence": {
+        "title": "Technologische Konvergenz",
+        "description": "KI, IoT, 5G und Cloud-Infrastruktur sind ausgereift genug, dass umfassende Fernüberwachung sowohl technisch machbar als auch wirtschaftlich rentabel für den Massenmarkt ist."
+      },
+      "demographic": {
+        "title": "Demografische Krise",
+        "description": "Babyboomer erreichen das Altenpflegealter, während jüngere Generationen weniger Kinder haben und weiter auseinander leben - das traditionelle familiäre Pflegemodell bricht zusammen."
+      },
+      "regulatory": {
+        "title": "Regulatorischer Rückenwind",
+        "description": "Medicare und Versicherungsgesellschaften übernehmen zunehmend Fernpatientenüberwachung. Jüngste CMS-Erstattungscodes machen unser Geschäftsmodell für Gesundheitsdienstleister attraktiver."
+      },
+      "covid": {
+        "title": "COVID-19 Beschleunigung",
+        "description": "Pandemie normalisierte Telemedizin und Fernüberwachung. Familien suchen jetzt aktiv nach Tech-Lösungen, um mit älteren Angehörigen verbunden zu bleiben."
+      }
+    },
+    "businessModel": {
+      "title": "Skalierbares SaaS-Modell",
+      "subtitle": "Mehrere Umsatzströme mit starker Unit-Ökonomie",
+      "b2c": {
+        "title": "B2C",
+        "description": "Einzelpersonen & Familienpläne",
+        "price": "25 €",
+        "period": "pro Monat"
+      },
+      "b2b": {
+        "title": "B2B",
+        "description": "Betreutes Wohnen & Gesundheitswesen",
+        "price": "20 €",
+        "period": "pro Bewohner/Monat",
+        "badge": "Hauptfokus"
+      },
+      "b2b2c": {
+        "title": "B2B2C",
+        "description": "Versicherungen & Arbeitgeber",
+        "price": "15 €",
+        "period": "pro Mitglied/Monat"
+      }
+    },
+    "cta": {
+      "title": "Schließen Sie Sich Uns Bei Der Transformation Der Altenpflege An",
+      "subtitle": "SymBIoT ist an der Schnittstelle massiver demografischer Trends und bahnbrechender Technologie positioniert. Lassen Sie uns darüber sprechen, wie Sie Teil dieser Transformation sein können.",
+      "scheduleDemo": "Demo Vereinbaren",
+      "contactInvestment": "Investment-Team Kontaktieren"
+    }
+  },
+  "pricing": {
+    "title": "Preise",
+    "heroTitle": "Einfache, Transparente Preise",
+    "heroSubtitle": "Wählen Sie den perfekten Plan für die Pflegebedürfnisse Ihrer Familie",
+    "choosePlan": "Wählen Sie Ihren Plan",
+    "monthly": "Monatlich",
+    "yearly": "Jährlich",
+    "perMonth": "pro Monat",
+    "perYear": "pro Jahr",
+    "selectPlan": "Plan Auswählen",
+    "currentPlan": "Aktueller Plan",
+    "upgrade": "Upgraden",
+    "features": "Funktionen",
+    "included": "Enthalten",
+    "saveWithYearly": "Sparen Sie 5% bei jährlicher Abrechnung",
+    "startFreeTrial": "Kostenlose Testversion Starten",
+    "getStarted": "Loslegen",
+    "allPlansInclude": "Alle Pläne Beinhalten",
+    "realTimeMonitoring": "Echtzeit-Überwachung",
+    "trackVitals": "Vitalwerte 24/7 verfolgen",
+    "activityTracking": "Aktivitätsverfolgung",
+    "monitorActivities": "Tägliche Aktivitäten überwachen",
+    "smartAlerts": "Intelligente Warnungen",
+    "instantNotifications": "Sofortige Benachrichtigungen",
+    "securePrivate": "Sicher und Privat",
+    "hipaaCompliant": "HIPAA-konform",
+    "faq": {
+      "title": "Häufig Gestellte Fragen",
+      "switchPlans": {
+        "question": "Kann ich später den Plan wechseln?",
+        "answer": "Ja! Sie können Ihren Plan jederzeit upgraden oder downgraden. Änderungen werden in Ihrem nächsten Abrechnungszyklus wirksam."
+      },
+      "trialEnds": {
+        "question": "Was passiert nach Ende meiner kostenlosen Testversion?",
+        "answer": "Nach Ihrer 14-tägigen Testversion können Sie mit einem kostenpflichtigen Plan fortfahren. Wenn Sie keinen Plan auswählen, wird Ihr Konto pausiert, bis Sie einen wählen."
+      },
+      "yearlyBilling": {
+        "question": "Wie funktioniert die jährliche Abrechnung?",
+        "answer": "Bei jährlicher Abrechnung zahlen Sie 12 Monate im Voraus und sparen 5% im Vergleich zur monatlichen Abrechnung. Der Gesamtbetrag wird einmal pro Jahr berechnet."
+      },
+      "whatIsDevice": {
+        "question": "Was zählt als Gerät?",
+        "answer": "Ein Gerät ist jeder Wearable oder Sensor, der mit der SymBIoT-Plattform zur Überwachung verbunden ist. Dies umfasst Smartwatches, Fitness-Tracker und dedizierte Gesundheitsmonitore."
+      }
+    },
+    "plans": {
+      "freeTrial": {
+        "name": "Kostenlose Testversion",
+        "description": "Perfekt zum Ausprobieren unseres Service",
+        "duration": "14 Tage",
+        "devices": "5 Geräte",
+        "badge": "Testversion"
+      },
+      "basic": {
+        "name": "Basis",
+        "description": "Ideal für kleine Familien",
+        "devices": "5 Geräte"
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "Am besten für größere Familien und Pflegeeinrichtungen",
+        "devices": "Unbegrenzte Geräte",
+        "badge": "Am Beliebtesten"
+      },
+      "features": {
+        "freeTrial14": "14-tägige kostenlose Testversion",
+        "upTo5Devices": "Bis zu 5 Geräte",
+        "realTimeMonitoring": "Echtzeit-Überwachung",
+        "basicAlerts": "Basis-Warnungen",
+        "activityTracking": "Aktivitätsverfolgung",
+        "emailSupport": "E-Mail-Support",
+        "advancedAlerts": "Erweiterte Warnungen",
+        "healthInsights": "Gesundheitseinblicke",
+        "priorityEmailSupport": "Prioritäts-E-Mail-Support",
+        "dataExport": "Datenexport",
+        "unlimitedDevices": "Unbegrenzte Geräte",
+        "support247": "24/7 Prioritäts-Support",
+        "customIntegrations": "Benutzerdefinierte Integrationen",
+        "apiAccess": "API-Zugang",
+        "dedicatedManager": "Dedizierter Account-Manager"
+      }
+    },
+    "footer": "© 2025 SymBIoT. Alle Rechte vorbehalten.",
+    "billedAnnually": "/Monat jährlich abgerechnet"
+  },
+  "profile": {
+    "title": "Profil",
+    "personalInfo": "Persönliche Informationen",
+    "settings": "Einstellungen",
+    "preferences": "Präferenzen",
+    "notifications": "Benachrichtigungen",
+    "security": "Sicherheit",
+    "privacy": "Datenschutz",
+    "changePassword": "Passwort ändern",
+    "updateProfile": "Profil aktualisieren",
+    "saveChanges": "Änderungen speichern",
+    "language": "Sprache",
+    "restartTour": "Einführungstour neu starten"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Willkommen bei SymBIoT",
+    "loading": "Dashboard wird geladen...",
+    "overview": "Übersicht",
+    "recentAlerts": "Aktuelle Warnungen",
+    "vitalSigns": "Vitalzeichen",
+    "activity": "Aktivität",
+    "quickActions": "Schnellaktionen",
+    "stats": {
+      "monitoredPersons": {
+        "label": "Überwachte Personen",
+        "tooltip": "Gesamtzahl der älteren Personen, die Sie derzeit überwachen. Dies umfasst alle Personen, die Ihrer Pflege zugewiesen sind."
+      },
+      "activeAlerts": {
+        "label": "Aktive Warnungen",
+        "tooltip": "Warnungen, die Aufmerksamkeit erfordern. Diese können Anomalien bei Vitalzeichen, Aktivierungen des Panikknopfs, Geofence-Verletzungen oder Geräteprobleme umfassen. Klicken Sie auf Warnungen, um sie zu bestätigen und zu lösen."
+      },
+      "avgHeartRate": {
+        "label": "Durchschn. Herzfrequenz",
+        "title": "Herzfrequenzüberwachung",
+        "tooltip": "Durchschnittliche Herzfrequenz aus aktuellen Messungen. Normale Ruheherzfrequenz: 60-100 Schläge/min. Warnungen werden für Werte außerhalb sicherer Bereiche ausgelöst.",
+        "bpm": "Schläge/min",
+        "noData": "Keine Daten"
+      },
+      "activityLevel": {
+        "label": "Aktivitätsniveau",
+        "title": "Aktivitätsniveau-Leitfaden",
+        "good": "Gut",
+        "fair": "Mittel",
+        "low": "Niedrig",
+        "goodDesc": "8.000+ Schritte/Tag",
+        "fairDesc": "4.000-8.000 Schritte/Tag",
+        "lowDesc": "<4.000 Schritte/Tag",
+        "noData": "Keine Daten"
+      }
+    }
+  },
+  "help": {
+    "pageTitle": {
+      "dashboard": "Dashboard-Hilfe",
+      "activity": "Aktivitätsüberwachung-Hilfe",
+      "alerts": "Warnungsverwaltung-Hilfe",
+      "devices": "Geräteüberwachung-Hilfe",
+      "tracking": "Standortverfolgung-Hilfe",
+      "dataSharing": "Datenfreigabe-Hilfe",
+      "default": "Hilfe & Support"
+    },
+    "description": "Finden Sie Antworten und lernen Sie, wie Sie SymBIoT effektiv nutzen",
+    "searchPlaceholder": "Hilfethemen suchen...",
+    "relevantToPage": "Relevant für diese Seite",
+    "quickActions": "Schnellaktionen",
+    "browseByTopic": "Nach Thema durchsuchen",
+    "searchResults": "Suchergebnisse",
+    "noResults": "Keine Ergebnisse gefunden für",
+    "clearSearch": "Suche löschen",
+    "needMoreHelp": "Brauchen Sie weitere Hilfe?",
+    "contactSupport": "Support kontaktieren",
+    "quickLinks": {
+      "viewDashboard": {
+        "title": "Dashboard anzeigen",
+        "description": "Übersicht aller überwachten Personen anzeigen"
+      },
+      "checkAlerts": {
+        "title": "Aktive Warnungen prüfen",
+        "description": "Warnungen überprüfen, die Aufmerksamkeit erfordern"
+      },
+      "monitorActivity": {
+        "title": "Aktivität überwachen",
+        "description": "Bewegungen und Verweildauer verfolgen"
+      },
+      "viewDevices": {
+        "title": "Gerätestatus anzeigen",
+        "description": "Alle verbundenen Geräte prüfen"
+      },
+      "trackLocation": {
+        "title": "Standort verfolgen",
+        "description": "Innen- und Außenverfolgung anzeigen"
+      },
+      "restartTour": {
+        "title": "Einführungstour neu starten",
+        "description": "Die geführte Tour erneut durchführen"
+      }
+    },
+    "categories": {
+      "gettingStarted": "Erste Schritte",
+      "dashboard": "Dashboard",
+      "activityMonitoring": "Aktivitätsüberwachung",
+      "alerts": "Warnungen",
+      "devices": "Geräte",
+      "tracking": "Verfolgung",
+      "dataSharing": "Datenfreigabe",
+      "troubleshooting": "Fehlerbehebung"
+    },
+    "topics": {
+      "gettingStarted": {
+        "title": "Erste Schritte mit SymBIoT",
+        "content": "SymBIoT ist eine umfassende Überwachungsplattform für die Altenpflege. Beginnen Sie mit dem Dashboard für einen Überblick, dann erkunden Sie die Aktivitätsverfolgung, Warnungsverwaltung und Geräteüberwachung."
+      },
+      "navigation": {
+        "title": "Navigation auf der Plattform",
+        "content": "Verwenden Sie das Navigationsmenü, um auf verschiedene Bereiche zuzugreifen: Dashboard (Übersicht), Aktivität (Bewegungsmuster), Verfolgung (Standort), Warnungen (Benachrichtigungen) und Geräte (Gerätestatus)."
+      },
+      "dashboardOverview": {
+        "title": "Das Dashboard verstehen",
+        "content": "Das Dashboard zeigt Schlüsselmetriken auf einen Blick: überwachte Personen, aktive Warnungen, durchschnittliche Herzfrequenz und Aktivitätsniveau. Wählen Sie eine Person aus der Liste, um ihre spezifischen Vitalzeichen anzuzeigen."
+      },
+      "selectingPerson": {
+        "title": "Eine Person zur Überwachung auswählen",
+        "content": "Klicken Sie auf eine Person in der Liste \"Überwachte Personen\", um ihre spezifischen Daten anzuzeigen. Ihre Vitalzeichen, Medikamente und Umgebungssensoren werden automatisch aktualisiert."
+      },
+      "vitalMetrics": {
+        "title": "Vitalzeichen anzeigen",
+        "content": "Vitalzeichen zeigen Echtzeit-Gesundheitsdaten einschließlich Herzfrequenz, Blutdruck, Sauerstoffwerte, Temperatur und mehr. Klicken Sie auf \"Diagramme anzeigen\", um historische Trends zu sehen."
+      },
+      "activityDashboard": {
+        "title": "Aktivitäts-Dashboard-Übersicht",
+        "content": "Verfolgen Sie Bewegungsmuster, Verweildauern und Aktivitätsabweichungen. Verwenden Sie den Datumsbereichselektor, um verschiedene Zeiträume zu analysieren. Sehen Sie zusammengefasste Statistiken, Verweildauer-Analysen und erstellen Sie Idealprofile."
+      },
+      "dwellTime": {
+        "title": "Verweildauer verstehen",
+        "content": "Verweildauer ist die Zeit, die an jedem Standort verbracht wird. Grüne Balken zeigen den normalen Bereich, Gelb zeigt 10-20% Abweichung, und Rot zeigt signifikante Abweichung (>20%) oder außerhalb des akzeptablen Bereichs."
+      },
+      "idealProfiles": {
+        "title": "Idealprofile erstellen",
+        "content": "Idealprofile etablieren Basis-Aktivitätsmuster. Klicken Sie auf \"Neues Profil\", verwenden Sie \"Aktuell als Basis verwenden\", um typische Aktivität zu erfassen, passen Sie Min/Max-Schwellenwerte an und aktivieren Sie dann. Das System warnt Sie, wenn Muster signifikant abweichen."
+      },
+      "alertManagement": {
+        "title": "Warnungen verwalten",
+        "content": "Alle Systemwarnungen mit Filterung nach Schweregrad, Typ, Status und Datumsbereich anzeigen. Verwenden Sie die Suche, um spezifische Warnungen zu finden. Klicken Sie auf \"Bestätigen\", um Warnungen als überprüft zu markieren."
+      },
+      "alertSeverity": {
+        "title": "Warnung-Schweregrade",
+        "content": "Kritisch (rot): Sofortiges Handeln erforderlich (Panikknopf, schwere Vital-Anomalie). Hoch (orange): Dringende Aufmerksamkeit erforderlich. Mittel (gelb): Sollte bald überprüft werden. Niedrig (grau): Informativ."
+      },
+      "alertTypes": {
+        "title": "Arten von Warnungen",
+        "content": "Vitalzeichen: Anomalien bei Gesundheitsmetriken. Panik/SOS: Notfallknopf aktiviert. Gerät offline: Geräteverbindung verloren. Geofence: Standortgrenzverletzung. Inaktivität: Längere Inaktivität erkannt. Verweildauer: Ungewöhnliche Zeit an Standorten."
+      },
+      "acknowledgingAlerts": {
+        "title": "Warnungen bestätigen",
+        "content": "Klicken Sie auf die Schaltfläche \"Bestätigen\" bei aktiven Warnungen, um sie als überprüft zu markieren. Dies verfolgt Reaktionszeiten und zeigt Verantwortlichkeit. Bestätigte Warnungen wechseln in den bestätigten Status."
+      },
+      "deviceMonitoring": {
+        "title": "Geräte überwachen",
+        "content": "Alle verbundenen Geräte für jede Person anzeigen. Online (grün): Verbunden und übertragend. Offline (gelb): Keine aktuellen Daten. Batteriestand und Zeitstempel der letzten empfangenen Daten prüfen."
+      },
+      "deviceTypes": {
+        "title": "Gerätetypen verstehen",
+        "content": "Gängige Gerätetypen sind: Wearables (Fitness-Tracker, Smartwatches), Gesundheitsmonitore (Blutdruck, Glukosemessgeräte), Umgebungssensoren (Temperatur, Bewegungsmelder), GPS-Tracker und Panikknöpfe."
+      },
+      "indoorTracking": {
+        "title": "Innenverfolgung mit Grundrissen",
+        "content": "Echtzeit-Standort auf hochgeladenen Grundrissen anzeigen. Zonen erstellen, um Bereiche wie Schlafzimmer, Küche, Bad zu definieren. Bewegungspfade und Verweildauern in jeder Zone verfolgen."
+      },
+      "outdoorTracking": {
+        "title": "GPS-Außenverfolgung",
+        "content": "Außenstandort mit GPS-Verfolgung überwachen. Geofences einrichten, um Warnungen zu erhalten, wenn die Person bestimmte Bereiche betritt oder verlässt. Standortverlauf auf der Karte anzeigen."
+      },
+      "geofences": {
+        "title": "Geofences einrichten",
+        "content": "Geofences sind virtuelle Grenzen. Klicken Sie auf \"Geofence hinzufügen\" auf der Karte, zeichnen Sie die Grenze, legen Sie einen Namen und Radius fest. Wählen Sie Auslöser für Warnungen (Eintritt, Austritt oder beides). Benachrichtigungen erhalten, wenn Grenzen überschritten werden."
+      },
+      "sharingData": {
+        "title": "Daten mit der Familie teilen",
+        "content": "Überwachungsdaten mit Familienmitgliedern oder anderen Pflegekräften teilen. Verwenden Sie die Datenfreigabe-Seite, um zu verwalten, wer Zugriff auf die Daten jeder Person hat. Berechtigungen und Ablaufdaten festlegen."
+      },
+      "deviceOffline": {
+        "title": "Gerät zeigt Offline an",
+        "content": "Wenn ein Gerät offline anzeigt: 1) Prüfen Sie, ob das Gerät eingeschaltet ist. 2) Stellen Sie sicher, dass es in Reichweite des Netzwerks ist. 3) Batteriestand prüfen. 4) Versuchen Sie, das Gerät neu zu starten. 5) Kontaktieren Sie den Support, wenn das Problem weiterhin besteht."
+      },
+      "noData": {
+        "title": "Fehlende Daten oder Keine Daten angezeigt",
+        "content": "Wenn Sie keine Daten sehen: 1) Überprüfen Sie, ob die richtige Person ausgewählt ist. 2) Prüfen Sie den Datumsbereich. 3) Stellen Sie sicher, dass Geräte verbunden sind und übertragen. 4) Seite aktualisieren. 5) Überprüfen Sie, ob Sie Zugriffsberechtigungen haben."
+      },
+      "alertsNotShowing": {
+        "title": "Warnungen werden nicht angezeigt",
+        "content": "Wenn erwartete Warnungen nicht erscheinen: 1) Prüfen Sie die Warnungsfilter (Schweregrad, Typ, Status, Datumsbereich). 2) Suchbegriffe löschen. 3) Überprüfen Sie, ob Warnungseinstellungen konfiguriert sind. 4) Prüfen Sie, ob Warnungen bereits bestätigt wurden."
+      }
+    }
+  }
+}

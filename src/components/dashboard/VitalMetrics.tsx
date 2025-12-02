@@ -9,6 +9,7 @@ import { useState } from 'react';
 import HealthMetricsCharts from './HealthMetricsCharts';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
 import { extractNumericValue, extractBloodPressure, extractBooleanValue, extractStringValue } from '@/lib/valueExtractor';
+import { useTranslation } from 'react-i18next';
 
 interface VitalMetricsProps {
   selectedPersonId?: string | null;
@@ -16,6 +17,7 @@ interface VitalMetricsProps {
 
 const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   const [showCharts, setShowCharts] = useState(false);
+  const { t } = useTranslation();
 
   const { data: recentData = [], isLoading } = useQuery({
     queryKey: ['vital-metrics', selectedPersonId],
@@ -286,7 +288,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
 
       case 'medication_taken':
         const taken = extractBooleanValue(value, type);
-        return taken ? 'Yes' : 'No';
+        return taken ? t('common.yes') : t('common.no');
 
       case 'next_dose_time':
         const time = typeof value === 'object' ? value.value : value;
@@ -303,7 +305,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
 
       case 'fall_detected':
         const fallen = extractBooleanValue(value, type);
-        return fallen ? 'Fall Detected!' : 'No Falls';
+        return fallen ? t('healthMetrics.values.fallDetected') : t('healthMetrics.values.noFalls');
 
       case 'impact_force':
         const force = extractNumericValue(value, type);
@@ -399,57 +401,61 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   };
 
   const getDisplayName = (type: string) => {
-    const nameMap: Record<string, string> = {
-      heart_rate: 'Heart Rate',
-      blood_pressure: 'Blood Pressure',
-      blood_sugar: 'Blood Sugar',
-      glucose: 'Blood Sugar',
-      blood_glucose: 'Blood Sugar',
-      oxygen_saturation: 'Oxygen Level',
-      oxygen_level: 'Oxygen Level',
-      blood_oxygen: 'Oxygen Level',
-      spo2: 'Oxygen Level',
-      temperature: 'Body Temperature',
-      steps: 'Steps Today',
-      activity: 'Activity Level',
-      sleep_quality: 'Sleep Quality',
-      sleep_stage: 'Sleep Stage',
-      medication_taken: 'Medication Taken',
-      next_dose_time: 'Next Dose',
-      humidity: 'Humidity',
-      fall_detected: 'Fall Status',
-      impact_force: 'Impact Force',
-      weight: 'Weight',
-      bmi: 'BMI',
-      body_fat: 'Body Fat',
-      pressure: 'Barometric Pressure',
-      barometric_pressure: 'Barometric Pressure',
+    const keyMap: Record<string, string> = {
+      heart_rate: 'healthMetrics.types.heart_rate',
+      blood_pressure: 'healthMetrics.types.blood_pressure',
+      blood_sugar: 'healthMetrics.types.blood_sugar',
+      glucose: 'healthMetrics.types.blood_sugar',
+      blood_glucose: 'healthMetrics.types.blood_sugar',
+      oxygen_saturation: 'healthMetrics.types.oxygen_level',
+      oxygen_level: 'healthMetrics.types.oxygen_level',
+      blood_oxygen: 'healthMetrics.types.oxygen_level',
+      spo2: 'healthMetrics.types.oxygen_level',
+      temperature: 'healthMetrics.types.temperature',
+      steps: 'healthMetrics.types.steps',
+      activity: 'healthMetrics.types.activity',
+      sleep_quality: 'healthMetrics.types.sleep_quality',
+      sleep_stage: 'healthMetrics.types.sleep_stage',
+      medication_taken: 'healthMetrics.types.medication_taken',
+      next_dose_time: 'healthMetrics.types.next_dose_time',
+      humidity: 'healthMetrics.types.humidity',
+      fall_detected: 'healthMetrics.types.fall_detected',
+      impact_force: 'healthMetrics.types.impact_force',
+      weight: 'healthMetrics.types.weight',
+      bmi: 'healthMetrics.types.bmi',
+      body_fat: 'healthMetrics.types.body_fat',
+      pressure: 'healthMetrics.types.barometric_pressure',
+      barometric_pressure: 'healthMetrics.types.barometric_pressure',
       pm2_5: 'PM 2.5',
       pm25: 'PM 2.5',
       pm1_0: 'PM 1.0',
       pm1: 'PM 1.0',
       pm10: 'PM 10',
       pm10_0: 'PM 10',
-      aqi: 'Air Quality Index',
-      air_quality_index: 'Air Quality Index',
-      co2: 'CO₂ Level',
-      carbon_dioxide: 'CO₂ Level',
-      voc: 'VOC Level',
-      volatile_organic_compounds: 'VOC Level',
-      noise: 'Noise Level',
-      sound_level: 'Noise Level',
-      light: 'Light Level',
-      illuminance: 'Light Level',
-      respiratory_rate: 'Respiratory Rate',
+      aqi: 'healthMetrics.types.air_quality_index',
+      air_quality_index: 'healthMetrics.types.air_quality_index',
+      co2: 'healthMetrics.types.co2_level',
+      carbon_dioxide: 'healthMetrics.types.co2_level',
+      voc: 'healthMetrics.types.voc_level',
+      volatile_organic_compounds: 'healthMetrics.types.voc_level',
+      noise: 'healthMetrics.types.noise_level',
+      sound_level: 'healthMetrics.types.noise_level',
+      light: 'healthMetrics.types.light_level',
+      illuminance: 'healthMetrics.types.light_level',
+      respiratory_rate: 'healthMetrics.types.respiratory_rate',
     };
-    return nameMap[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const key = keyMap[type];
+    if (key && key.startsWith('healthMetrics.')) {
+      return t(key);
+    }
+    return key || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Health Metrics</CardTitle>
+          <CardTitle>{t('healthMetrics.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-4">
@@ -466,11 +472,11 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Health Metrics</CardTitle>
+          <CardTitle>{t('healthMetrics.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-center py-8">
-            No health data available yet
+            {t('healthMetrics.noData')}
           </p>
         </CardContent>
       </Card>
@@ -482,15 +488,15 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Health Metrics</CardTitle>
+            <CardTitle>{t('healthMetrics.title')}</CardTitle>
             {selectedPersonId && recentData.length > 0 && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => setShowCharts(true)}
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
-                View Charts
+                {t('healthMetrics.viewCharts')}
               </Button>
             )}
           </div>

@@ -3,26 +3,19 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Share2, Users } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Globe, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { restartTour } from '@/components/help/OnboardingTour';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DataSharing from '@/components/dashboard/DataSharing';
-
-type UserRole = 'elderly' | 'caregiver' | 'relative';
-
-const EDITABLE_ROLES: { value: UserRole; label: string }[] = [
-  { value: 'elderly', label: 'Elderly' },
-  { value: 'caregiver', label: 'Caregiver' },
-  { value: 'relative', label: 'Relative' },
-];
 
 const Profile = () => {
   const { user, userRole, signOut } = useAuth();
@@ -30,6 +23,7 @@ const Profile = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const { t } = useTranslation();
 
   // Fetch user profile
   const { data: profile, isLoading } = useQuery({
@@ -40,7 +34,7 @@ const Profile = () => {
         .select('*')
         .eq('id', user?.id)
         .maybeSingle();
-      
+
       if (error) throw error;
       return data;
     },
@@ -50,7 +44,6 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     phone: profile?.phone || '',
-    role: userRole || '',
   });
 
   // Update form when profile loads
@@ -59,14 +52,13 @@ const Profile = () => {
       setFormData({
         full_name: profile.full_name || '',
         phone: profile.phone || '',
-        role: userRole || '',
       });
     }
-  }, [profile, userRole]);
+  }, [profile]);
 
   // Update profile mutation
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: { full_name: string; phone: string }) => {
+    mutationFn: async (data: any) => {
       const { error } = await supabase
         .from('profiles')
         .update(data)
@@ -76,6 +68,11 @@ const Profile = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully.",
+      });
+      setIsEditing(false);
     },
     onError: (error: any) => {
       toast({
@@ -86,73 +83,10 @@ const Profile = () => {
     },
   });
 
-  // Update user role mutation
-  const updateRoleMutation = useMutation({
-    mutationFn: async (newRole: string) => {
-      // Only allow changing to elderly, caregiver, or relative
-      if (!['elderly', 'caregiver', 'relative'].includes(newRole)) {
-        throw new Error('Invalid role');
-      }
-
-      // First, delete existing non-admin roles
-      const { error: deleteError } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', user?.id)
-        .in('role', ['elderly', 'caregiver', 'relative']);
-
-      if (deleteError) throw deleteError;
-
-      // Then insert the new role
-      const { error: insertError } = await supabase
-        .from('user_roles')
-        .insert({ user_id: user?.id, role: newRole });
-
-      if (insertError) throw insertError;
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Failed to update role",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const profileData = { full_name: formData.full_name, phone: formData.phone };
-    const roleChanged = formData.role !== userRole &&
-                        ['elderly', 'caregiver', 'relative'].includes(formData.role);
-
-    try {
-      // Update profile
-      await updateProfileMutation.mutateAsync(profileData);
-
-      // Update role if changed (only for non-admin roles)
-      if (roleChanged) {
-        await updateRoleMutation.mutateAsync(formData.role);
-        toast({
-          title: "Profile updated",
-          description: "Your profile and role have been updated. Refreshing...",
-        });
-        // Reload to refresh auth context with new role
-        setTimeout(() => window.location.reload(), 1000);
-      } else {
-        toast({
-          title: "Profile updated",
-          description: "Your profile has been updated successfully.",
-        });
-        setIsEditing(false);
-      }
-    } catch (error) {
-      // Error handling is done in individual mutations
-    }
+    updateProfileMutation.mutate(formData);
   };
-
-  // Check if user can edit their role (not admin/super_admin)
-  const canEditRole = userRole && ['elderly', 'caregiver', 'relative'].includes(userRole);
 
   const getRoleColor = (role: string | null) => {
     switch (role) {
@@ -189,21 +123,23 @@ const Profile = () => {
             <span className="hidden sm:inline">Back to Dashboard</span>
             <span className="sm:hidden">Back</span>
           </Button>
-          <h1 className="text-lg sm:text-xl font-bold">Profile</h1>
+          <h1 className="text-lg sm:text-xl font-bold">{t('profile.title')}</h1>
           <div className="w-16 sm:w-24"></div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-4xl">
+      <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-2xl">
         <Tabs defaultValue="profile" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="w-4 h-4" />
-              Profile
+              <span className="hidden sm:inline">{t('profile.title')}</span>
+              <span className="sm:hidden">{t('profile.title')}</span>
             </TabsTrigger>
             <TabsTrigger value="data-sharing" className="flex items-center gap-2">
               <Share2 className="w-4 h-4" />
-              Data Sharing
+              <span className="hidden sm:inline">{t('nav.dataSharing')}</span>
+              <span className="sm:hidden">{t('nav.dataSharing')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -236,7 +172,7 @@ const Profile = () => {
                   <div className="space-y-2">
                     <Label htmlFor="email" className="flex items-center gap-2">
                       <Mail className="w-4 h-4" />
-                      Email
+                      {t('auth.email')}
                     </Label>
                     <Input
                       id="email"
@@ -253,7 +189,7 @@ const Profile = () => {
                   <div className="space-y-2">
                     <Label htmlFor="full_name" className="flex items-center gap-2">
                       <User className="w-4 h-4" />
-                      Full Name
+                      {t('auth.fullName')}
                     </Label>
                     <Input
                       id="full_name"
@@ -268,7 +204,7 @@ const Profile = () => {
                   <div className="space-y-2">
                     <Label htmlFor="phone" className="flex items-center gap-2">
                       <Phone className="w-4 h-4" />
-                      Phone Number
+                      {t('auth.phone')}
                     </Label>
                     <Input
                       id="phone"
@@ -279,48 +215,6 @@ const Profile = () => {
                       placeholder="Enter your phone number"
                     />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="role" className="flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      Profile Type
-                    </Label>
-                    {canEditRole ? (
-                      <>
-                        <Select
-                          value={formData.role}
-                          onValueChange={(value) => setFormData({ ...formData, role: value })}
-                          disabled={!isEditing}
-                        >
-                          <SelectTrigger id="role">
-                            <SelectValue placeholder="Select your profile type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {EDITABLE_ROLES.map((role) => (
-                              <SelectItem key={role.value} value={role.value}>
-                                {role.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground">
-                          Your profile type determines your role in the system
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <Input
-                          id="role"
-                          value={userRole ? userRole.charAt(0).toUpperCase() + userRole.slice(1) : ''}
-                          disabled
-                          className="bg-muted capitalize"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Admin roles cannot be changed from this page
-                        </p>
-                      </>
-                    )}
-                  </div>
                 </div>
 
                 {isEditing && (
@@ -328,10 +222,10 @@ const Profile = () => {
                     <Button
                       type="submit"
                       className="flex-1"
-                      disabled={updateProfileMutation.isPending || updateRoleMutation.isPending}
+                      disabled={updateProfileMutation.isPending}
                     >
                       <Save className="w-4 h-4 mr-2" />
-                      {updateProfileMutation.isPending || updateRoleMutation.isPending ? 'Saving...' : 'Save Changes'}
+                      {updateProfileMutation.isPending ? 'Saving...' : t('profile.saveChanges')}
                     </Button>
                     <Button
                       type="button"
@@ -342,28 +236,36 @@ const Profile = () => {
                         setFormData({
                           full_name: profile?.full_name || '',
                           phone: profile?.phone || '',
-                          role: userRole || '',
                         });
                       }}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </Button>
                   </div>
                 )}
               </form>
             </Card>
 
-            {/* Additional Actions */}
+            {/* Settings Card */}
             <Card className="p-4 sm:p-6">
-              <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('profile.settings')}</h3>
               <div className="space-y-3">
+                {/* Language Settings */}
+                <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-4 h-4" />
+                    <span>{t('profile.language')}</span>
+                  </div>
+                  <LanguageSwitcher />
+                </div>
+                <Separator />
                 <Button
                   variant="outline"
                   className="w-full justify-start"
                   onClick={restartTour}
                 >
                   <HelpCircle className="w-4 h-4 mr-2" />
-                  Restart Onboarding Tour
+                  {t('profile.restartTour')}
                 </Button>
                 <Separator />
                 {userRole === 'super_admin' && (
@@ -385,7 +287,7 @@ const Profile = () => {
                   onClick={signOut}
                 >
                   <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
+                  {t('nav.signOut')}
                 </Button>
               </div>
             </Card>

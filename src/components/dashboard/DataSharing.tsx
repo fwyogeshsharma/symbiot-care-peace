@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Share2, Trash2, UserPlus, Edit2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -43,6 +44,7 @@ export default function DataSharing({ userId }: DataSharingProps) {
   const [editRelationship, setEditRelationship] = useState('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   // Fetch elderly persons that the current user OWNS (not just has access to)
   const { data: elderlyPersons = [] } = useQuery({
@@ -117,7 +119,7 @@ export default function DataSharing({ userId }: DataSharingProps) {
       }
 
       if (elderlyPersons.length === 0) {
-        throw new Error('No elderly persons found to share');
+        throw new Error(t('dataSharing.errors.noElderlyPersons'));
       }
 
       // Use secure lookup function to find user by email
@@ -125,7 +127,7 @@ export default function DataSharing({ userId }: DataSharingProps) {
         .rpc('lookup_user_by_email', { _email: validation.data.email });
 
       if (profileError || !targetUserId) {
-        throw new Error('User not found with this email');
+        throw new Error(t('dataSharing.errors.userNotFound'));
       }
 
       // Create assignments for all elderly persons owned by the user
@@ -146,7 +148,7 @@ export default function DataSharing({ userId }: DataSharingProps) {
       const newAssignments = assignments.filter(a => !existingIds.has(a.elderly_person_id));
 
       if (newAssignments.length === 0) {
-        throw new Error('Access already granted to this user for all persons');
+        throw new Error(t('dataSharing.errors.accessAlreadyGranted'));
       }
 
       // Create new assignments
@@ -161,13 +163,13 @@ export default function DataSharing({ userId }: DataSharingProps) {
       setEmail('');
       setRelationship('');
       toast({
-        title: 'Access granted',
-        description: 'User can now view monitoring data',
+        title: t('dataSharing.toasts.accessGranted'),
+        description: t('dataSharing.toasts.userCanView'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Failed to share',
+        title: t('dataSharing.toasts.failedToShare'),
         description: error.message,
         variant: 'destructive',
       });
@@ -195,13 +197,13 @@ export default function DataSharing({ userId }: DataSharingProps) {
       setEditingUser(null);
       setEditRelationship('');
       toast({
-        title: 'Access updated',
-        description: 'Relationship has been updated successfully',
+        title: t('dataSharing.toasts.accessUpdated'),
+        description: t('dataSharing.toasts.relationshipUpdated'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Failed to update',
+        title: t('dataSharing.toasts.failedToUpdate'),
         description: error.message,
         variant: 'destructive',
       });
@@ -221,13 +223,13 @@ export default function DataSharing({ userId }: DataSharingProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shared-users'] });
       toast({
-        title: 'Access revoked',
-        description: 'User can no longer view monitoring data',
+        title: t('dataSharing.toasts.accessRevoked'),
+        description: t('dataSharing.toasts.userCanNoLongerView'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Failed to revoke',
+        title: t('dataSharing.toasts.failedToRevoke'),
         description: error.message,
         variant: 'destructive',
       });
@@ -253,10 +255,10 @@ export default function DataSharing({ userId }: DataSharingProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Share2 className="h-5 w-5" />
-          Data Sharing
+          {t('dataSharing.title')}
         </CardTitle>
         <CardDescription>
-          Share monitoring data with family members or other caregivers. Access will be granted to all your monitored persons.
+          {t('dataSharing.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -264,26 +266,26 @@ export default function DataSharing({ userId }: DataSharingProps) {
         <div className="space-y-4 p-4 border rounded-lg" data-tour="data-sharing-form">
           <h3 className="font-semibold flex items-center gap-2">
             <UserPlus className="h-4 w-4" />
-            Grant Access
+            {t('dataSharing.grantAccess')}
           </h3>
 
           <div className="space-y-2">
-            <Label htmlFor="email">User Email</Label>
+            <Label htmlFor="email">{t('dataSharing.userEmail')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="user@example.com"
+              placeholder={t('dataSharing.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="relationship">Relationship (Optional)</Label>
+            <Label htmlFor="relationship">{t('dataSharing.relationshipOptional')}</Label>
             <Input
               id="relationship"
               type="text"
-              placeholder="e.g., Family, Friend, Caregiver"
+              placeholder={t('dataSharing.relationshipPlaceholder')}
               value={relationship}
               onChange={(e) => setRelationship(e.target.value)}
             />
@@ -294,17 +296,17 @@ export default function DataSharing({ userId }: DataSharingProps) {
             disabled={!email || shareMutation.isPending}
             className="w-full"
           >
-            {shareMutation.isPending ? 'Granting Access...' : 'Grant Access'}
+            {shareMutation.isPending ? t('dataSharing.grantingAccess') : t('dataSharing.grantAccess')}
           </Button>
         </div>
 
         {/* Shared users list */}
         <div className="space-y-4" data-tour="data-sharing-list">
-          <h3 className="font-semibold">Current Access</h3>
+          <h3 className="font-semibold">{t('dataSharing.currentAccess')}</h3>
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
+            <p className="text-sm text-muted-foreground">{t('dataSharing.loading')}</p>
           ) : sharedUsers.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No data sharing active</p>
+            <p className="text-sm text-muted-foreground">{t('dataSharing.noDataSharing')}</p>
           ) : (
             <div className="space-y-2">
               {sharedUsers.map((user) => (
@@ -316,7 +318,7 @@ export default function DataSharing({ userId }: DataSharingProps) {
                     <p className="font-medium">{user.full_name || user.email}</p>
                     <p className="text-xs text-muted-foreground">{user.email}</p>
                     <p className="text-sm text-muted-foreground">
-                      Monitoring: {user.elderly_person_name}
+                      {t('dataSharing.monitoring')}: {user.elderly_person_name}
                       {user.relationship && ` • ${user.relationship}`}
                     </p>
                   </div>
@@ -348,24 +350,24 @@ export default function DataSharing({ userId }: DataSharingProps) {
         <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Edit Access</DialogTitle>
+              <DialogTitle>{t('dataSharing.editAccess')}</DialogTitle>
               <DialogDescription>
-                Update the relationship for {editingUser?.full_name || editingUser?.email}
+                {t('dataSharing.updateRelationshipFor')} {editingUser?.full_name || editingUser?.email}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-relationship">Relationship</Label>
+                <Label htmlFor="edit-relationship">{t('dataSharing.relationship')}</Label>
                 <Input
                   id="edit-relationship"
                   type="text"
-                  placeholder="e.g., Family, Friend, Caregiver"
+                  placeholder={t('dataSharing.relationshipPlaceholder')}
                   value={editRelationship}
                   onChange={(e) => setEditRelationship(e.target.value)}
                 />
               </div>
               <div className="text-sm text-muted-foreground">
-                Monitoring: {editingUser?.elderly_person_name}
+                {t('dataSharing.monitoring')}: {editingUser?.elderly_person_name}
               </div>
             </div>
             <DialogFooter>
@@ -374,13 +376,13 @@ export default function DataSharing({ userId }: DataSharingProps) {
                 onClick={() => setEditingUser(null)}
                 disabled={updateMutation.isPending}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 onClick={handleUpdateAccess}
                 disabled={updateMutation.isPending}
               >
-                {updateMutation.isPending ? 'Updating...' : 'Update Access'}
+                {updateMutation.isPending ? t('dataSharing.updatingAccess') : t('dataSharing.updateAccess')}
               </Button>
             </DialogFooter>
           </DialogContent>

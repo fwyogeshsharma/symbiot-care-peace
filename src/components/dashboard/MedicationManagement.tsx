@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Pill, Clock, CheckCircle2, XCircle, TrendingUp } from 'lucide-react';
 import { format, isToday, parseISO } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface MedicationManagementProps {
   selectedPersonId: string | null;
 }
 
 export const MedicationManagement = ({ selectedPersonId }: MedicationManagementProps) => {
+  const { t } = useTranslation();
   const { data: medicationData, isLoading } = useQuery({
     queryKey: ['medication-data', selectedPersonId],
     queryFn: async () => {
@@ -36,11 +38,11 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Pill className="h-5 w-5 text-primary" />
-            Medication Management
+            {t('medication.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Select a person to view medication data</p>
+          <p className="text-sm text-muted-foreground">{t('medication.selectPerson')}</p>
         </CardContent>
       </Card>
     );
@@ -52,7 +54,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Pill className="h-5 w-5 text-primary" />
-            Medication Management
+            {t('medication.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -93,7 +95,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Pill className="h-5 w-5 text-primary" />
-          Medication Management
+          {t('medication.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -102,7 +104,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              <span className="text-base font-semibold">7-Day Compliance</span>
+              <span className="text-base font-semibold">{t('medication.compliance')}</span>
             </div>
             <span className={`text-xl font-bold ${getComplianceColor(complianceRate)}`}>
               {complianceRate}%
@@ -131,10 +133,10 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
               ) : (
                 <XCircle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
               )}
-              <span className="text-xs text-muted-foreground">Latest Dose</span>
+              <span className="text-xs text-muted-foreground">{t('medication.latestDose')}</span>
             </div>
             <p className="text-sm font-semibold">
-              {latestDose?.value ? 'Taken' : 'Missed'}
+              {latestDose?.value ? t('medication.taken') : t('medication.missed')}
             </p>
             {latestDose && (
               <p className="text-xs text-muted-foreground mt-1">
@@ -146,10 +148,10 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
           <div className="bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-primary/10">
             <div className="flex items-center gap-2 mb-1">
               <Clock className="h-4 w-4 text-primary" />
-              <span className="text-xs text-muted-foreground">Next Dose</span>
+              <span className="text-xs text-muted-foreground">{t('medication.nextDose')}</span>
             </div>
             <p className="text-sm font-semibold">
-              {nextDoseTime ? format(parseISO(nextDoseTime), 'HH:mm') : 'Not scheduled'}
+              {nextDoseTime ? format(parseISO(nextDoseTime), 'HH:mm') : t('medication.notScheduled')}
             </p>
             {nextDoseTime && (
               <p className="text-xs text-muted-foreground mt-1">
@@ -163,7 +165,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
         <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-primary/10">
           <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
             <Pill className="h-4 w-4 text-primary" />
-            Today's Doses
+            {t('medication.todaysDoses')}
           </h4>
           {todayDoses.length > 0 ? (
             <div className="flex items-center gap-2">
@@ -175,18 +177,18 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
                       ? 'bg-green-600'
                       : 'bg-orange-600'
                   }`}
-                  title={`${format(parseISO(dose.recorded_at), 'HH:mm')} - ${dose.value ? 'Taken' : 'Missed'}`}
+                  title={`${format(parseISO(dose.recorded_at), 'HH:mm')} - ${dose.value ? t('medication.taken') : t('medication.missed')}`}
                 />
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No doses recorded today</p>
+            <p className="text-sm text-muted-foreground">{t('medication.noDosesToday')}</p>
           )}
         </div>
 
         {/* Recent History */}
         <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-primary/10">
-          <h4 className="text-sm font-medium mb-3">Recent Activity</h4>
+          <h4 className="text-sm font-medium mb-3">{t('medication.recentActivity')}</h4>
           <div className="space-y-2">
             {recentDoses.length > 0 ? (
               recentDoses.map((dose, idx) => (
@@ -201,7 +203,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
                       <XCircle className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" />
                     )}
                     <span className={dose.value ? 'text-foreground' : 'text-muted-foreground'}>
-                      {dose.value ? 'Taken' : 'Missed'}
+                      {dose.value ? t('medication.taken') : t('medication.missed')}
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground">
@@ -210,7 +212,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">No recent activity</p>
+              <p className="text-sm text-muted-foreground">{t('medication.noRecentActivity')}</p>
             )}
           </div>
         </div>

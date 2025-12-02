@@ -1,17 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx supabase:*)",
-      "Bash(psql:*)",
-      "Bash(npm run type-check:*)",
-      "Bash(npm run build:*)",
-      "Bash(npx tsc:*)",
-      "Bash(./go2rtc.exe:*)",
-      "Bash(powershell:*)",
-      "WebSearch",
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:www.earthcamtv.com)",
-      "WebFetch(domain:www.skylinewebcams.com)"
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import { MovementSummary } from "@/components/dashboard/MovementSummary";
@@ -28,6 +29,7 @@ import { OnboardingTour, useShouldShowTour } from "@/components/help/OnboardingT
 import { useElderly } from "@/contexts/ElderlyContext";
 
 export default function MovementDashboard() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { elderlyPersons, selectedPersonId, setSelectedPersonId, isLoading: elderlyLoading } = useElderly();
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
@@ -131,26 +133,26 @@ export default function MovementDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
-      <Header showBackButton title="Activity Dashboard" subtitle="Track activity patterns over time" />
+      <Header showBackButton title={t('movement.title')} subtitle={t('movement.subtitle')} />
       <main className="container mx-auto p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Activity Dashboard</h1>
+            <h1 className="text-3xl font-bold">{t('movement.title')}</h1>
             <p className="text-muted-foreground">
-              Track and visualize activity patterns over time
+              {t('movement.description')}
             </p>
           </div>
-          
+
           <div data-tour="date-range-selector" className="flex items-center gap-4">
             <Select value={selectedPreset} onValueChange={handlePresetChange}>
               <SelectTrigger className="w-[180px]">
                 <Calendar className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Select period" />
+                <SelectValue placeholder={t('movement.selectPeriod')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="last7days">Last 7 Days</SelectItem>
-                <SelectItem value="last30days">Last 30 Days</SelectItem>
+                <SelectItem value="today">{t('movement.today')}</SelectItem>
+                <SelectItem value="last7days">{t('movement.last7days')}</SelectItem>
+                <SelectItem value="last30days">{t('movement.last30days')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
