@@ -13,6 +13,13 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
 
+// Check if temperature unit is Fahrenheit
+const isTemperatureFahrenheit = (unit: string | null | undefined): boolean => {
+  if (!unit) return false;
+  const normalizedUnit = unit.toLowerCase().trim();
+  return normalizedUnit === '°f' || normalizedUnit === 'f' || normalizedUnit === 'fahrenheit';
+};
+
 interface HealthMetricsChartsProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -92,8 +99,8 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
 
       let numericValue = typeof value === 'number' ? value : parseFloat(value) || 0;
 
-      // Convert temperature from Celsius to Fahrenheit
-      if (dataType === 'temperature') {
+      // Convert temperature from Celsius to Fahrenheit (if not already in Fahrenheit)
+      if (dataType === 'temperature' && !isTemperatureFahrenheit(item.unit)) {
         numericValue = celsiusToFahrenheit(numericValue);
       }
 
