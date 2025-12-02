@@ -109,21 +109,12 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
   const temperatureFahrenheit = getTemperatureInFahrenheit();
 
   const getTempStatus = (tempF: number | null) => {
-    if (tempF === null) return { color: 'text-muted-foreground', label: 'No data', gradient: 'from-muted to-muted' };
+    if (tempF === null) return { color: 'text-muted-foreground', label: t('environmental.status.noData'), gradient: 'from-muted to-muted' };
     // Ranges in Fahrenheit: 64°F, 72°F, 79°F, 86°F
-    if (tempF < 64) return { color: 'text-info', label: 'Cold', gradient: 'from-info/20 to-info/5' };
-    if (tempF < 72) return { color: 'text-success', label: 'Cool', gradient: 'from-success/20 to-success/5' };
-    if (tempF < 79) return { color: 'text-success', label: 'Comfortable', gradient: 'from-success/20 to-success/5' };
-    if (tempF < 86) return { color: 'text-warning', label: 'Warm', gradient: 'from-warning/20 to-warning/5' };
-    return { color: 'text-destructive', label: 'Hot', gradient: 'from-destructive/20 to-destructive/5' };
-  const getTempStatus = (tempCelsius: number | null) => {
-    if (tempCelsius === null) return { color: 'text-muted-foreground', label: t('environmental.status.noData'), gradient: 'from-muted to-muted' };
-    const temp = celsiusToFahrenheit(tempCelsius);
-    // Converted ranges: 64°F, 72°F, 79°F, 86°F
-    if (temp < 64) return { color: 'text-info', label: t('environmental.status.cold'), gradient: 'from-info/20 to-info/5' };
-    if (temp < 72) return { color: 'text-success', label: t('environmental.status.cool'), gradient: 'from-success/20 to-success/5' };
-    if (temp < 79) return { color: 'text-success', label: t('environmental.status.comfortable'), gradient: 'from-success/20 to-success/5' };
-    if (temp < 86) return { color: 'text-warning', label: t('environmental.status.warm'), gradient: 'from-warning/20 to-warning/5' };
+    if (tempF < 64) return { color: 'text-info', label: t('environmental.status.cold'), gradient: 'from-info/20 to-info/5' };
+    if (tempF < 72) return { color: 'text-success', label: t('environmental.status.cool'), gradient: 'from-success/20 to-success/5' };
+    if (tempF < 79) return { color: 'text-success', label: t('environmental.status.comfortable'), gradient: 'from-success/20 to-success/5' };
+    if (tempF < 86) return { color: 'text-warning', label: t('environmental.status.warm'), gradient: 'from-warning/20 to-warning/5' };
     return { color: 'text-destructive', label: t('environmental.status.hot'), gradient: 'from-destructive/20 to-destructive/5' };
   };
 
@@ -158,7 +149,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground text-center py-8">
-            Select a person to view environmental data
+            {t('environmental.selectPerson')}
           </p>
         </CardContent>
       </Card>
@@ -215,7 +206,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
                     <Thermometer className={cn("w-6 h-6", tempStatus.color)} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Temperature</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('environmental.temperature')}</p>
                     <p className="text-xs text-muted-foreground">{tempStatus.label}</p>
                   </div>
                 </div>
@@ -259,7 +250,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
                     <Droplets className={cn("w-6 h-6", humidityStatus.color)} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Humidity</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('environmental.humidity')}</p>
                     <p className="text-xs text-muted-foreground">{humidityStatus.label}</p>
                   </div>
                 </div>
@@ -269,7 +260,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
                       <p className={cn("text-3xl font-bold", humidityStatus.color)}>
                         {Math.round(humidity)}%
                       </p>
-                      <p className="text-xs text-muted-foreground">Relative</p>
+                      <p className="text-xs text-muted-foreground">{t('environmental.relative')}</p>
                     </>
                   ) : (
                     <p className="text-xl text-muted-foreground">—</p>
