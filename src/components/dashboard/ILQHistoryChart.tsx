@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp } from 'lucide-react';
 import { ILQInfoDialog } from './ILQInfoDialog';
+import { useTranslation } from 'react-i18next';
 
 interface ILQHistoryChartProps {
   elderlyPersonId: string;
@@ -11,6 +12,7 @@ interface ILQHistoryChartProps {
 }
 
 export function ILQHistoryChart({ elderlyPersonId, days = 30 }: ILQHistoryChartProps) {
+  const { t } = useTranslation();
   const { data: ilqHistory, isLoading } = useQuery({
     queryKey: ['ilq-history-chart', elderlyPersonId, days],
     queryFn: async () => {
@@ -41,13 +43,13 @@ export function ILQHistoryChart({ elderlyPersonId, days = 30 }: ILQHistoryChartP
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            ILQ Trend
+            {t('ilq.trend')}
             <ILQInfoDialog />
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-64 flex items-center justify-center">
-            <div className="animate-pulse text-muted-foreground">Loading chart...</div>
+            <div className="animate-pulse text-muted-foreground">{t('ilq.loadingChart')}</div>
           </div>
         </CardContent>
       </Card>
@@ -60,14 +62,14 @@ export function ILQHistoryChart({ elderlyPersonId, days = 30 }: ILQHistoryChartP
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            ILQ Trend
+            {t('ilq.trend')}
             <ILQInfoDialog />
           </CardTitle>
-          <CardDescription>Last {days} days</CardDescription>
+          <CardDescription>{t('ilq.lastDays', { days })}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-64 flex items-center justify-center text-muted-foreground">
-            No ILQ data available for the selected period
+            {t('ilq.noDataPeriod')}
           </div>
         </CardContent>
       </Card>
@@ -79,55 +81,55 @@ export function ILQHistoryChart({ elderlyPersonId, days = 30 }: ILQHistoryChartP
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
-          ILQ Trend
+          {t('ilq.trend')}
           <ILQInfoDialog />
         </CardTitle>
-        <CardDescription>Independence score over last {days} days</CardDescription>
+        <CardDescription>{t('ilq.independenceScore', { days })}</CardDescription>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="date" 
+            <XAxis
+              dataKey="date"
               className="text-xs"
               tick={{ fill: 'hsl(var(--muted-foreground))' }}
             />
-            <YAxis 
-              domain={[0, 100]} 
+            <YAxis
+              domain={[0, 100]}
               className="text-xs"
               tick={{ fill: 'hsl(var(--muted-foreground))' }}
             />
-            <Tooltip 
-              contentStyle={{ 
+            <Tooltip
+              contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
             />
             <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="score" 
-              stroke="hsl(var(--primary))" 
-              strokeWidth={3} 
-              name="ILQ Score"
+            <Line
+              type="monotone"
+              dataKey="score"
+              stroke="hsl(var(--primary))"
+              strokeWidth={3}
+              name={t('ilq.ilqScore')}
               dot={{ fill: 'hsl(var(--primary))' }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="health" 
-              stroke="#10b981" 
-              strokeWidth={2} 
-              name="Health"
+            <Line
+              type="monotone"
+              dataKey="health"
+              stroke="#10b981"
+              strokeWidth={2}
+              name={t('ilq.health')}
               strokeDasharray="5 5"
             />
-            <Line 
-              type="monotone" 
-              dataKey="activity" 
-              stroke="#3b82f6" 
-              strokeWidth={2} 
-              name="Activity"
+            <Line
+              type="monotone"
+              dataKey="activity"
+              stroke="#3b82f6"
+              strokeWidth={2}
+              name={t('ilq.activity')}
               strokeDasharray="5 5"
             />
           </LineChart>

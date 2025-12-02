@@ -6,12 +6,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface HomeHubCardProps {
   selectedPersonId: string | null;
 }
 
 const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
+  const { t } = useTranslation();
   const { data: hubData, isLoading } = useQuery({
     queryKey: ['home-hub-data', selectedPersonId],
     queryFn: async () => {
@@ -57,7 +59,7 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
 
   const getConnectionStatus = () => {
     if (!hubData || hubData.length === 0) {
-      return { status: 'offline', label: 'Offline', color: 'text-muted-foreground', icon: WifiOff };
+      return { status: 'offline', label: t('homeHub.offline'), color: 'text-muted-foreground', icon: WifiOff };
     }
 
     const latestDataTime = new Date(hubData[0].recorded_at).getTime();
@@ -65,11 +67,11 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
     const minutesSinceLastData = (now - latestDataTime) / 1000 / 60;
 
     if (minutesSinceLastData < 15) {
-      return { status: 'online', label: 'Online', color: 'text-success', icon: Wifi };
+      return { status: 'online', label: t('homeHub.online'), color: 'text-success', icon: Wifi };
     } else if (minutesSinceLastData < 60) {
-      return { status: 'idle', label: 'Idle', color: 'text-warning', icon: Wifi };
+      return { status: 'idle', label: t('homeHub.idle'), color: 'text-warning', icon: Wifi };
     } else {
-      return { status: 'offline', label: 'Offline', color: 'text-muted-foreground', icon: WifiOff };
+      return { status: 'offline', label: t('homeHub.offline'), color: 'text-muted-foreground', icon: WifiOff };
     }
   };
 
@@ -95,12 +97,12 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Home className="w-5 h-5" />
-            Home Hub
+            {t('homeHub.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground text-center py-8">
-            Select a person to view home hub data
+            {t('homeHub.selectPerson')}
           </p>
         </CardContent>
       </Card>
@@ -113,7 +115,7 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Home className="w-5 h-5" />
-            Home Hub
+            {t('homeHub.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -134,7 +136,7 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Home className="w-5 h-5" />
-            Home Hub
+            {t('homeHub.title')}
           </CardTitle>
           <div className="flex items-center gap-2">
             <connectionStatus.icon className={cn("w-4 h-4", connectionStatus.color)} />
@@ -149,14 +151,14 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
           <div className="text-center py-8">
             <AlertCircle className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
             <p className="text-sm text-muted-foreground">
-              No home hub device registered
+              {t('homeHub.noDeviceRegistered')}
             </p>
           </div>
         ) : !hasData ? (
           <div className="text-center py-8">
             <AlertCircle className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
             <p className="text-sm text-muted-foreground">
-              No data available from home hub
+              {t('homeHub.noDataAvailable')}
             </p>
           </div>
         ) : (
@@ -164,19 +166,19 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
             {/* Device Info */}
             <div className="border rounded-lg p-4 bg-muted/30">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="font-semibold">Device Information</h4>
+                <h4 className="font-semibold">{t('homeHub.deviceInformation')}</h4>
               </div>
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Device Name:</span>
-                  <span className="font-medium">{hubDevices[0]?.device_name || 'Unknown'}</span>
+                  <span className="text-muted-foreground">{t('homeHub.deviceName')}:</span>
+                  <span className="font-medium">{hubDevices[0]?.device_name || t('homeHub.unknown')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Device ID:</span>
+                  <span className="text-muted-foreground">{t('homeHub.deviceId')}:</span>
                   <span className="font-mono text-xs">{hubDevices[0]?.device_id || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Last Updated:</span>
+                  <span className="text-muted-foreground">{t('homeHub.lastUpdated')}:</span>
                   <span className="font-medium">
                     {formatDistanceToNow(new Date(hubData[0].recorded_at), { addSuffix: true })}
                   </span>
@@ -186,7 +188,7 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
 
             {/* Recent Activity */}
             <div>
-              <h4 className="font-semibold mb-3">Recent Activity</h4>
+              <h4 className="font-semibold mb-3">{t('homeHub.recentActivity')}</h4>
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {hubData.slice(0, 8).map((item: any, index: number) => (
                   <div
@@ -206,7 +208,7 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
                           {formatDistanceToNow(new Date(item.recorded_at), { addSuffix: true })}
                         </p>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">Value:</span>
+                          <span className="text-xs text-muted-foreground">{t('homeHub.value')}:</span>
                           <span className="text-sm font-mono font-semibold">
                             {formatDataValue(item.value)}
                           </span>

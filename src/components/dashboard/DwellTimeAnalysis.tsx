@@ -4,6 +4,7 @@ import { Clock, TrendingDown, TrendingUp, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { ProcessedMovementData, calculateDwellTimes } from "@/lib/movementUtils";
 import { HelpTooltip } from "@/components/help/HelpTooltip";
+import { useTranslation } from "react-i18next";
 
 interface DwellTimeAnalysisProps {
   data: ProcessedMovementData;
@@ -13,6 +14,7 @@ interface DwellTimeAnalysisProps {
 }
 
 export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps) => {
+  const { t } = useTranslation();
   const dwellTimes = calculateDwellTimes(data.events);
 
   // Prepare chart data with actual vs ideal comparison
@@ -62,12 +64,12 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
   const getStatusBadge = (status: string, deviation: number) => {
     switch (status) {
       case 'alert':
-        return <Badge variant="destructive" className="text-xs">Alert</Badge>;
+        return <Badge variant="destructive" className="text-xs">{t('movement.dwellTime.alert')}</Badge>;
       case 'warning':
-        return <Badge className="bg-warning text-xs">Warning</Badge>;
+        return <Badge className="bg-warning text-xs">{t('movement.dwellTime.warning')}</Badge>;
       default:
         if (Math.abs(deviation) < 10) {
-          return <Badge variant="outline" className="text-xs text-success">Normal</Badge>;
+          return <Badge variant="outline" className="text-xs text-success">{t('movement.dwellTime.normal')}</Badge>;
         }
         return null;
     }
@@ -85,25 +87,25 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
           <div className="flex items-center gap-2">
             <CardTitle className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
-              Dwell Time Analysis
+              {t('movement.dwellTime.title')}
             </CardTitle>
-            <HelpTooltip 
-              title="Understanding Dwell Times"
+            <HelpTooltip
+              title={t('movement.dwellTime.helpTitle')}
               content={
                 <div className="space-y-2">
-                  <p>Dwell time is the amount of time spent in each location/zone.</p>
+                  <p>{t('movement.dwellTime.helpDescription')}</p>
                   <div className="mt-2 space-y-1 text-xs">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-primary rounded" />
-                      <span>Normal: Within ideal range</span>
+                      <span>{t('movement.dwellTime.helpNormal')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-warning rounded" />
-                      <span>Warning: 10-20% deviation</span>
+                      <span>{t('movement.dwellTime.helpWarning')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-destructive rounded" />
-                      <span>Alert: &gt;20% deviation or outside range</span>
+                      <span>{t('movement.dwellTime.helpAlert')}</span>
                     </div>
                   </div>
                 </div>
@@ -112,7 +114,7 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
           </div>
           {idealProfile && (
             <Badge variant="outline" className="text-xs">
-              Comparing to: {idealProfile?.baseline_data ? 'Active Profile' : 'No Profile'}
+              {t('movement.dwellTime.comparingTo')}: {idealProfile?.baseline_data ? t('movement.dwellTime.activeProfile') : t('movement.dwellTime.noProfile')}
             </Badge>
           )}
         </div>
@@ -121,15 +123,15 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 rounded-lg bg-muted/50">
-            <p className="text-base font-semibold mb-1">Total Dwell Time</p>
-            <p className="text-xl font-bold">{Math.round(totalDwellTime)} min</p>
+            <p className="text-base font-semibold mb-1">{t('movement.dwellTime.totalDwellTime')}</p>
+            <p className="text-xl font-bold">{Math.round(totalDwellTime)} {t('movement.dwellTime.min')}</p>
           </div>
           <div className="p-4 rounded-lg bg-muted/50">
-            <p className="text-base font-semibold mb-1">Average per Location</p>
-            <p className="text-xl font-bold">{Math.round(averageDwellTime)} min</p>
+            <p className="text-base font-semibold mb-1">{t('movement.dwellTime.averagePerLocation')}</p>
+            <p className="text-xl font-bold">{Math.round(averageDwellTime)} {t('movement.dwellTime.min')}</p>
           </div>
           <div className="p-4 rounded-lg bg-muted/50">
-            <p className="text-base font-semibold mb-1">Locations Visited</p>
+            <p className="text-base font-semibold mb-1">{t('movement.dwellTime.locationsVisited')}</p>
             <p className="text-xl font-bold">{Object.keys(dwellTimes).length}</p>
           </div>
         </div>
@@ -137,7 +139,7 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
         {/* Comparison Chart */}
         {chartData.length > 0 && (
           <div>
-            <h4 className="text-sm font-semibold mb-3">Actual vs Ideal Dwell Time by Location</h4>
+            <h4 className="text-sm font-semibold mb-3">{t('movement.dwellTime.actualVsIdeal')}</h4>
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -150,10 +152,10 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
                   tick={{ fontSize: 11 }}
                 />
                 <YAxis
-                  label={{ value: 'Minutes', angle: -90, position: 'insideLeft' }}
+                  label={{ value: t('movement.dwellTime.minutes'), angle: -90, position: 'insideLeft' }}
                   tick={{ fontSize: 12 }}
                 />
-                <Tooltip 
+                <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const data = payload[0].payload;
@@ -161,13 +163,13 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
                         <div className="bg-card border rounded-lg p-3 shadow-lg">
                           <p className="font-semibold mb-2">{data.location}</p>
                           <div className="space-y-1 text-sm">
-                            <p>Actual: <span className="font-bold">{data.actual} min</span></p>
+                            <p>{t('movement.dwellTime.actual')}: <span className="font-bold">{data.actual} {t('movement.dwellTime.min')}</span></p>
                             {data.ideal > 0 && (
                               <>
-                                <p>Ideal: <span className="font-bold">{data.ideal} min</span></p>
-                                <p>Range: <span className="font-bold">{data.min}-{data.max} min</span></p>
+                                <p>{t('movement.dwellTime.ideal')}: <span className="font-bold">{data.ideal} {t('movement.dwellTime.min')}</span></p>
+                                <p>{t('movement.dwellTime.range')}: <span className="font-bold">{data.min}-{data.max} {t('movement.dwellTime.min')}</span></p>
                                 <p className={data.deviation > 0 ? 'text-warning' : 'text-success'}>
-                                  Deviation: <span className="font-bold">{data.deviation > 0 ? '+' : ''}{data.deviation}%</span>
+                                  {t('movement.dwellTime.deviation')}: <span className="font-bold">{data.deviation > 0 ? '+' : ''}{data.deviation}%</span>
                                 </p>
                               </>
                             )}
@@ -179,12 +181,12 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
                   }}
                 />
                 <Legend />
-                <Bar dataKey="actual" name="Actual Time" radius={[8, 8, 0, 0]}>
+                <Bar dataKey="actual" name={t('movement.dwellTime.actual')} radius={[8, 8, 0, 0]}>
                   {chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={getStatusColor(entry.status)} />
                   ))}
                 </Bar>
-                {idealProfile && <Bar dataKey="ideal" name="Ideal Time" fill="hsl(var(--muted-foreground))" opacity={0.3} radius={[8, 8, 0, 0]} />}
+                {idealProfile && <Bar dataKey="ideal" name={t('movement.dwellTime.ideal')} fill="hsl(var(--muted-foreground))" opacity={0.3} radius={[8, 8, 0, 0]} />}
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -192,7 +194,7 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
 
         {/* Detailed Breakdown */}
         <div>
-          <h4 className="text-sm font-semibold mb-3">Detailed Breakdown</h4>
+          <h4 className="text-sm font-semibold mb-3">{t('movement.dwellTime.detailedBreakdown')}</h4>
           <div className="space-y-2">
             {chartData.map((item) => (
               <div key={item.location} className="flex items-center justify-between p-3 rounded-lg border">
@@ -202,11 +204,11 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
                     {getStatusBadge(item.status, item.deviation)}
                   </div>
                   <div className="flex gap-4 text-sm text-muted-foreground">
-                    <span>Actual: <strong>{item.actual} min</strong></span>
+                    <span>{t('movement.dwellTime.actual')}: <strong>{item.actual} {t('movement.dwellTime.min')}</strong></span>
                     {item.ideal > 0 && (
                       <>
-                        <span>Ideal: <strong>{item.ideal} min</strong></span>
-                        <span>Range: <strong>{item.min}-{item.max} min</strong></span>
+                        <span>{t('movement.dwellTime.ideal')}: <strong>{item.ideal} {t('movement.dwellTime.min')}</strong></span>
+                        <span>{t('movement.dwellTime.range')}: <strong>{item.min}-{item.max} {t('movement.dwellTime.min')}</strong></span>
                       </>
                     )}
                   </div>
@@ -219,8 +221,8 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
                       <TrendingDown className="w-4 h-4 text-success" />
                     ) : null}
                     <span className={`text-sm font-bold ${
-                      item.status === 'alert' ? 'text-destructive' : 
-                      item.status === 'warning' ? 'text-warning' : 
+                      item.status === 'alert' ? 'text-destructive' :
+                      item.status === 'warning' ? 'text-warning' :
                       'text-muted-foreground'
                     }`}>
                       {item.deviation > 0 ? '+' : ''}{item.deviation}%
@@ -236,9 +238,9 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
           <div className="flex items-center gap-3 p-4 rounded-lg bg-accent/10 border border-accent">
             <AlertTriangle className="w-5 h-5 text-accent shrink-0" />
             <div>
-              <p className="text-sm font-medium">No Ideal Profile Set</p>
+              <p className="text-sm font-medium">{t('movement.dwellTime.noIdealProfile')}</p>
               <p className="text-xs text-muted-foreground">
-                Create an ideal profile to track deviations and receive alerts
+                {t('movement.dwellTime.createIdealProfile')}
               </p>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ILQInfoDialog } from './ILQInfoDialog';
+import { useTranslation } from 'react-i18next';
 
 interface ILQWidgetProps {
   elderlyPersonId: string;
@@ -11,6 +12,7 @@ interface ILQWidgetProps {
 }
 
 export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidgetProps) {
+  const { t } = useTranslation();
   const { data: latestScore, isLoading } = useQuery({
     queryKey: ['ilq-score-latest', elderlyPersonId],
     queryFn: async () => {
@@ -32,13 +34,13 @@ export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidge
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            ILQ Score
+            {t('ilq.score')}
             <ILQInfoDialog />
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-40">
-            <div className="animate-pulse text-muted-foreground">Loading ILQ...</div>
+            <div className="animate-pulse text-muted-foreground">{t('ilq.loadingILQ')}</div>
           </div>
         </CardContent>
       </Card>
@@ -51,14 +53,14 @@ export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidge
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            ILQ Score
+            {t('ilq.score')}
             <ILQInfoDialog />
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            <p>No ILQ data available yet</p>
-            <p className="text-sm mt-2">ILQ scores will appear here once device data is collected</p>
+            <p>{t('ilq.noDataAvailable')}</p>
+            <p className="text-sm mt-2">{t('ilq.dataWillAppear')}</p>
           </div>
         </CardContent>
       </Card>
@@ -81,11 +83,11 @@ export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidge
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 85) return 'Excellent';
-    if (score >= 70) return 'Good';
-    if (score >= 55) return 'Fair';
-    if (score >= 40) return 'Poor';
-    return 'Critical';
+    if (score >= 85) return t('ilq.excellent');
+    if (score >= 70) return t('ilq.good');
+    if (score >= 55) return t('ilq.fair');
+    if (score >= 40) return t('ilq.poor');
+    return t('ilq.critical');
   };
 
   return (
@@ -94,7 +96,7 @@ export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidge
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            ILQ Score
+            {t('ilq.score')}
             <ILQInfoDialog />
           </span>
           {!hideViewDetails && (
@@ -102,7 +104,7 @@ export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidge
               to="/ilq-analytics"
               className="text-sm font-normal text-primary hover:underline"
             >
-              View Details
+              {t('ilq.viewDetails')}
             </Link>
           )}
         </CardTitle>
@@ -122,33 +124,33 @@ export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidge
               {getScoreLabel(score)}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
-              Last updated: {new Date(current.computation_timestamp).toLocaleDateString()}
+              {t('ilq.lastUpdated')}: {new Date(current.computation_timestamp).toLocaleDateString()}
             </div>
           </div>
 
           {/* Component Breakdown */}
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="bg-muted/50 rounded p-2">
-              <div className="text-xs text-muted-foreground">Health</div>
+              <div className="text-xs text-muted-foreground">{t('ilq.health')}</div>
               <div className="font-semibold">{getScoreValue(current.health_vitals_score)?.toFixed(0) || 'N/A'}</div>
             </div>
             <div className="bg-muted/50 rounded p-2">
-              <div className="text-xs text-muted-foreground">Activity</div>
+              <div className="text-xs text-muted-foreground">{t('ilq.activity')}</div>
               <div className="font-semibold">{getScoreValue(current.physical_activity_score)?.toFixed(0) || 'N/A'}</div>
             </div>
             <div className="bg-muted/50 rounded p-2">
-              <div className="text-xs text-muted-foreground">Cognitive</div>
+              <div className="text-xs text-muted-foreground">{t('ilq.cognitive')}</div>
               <div className="font-semibold">{getScoreValue(current.cognitive_function_score)?.toFixed(0) || 'N/A'}</div>
             </div>
             <div className="bg-muted/50 rounded p-2">
-              <div className="text-xs text-muted-foreground">Safety</div>
+              <div className="text-xs text-muted-foreground">{t('ilq.safety')}</div>
               <div className="font-semibold">{getScoreValue(current.environmental_safety_score)?.toFixed(0) || 'N/A'}</div>
             </div>
           </div>
 
           {/* Confidence */}
           <div className="text-xs text-center text-muted-foreground">
-            Confidence: {((current.confidence_level || 0) * 100).toFixed(0)}% • {current.data_points_analyzed} data points
+            {t('ilq.confidence')}: {((current.confidence_level || 0) * 100).toFixed(0)}% • {current.data_points_analyzed} {t('ilq.dataPoints')}
           </div>
         </div>
       </CardContent>

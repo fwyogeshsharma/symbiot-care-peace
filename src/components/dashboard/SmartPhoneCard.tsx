@@ -7,12 +7,14 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { formatCoordinates } from '@/lib/gpsUtils';
+import { useTranslation } from 'react-i18next';
 
 interface SmartPhoneCardProps {
   selectedPersonId: string | null;
 }
 
 const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
+  const { t } = useTranslation();
   const { data: phoneData, isLoading } = useQuery({
     queryKey: ['smart-phone-data', selectedPersonId],
     queryFn: async () => {
@@ -58,7 +60,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
 
   const getConnectionStatus = () => {
     if (!phoneData || phoneData.length === 0) {
-      return { status: 'offline', label: 'Offline', color: 'text-muted-foreground', icon: WifiOff };
+      return { status: 'offline', label: t('smartPhone.offline'), color: 'text-muted-foreground', icon: WifiOff };
     }
 
     const latestDataTime = new Date(phoneData[0].recorded_at).getTime();
@@ -66,11 +68,11 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
     const minutesSinceLastData = (now - latestDataTime) / 1000 / 60;
 
     if (minutesSinceLastData < 5) {
-      return { status: 'online', label: 'Online', color: 'text-success', icon: Wifi };
+      return { status: 'online', label: t('smartPhone.online'), color: 'text-success', icon: Wifi };
     } else if (minutesSinceLastData < 30) {
-      return { status: 'idle', label: 'Idle', color: 'text-warning', icon: Wifi };
+      return { status: 'idle', label: t('smartPhone.idle'), color: 'text-warning', icon: Wifi };
     } else {
-      return { status: 'offline', label: 'Offline', color: 'text-muted-foreground', icon: WifiOff };
+      return { status: 'offline', label: t('smartPhone.offline'), color: 'text-muted-foreground', icon: WifiOff };
     }
   };
 
@@ -117,12 +119,12 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Smartphone className="w-5 h-5" />
-            Smart Phone
+            {t('smartPhone.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground text-center py-8">
-            Select a person to view smart phone data
+            {t('smartPhone.selectPerson')}
           </p>
         </CardContent>
       </Card>
@@ -135,7 +137,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Smartphone className="w-5 h-5" />
-            Smart Phone
+            {t('smartPhone.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -165,7 +167,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Smartphone className="w-5 h-5" />
-            Smart Phone
+            {t('smartPhone.title')}
           </CardTitle>
           <div className="flex items-center gap-2">
             <connectionStatus.icon className={cn("w-4 h-4", connectionStatus.color)} />
@@ -180,14 +182,14 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
           <div className="text-center py-8">
             <AlertCircle className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
             <p className="text-sm text-muted-foreground">
-              No smart phone device registered
+              {t('smartPhone.noDeviceRegistered')}
             </p>
           </div>
         ) : !hasData ? (
           <div className="text-center py-8">
             <AlertCircle className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
             <p className="text-sm text-muted-foreground">
-              No data available from smart phone
+              {t('smartPhone.noDataAvailable')}
             </p>
           </div>
         ) : (
@@ -195,7 +197,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
             {/* Device Info & Status */}
             <div className="border rounded-lg p-4 bg-muted/30">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="font-semibold">Device Information</h4>
+                <h4 className="font-semibold">{t('smartPhone.deviceInformation')}</h4>
                 {batteryLevel !== null && (
                   <div className="flex items-center gap-2">
                     <BatteryIcon className={cn("w-5 h-5", batteryColor)} />
@@ -207,15 +209,15 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
               </div>
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Device Name:</span>
-                  <span className="font-medium">{phoneDevices[0]?.device_name || 'Unknown'}</span>
+                  <span className="text-muted-foreground">{t('smartPhone.deviceName')}:</span>
+                  <span className="font-medium">{phoneDevices[0]?.device_name || t('smartPhone.unknown')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Device ID:</span>
+                  <span className="text-muted-foreground">{t('smartPhone.deviceId')}:</span>
                   <span className="font-mono text-xs">{phoneDevices[0]?.device_id || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Last Updated:</span>
+                  <span className="text-muted-foreground">{t('smartPhone.lastUpdated')}:</span>
                   <span className="font-medium">
                     {formatDistanceToNow(new Date(phoneData[0].recorded_at), { addSuffix: true })}
                   </span>
@@ -231,7 +233,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
                     <MapPin className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold mb-2">Last Known Location</h4>
+                    <h4 className="font-semibold mb-2">{t('smartPhone.lastKnownLocation')}</h4>
                     {typeof latestGPS.value === 'object' && latestGPS.value.latitude && latestGPS.value.longitude ? (
                       <>
                         <p className="text-sm font-mono mb-1">
@@ -242,12 +244,12 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
                         </p>
                         {latestGPS.value.accuracy && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Accuracy: ±{Math.round(latestGPS.value.accuracy)}m
+                            {t('smartPhone.accuracy')}: ±{Math.round(latestGPS.value.accuracy)}m
                           </p>
                         )}
                       </>
                     ) : (
-                      <p className="text-sm text-muted-foreground">Invalid GPS data</p>
+                      <p className="text-sm text-muted-foreground">{t('smartPhone.invalidGpsData')}</p>
                     )}
                   </div>
                 </div>
@@ -256,7 +258,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
 
             {/* Recent Activity */}
             <div>
-              <h4 className="font-semibold mb-3">Recent Activity</h4>
+              <h4 className="font-semibold mb-3">{t('smartPhone.recentActivity')}</h4>
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {phoneData.slice(0, 10).map((item: any, index: number) => {
                   // Skip GPS data in list as it's shown above
@@ -280,7 +282,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
                             {formatDistanceToNow(new Date(item.recorded_at), { addSuffix: true })}
                           </p>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">Value:</span>
+                            <span className="text-xs text-muted-foreground">{t('smartPhone.value')}:</span>
                             <span className="text-sm font-mono font-semibold">
                               {formatDataValue(item.value)}
                             </span>
