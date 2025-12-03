@@ -1,0 +1,1497 @@
+{
+  "common": {
+    "symbiot": "SymBIoT",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "import": "Importer",
+    "submit": "Soumettre",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non",
+    "copyright": "© 2025 SymBIoT. Tous droits réservés. Tranquillité d'esprit pour vos proches."
+  },
+  "healthMetrics": {
+    "title": "Métriques de Santé",
+    "viewCharts": "Voir les Graphiques",
+    "noData": "Aucune donnée de santé disponible pour le moment",
+    "types": {
+      "heart_rate": "Fréquence Cardiaque",
+      "blood_pressure": "Pression Artérielle",
+      "blood_sugar": "Glycémie",
+      "oxygen_level": "Niveau d'Oxygène",
+      "temperature": "Température Corporelle",
+      "steps": "Pas Aujourd'hui",
+      "activity": "Niveau d'Activité",
+      "sleep_quality": "Qualité du Sommeil",
+      "sleep_stage": "Stade du Sommeil",
+      "medication_taken": "Médicament Pris",
+      "next_dose_time": "Prochaine Dose",
+      "humidity": "Humidité",
+      "fall_detected": "État de Chute",
+      "impact_force": "Force d'Impact",
+      "weight": "Poids",
+      "bmi": "IMC",
+      "body_fat": "Graisse Corporelle",
+      "barometric_pressure": "Pression Barométrique",
+      "air_quality_index": "Indice de Qualité de l'Air",
+      "co2_level": "Niveau de CO₂",
+      "voc_level": "Niveau de COV",
+      "noise_level": "Niveau Sonore",
+      "light_level": "Niveau de Lumière",
+      "respiratory_rate": "Fréquence Respiratoire"
+    },
+    "values": {
+      "fallDetected": "Chute Détectée !",
+      "noFalls": "Pas de Chutes",
+      "steps": "pas"
+    }
+  },
+  "panicSos": {
+    "title": "Événements Panique/SOS",
+    "loading": "Chargement des événements...",
+    "noEvents": "Aucun événement panique/SOS enregistré",
+    "noEventsHint": "Les appuis sur le bouton d'urgence apparaîtront ici",
+    "viewCharts": "Voir les Graphiques",
+    "showMore": "Afficher Plus",
+    "showLess": "Afficher Moins",
+    "event": "événement",
+    "events": "événements",
+    "unknown": "Inconnu",
+    "device": "Appareil",
+    "descriptions": {
+      "fallDetected": "Chute détectée",
+      "sosPressed": "Bouton SOS appuyé",
+      "emergency": "Alerte d'urgence"
+    }
+  },
+  "environmental": {
+    "title": "Capteurs Environnementaux",
+    "selectPerson": "Sélectionnez une personne pour voir les données environnementales",
+    "noData": "Aucune donnée environnementale disponible",
+    "temperature": "Température",
+    "humidity": "Humidité",
+    "airQuality": "Qualité de l'Air",
+    "fahrenheit": "Fahrenheit",
+    "relative": "Relative",
+    "aqi": "IQA",
+    "status": {
+      "noData": "Aucune donnée",
+      "cold": "Froid",
+      "cool": "Frais",
+      "comfortable": "Confortable",
+      "warm": "Chaud",
+      "hot": "Très Chaud",
+      "dry": "Sec",
+      "humid": "Humide",
+      "good": "Bonne",
+      "moderate": "Modérée",
+      "unhealthySensitive": "Malsaine pour Sensibles",
+      "unhealthy": "Malsaine",
+      "hazardous": "Dangereuse"
+    }
+  },
+  "medication": {
+    "title": "Gestion des Médicaments",
+    "selectPerson": "Sélectionnez une personne pour voir les données de médicaments",
+    "compliance": "Conformité 7 Jours",
+    "latestDose": "Dernière Dose",
+    "nextDose": "Prochaine Dose",
+    "taken": "Prise",
+    "missed": "Manquée",
+    "notScheduled": "Non programmée",
+    "todaysDoses": "Doses d'Aujourd'hui",
+    "noDosesToday": "Aucune dose enregistrée aujourd'hui",
+    "recentActivity": "Activité Récente",
+    "noRecentActivity": "Aucune activité récente"
+  },
+  "dataSharing": {
+    "title": "Partage de Données",
+    "subtitle": "Gérer l'accès aux données",
+    "description": "Partagez les données de surveillance avec les membres de la famille ou d'autres aidants. L'accès sera accordé à toutes vos personnes surveillées.",
+    "grantAccess": "Accorder l'Accès",
+    "grantingAccess": "Accord en cours...",
+    "userEmail": "Email de l'Utilisateur",
+    "emailPlaceholder": "utilisateur@exemple.com",
+    "relationship": "Relation",
+    "relationshipOptional": "Relation (Optionnel)",
+    "relationshipPlaceholder": "ex., Famille, Ami, Aidant",
+    "currentAccess": "Accès Actuel",
+    "loading": "Chargement...",
+    "noDataSharing": "Aucun partage de données actif",
+    "monitoring": "Surveillance",
+    "editAccess": "Modifier l'Accès",
+    "updateRelationshipFor": "Mettre à jour la relation pour",
+    "updatingAccess": "Mise à jour...",
+    "updateAccess": "Mettre à jour l'Accès",
+    "toasts": {
+      "accessGranted": "Accès accordé",
+      "userCanView": "L'utilisateur peut maintenant voir les données de surveillance",
+      "failedToShare": "Échec du partage",
+      "accessUpdated": "Accès mis à jour",
+      "relationshipUpdated": "La relation a été mise à jour avec succès",
+      "failedToUpdate": "Échec de la mise à jour",
+      "accessRevoked": "Accès révoqué",
+      "userCanNoLongerView": "L'utilisateur ne peut plus voir les données de surveillance",
+      "failedToRevoke": "Échec de la révocation"
+    },
+    "errors": {
+      "noElderlyPersons": "Aucune personne âgée trouvée à partager",
+      "userNotFound": "Utilisateur non trouvé avec cet email",
+      "accessAlreadyGranted": "Accès déjà accordé à cet utilisateur pour toutes les personnes"
+    }
+  },
+  "auth": {
+    "signIn": "Se Connecter",
+    "signUp": "S'inscrire",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "fullName": "Nom Complet",
+    "phone": "Numéro de Téléphone",
+    "role": "Rôle",
+    "forgotPassword": "Mot de passe oublié?",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "sendResetLink": "Envoyer le lien de réinitialisation",
+    "backToLogin": "Retour à la connexion",
+    "noAccount": "Pas de compte? Inscrivez-vous",
+    "hasAccount": "Déjà un compte? Connectez-vous",
+    "createAccount": "Créer un compte",
+    "welcome": "Bon Retour",
+    "welcomeNew": "Créez Votre Compte",
+    "getStarted": "Commencez avec SymBIoT",
+    "selectRole": "Sélectionnez votre rôle",
+    "roles": {
+      "elderly": "Personne Âgée",
+      "caregiver": "Soignant",
+      "relative": "Membre de la Famille",
+      "admin": "Administrateur"
+    },
+    "validation": {
+      "invalidEmail": "Adresse e-mail invalide",
+      "passwordMin": "Le mot de passe doit contenir au moins 6 caractères",
+      "passwordMatch": "Les mots de passe ne correspondent pas",
+      "nameMin": "Le nom doit contenir au moins 2 caractères",
+      "phoneMin": "Le numéro de téléphone doit contenir au moins 10 chiffres",
+      "phoneInvalid": "Format de numéro de téléphone invalide"
+    }
+  },
+  "nav": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "health": "Santé",
+    "profile": "Profil",
+    "alerts": "Alertes",
+    "tracking": "Suivi",
+    "devices": "Appareils",
+    "dataSharing": "Partage de données",
+    "movement": "Activité",
+    "floorPlans": "Plans d'étage",
+    "analytics": "Analytique",
+    "metrics": "Métriques",
+    "pricing": "Tarifs",
+    "investorInfo": "Info Investisseurs",
+    "admin": "Admin",
+    "userManagement": "Gestion des utilisateurs",
+    "deviceTypes": "Types d'appareils",
+    "signOut": "Déconnexion",
+    "signIn": "Connexion",
+    "getStarted": "Commencer",
+    "help": "Aide"
+  },
+  "index": {
+    "tagline": "Tranquillité d'esprit",
+    "login": "Connexion",
+    "goToDashboard": "Aller au tableau de bord",
+    "dashboard": "Tableau de bord",
+    "start": "Commencer",
+    "hero": {
+      "title": "Tranquillité d'Esprit pour Vos Proches",
+      "subtitle": "Surveillance de santé IoT avancée qui maintient les familles connectées et les personnes âgées en sécurité, indépendantes et épanouies à domicile.",
+      "knowMore": "En Savoir Plus"
+    },
+    "features": {
+      "title": "Soins Complets, Simplifiés",
+      "subtitle": "Surveillez la santé, l'activité et l'environnement avec des informations alimentées par l'IA qui vous alertent sur ce qui compte le plus.",
+      "realTimeVitals": {
+        "title": "Signes Vitaux en Temps Réel",
+        "description": "Surveillez la fréquence cardiaque, la tension artérielle, les niveaux d'oxygène et plus encore avec des capteurs portables et non invasifs."
+      },
+      "activityTracking": {
+        "title": "Suivi d'Activité",
+        "description": "Détection automatique des routines quotidiennes, des schémas de mouvement et des niveaux d'activité pour repérer les changements tôt."
+      },
+      "smartAlerts": {
+        "title": "Alertes Intelligentes",
+        "description": "Notifications intelligentes pour les chutes, les médicaments oubliés, les signes vitaux irréguliers ou les schémas de comportement inhabituels."
+      },
+      "privacyFirst": {
+        "title": "Confidentialité d'Abord",
+        "description": "Conforme HIPAA et RGPD avec stockage de données crypté et contrôle d'accès basé sur les rôles pour les membres de la famille."
+      },
+      "predictiveAnalytics": {
+        "title": "Analyse Prédictive",
+        "description": "Informations alimentées par l'IA qui prédisent les problèmes de santé potentiels avant qu'ils ne deviennent des urgences."
+      },
+      "familyCollaboration": {
+        "title": "Collaboration Familiale",
+        "description": "Coordonnez les soins avec les membres de la famille, les soignants et les prestataires de soins de santé sur une plateforme sécurisée."
+      }
+    },
+    "cta": {
+      "title": "Prêt à Apporter la Tranquillité d'Esprit à la Maison?",
+      "subtitle": "Rejoignez des milliers de familles qui font confiance à SymBIoT pour garder leurs proches en sécurité et indépendants.",
+      "getStartedToday": "Commencez Aujourd'hui"
+    },
+    "footer": {
+      "copyright": "© 2025 SymBIoT. Tous droits réservés. Version: 1.0.6",
+      "tagline": "Rapprocher les familles et la technologie pour de meilleurs soins."
+    }
+  },
+  "movement": {
+    "title": "Tableau de Bord d'Activité",
+    "subtitle": "Suivre les modèles d'activité au fil du temps",
+    "description": "Suivre et visualiser les modèles d'activité au fil du temps",
+    "selectPeriod": "Sélectionner la période",
+    "activityLevel": "Niveau d'Activité",
+    "steps": "Pas",
+    "distance": "Distance",
+    "duration": "Durée",
+    "patterns": "Modèles de Mouvement",
+    "today": "Aujourd'hui",
+    "last7days": "7 Derniers Jours",
+    "last30days": "30 Derniers Jours",
+    "week": "Cette Semaine",
+    "month": "Ce Mois",
+    "summary": {
+      "totalMovements": "Mouvements Totaux",
+      "sensorEventsDetected": "Événements du capteur détectés",
+      "mostActiveLocation": "Emplacement Le Plus Actif",
+      "events": "événements",
+      "locationsVisited": "Emplacements Visités",
+      "differentAreas": "Zones différentes",
+      "lastActivity": "Dernière Activité",
+      "mostRecentEvent": "Événement le plus récent",
+      "noActivity": "Aucune activité"
+    },
+    "timeline": {
+      "title": "Chronologie des Mouvements",
+      "noData": "Aucune donnée de mouvement disponible pour la période sélectionnée",
+      "min": "min"
+    },
+    "elderlyList": {
+      "title": "Individus Surveillés",
+      "noIndividuals": "Aucun individu n'est encore surveillé.",
+      "condition": "condition",
+      "conditions": "conditions"
+    },
+    "heatmap": {
+      "activityByLocation": "Activité par Emplacement",
+      "activityByHour": "Activité par Heure",
+      "events": "Événements",
+      "peakHour": "Heure de Pointe",
+      "totalEvents": "Événements Totaux",
+      "activeHours": "Heures Actives",
+      "noLocationData": "Aucune donnée d'emplacement disponible",
+      "noHourlyData": "Aucune donnée horaire disponible"
+    },
+    "dwellTime": {
+      "title": "Analyse du Temps de Séjour",
+      "helpTitle": "Comprendre les Temps de Séjour",
+      "helpDescription": "Le temps de séjour est le temps passé dans chaque emplacement/zone.",
+      "helpNormal": "Normal : Dans la plage idéale",
+      "helpWarning": "Avertissement : 10-20% de déviation",
+      "helpAlert": "Alerte : >20% de déviation ou hors de la plage",
+      "comparingTo": "Comparaison avec",
+      "activeProfile": "Profil Actif",
+      "noProfile": "Aucun Profil",
+      "totalDwellTime": "Temps de Séjour Total",
+      "averagePerLocation": "Moyenne par Emplacement",
+      "locationsVisited": "Emplacements Visités",
+      "actualVsIdeal": "Temps de Séjour Réel vs Idéal par Emplacement",
+      "minutes": "Minutes",
+      "min": "min",
+      "actual": "Réel",
+      "ideal": "Idéal",
+      "range": "Plage",
+      "deviation": "Déviation",
+      "detailedBreakdown": "Répartition Détaillée",
+      "alert": "Alerte",
+      "warning": "Avertissement",
+      "normal": "Normal",
+      "noIdealProfile": "Aucun Profil Idéal Défini",
+      "createIdealProfile": "Créez un profil idéal pour suivre les déviations et recevoir des alertes"
+    },
+    "idealProfile": {
+      "title": "Gestion du Profil Idéal",
+      "helpTitle": "Qu'est-ce que les Profils Idéaux?",
+      "helpDescription": "Les profils idéaux définissent les modèles d'activité de base pour surveiller les déviations.",
+      "helpHowToUse": "Comment utiliser :",
+      "helpStep1": "Créez un profil avec un nom descriptif",
+      "helpStep2": "Utilisez \"Utiliser l'Actuel comme Référence\" pour capturer l'activité actuelle",
+      "helpStep3": "Ajustez les seuils min/max pour chaque emplacement",
+      "helpStep4": "Activez le profil pour commencer la surveillance",
+      "helpAlertInfo": "Le système vous alertera lorsque les temps de séjour réels s'écartent significativement des plages idéales.",
+      "newProfile": "Nouveau Profil",
+      "editProfile": "Modifier le Profil Idéal",
+      "createProfile": "Créer un Profil Idéal",
+      "profileName": "Nom du Profil",
+      "profileNamePlaceholder": "ex., Routine en Semaine, Modèle de Week-end",
+      "notes": "Notes",
+      "notesPlaceholder": "Notes optionnelles sur ce profil...",
+      "baselineDwellTimes": "Temps de Séjour de Référence (minutes)",
+      "useCurrentBaseline": "Utiliser l'Actuel comme Référence",
+      "noBaselineData": "Aucune donnée de référence. Cliquez sur \"Utiliser l'Actuel comme Référence\" pour commencer.",
+      "min": "Min",
+      "ideal": "Idéal",
+      "max": "Max",
+      "cancel": "Annuler",
+      "saving": "Enregistrement...",
+      "update": "Mettre à jour",
+      "create": "Créer",
+      "active": "Actif",
+      "activate": "Activer",
+      "locationsConfigured": "emplacements configurés",
+      "noProfilesYet": "Aucun profil idéal pour le moment",
+      "noProfilesDescription": "Créez un profil idéal pour établir des modèles d'activité de base et recevoir des alertes lorsque des déviations se produisent. Utilisez le bouton 'Nouveau Profil' ci-dessus pour commencer.",
+      "profileUpdated": "Profil mis à jour",
+      "profileCreated": "Profil créé",
+      "profileDeleted": "Profil supprimé",
+      "profileActivated": "Profil activé",
+      "failedToSave": "Échec de l'enregistrement du profil",
+      "failedToDelete": "Échec de la suppression du profil",
+      "failedToActivate": "Échec de l'activation du profil",
+      "profileNameRequired": "Le nom du profil est obligatoire",
+      "baselineRequired": "Les données de référence sont obligatoires",
+      "noCurrentData": "Aucune donnée actuelle disponible",
+      "baselineSet": "Référence établie à partir de l'activité actuelle"
+    }
+  },
+  "investorInfo": {
+    "badge": {
+      "investorOverview": "Aperçu Investisseurs",
+      "theProblem": "Le Problème",
+      "currentSolutions": "Solutions Actuelles",
+      "ourSolution": "La Solution SymBIoT",
+      "techInnovation": "Innovation Technologique",
+      "theImpact": "L'Impact",
+      "marketOpportunity": "Opportunité de Marché",
+      "perfectTiming": "Timing Parfait",
+      "businessModel": "Modèle d'Affaires"
+    },
+    "hero": {
+      "title": "Transformer les Soins aux Personnes Âgées avec",
+      "titleAccent": "l'IA et l'IoT",
+      "subtitle": "Une plateforme complète qui permet aux personnes âgées de vieillir en toute sécurité à domicile tout en réduisant les coûts de 99% par rapport aux maisons de retraite - propulsée par une technologie révolutionnaire d'IA et d'IoT.",
+      "scheduleDemo": "Planifier une Démo",
+      "readFullStory": "Lire l'Histoire Complète"
+    },
+    "problem": {
+      "title": "La Crise des Soins aux Personnes Âgées",
+      "subtitle": "Alors que notre population vieillit, les familles font face à des choix impossibles entre abordabilité, sécurité et indépendance. Le système actuel est brisé.",
+      "delayedResponse": {
+        "title": "Réponse d'Urgence Retardée",
+        "description": "Les chutes et urgences médicales passent souvent inaperçues pendant des heures, entraînant de pires résultats et des coûts de santé plus élevés."
+      },
+      "escalatingCosts": {
+        "title": "Coûts de Soins en Hausse",
+        "description": "Les soins en maison de retraite coûtent en moyenne plus de 100 000 $/an. Les familles ont du mal à payer des soins de qualité tandis que les personnes âgées perdent leur indépendance."
+      },
+      "caregiverBurnout": {
+        "title": "Épuisement des Aidants",
+        "description": "47 millions d'aidants familiaux font face à un stress constant, incapables de surveiller leurs proches à distance, entraînant des perturbations au travail et des problèmes de santé."
+      },
+      "fragmentedInfo": {
+        "title": "Informations Fragmentées",
+        "description": "Les prestataires de soins de santé, les membres de la famille et les aidants manquent d'une vue unifiée des modèles de santé et d'activité de la personne âgée."
+      }
+    },
+    "currentSolutions": {
+      "title": "Les Solutions Existantes Sont Insuffisantes",
+      "subtitle": "Le marché a tenté de résoudre ces problèmes, mais les solutions existantes sont soit trop chères, trop limitées, ou compromettent l'indépendance et la qualité de vie.",
+      "medicalAlerts": {
+        "title": "Systèmes d'Alerte Médicale",
+        "limitations": [
+          "Nécessitent une activation manuelle (les personnes âgées ne peuvent souvent pas appuyer sur le bouton lors de chutes)",
+          "Pas d'analyse prédictive ou de détection de tendances",
+          "Limité à la réponse d'urgence uniquement",
+          "Pas de surveillance de l'activité ou des signes vitaux"
+        ]
+      },
+      "homeHealthAides": {
+        "title": "Aides de Santé à Domicile",
+        "limitations": [
+          "Coût de 25-50 $/heure, plus de 200 000 $/an pour des soins 24/7",
+          "Qualité de soins incohérente et forte rotation",
+          "Aucune couverture pendant les heures creuses",
+          "Limité à la présence physique, pas d'informations sur les données"
+        ]
+      },
+      "nursingHomes": {
+        "title": "Maisons de Retraite",
+        "limitations": [
+          "Moyenne de plus de 100 000 $/an en coûts",
+          "Perte d'indépendance et d'environnement familier",
+          "Augmentation de la dépression et du déclin cognitif",
+          "Listes d'attente et problèmes de disponibilité"
+        ]
+      },
+      "fitnessTrackers": {
+        "title": "Trackers de Fitness Basiques",
+        "limitations": [
+          "Qualité grand public, non certifiés pour la santé",
+          "Pas de conformité HIPAA ou de contrôles de partage de données",
+          "Capacités d'alerte limitées",
+          "Pas d'intégration avec les flux de travail de soins"
+        ]
+      }
+    },
+    "solution": {
+      "title": "Une Meilleure Façon de Prendre Soin",
+      "subtitle": "SymBIoT combine l'analyse alimentée par l'IA, les capteurs IoT et l'automatisation intelligente pour fournir une surveillance complète et abordable qui garde les personnes âgées en sécurité à domicile.",
+      "vitalMonitoring": {
+        "title": "Surveillance Continue des Signes Vitaux",
+        "description": "Suivi 24/7 de la fréquence cardiaque, de la tension artérielle, des niveaux d'oxygène et de la température avec détection d'anomalies alimentée par l'IA.",
+        "improvement": "Détecte les problèmes de santé des heures ou des jours avant qu'ils ne deviennent des urgences"
+      },
+      "activityRecognition": {
+        "title": "Reconnaissance Intelligente de l'Activité",
+        "description": "L'IA analyse les modèles de mouvement, détecte automatiquement les chutes, identifie les changements de comportement qui signalent un déclin cognitif.",
+        "improvement": "Aucun bouton à presser - le système détecte automatiquement les problèmes"
+      },
+      "tracking": {
+        "title": "Suivi Intérieur + Extérieur",
+        "description": "Suivi GPS en extérieur avec cartographie de plan d'étage personnalisé en intérieur. Alertes de géorepérage pour errance ou zones dangereuses.",
+        "improvement": "Conscience complète de la localisation contrairement aux systèmes GPS uniquement ou intérieur uniquement"
+      },
+      "smartAlerts": {
+        "title": "Alertes Prédictives Intelligentes",
+        "description": "L'IA apprend les modèles normaux et alerte les aidants des écarts avant qu'ils ne deviennent critiques. Réduit les fausses alarmes de 70%.",
+        "improvement": "Intervention proactive vs réponse d'urgence réactive"
+      },
+      "analytics": {
+        "title": "Analyses et Rapports ILQ",
+        "description": "Les scores du Quotient de Vie Indépendante suivent les tendances au fil du temps. Rapports complets pour les prestataires de soins de santé et la famille.",
+        "improvement": "Décisions de soins basées sur les données vs intuition et preuves anecdotiques"
+      },
+      "coordination": {
+        "title": "Coordination Unifiée des Soins",
+        "description": "Plateforme basée sur les rôles connectant les personnes âgées, la famille, les aidants et les médecins avec partage sécurisé des données et communication.",
+        "improvement": "Tout le monde sur la même page vs appels téléphoniques et messages fragmentés"
+      }
+    },
+    "technology": {
+      "title": "Comment l'IA et l'IoT Rendent Cela Possible Maintenant",
+      "subtitle": "Les récentes percées en intelligence artificielle et en technologie de l'Internet des Objets permettent une surveillance complète des soins aux personnes âgées à un prix qui n'était pas possible il y a même 3 ans.",
+      "ai": {
+        "title": "IA et Apprentissage Automatique",
+        "description": "L'IA moderne peut maintenant reconnaître les modèles, prédire les événements de santé et réduire les fausses alarmes - technologie qui n'existait pas il y a 5 ans à ce prix et cette précision."
+      },
+      "iot": {
+        "title": "Capteurs IoT Abordables",
+        "description": "Les capteurs de qualité médicale sont maintenant 90% moins chers qu'en 2015. Les appareils portables et capteurs domestiques peuvent surveiller en continu les signes vitaux à des prix adaptés aux consommateurs."
+      },
+      "5g": {
+        "title": "5G et Edge Computing",
+        "description": "Le traitement des données en temps réel avec une latence en millisecondes permet la détection instantanée de chutes et les alertes d'urgence impossibles avec les anciens réseaux."
+      },
+      "cloud": {
+        "title": "Infrastructure Cloud",
+        "description": "Les plateformes cloud conformes HIPAA comme Supabase permettent un stockage de données sécurisé et évolutif et une synchronisation en temps réel entre les appareils à une fraction des coûts historiques."
+      }
+    },
+    "impact": {
+      "title": "Économies de Coûts et Meilleure Vie",
+      "subtitle": "SymBIoT offre des avantages financiers mesurables tout en améliorant considérablement la qualité de vie des personnes âgées et la tranquillité d'esprit des familles.",
+      "costSavings": {
+        "title": "Économies de Coûts",
+        "lowerCost": {
+          "title": "99% Moins Cher Que les Maisons de Retraite",
+          "description": "Abonnement SymBIoT à 25 $/mois vs plus de 8 000 $/mois pour les soins en maison de retraite"
+        },
+        "reduceReadmissions": {
+          "title": "Réduire les Réadmissions Hospitalières",
+          "description": "La détection précoce prévient 40% des visites aux urgences, économisant 2 000 à 10 000 $ par incident"
+        },
+        "optimizeCaregiver": {
+          "title": "Optimiser le Temps des Aidants",
+          "description": "Les aidants professionnels visitent uniquement en cas de besoin vs visites programmées, réduisant les coûts de 50%"
+        },
+        "insurance": {
+          "title": "Réductions des Primes d'Assurance",
+          "description": "La surveillance proactive peut qualifier les familles pour des primes d'assurance de soins de longue durée plus basses"
+        }
+      },
+      "qualityOfLife": {
+        "title": "Qualité de Vie",
+        "ageInPlace": {
+          "title": "Vieillir Chez Soi en Sécurité",
+          "description": "Les personnes âgées maintiennent leur indépendance dans leur propre maison, prouvé pour améliorer la santé mentale et la longévité"
+        },
+        "peaceOfMind": {
+          "title": "Tranquillité d'Esprit pour les Familles",
+          "description": "Les aidants familiaux dorment mieux en sachant qu'ils seront alertés immédiatement de tout problème, réduisant le stress et l'épuisement"
+        },
+        "fasterResponse": {
+          "title": "Réponse d'Urgence Plus Rapide",
+          "description": "La détection automatique de chutes et les alertes réduisent le temps de réponse de plusieurs heures à quelques minutes, prévenant les complications"
+        },
+        "dignity": {
+          "title": "Dignité et Autonomie Préservées",
+          "description": "Les personnes âgées vivent indépendamment avec un filet de sécurité invisible vs supervision constante ou soins institutionnels"
+        }
+      },
+      "savingsHighlight": "Plus de 95 000 $ Économisés Par An",
+      "savingsDescription": "La famille moyenne économise en choisissant SymBIoT (25 $/mois) plutôt que les soins en maison de retraite (plus de 8 000 $/mois) tout en maintenant une meilleure qualité de vie"
+    },
+    "market": {
+      "title": "Opportunité de Marché Massive",
+      "subtitle": "La démographie vieillissante et l'adoption technologique créent une tempête parfaite pour la disruption",
+      "adults65": {
+        "stat": "54M+",
+        "label": "Adultes 65+ aux États-Unis",
+        "context": "Croissance de 10 000/jour jusqu'en 2030"
+      },
+      "marketSize": {
+        "stat": "460 Mrd $",
+        "label": "Marché des Soins aux Personnes Âgées",
+        "context": "8,5% TCAC jusqu'en 2030"
+      },
+      "ageAtHome": {
+        "stat": "90%",
+        "label": "Veulent Vieillir Chez Eux",
+        "context": "Solutions actuelles trop chères ou inadéquates"
+      },
+      "caregivers": {
+        "stat": "47M",
+        "label": "Aidants Familiaux",
+        "context": "La perte de productivité coûte 500 Mrd $/an à l'économie"
+      }
+    },
+    "whyNow": {
+      "title": "Pourquoi Maintenant?",
+      "subtitle": "Plusieurs tendances convergentes créent une opportunité sans précédent pour SymBIoT",
+      "techConvergence": {
+        "title": "Convergence Technologique",
+        "description": "L'IA, l'IoT, la 5G et l'infrastructure cloud ont mûri au point où la surveillance à distance complète est à la fois techniquement faisable et économiquement viable pour le marché de masse."
+      },
+      "demographic": {
+        "title": "Crise Démographique",
+        "description": "Les baby-boomers entrent dans les années de soins aux personnes âgées tandis que les générations plus jeunes ont moins d'enfants et vivent plus éloignées - le modèle traditionnel de soins familiaux s'effondre."
+      },
+      "regulatory": {
+        "title": "Élan Réglementaire",
+        "description": "Medicare et les compagnies d'assurance couvrent de plus en plus la surveillance à distance des patients. Les codes de remboursement CMS récents rendent notre modèle d'affaires plus attractif pour les prestataires de soins de santé."
+      },
+      "covid": {
+        "title": "Accélération COVID-19",
+        "description": "La pandémie a normalisé la télésanté et la surveillance à distance. Les familles recherchent maintenant activement des solutions technologiques pour rester connectées avec leurs proches âgés."
+      }
+    },
+    "businessModel": {
+      "title": "Modèle SaaS Évolutif",
+      "subtitle": "Plusieurs flux de revenus avec une économie unitaire solide",
+      "b2c": {
+        "title": "B2C",
+        "description": "Plans Individuels et Familiaux",
+        "price": "25 $",
+        "period": "par mois"
+      },
+      "b2b": {
+        "title": "B2B",
+        "description": "Résidence Assistée et Soins de Santé",
+        "price": "20 $",
+        "period": "par résident/mois",
+        "badge": "Focus Principal"
+      },
+      "b2b2c": {
+        "title": "B2B2C",
+        "description": "Assurance et Employeurs",
+        "price": "15 $",
+        "period": "par membre/mois"
+      }
+    },
+    "cta": {
+      "title": "Rejoignez-Nous Pour Transformer les Soins aux Personnes Âgées",
+      "subtitle": "SymBIoT est positionné à l'intersection de tendances démographiques massives et de technologie révolutionnaire. Discutons de la façon dont vous pouvez faire partie de cette transformation.",
+      "scheduleDemo": "Planifier une Démo",
+      "contactInvestment": "Contacter l'Équipe d'Investissement"
+    }
+  },
+  "pricing": {
+    "title": "Tarifs",
+    "heroTitle": "Tarification Simple et Transparente",
+    "heroSubtitle": "Choisissez le forfait parfait pour les besoins de soins de votre famille",
+    "choosePlan": "Choisissez Votre Forfait",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "perMonth": "par mois",
+    "perYear": "par an",
+    "selectPlan": "Sélectionner le Forfait",
+    "currentPlan": "Forfait Actuel",
+    "upgrade": "Mettre à niveau",
+    "features": "Fonctionnalités",
+    "included": "Inclus",
+    "saveWithYearly": "Économisez 5% avec la facturation annuelle",
+    "startFreeTrial": "Commencer l'Essai Gratuit",
+    "getStarted": "Commencer",
+    "allPlansInclude": "Tous les Forfaits Incluent",
+    "realTimeMonitoring": "Surveillance en Temps Réel",
+    "trackVitals": "Suivi des signes vitaux 24/7",
+    "activityTracking": "Suivi d'Activité",
+    "monitorActivities": "Surveiller les activités quotidiennes",
+    "smartAlerts": "Alertes Intelligentes",
+    "instantNotifications": "Notifications instantanées",
+    "securePrivate": "Sécurisé et Privé",
+    "hipaaCompliant": "Conforme HIPAA",
+    "faq": {
+      "title": "Questions Fréquemment Posées",
+      "switchPlans": {
+        "question": "Puis-je changer de forfait plus tard?",
+        "answer": "Oui! Vous pouvez mettre à niveau ou rétrograder votre forfait à tout moment. Les changements seront reflétés dans votre prochain cycle de facturation."
+      },
+      "trialEnds": {
+        "question": "Que se passe-t-il après la fin de mon essai gratuit?",
+        "answer": "Après votre essai de 14 jours, vous pouvez choisir de continuer avec un forfait payant. Si vous ne sélectionnez pas de forfait, votre compte sera suspendu jusqu'à ce que vous en choisissiez un."
+      },
+      "yearlyBilling": {
+        "question": "Comment fonctionne la facturation annuelle?",
+        "answer": "Avec la facturation annuelle, vous payez 12 mois à l'avance et économisez 5% par rapport à la facturation mensuelle. Le montant total est facturé une fois par an."
+      },
+      "whatIsDevice": {
+        "question": "Qu'est-ce qui compte comme appareil?",
+        "answer": "Un appareil est tout wearable ou capteur connecté à la plateforme SymBIoT pour la surveillance. Cela inclut les montres connectées, les trackers de fitness et les moniteurs de santé dédiés."
+      }
+    },
+    "plans": {
+      "freeTrial": {
+        "name": "Essai Gratuit",
+        "description": "Parfait pour essayer notre service",
+        "duration": "14 jours",
+        "devices": "5 appareils",
+        "badge": "Essai"
+      },
+      "basic": {
+        "name": "Basique",
+        "description": "Idéal pour les petites familles",
+        "devices": "5 appareils"
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "Meilleur pour les grandes familles et établissements de soins",
+        "devices": "Appareils illimités",
+        "badge": "Plus Populaire"
+      },
+      "features": {
+        "freeTrial14": "Essai gratuit de 14 jours",
+        "upTo5Devices": "Jusqu'à 5 appareils",
+        "realTimeMonitoring": "Surveillance en temps réel",
+        "basicAlerts": "Alertes basiques",
+        "activityTracking": "Suivi d'activité",
+        "emailSupport": "Support par email",
+        "advancedAlerts": "Alertes avancées",
+        "healthInsights": "Informations de santé",
+        "priorityEmailSupport": "Support email prioritaire",
+        "dataExport": "Export de données",
+        "unlimitedDevices": "Appareils illimités",
+        "support247": "Support prioritaire 24/7",
+        "customIntegrations": "Intégrations personnalisées",
+        "apiAccess": "Accès API",
+        "dedicatedManager": "Gestionnaire de compte dédié"
+      }
+    },
+    "footer": "© 2025 SymBIoT. Tous droits réservés.",
+    "billedAnnually": "/mois facturé annuellement"
+  },
+  "devices": {
+    "title": "Appareils",
+    "subtitle": "Surveillez vos appareils",
+    "pageTitle": "Appareils",
+    "pageDescription": "Surveillez et gérez tous les appareils connectés",
+    "status": "État de l'Appareil",
+    "online": "En Ligne",
+    "offline": "Hors Ligne",
+    "inactive": "Inactif",
+    "maintenance": "Maintenance",
+    "battery": "Batterie",
+    "lastSeen": "Dernière Connexion",
+    "addDevice": "Ajouter un Appareil",
+    "removeDevice": "Supprimer l'Appareil",
+    "deviceName": "Nom de l'Appareil",
+    "deviceType": "Type d'Appareil",
+    "location": "Emplacement",
+    "platformMetrics": "Métriques de Plateforme",
+    "deviceTypes": "Types d'Appareils",
+    "noDevices": "Aucun appareil enregistré",
+    "noData": "Pas de Données",
+    "records": "enregistrements",
+    "generateData": "Générer des Données",
+    "generateDataTooltip": "Générer 7 jours de données de test",
+    "unassigned": "Non Assigné",
+    "guide": {
+      "title": "Guide d'État des Appareils",
+      "description": "Surveillez tous les appareils connectés et leur état en temps réel.",
+      "onlineDesc": "L'appareil est connecté et transmet",
+      "offlineDesc": "Aucune donnée récente reçue",
+      "inactiveDesc": "Appareil non configuré",
+      "clickTip": "Cliquez sur une carte d'appareil pour voir les informations détaillées et l'historique."
+    },
+    "apiDetails": {
+      "title": "Détails API de l'Appareil",
+      "description": "Utilisez ces détails pour envoyer des données depuis votre appareil IoT",
+      "apiKey": "Clé API",
+      "saveSecurely": "Conservez ceci en sécurité",
+      "apiEndpoint": "Point d'Accès API",
+      "exampleRequest": "Exemple de Requête",
+      "availableDataTypes": "Types de données disponibles",
+      "dataTypesList": "heart_rate, blood_pressure, temperature, fall_detected, steps, sleep, activity, location",
+      "useKeyAuth": "Utilisez cette clé pour authentifier votre appareil lors de l'envoi de données",
+      "copied": "Copié !",
+      "copiedToClipboard": "Clé API copiée dans le presse-papiers",
+      "viewHistory": "Voir l'Historique de l'Appareil"
+    },
+    "edit": {
+      "title": "Modifier l'Appareil",
+      "description": "Mettre à jour les informations de l'appareil",
+      "deviceName": "Nom de l'Appareil",
+      "deviceType": "Type d'Appareil",
+      "location": "Emplacement",
+      "company": "Entreprise/Fabricant",
+      "selectCompany": "Sélectionner l'entreprise (optionnel)",
+      "cancel": "Annuler",
+      "updating": "Mise à jour...",
+      "updateDevice": "Mettre à Jour l'Appareil",
+      "updated": "Appareil mis à jour",
+      "updatedDesc": "Les informations de l'appareil ont été mises à jour avec succès.",
+      "updateFailed": "Échec de la mise à jour"
+    },
+    "delete": {
+      "title": "Supprimer l'Appareil",
+      "confirmMessage": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ? Cette action est irréversible.",
+      "alsoDeleteData": "Supprimer également toutes les données de l'appareil (dossiers de santé, lectures de capteurs, etc.)",
+      "cancel": "Annuler",
+      "deleting": "Suppression...",
+      "deleteDevice": "Supprimer l'Appareil",
+      "deleted": "Appareil supprimé",
+      "deletedDesc": "L'appareil a été supprimé avec succès.",
+      "deleteFailed": "Échec de la suppression"
+    },
+    "register": {
+      "title": "Enregistrer un Nouvel Appareil",
+      "dialogTitle": "Ajouter un Appareil IoT",
+      "dialogDescription": "Enregistrez un appareil manuellement ou utilisez le flux d'appairage pour une configuration collaborative.",
+      "manualRegistration": "Enregistrement Manuel",
+      "pairDevice": "Appairer l'Appareil",
+      "deviceName": "Nom de l'Appareil",
+      "deviceNamePlaceholder": "ex., Moniteur Salon",
+      "deviceType": "Type d'Appareil",
+      "selectDeviceType": "Sélectionner le type d'appareil",
+      "company": "Entreprise/Fabricant",
+      "selectCompany": "Sélectionner l'entreprise (optionnel)",
+      "model": "Modèle d'Appareil",
+      "selectModel": "Sélectionner le modèle (optionnel)",
+      "modelDescription": "Sélectionnez le modèle spécifique de votre appareil",
+      "deviceId": "ID de l'Appareil",
+      "deviceIdPlaceholder": "ex., DEV-12345",
+      "deviceIdDescription": "Identifiant unique de votre appareil IoT",
+      "location": "Emplacement (Optionnel)",
+      "locationPlaceholder": "ex., Chambre, Salon",
+      "generateSampleData": "Générer des données de test",
+      "generateSampleDataDesc": "Créer automatiquement 7 jours de données fictives pour tester les tableaux de bord",
+      "registering": "Enregistrement...",
+      "registerDevice": "Enregistrer l'Appareil",
+      "success": "Appareil enregistré avec succès",
+      "successWithData": "Votre appareil IoT a été ajouté avec des données d'exemple.",
+      "successNoData": "Votre appareil IoT a été ajouté.",
+      "failed": "Échec de l'enregistrement de l'appareil",
+      "missingInfo": "Information manquante",
+      "fillRequired": "Veuillez remplir tous les champs requis",
+      "noProfile": "Profil non trouvé",
+      "createProfileFirst": "Veuillez d'abord créer un profil de personne âgée",
+      "noProfileForPairing": "Aucun profil de personne âgée trouvé.",
+      "setupProfileFirst": "Veuillez d'abord configurer un profil pour appairer des appareils.",
+      "apiKeyTitle": "Clé API (Conservez-la en sécurité)",
+      "apiKeyWarning": "Cette clé ne sera affichée qu'une seule fois. Enregistrez-la maintenant !",
+      "useApiKeyAuth": "Utilisez cette clé API pour authentifier votre appareil lors de l'envoi de données.",
+      "apiEndpoint": "Point d'Accès API :",
+      "exampleRequest": "Exemple de Requête :",
+      "registerAnother": "Enregistrer un Autre Appareil",
+      "apiKeyCopied": "Clé API copiée",
+      "apiKeyCopiedDesc": "La clé API a été copiée dans le presse-papiers"
+    },
+    "geofenceAlert": {
+      "title": "Géoclôtures Requises",
+      "description": "Les appareils GPS nécessitent au moins une géoclôture configurée avant l'enregistrement.",
+      "explanation": "Les géoclôtures définissent des zones sûres et des lieux importants (comme la maison, le travail ou les établissements médicaux). Elles permettent des alertes basées sur la localisation lorsque la personne entre ou sort de ces zones.",
+      "howToAdd": "Pour ajouter des géoclôtures :",
+      "step1": "Allez dans Suivi dans la navigation",
+      "step2": "Sélectionnez l'onglet Suivi Extérieur",
+      "step3": "Utilisez le Gestionnaire de Géoclôtures pour ajouter des lieux",
+      "step4": "Revenez ici pour enregistrer votre appareil GPS",
+      "cancel": "Annuler",
+      "goToTracking": "Aller au Suivi"
+    },
+    "history": {
+      "title": "Historique de l'Appareil",
+      "titleWithName": "Historique de l'Appareil - {{name}}",
+      "description": "Lectures de données historiques de cet appareil",
+      "loading": "Chargement de l'historique...",
+      "noData": "Aucune donnée enregistrée",
+      "readings": "lectures"
+    },
+    "dataGeneration": {
+      "generated": "Données générées",
+      "generatedDesc": "Les données d'exemple ont été générées avec succès pour l'appareil.",
+      "failed": "Échec de la génération",
+      "sampleDataFailed": "Échec de la génération des données d'exemple"
+    },
+    "validation": {
+      "deviceNameRequired": "Le nom de l'appareil est requis",
+      "deviceNameMax": "Le nom de l'appareil doit faire moins de 100 caractères",
+      "deviceTypeRequired": "Le type d'appareil est requis",
+      "deviceIdRequired": "L'ID de l'appareil est requis",
+      "deviceIdMax": "L'ID de l'appareil doit faire moins de 50 caractères",
+      "deviceIdFormat": "L'ID de l'appareil ne peut contenir que des lettres, chiffres, tirets et underscores",
+      "locationMax": "L'emplacement doit faire moins de 100 caractères"
+    },
+    "pairing": {
+      "title": "Demandes d'Appairage",
+      "noPending": "Aucune demande d'appairage en attente",
+      "approveTitle": "Approuver l'Appairage",
+      "reviewAndApprove": "Vérifier et approuver l'appareil pour {{name}}",
+      "deviceId": "ID de l'Appareil",
+      "deviceType": "Type d'Appareil",
+      "unknown": "Inconnu",
+      "pairingCode": "Code d'Appairage",
+      "requested": "Demandé",
+      "deviceNameOptional": "Nom de l'Appareil (Optionnel)",
+      "deviceNamePlaceholder": "ex., Capteur du Salon",
+      "locationOptional": "Emplacement (Optionnel)",
+      "locationPlaceholder": "ex., Salon",
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "backToList": "Retour à la Liste",
+      "pendingRequests": "{{count}} demande en attente",
+      "pendingRequestsPlural": "{{count}} demandes en attente",
+      "forPerson": "Pour {{name}}",
+      "newRequestReceived": "Nouvelle demande d'appairage reçue!",
+      "pairedSuccessfully": "Appareil appairé avec succès!",
+      "approveFailed": "Échec de l'approbation",
+      "rejected": "Demande d'appairage rejetée",
+      "rejectFailed": "Échec du rejet"
+    }
+  },
+  "tracking": {
+    "title": "Suivi",
+    "subtitle": "Système de positionnement intérieur et extérieur",
+    "movementTracking": "Suivi des Mouvements",
+    "realTimePositioning": "Positionnement intérieur et extérieur en temps réel",
+    "location": "Position Actuelle",
+    "indoor": "Intérieur",
+    "outdoor": "Extérieur",
+    "cameras": "Caméras",
+    "indoorTracking": "Suivi Intérieur",
+    "outdoorTracking": "Suivi Extérieur",
+    "safeZones": "Zones Sécurisées",
+    "geofencing": "Géorepérage",
+    "history": "Historique de Localisation",
+    "realTime": "Temps Réel",
+    "addZone": "Ajouter Zone Sécurisée",
+    "editZone": "Modifier Zone",
+    "deleteZone": "Supprimer Zone",
+    "floorPlans": "Plans d'Étage",
+    "selectPeriod": "Sélectionner la période",
+    "today": "Aujourd'hui",
+    "last7Days": "7 Derniers Jours",
+    "last30Days": "30 Derniers Jours",
+    "noFloorPlan": {
+      "title": "Aucun Plan d'Étage Trouvé",
+      "description": "Enregistrez un appareil portable pour voir le suivi intérieur"
+    },
+    "noGpsData": {
+      "title": "Aucune Donnée GPS ni Géorepérage",
+      "description": "Enregistrez un appareil GPS pour voir le suivi extérieur et les données de localisation en temps réel",
+      "setupGeofences": "Configurez vos géorepérages ci-dessous ! Les géorepérages définissent les lieux importants et les zones sécurisées pour les alertes basées sur la localisation."
+    },
+    "geofencesConfigured": {
+      "title": "Géorepérages Configurés",
+      "description": "Vos géorepérages sont affichés sur la carte ci-dessous. Enregistrez un appareil GPS pour voir le suivi en temps réel."
+    },
+    "securityCameras": "Caméras de Sécurité",
+    "noMovementData": {
+      "title": "Aucune donnée de mouvement disponible",
+      "description": "Pour voir le suivi des mouvements, allez au Tableau de bord et cliquez sur \"Générer Données Appareil\" pour un appareil portable pour générer des données de position échantillon.",
+      "goToDashboard": "Aller au Tableau de Bord"
+    },
+    "positioningVisualization": "Positionnement en temps réel et visualisation des mouvements",
+    "playback": {
+      "title": "Lecture des Mouvements",
+      "noData": "Aucune donnée de mouvement à lire",
+      "zone": "Zone",
+      "speed": "Vitesse",
+      "accuracy": "Précision"
+    },
+    "metrics": {
+      "totalDistance": "Distance Totale",
+      "traveled": "parcouru",
+      "averageSpeed": "Vitesse Moyenne",
+      "zoneVisits": "Visites de Zones",
+      "most": "Plus",
+      "noData": "Aucune donnée",
+      "activeTime": "Temps Actif",
+      "acrossZones": "Dans {{count}} zones",
+      "zoneStatistics": "Statistiques des Zones",
+      "visits": "visites"
+    },
+    "gps": {
+      "totalDistance": "Distance Totale",
+      "basedOnPoints": "Basé sur {{count}} points GPS",
+      "locationsVisited": "Lieux Visités",
+      "activeGeofences": "Lieux de géorepérage actifs",
+      "totalEvents": "Total des Événements",
+      "entryExitEvents": "Événements d'entrée et de sortie",
+      "mostVisitedPlaces": "Lieux les Plus Visités",
+      "visit": "visite",
+      "visits": "visites"
+    },
+    "geofence": {
+      "title": "Lieux de Géorepérage",
+      "addPlace": "Ajouter un Lieu",
+      "editPlace": "Modifier Lieu de Géorepérage",
+      "addGeofencePlace": "Ajouter Lieu de Géorepérage",
+      "loading": "Chargement des lieux de géorepérage...",
+      "noPlaces": "Aucun lieu de géorepérage configuré.",
+      "ftRadius": "pieds de rayon",
+      "name": "Nom",
+      "namePlaceholder": "ex., Maison",
+      "placeType": "Type de Lieu",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "radius": "Rayon (pieds)",
+      "address": "Adresse (optionnel)",
+      "addressPlaceholder": "123 Rue Principale, Ville, Pays",
+      "getCoordinates": "Obtenir les coordonnées de l'adresse",
+      "color": "Couleur",
+      "notes": "Notes (optionnel)",
+      "notesPlaceholder": "Notes supplémentaires...",
+      "createPlace": "Créer un Lieu",
+      "updatePlace": "Mettre à Jour le Lieu",
+      "cancel": "Annuler",
+      "created": "Lieu de géorepérage créé avec succès",
+      "updated": "Lieu de géorepérage mis à jour avec succès",
+      "deleted": "Lieu de géorepérage supprimé avec succès",
+      "createError": "Échec de la création du lieu de géorepérage",
+      "updateError": "Échec de la mise à jour du lieu de géorepérage",
+      "deleteError": "Échec de la suppression du lieu de géorepérage",
+      "enterAddress": "Veuillez d'abord entrer une adresse",
+      "coordinatesUpdated": "Coordonnées mises à jour à partir de l'adresse",
+      "coordinatesNotFound": "Impossible de trouver les coordonnées pour cette adresse",
+      "geocodeError": "Échec du géocodage de l'adresse"
+    },
+    "events": {
+      "title": "Historique de Localisation",
+      "loading": "Chargement des événements...",
+      "noEvents": "Aucun événement de localisation dans cette période.",
+      "arrived": "Arrivé",
+      "left": "Parti",
+      "duration": "Durée",
+      "unknownLocation": "Lieu Inconnu"
+    },
+    "map": {
+      "currentPosition": "Position Actuelle"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "personalInfo": "Informations Personnelles",
+    "settings": "Paramètres",
+    "preferences": "Préférences",
+    "notifications": "Notifications",
+    "security": "Sécurité",
+    "privacy": "Confidentialité",
+    "changePassword": "Changer le mot de passe",
+    "updateProfile": "Mettre à jour le profil",
+    "saveChanges": "Enregistrer les modifications",
+    "language": "Langue",
+    "restartTour": "Redémarrer la visite guidée"
+  },
+  "dashboard": {
+    "title": "Tableau de Bord",
+    "welcome": "Bienvenue sur SymBIoT",
+    "loading": "Chargement du tableau de bord...",
+    "overview": "Aperçu",
+    "recentAlerts": "Alertes Récentes",
+    "vitalSigns": "Signes Vitaux",
+    "activity": "Activité",
+    "quickActions": "Actions Rapides",
+    "stats": {
+      "monitoredPersons": {
+        "label": "Personnes Surveillées",
+        "tooltip": "Nombre total de personnes âgées que vous surveillez actuellement. Cela inclut toutes les personnes assignées à vos soins."
+      },
+      "activeAlerts": {
+        "label": "Alertes Actives",
+        "tooltip": "Alertes nécessitant une attention. Celles-ci peuvent inclure des anomalies de signes vitaux, des activations de bouton panique, des violations de géorepérage ou des problèmes d'appareils. Cliquez sur les alertes pour les reconnaître et les résoudre."
+      },
+      "avgHeartRate": {
+        "label": "Fréquence Cardiaque Moy.",
+        "title": "Surveillance de la Fréquence Cardiaque",
+        "tooltip": "Fréquence cardiaque moyenne des lectures récentes. Fréquence cardiaque normale au repos : 60-100 bpm. Les alertes sont déclenchées pour les valeurs hors des plages sûres.",
+        "bpm": "bpm",
+        "noData": "Aucune donnée"
+      },
+      "activityLevel": {
+        "label": "Niveau d'Activité",
+        "title": "Guide du Niveau d'Activité",
+        "good": "Bon",
+        "fair": "Moyen",
+        "low": "Faible",
+        "goodDesc": "8 000+ pas/jour",
+        "fairDesc": "4 000-8 000 pas/jour",
+        "lowDesc": "<4 000 pas/jour",
+        "noData": "Aucune donnée"
+      }
+    }
+  },
+  "alerts": {
+    "title": "Alertes",
+    "management": "Gestion des Alertes",
+    "subtitle": "Surveiller et répondre aux alertes du système",
+    "noAlerts": "Aucune alerte pour le moment",
+    "noAlertsFound": "Aucune alerte trouvée",
+    "noAlertsDescription": "Tout est clair ! Aucune alerte ne correspond à vos filtres actuels. Essayez d'ajuster les filtres ci-dessus pour voir différentes alertes.",
+    "allClear": "Tout est clair ! Aucune alerte active.",
+    "critical": "Critique",
+    "high": "Élevé",
+    "medium": "Moyen",
+    "low": "Faible",
+    "warning": "Avertissement",
+    "info": "Information",
+    "resolved": "Résolu",
+    "unresolved": "Non résolu",
+    "markResolved": "Marquer comme Résolu",
+    "viewDetails": "Voir les Détails",
+    "filterBy": "Filtrer par",
+    "sortBy": "Trier par",
+    "date": "Date",
+    "severity": "Sévérité",
+    "type": "Type",
+    "status": "Statut",
+    "stats": {
+      "totalAlerts": "Total des Alertes",
+      "totalAlertsTooltip": "Nombre total d'alertes dans la période sélectionnée, y compris les alertes actives, reconnues et résolues.",
+      "active": "Actives",
+      "critical": "Critiques",
+      "avgResponse": "Réponse Moy.",
+      "responseTime": "Temps de Réponse",
+      "responseTimeTooltip": "Temps moyen pour reconnaître les alertes. Des temps de réponse plus courts indiquent une attention plus rapide aux problèmes critiques.",
+      "minutes": "minutes"
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher des alertes...",
+      "allSeverity": "Toutes les Sévérités",
+      "allTypes": "Tous les Types",
+      "allStatus": "Tous les Statuts",
+      "dateRange": "Plage de Dates"
+    },
+    "types": {
+      "vital_signs": "Signes Vitaux",
+      "panic_sos": "Panique/SOS",
+      "device_offline": "Appareil Hors Ligne",
+      "geofence": "Géorepérage",
+      "inactivity": "Inactivité",
+      "fall_detected": "Chute Détectée",
+      "medication": "Médicament",
+      "wandering": "Errance",
+      "environmental": "Environnemental",
+      "battery_low": "Batterie Faible",
+      "connection_lost": "Connexion Perdue",
+      "dwell_time": "Temps de Séjour",
+      "heart_rate": "Fréquence Cardiaque",
+      "blood_pressure": "Pression Artérielle",
+      "oxygen_level": "Niveau d'Oxygène",
+      "temperature": "Température"
+    },
+    "statusOptions": {
+      "active": "Active",
+      "acknowledged": "Reconnue",
+      "resolved": "Résolue"
+    },
+    "dateRanges": {
+      "last24Hours": "Dernières 24 Heures",
+      "last7Days": "7 Derniers Jours",
+      "last30Days": "30 Derniers Jours",
+      "last90Days": "90 Derniers Jours"
+    },
+    "charts": {
+      "alertTrends": "Tendances des Alertes",
+      "alertTypesDistribution": "Distribution par Type d'Alerte",
+      "severityBreakdown": "Répartition par Sévérité",
+      "alerts": "alertes",
+      "count": "nombre"
+    },
+    "recipients": {
+      "title": "Destinataires Récents",
+      "alerts": "alertes"
+    },
+    "timeline": {
+      "title": "Chronologie des Alertes",
+      "severityLevels": "Niveaux de Sévérité des Alertes",
+      "criticalDesc": "Action immédiate requise (ex., bouton panique, anomalie vitale sévère)",
+      "highDesc": "Attention urgente nécessaire (ex., violation de géorepérage, appareil hors ligne)",
+      "mediumDesc": "À examiner bientôt (ex., écart mineur des signes vitaux)",
+      "lowDesc": "Informatif (ex., notifications de routine)",
+      "unknown": "Inconnu",
+      "acknowledged": "Reconnue"
+    },
+    "actions": {
+      "acknowledge": "Reconnaître"
+    },
+    "notifications": {
+      "newAlert": "Nouvelle Alerte",
+      "newAlertGenerated": "Une nouvelle alerte a été générée",
+      "person": "Personne",
+      "viewLater": "Voir Plus Tard",
+      "acknowledgeAlert": "Reconnaître l'Alerte"
+    },
+    "toasts": {
+      "error": "Erreur",
+      "failedToAcknowledge": "Échec de la reconnaissance de l'alerte",
+      "alertAcknowledged": "Alerte reconnue",
+      "alertAcknowledgedTitle": "Alerte Reconnue",
+      "alertAcknowledgedDesc": "L'alerte a été marquée comme reconnue"
+    },
+    "list": {
+      "activeAlerts": "Alertes Actives",
+      "filtered": "(Filtré)",
+      "active": "Actives"
+    },
+    "messages": {
+      "panic_sos": {
+        "title": "Bouton d'Urgence Activé",
+        "description": "Le bouton d'urgence a été pressé. Attention immédiate requise."
+      },
+      "vital_signs": {
+        "title": "Alerte Signes Vitaux",
+        "description": "Signes vitaux anormaux détectés. Veuillez vérifier l'état du patient."
+      },
+      "device_offline": {
+        "title": "Appareil Hors Ligne",
+        "description": "Un appareil est hors ligne et ne transmet plus de données."
+      },
+      "geofence": {
+        "title": "Alerte Géorepérage",
+        "description": "La personne a quitté ou est entrée dans une zone sécurisée désignée."
+      },
+      "inactivity": {
+        "title": "Alerte d'Inactivité",
+        "description": "Inactivité prolongée détectée. Veuillez vérifier la personne."
+      },
+      "fall_detected": {
+        "title": "Chute Détectée",
+        "description": "Une chute potentielle a été détectée. Attention immédiate requise."
+      },
+      "heart_rate": {
+        "title": "Alerte Fréquence Cardiaque",
+        "description": "Fréquence cardiaque anormale détectée."
+      },
+      "blood_pressure": {
+        "title": "Alerte Tension Artérielle",
+        "description": "Lecture de tension artérielle anormale détectée."
+      },
+      "oxygen_level": {
+        "title": "Alerte Niveau d'Oxygène",
+        "description": "Niveau de saturation en oxygène bas détecté."
+      },
+      "temperature": {
+        "title": "Alerte Température",
+        "description": "Température corporelle anormale détectée."
+      },
+      "dwell_time": {
+        "title": "Alerte Temps de Séjour",
+        "description": "Temps inhabituel passé dans un endroit détecté."
+      },
+      "battery_low": {
+        "title": "Batterie Faible",
+        "description": "La batterie de l'appareil est faible."
+      },
+      "medication": {
+        "title": "Rappel de Médicament",
+        "description": "Rappel de médicament déclenché."
+      },
+      "wandering": {
+        "title": "Alerte Errance",
+        "description": "Comportement d'errance inhabituel détecté."
+      }
+    }
+  },
+  "help": {
+    "pageTitle": {
+      "dashboard": "Aide du Tableau de Bord",
+      "activity": "Aide de Surveillance d'Activité",
+      "alerts": "Aide de Gestion des Alertes",
+      "devices": "Aide de Surveillance des Appareils",
+      "tracking": "Aide de Suivi de Localisation",
+      "dataSharing": "Aide de Partage de Données",
+      "default": "Aide et Support"
+    },
+    "description": "Trouvez des réponses et apprenez à utiliser SymBIoT efficacement",
+    "searchPlaceholder": "Rechercher des sujets d'aide...",
+    "relevantToPage": "Pertinent pour cette page",
+    "quickActions": "Actions Rapides",
+    "browseByTopic": "Parcourir par Sujet",
+    "searchResults": "Résultats de Recherche",
+    "noResults": "Aucun résultat trouvé pour",
+    "clearSearch": "Effacer la recherche",
+    "needMoreHelp": "Besoin d'aide supplémentaire?",
+    "contactSupport": "Contacter le Support",
+    "quickLinks": {
+      "viewDashboard": {
+        "title": "Voir le Tableau de Bord",
+        "description": "Voir l'aperçu de toutes les personnes surveillées"
+      },
+      "checkAlerts": {
+        "title": "Vérifier les Alertes Actives",
+        "description": "Examiner les alertes nécessitant une attention"
+      },
+      "monitorActivity": {
+        "title": "Surveiller l'Activité",
+        "description": "Suivre les mouvements et temps de séjour"
+      },
+      "viewDevices": {
+        "title": "Voir l'État des Appareils",
+        "description": "Vérifier tous les appareils connectés"
+      },
+      "trackLocation": {
+        "title": "Suivre la Localisation",
+        "description": "Voir le suivi intérieur et extérieur"
+      },
+      "restartTour": {
+        "title": "Relancer le Tour d'Introduction",
+        "description": "Refaire le tour guidé"
+      }
+    },
+    "categories": {
+      "gettingStarted": "Pour Commencer",
+      "dashboard": "Tableau de Bord",
+      "activityMonitoring": "Surveillance d'Activité",
+      "alerts": "Alertes",
+      "devices": "Appareils",
+      "tracking": "Suivi",
+      "dataSharing": "Partage de Données",
+      "troubleshooting": "Dépannage"
+    },
+    "topics": {
+      "gettingStarted": {
+        "title": "Commencer avec SymBIoT",
+        "content": "SymBIoT est une plateforme de surveillance complète pour les soins aux personnes âgées. Commencez par voir le Tableau de Bord pour un aperçu, puis explorez le suivi d'Activité, la gestion des Alertes et la surveillance des Appareils."
+      },
+      "navigation": {
+        "title": "Naviguer sur la Plateforme",
+        "content": "Utilisez le menu de navigation pour accéder aux différentes sections : Tableau de Bord (aperçu), Activité (schémas de mouvement), Suivi (localisation), Alertes (notifications) et Appareils (état des appareils)."
+      },
+      "dashboardOverview": {
+        "title": "Comprendre le Tableau de Bord",
+        "content": "Le Tableau de Bord affiche les métriques clés en un coup d'œil : personnes surveillées, alertes actives, fréquence cardiaque moyenne et niveau d'activité. Sélectionnez une personne dans la liste pour voir ses métriques vitales spécifiques."
+      },
+      "selectingPerson": {
+        "title": "Sélectionner une Personne à Surveiller",
+        "content": "Cliquez sur n'importe quelle personne dans la liste \"Personnes Surveillées\" pour voir leurs données spécifiques. Leurs métriques vitales, médicaments et capteurs environnementaux se mettront à jour automatiquement."
+      },
+      "vitalMetrics": {
+        "title": "Voir les Métriques Vitales",
+        "content": "Les métriques vitales montrent les données de santé en temps réel incluant la fréquence cardiaque, la pression artérielle, les niveaux d'oxygène, la température et plus encore. Cliquez sur \"Voir les Graphiques\" pour voir les tendances historiques."
+      },
+      "activityDashboard": {
+        "title": "Aperçu du Tableau de Bord d'Activité",
+        "content": "Suivez les schémas de mouvement, les temps de séjour et les écarts d'activité. Utilisez le sélecteur de plage de dates pour analyser différentes périodes. Voir les statistiques résumées, l'analyse du temps de séjour et créer des profils idéaux."
+      },
+      "dwellTime": {
+        "title": "Comprendre le Temps de Séjour",
+        "content": "Le temps de séjour est le temps passé dans chaque emplacement. Les barres vertes indiquent la plage normale, le jaune montre un écart de 10-20%, et le rouge indique un écart significatif (>20%) ou hors de la plage acceptable."
+      },
+      "idealProfiles": {
+        "title": "Créer des Profils Idéaux",
+        "content": "Les profils idéaux établissent des schémas d'activité de référence. Cliquez sur \"Nouveau Profil\", utilisez \"Utiliser Actuel comme Référence\" pour capturer l'activité typique, ajustez les seuils min/max, puis activez. Le système vous alertera lorsque les schémas dévient significativement."
+      },
+      "alertManagement": {
+        "title": "Gérer les Alertes",
+        "content": "Voir toutes les alertes système avec filtrage par gravité, type, statut et plage de dates. Utilisez la recherche pour trouver des alertes spécifiques. Cliquez sur \"Reconnaître\" pour marquer les alertes comme examinées."
+      },
+      "alertSeverity": {
+        "title": "Niveaux de Gravité des Alertes",
+        "content": "Critique (rouge) : Action immédiate requise (bouton panique, anomalie vitale grave). Élevé (orange) : Attention urgente nécessaire. Moyen (jaune) : Doit être examiné bientôt. Faible (gris) : Informatif."
+      },
+      "alertTypes": {
+        "title": "Types d'Alertes",
+        "content": "Signes Vitaux : Anomalies des métriques de santé. Panique/SOS : Activation du bouton d'urgence. Appareil Hors Ligne : Connexion de l'appareil perdue. Géorepérage : Violation de limite de localisation. Inactivité : Inactivité prolongée détectée. Temps de Séjour : Temps inhabituel dans les emplacements."
+      },
+      "acknowledgingAlerts": {
+        "title": "Reconnaître les Alertes",
+        "content": "Cliquez sur le bouton \"Reconnaître\" sur les alertes actives pour les marquer comme examinées. Cela suit les temps de réponse et montre la responsabilité. Les alertes reconnues passent au statut reconnu."
+      },
+      "deviceMonitoring": {
+        "title": "Surveiller les Appareils",
+        "content": "Voir tous les appareils connectés pour chaque personne. En ligne (vert) : Connecté et transmettant. Hors ligne (jaune) : Pas de données récentes. Vérifier les niveaux de batterie et les horodatages des dernières données reçues."
+      },
+      "deviceTypes": {
+        "title": "Comprendre les Types d'Appareils",
+        "content": "Les types d'appareils courants incluent : Wearables (trackers de fitness, montres connectées), Moniteurs de Santé (tension artérielle, glucomètres), Capteurs Environnementaux (température, détecteurs de mouvement), Trackers GPS et Boutons Panique."
+      },
+      "indoorTracking": {
+        "title": "Suivi Intérieur avec Plans d'Étage",
+        "content": "Voir la localisation en temps réel sur les plans d'étage téléchargés. Créer des zones pour définir des espaces comme chambre, cuisine, salle de bain. Suivre les trajets de mouvement et les temps de séjour dans chaque zone."
+      },
+      "outdoorTracking": {
+        "title": "Suivi GPS Extérieur",
+        "content": "Surveiller la localisation extérieure avec le suivi GPS. Configurer des géorepérages pour recevoir des alertes lorsque la personne entre ou sort des zones désignées. Voir l'historique de localisation sur la carte."
+      },
+      "geofences": {
+        "title": "Configurer les Géorepérages",
+        "content": "Les géorepérages sont des limites virtuelles. Cliquez sur \"Ajouter Géorepérage\" sur la carte, dessinez la limite, définissez un nom et un rayon. Choisissez les déclencheurs d'alerte (entrée, sortie ou les deux). Recevoir des notifications lorsque les limites sont franchies."
+      },
+      "sharingData": {
+        "title": "Partager des Données avec la Famille",
+        "content": "Partager les données de surveillance avec les membres de la famille ou d'autres soignants. Utilisez la page Partage de Données pour gérer qui a accès aux données de chaque personne. Définir les permissions et dates d'expiration."
+      },
+      "deviceOffline": {
+        "title": "Appareil Affichant Hors Ligne",
+        "content": "Si un appareil affiche hors ligne : 1) Vérifiez si l'appareil est allumé. 2) Assurez-vous qu'il est à portée du réseau. 3) Vérifiez le niveau de batterie. 4) Essayez de redémarrer l'appareil. 5) Contactez le support si le problème persiste."
+      },
+      "noData": {
+        "title": "Données Manquantes ou Pas de Données Affichées",
+        "content": "Si vous ne voyez pas de données : 1) Vérifiez que la bonne personne est sélectionnée. 2) Vérifiez la plage de dates. 3) Assurez-vous que les appareils sont connectés et transmettent. 4) Actualisez la page. 5) Vérifiez que vous avez les permissions d'accès."
+      },
+      "alertsNotShowing": {
+        "title": "Alertes N'Apparaissant Pas",
+        "content": "Si les alertes attendues n'apparaissent pas : 1) Vérifiez les filtres d'alertes (gravité, type, statut, plage de dates). 2) Effacez les termes de recherche. 3) Vérifiez que les paramètres d'alertes sont configurés. 4) Vérifiez si les alertes ont déjà été reconnues."
+      }
+    }
+  },
+  "ilq": {
+    "score": "Score ILQ",
+    "loadingILQ": "Chargement de l'ILQ...",
+    "noDataAvailable": "Aucune donnée ILQ disponible",
+    "dataWillAppear": "Les scores ILQ apparaîtront ici une fois que les données de l'appareil seront collectées",
+    "viewDetails": "Voir les Détails",
+    "lastUpdated": "Dernière mise à jour",
+    "health": "Santé",
+    "activity": "Activité",
+    "cognitive": "Cognitif",
+    "safety": "Sécurité",
+    "confidence": "Confiance",
+    "dataPoints": "points de données",
+    "excellent": "Excellent",
+    "good": "Bon",
+    "fair": "Moyen",
+    "poor": "Faible",
+    "critical": "Critique",
+    "trend": "Tendance ILQ",
+    "loadingChart": "Chargement du graphique...",
+    "noDataPeriod": "Aucune donnée ILQ disponible pour la période sélectionnée",
+    "lastDays": "{{days}} derniers jours",
+    "independenceScore": "Score d'indépendance sur les {{days}} derniers jours",
+    "ilqScore": "Score ILQ",
+    "alertsHistory": "Historique des Alertes ILQ",
+    "alertsHistoryDesc": "Toutes les alertes liées aux changements de score ILQ",
+    "change": "Changement",
+    "points": "points",
+    "analytics": {
+      "title": "Analytique ILQ",
+      "subtitle": "Quotient de Vie Indépendante",
+      "description": "Quotient de Vie Indépendante - Évaluation Complète de l'Indépendance",
+      "selectPerson": "Sélectionner une personne",
+      "computeILQ": "Calculer ILQ",
+      "autoOn": "Auto: ON",
+      "autoOff": "Auto: OFF",
+      "autoRefreshOn": "Auto-actualisation ACTIVÉE (toutes les 10s)",
+      "autoRefreshOff": "Auto-actualisation DÉSACTIVÉE",
+      "downloadReport": "Télécharger le Rapport",
+      "sevenDayTrend": "Tendance sur 7 Jours",
+      "loadingTrendData": "Chargement des données de tendance...",
+      "improving": "En Amélioration",
+      "needsAttention": "Nécessite Attention",
+      "notEnoughData": "Données insuffisantes",
+      "activeAlerts": "Alertes Actives",
+      "historicalTrends": "Tendances Historiques",
+      "componentBreakdown": "Répartition des Composants",
+      "alertsHistory": "Historique des Alertes",
+      "scoreHistory": "Historique du Score ILQ",
+      "trackIndependence": "Suivre les niveaux d'indépendance",
+      "last7Days": "7 derniers jours",
+      "last30Days": "30 derniers jours",
+      "last90Days": "90 derniers jours",
+      "noHistoricalData": "Aucune donnée historique disponible",
+      "componentAnalysis": "Analyse des Composants",
+      "componentAnalysisDesc": "Répartition des scores sur toutes les dimensions",
+      "noComponentData": "Aucune donnée de composant disponible",
+      "componentDetails": "Détails des Composants",
+      "componentDetailsDesc": "Comprendre chaque dimension",
+      "healthVitals": "Signes Vitaux",
+      "healthVitalsPercent": "Signes Vitaux (30%)",
+      "healthVitalsDesc": "Fréquence cardiaque, tension artérielle, température",
+      "physicalActivity": "Activité Physique",
+      "physicalActivityPercent": "Activité Physique (25%)",
+      "physicalActivityDesc": "Pas, modèles de mouvement, mobilité",
+      "cognitiveFunction": "Fonction Cognitive",
+      "cognitiveFunctionPercent": "Fonction Cognitive (15%)",
+      "cognitiveFunctionDesc": "Adhésion à la routine, observance médicamenteuse",
+      "environmental": "Environnemental",
+      "emergency": "Urgence",
+      "social": "Social",
+      "computingScore": "Calcul du score ILQ...",
+      "computedSuccess": "ILQ calculé avec succès: {{score}}",
+      "computeFailed": "Échec du calcul ILQ",
+      "generatingReport": "Génération du rapport PDF...",
+      "reportDownloaded": "Rapport téléchargé avec succès!",
+      "reportFailed": "Échec de la génération du rapport"
+    }
+  },
+  "homeHub": {
+    "title": "Hub Domestique",
+    "selectPerson": "Sélectionnez une personne pour voir les données du hub domestique",
+    "noDeviceRegistered": "Aucun hub domestique enregistré",
+    "noDataAvailable": "Aucune donnée disponible du hub domestique",
+    "deviceInformation": "Informations sur l'Appareil",
+    "deviceName": "Nom de l'Appareil",
+    "deviceId": "ID de l'Appareil",
+    "lastUpdated": "Dernière Mise à Jour",
+    "recentActivity": "Activité Récente",
+    "unknown": "Inconnu",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "idle": "Inactif",
+    "value": "Valeur"
+  },
+  "smartPhone": {
+    "title": "Téléphone Intelligent",
+    "selectPerson": "Sélectionnez une personne pour voir les données du téléphone intelligent",
+    "noDeviceRegistered": "Aucun téléphone intelligent enregistré",
+    "noDataAvailable": "Aucune donnée disponible du téléphone intelligent",
+    "deviceInformation": "Informations sur l'Appareil",
+    "deviceName": "Nom de l'Appareil",
+    "deviceId": "ID de l'Appareil",
+    "lastUpdated": "Dernière Mise à Jour",
+    "lastKnownLocation": "Dernière Position Connue",
+    "invalidGpsData": "Données GPS invalides",
+    "accuracy": "Précision",
+    "recentActivity": "Activité Récente",
+    "unknown": "Inconnu",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "idle": "Inactif",
+    "value": "Valeur"
+  }
+}
