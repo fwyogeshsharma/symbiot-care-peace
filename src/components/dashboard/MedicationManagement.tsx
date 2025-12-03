@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Pill, Clock, CheckCircle2, XCircle, TrendingUp } from 'lucide-react';
 import { format, isToday, parseISO } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { extractBooleanValue } from '@/lib/valueExtractor';
 
 interface MedicationManagementProps {
   selectedPersonId: string | null;
@@ -19,8 +20,8 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
 
       const { data, error } = await supabase
         .from('device_data')
-        .select('*, devices!inner(*)')
-        .eq('devices.device_type', 'medication_dispenser')
+        .select('*, devices!inner(*, device_types(category))')
+        .in('devices.device_type', ['medication_dispenser', 'medication'])
         .eq('elderly_person_id', selectedPersonId)
         .order('recorded_at', { ascending: false })
         .limit(50);
@@ -65,21 +66,54 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
     );
   }
 
+  // Helper to check if medication was taken
+  const isMedicationTaken = (value: any): boolean => {
+    const boolValue = extractBooleanValue(value, 'medication_taken');
+    if (boolValue !== null) return boolValue;
+    // Handle string values like "Yes"/"No"
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'yes' || value.toLowerCase() === 'true';
+    }
+    return false;
+  };
+
+  // Helper to extract next dose time
+  const extractNextDoseTime = (value: any): string | null => {
+    if (!value && value !== 0) return null;
+
+    let rawValue = value;
+    // Handle object with value property
+    if (typeof value === 'object' && value.value !== undefined) {
+      rawValue = value.value;
+    }
+
+    // Handle numeric hour values (e.g., 23 -> "23:00")
+    if (typeof rawValue === 'number') {
+      const hour = rawValue;
+      if (hour >= 0 && hour <= 23) {
+        return `${hour.toString().padStart(2, '0')}:00`;
+      }
+      return String(rawValue);
+    }
+
+    return String(rawValue);
+  };
+
   // Process medication data
   const medicationTakenData = medicationData?.filter(d => d.data_type === 'medication_taken') || [];
   const nextDoseData = medicationData?.find(d => d.data_type === 'next_dose_time');
-  
+
   // Calculate compliance rate (last 7 days)
   const last7Days = medicationTakenData.slice(0, 21); // Assuming 3 doses per day
-  const takenCount = last7Days.filter(d => d.value === true).length;
+  const takenCount = last7Days.filter(d => isMedicationTaken(d.value)).length;
   const complianceRate = last7Days.length > 0 ? Math.round((takenCount / last7Days.length) * 100) : 0;
 
   // Get today's doses
   const todayDoses = medicationTakenData.filter(d => isToday(parseISO(d.recorded_at)));
-  
+
   // Get latest status
   const latestDose = medicationTakenData[0];
-  const nextDoseTime = nextDoseData?.value as string;
+  const nextDoseTime = extractNextDoseTime(nextDoseData?.value);
 
   // Get recent doses (last 5)
   const recentDoses = medicationTakenData.slice(0, 5);
@@ -128,7 +162,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-card/50 backdrop-blur-sm rounded-lg p-3 border border-primary/10">
             <div className="flex items-center gap-2 mb-1">
-              {latestDose?.value ? (
+              {latestDose && isMedicationTaken(latestDose.value) ? (
                 <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
               ) : (
                 <XCircle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
@@ -136,7 +170,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
               <span className="text-xs text-muted-foreground">{t('medication.latestDose')}</span>
             </div>
             <p className="text-sm font-semibold">
-              {latestDose?.value ? t('medication.taken') : t('medication.missed')}
+              {latestDose && isMedicationTaken(latestDose.value) ? t('medication.taken') : t('medication.missed')}
             </p>
             {latestDose && (
               <p className="text-xs text-muted-foreground mt-1">
@@ -151,11 +185,28 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
               <span className="text-xs text-muted-foreground">{t('medication.nextDose')}</span>
             </div>
             <p className="text-sm font-semibold">
-              {nextDoseTime ? format(parseISO(nextDoseTime), 'HH:mm') : t('medication.notScheduled')}
+              {nextDoseTime ? (
+                // Check if it's already formatted time (e.g., "5:30 AM") or ISO timestamp
+                nextDoseTime.includes(':') && !nextDoseTime.includes('T')
+                  ? nextDoseTime
+                  : (() => {
+                      try {
+                        return format(parseISO(nextDoseTime), 'HH:mm');
+                      } catch {
+                        return nextDoseTime;
+                      }
+                    })()
+              ) : t('medication.notScheduled')}
             </p>
-            {nextDoseTime && (
+            {nextDoseTime && nextDoseTime.includes('T') && (
               <p className="text-xs text-muted-foreground mt-1">
-                {format(parseISO(nextDoseTime), 'MMM d')}
+                {(() => {
+                  try {
+                    return format(parseISO(nextDoseTime), 'MMM d');
+                  } catch {
+                    return '';
+                  }
+                })()}
               </p>
             )}
           </div>
@@ -173,11 +224,11 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
                 <div
                   key={idx}
                   className={`flex-1 h-2 rounded-full ${
-                    dose.value
+                    isMedicationTaken(dose.value)
                       ? 'bg-green-600'
                       : 'bg-orange-600'
                   }`}
-                  title={`${format(parseISO(dose.recorded_at), 'HH:mm')} - ${dose.value ? t('medication.taken') : t('medication.missed')}`}
+                  title={`${format(parseISO(dose.recorded_at), 'HH:mm')} - ${isMedicationTaken(dose.value) ? t('medication.taken') : t('medication.missed')}`}
                 />
               ))}
             </div>
@@ -197,13 +248,13 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
                   className="flex items-center justify-between text-sm py-2 border-b border-border/50 last:border-0"
                 >
                   <div className="flex items-center gap-2">
-                    {dose.value ? (
+                    {isMedicationTaken(dose.value) ? (
                       <CheckCircle2 className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
                     ) : (
                       <XCircle className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" />
                     )}
-                    <span className={dose.value ? 'text-foreground' : 'text-muted-foreground'}>
-                      {dose.value ? t('medication.taken') : t('medication.missed')}
+                    <span className={isMedicationTaken(dose.value) ? 'text-foreground' : 'text-muted-foreground'}>
+                      {isMedicationTaken(dose.value) ? t('medication.taken') : t('medication.missed')}
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground">
