@@ -1025,7 +1025,20 @@
     "updateProfile": "Mettre à jour le profil",
     "saveChanges": "Enregistrer les modifications",
     "language": "Langue",
-    "restartTour": "Redémarrer la visite guidée"
+    "restartTour": "Redémarrer la visite guidée",
+    "backToDashboard": "Retour au Tableau de Bord",
+    "back": "Retour",
+    "loading": "Chargement du profil...",
+    "editProfile": "Modifier le Profil",
+    "edit": "Modifier",
+    "emailCannotChange": "Le courriel ne peut pas être modifié",
+    "enterFullName": "Entrez votre nom complet",
+    "enterPhone": "Entrez votre numéro de téléphone",
+    "saving": "Enregistrement...",
+    "userManagement": "Gestion des Utilisateurs",
+    "profileUpdated": "Profil mis à jour",
+    "profileUpdatedDesc": "Votre profil a été mis à jour avec succès.",
+    "updateFailed": "Échec de la mise à jour du profil"
   },
   "dashboard": {
     "title": "Tableau de Bord",

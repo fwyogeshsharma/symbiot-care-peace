@@ -1082,7 +1082,20 @@
     "updateProfile": "Update Profile",
     "saveChanges": "Save Changes",
     "language": "Language",
-    "restartTour": "Restart Onboarding Tour"
+    "restartTour": "Restart Onboarding Tour",
+    "backToDashboard": "Back to Dashboard",
+    "back": "Back",
+    "loading": "Loading profile...",
+    "editProfile": "Edit Profile",
+    "edit": "Edit",
+    "emailCannotChange": "Email cannot be changed",
+    "enterFullName": "Enter your full name",
+    "enterPhone": "Enter your phone number",
+    "saving": "Saving...",
+    "userManagement": "User Management",
+    "profileUpdated": "Profile updated",
+    "profileUpdatedDesc": "Your profile has been updated successfully.",
+    "updateFailed": "Failed to update profile"
   },
   "dataSharing": {
     "title": "Data Sharing",

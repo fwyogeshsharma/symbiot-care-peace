@@ -1025,7 +1025,20 @@
     "updateProfile": "Profil aktualisieren",
     "saveChanges": "Änderungen speichern",
     "language": "Sprache",
-    "restartTour": "Einführungstour neu starten"
+    "restartTour": "Einführungstour neu starten",
+    "backToDashboard": "Zurück zum Dashboard",
+    "back": "Zurück",
+    "loading": "Profil wird geladen...",
+    "editProfile": "Profil bearbeiten",
+    "edit": "Bearbeiten",
+    "emailCannotChange": "E-Mail kann nicht geändert werden",
+    "enterFullName": "Geben Sie Ihren vollständigen Namen ein",
+    "enterPhone": "Geben Sie Ihre Telefonnummer ein",
+    "saving": "Speichern...",
+    "userManagement": "Benutzerverwaltung",
+    "profileUpdated": "Profil aktualisiert",
+    "profileUpdatedDesc": "Ihr Profil wurde erfolgreich aktualisiert.",
+    "updateFailed": "Profilaktualisierung fehlgeschlagen"
   },
   "dashboard": {
     "title": "Dashboard",

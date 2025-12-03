@@ -69,14 +69,14 @@ const Profile = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
       toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully.",
+        title: t('profile.profileUpdated'),
+        description: t('profile.profileUpdatedDesc'),
       });
       setIsEditing(false);
     },
     onError: (error: any) => {
       toast({
-        title: "Failed to update profile",
+        title: t('profile.updateFailed'),
         description: error.message,
         variant: "destructive",
       });
@@ -108,7 +108,7 @@ const Profile = () => {
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading profile...</p>
+          <p className="text-muted-foreground">{t('profile.loading')}</p>
         </div>
       </div>
     );
@@ -120,8 +120,8 @@ const Profile = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate('/dashboard')} size="sm">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">Back to Dashboard</span>
-            <span className="sm:hidden">Back</span>
+            <span className="hidden sm:inline">{t('profile.backToDashboard')}</span>
+            <span className="sm:hidden">{t('profile.back')}</span>
           </Button>
           <h1 className="text-lg sm:text-xl font-bold">{t('profile.title')}</h1>
           <div className="w-16 sm:w-24"></div>
@@ -161,8 +161,8 @@ const Profile = () => {
                 </div>
                 {!isEditing && (
                   <Button onClick={() => setIsEditing(true)} variant="outline" size="sm" className="shrink-0">
-                    <span className="hidden sm:inline">Edit Profile</span>
-                    <span className="sm:hidden">Edit</span>
+                    <span className="hidden sm:inline">{t('profile.editProfile')}</span>
+                    <span className="sm:hidden">{t('profile.edit')}</span>
                   </Button>
                 )}
               </div>
@@ -182,7 +182,7 @@ const Profile = () => {
                       className="bg-muted"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Email cannot be changed
+                      {t('profile.emailCannotChange')}
                     </p>
                   </div>
 
@@ -197,7 +197,7 @@ const Profile = () => {
                       value={formData.full_name}
                       onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                       disabled={!isEditing}
-                      placeholder="Enter your full name"
+                      placeholder={t('profile.enterFullName')}
                     />
                   </div>
 
@@ -212,7 +212,7 @@ const Profile = () => {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       disabled={!isEditing}
-                      placeholder="Enter your phone number"
+                      placeholder={t('profile.enterPhone')}
                     />
                   </div>
                 </div>
@@ -225,7 +225,7 @@ const Profile = () => {
                       disabled={updateProfileMutation.isPending}
                     >
                       <Save className="w-4 h-4 mr-2" />
-                      {updateProfileMutation.isPending ? 'Saving...' : t('profile.saveChanges')}
+                      {updateProfileMutation.isPending ? t('profile.saving') : t('profile.saveChanges')}
                     </Button>
                     <Button
                       type="button"
@@ -276,7 +276,7 @@ const Profile = () => {
                       onClick={() => navigate('/admin/user-management')}
                     >
                       <Shield className="w-4 h-4 mr-2" />
-                      User Management
+                      {t('profile.userManagement')}
                     </Button>
                     <Separator />
                   </>

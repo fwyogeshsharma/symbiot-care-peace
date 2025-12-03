@@ -1025,7 +1025,20 @@
     "updateProfile": "Actualizar Perfil",
     "saveChanges": "Guardar Cambios",
     "language": "Idioma",
-    "restartTour": "Reiniciar Tour de Introducción"
+    "restartTour": "Reiniciar Tour de Introducción",
+    "backToDashboard": "Volver al Panel",
+    "back": "Volver",
+    "loading": "Cargando perfil...",
+    "editProfile": "Editar Perfil",
+    "edit": "Editar",
+    "emailCannotChange": "El correo no se puede cambiar",
+    "enterFullName": "Ingresa tu nombre completo",
+    "enterPhone": "Ingresa tu número de teléfono",
+    "saving": "Guardando...",
+    "userManagement": "Gestión de Usuarios",
+    "profileUpdated": "Perfil actualizado",
+    "profileUpdatedDesc": "Tu perfil ha sido actualizado exitosamente.",
+    "updateFailed": "Error al actualizar perfil"
   },
   "dashboard": {
     "title": "Panel",
