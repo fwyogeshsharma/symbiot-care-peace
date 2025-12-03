@@ -517,8 +517,16 @@
   },
   "alerts": {
     "title": "Alerts",
+    "management": "Alert Management",
+    "subtitle": "Monitor and respond to system alerts",
     "noAlerts": "No alerts at this time",
+    "noAlertsFound": "No alerts found",
+    "noAlertsDescription": "All clear! No alerts match your current filters. Try adjusting the filters above to view different alerts.",
+    "allClear": "All clear! No active alerts.",
     "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
     "warning": "Warning",
     "info": "Info",
     "resolved": "Resolved",
@@ -529,33 +537,453 @@
     "sortBy": "Sort by",
     "date": "Date",
     "severity": "Severity",
-    "type": "Type"
+    "type": "Type",
+    "status": "Status",
+    "stats": {
+      "totalAlerts": "Total Alerts",
+      "totalAlertsTooltip": "Total number of alerts in the selected time period, including active, acknowledged, and resolved alerts.",
+      "active": "Active",
+      "critical": "Critical",
+      "avgResponse": "Avg Response",
+      "responseTime": "Response Time",
+      "responseTimeTooltip": "Average time taken to acknowledge alerts. Lower response times indicate faster attention to critical issues.",
+      "minutes": "minutes"
+    },
+    "filters": {
+      "searchPlaceholder": "Search alerts...",
+      "allSeverity": "All Severity",
+      "allTypes": "All Types",
+      "allStatus": "All Status",
+      "dateRange": "Date Range"
+    },
+    "types": {
+      "vital_signs": "Vital Signs",
+      "panic_sos": "Panic/SOS",
+      "device_offline": "Device Offline",
+      "geofence": "Geofence",
+      "inactivity": "Inactivity",
+      "fall_detected": "Fall Detected",
+      "medication": "Medication",
+      "wandering": "Wandering",
+      "environmental": "Environmental",
+      "battery_low": "Low Battery",
+      "connection_lost": "Connection Lost",
+      "dwell_time": "Dwell Time",
+      "heart_rate": "Heart Rate",
+      "blood_pressure": "Blood Pressure",
+      "oxygen_level": "Oxygen Level",
+      "temperature": "Temperature"
+    },
+    "statusOptions": {
+      "active": "Active",
+      "acknowledged": "Acknowledged",
+      "resolved": "Resolved"
+    },
+    "dateRanges": {
+      "last24Hours": "Last 24 Hours",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "last90Days": "Last 90 Days"
+    },
+    "charts": {
+      "alertTrends": "Alert Trends",
+      "alertTypesDistribution": "Alert Types Distribution",
+      "severityBreakdown": "Severity Breakdown",
+      "alerts": "alerts",
+      "count": "count"
+    },
+    "recipients": {
+      "title": "Recent Recipients",
+      "alerts": "alerts"
+    },
+    "timeline": {
+      "title": "Alert Timeline",
+      "severityLevels": "Alert Severity Levels",
+      "criticalDesc": "Immediate action required (e.g., panic button, severe vital anomaly)",
+      "highDesc": "Urgent attention needed (e.g., geofence breach, device offline)",
+      "mediumDesc": "Should be reviewed soon (e.g., minor vital deviation)",
+      "lowDesc": "Informational (e.g., routine notifications)",
+      "unknown": "Unknown",
+      "acknowledged": "Acknowledged"
+    },
+    "actions": {
+      "acknowledge": "Acknowledge"
+    },
+    "notifications": {
+      "newAlert": "New Alert",
+      "newAlertGenerated": "A new alert has been generated",
+      "person": "Person",
+      "viewLater": "View Later",
+      "acknowledgeAlert": "Acknowledge Alert"
+    },
+    "toasts": {
+      "error": "Error",
+      "failedToAcknowledge": "Failed to acknowledge alert",
+      "alertAcknowledged": "Alert acknowledged",
+      "alertAcknowledgedTitle": "Alert Acknowledged",
+      "alertAcknowledgedDesc": "The alert has been marked as acknowledged"
+    },
+    "list": {
+      "activeAlerts": "Active Alerts",
+      "filtered": "(Filtered)",
+      "active": "Active"
+    },
+    "messages": {
+      "panic_sos": {
+        "title": "Emergency Button Activated",
+        "description": "Emergency button has been pressed. Immediate attention required."
+      },
+      "vital_signs": {
+        "title": "Vital Signs Alert",
+        "description": "Abnormal vital signs detected. Please check the patient's condition."
+      },
+      "device_offline": {
+        "title": "Device Offline",
+        "description": "A device has gone offline and is no longer transmitting data."
+      },
+      "geofence": {
+        "title": "Geofence Alert",
+        "description": "Person has left or entered a designated safe zone."
+      },
+      "inactivity": {
+        "title": "Inactivity Alert",
+        "description": "Prolonged inactivity detected. Please check on the person."
+      },
+      "fall_detected": {
+        "title": "Fall Detected",
+        "description": "A potential fall has been detected. Immediate attention required."
+      },
+      "heart_rate": {
+        "title": "Heart Rate Alert",
+        "description": "Abnormal heart rate detected."
+      },
+      "blood_pressure": {
+        "title": "Blood Pressure Alert",
+        "description": "Abnormal blood pressure reading detected."
+      },
+      "oxygen_level": {
+        "title": "Oxygen Level Alert",
+        "description": "Low oxygen saturation level detected."
+      },
+      "temperature": {
+        "title": "Temperature Alert",
+        "description": "Abnormal body temperature detected."
+      },
+      "dwell_time": {
+        "title": "Dwell Time Alert",
+        "description": "Unusual time spent in a location detected."
+      },
+      "battery_low": {
+        "title": "Low Battery",
+        "description": "Device battery is running low."
+      },
+      "medication": {
+        "title": "Medication Reminder",
+        "description": "Medication reminder triggered."
+      },
+      "wandering": {
+        "title": "Wandering Alert",
+        "description": "Unusual wandering behavior detected."
+      }
+    }
   },
   "devices": {
     "title": "Devices",
+    "subtitle": "Monitor your devices",
+    "pageTitle": "Devices",
+    "pageDescription": "Monitor and manage all connected devices",
     "status": "Device Status",
     "online": "Online",
     "offline": "Offline",
+    "inactive": "Inactive",
+    "maintenance": "Maintenance",
     "battery": "Battery",
     "lastSeen": "Last Seen",
     "addDevice": "Add Device",
     "removeDevice": "Remove Device",
     "deviceName": "Device Name",
     "deviceType": "Device Type",
-    "location": "Location"
+    "location": "Location",
+    "platformMetrics": "Platform Metrics",
+    "deviceTypes": "Device Types",
+    "noDevices": "No devices registered yet",
+    "noData": "No Data",
+    "records": "records",
+    "generateData": "Generate Data",
+    "generateDataTooltip": "Generate 7 days of sample data for testing",
+    "unassigned": "Unassigned",
+    "guide": {
+      "title": "Device Status Guide",
+      "description": "Monitor all connected devices and their real-time status.",
+      "onlineDesc": "Device is connected and transmitting",
+      "offlineDesc": "No recent data received",
+      "inactiveDesc": "Device not configured",
+      "clickTip": "Click on any device card to view detailed information and history."
+    },
+    "apiDetails": {
+      "title": "Device API Details",
+      "description": "Use these details to send data from your IoT device",
+      "apiKey": "API Key",
+      "saveSecurely": "Save this securely",
+      "apiEndpoint": "API Endpoint",
+      "exampleRequest": "Example Request",
+      "availableDataTypes": "Available data types",
+      "dataTypesList": "heart_rate, blood_pressure, temperature, fall_detected, steps, sleep, activity, location",
+      "useKeyAuth": "Use this key to authenticate your device when sending data",
+      "copied": "Copied!",
+      "copiedToClipboard": "API key copied to clipboard",
+      "viewHistory": "View Device History"
+    },
+    "edit": {
+      "title": "Edit Device",
+      "description": "Update device information",
+      "deviceName": "Device Name",
+      "deviceType": "Device Type",
+      "location": "Location",
+      "company": "Company/Manufacturer",
+      "selectCompany": "Select company (optional)",
+      "cancel": "Cancel",
+      "updating": "Updating...",
+      "updateDevice": "Update Device",
+      "updated": "Device updated",
+      "updatedDesc": "Device information has been updated successfully.",
+      "updateFailed": "Update failed"
+    },
+    "delete": {
+      "title": "Delete Device",
+      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+      "alsoDeleteData": "Also delete all device data (health records, sensor readings, etc.)",
+      "cancel": "Cancel",
+      "deleting": "Deleting...",
+      "deleteDevice": "Delete Device",
+      "deleted": "Device deleted",
+      "deletedDesc": "Device has been removed successfully.",
+      "deleteFailed": "Delete failed"
+    },
+    "register": {
+      "title": "Register New Device",
+      "dialogTitle": "Add IoT Device",
+      "dialogDescription": "Register a device manually or use the pairing flow for collaborative setup.",
+      "manualRegistration": "Manual Registration",
+      "pairDevice": "Pair Device",
+      "deviceName": "Device Name",
+      "deviceNamePlaceholder": "e.g., Living Room Monitor",
+      "deviceType": "Device Type",
+      "selectDeviceType": "Select device type",
+      "company": "Company/Manufacturer",
+      "selectCompany": "Select company (optional)",
+      "model": "Device Model",
+      "selectModel": "Select model (optional)",
+      "modelDescription": "Select the specific model of your device",
+      "deviceId": "Device ID",
+      "deviceIdPlaceholder": "e.g., DEV-12345",
+      "deviceIdDescription": "Unique identifier from your IoT device",
+      "location": "Location (Optional)",
+      "locationPlaceholder": "e.g., Bedroom, Living Room",
+      "generateSampleData": "Generate sample data for testing",
+      "generateSampleDataDesc": "Automatically create 7 days of fake data to test dashboards",
+      "registering": "Registering...",
+      "registerDevice": "Register Device",
+      "success": "Device registered successfully",
+      "successWithData": "Your IoT device has been added with sample data.",
+      "successNoData": "Your IoT device has been added.",
+      "failed": "Failed to register device",
+      "missingInfo": "Missing information",
+      "fillRequired": "Please fill in all required fields",
+      "noProfile": "No profile found",
+      "createProfileFirst": "Please create an elderly person profile first",
+      "noProfileForPairing": "No elderly person profile found.",
+      "setupProfileFirst": "Please set up a profile first to pair devices.",
+      "apiKeyTitle": "API Key (Save this securely)",
+      "apiKeyWarning": "This key will only be shown once. Save it now!",
+      "useApiKeyAuth": "Use this API key to authenticate your device when sending data.",
+      "apiEndpoint": "API Endpoint:",
+      "exampleRequest": "Example Request:",
+      "registerAnother": "Register Another Device",
+      "apiKeyCopied": "API Key copied",
+      "apiKeyCopiedDesc": "API key has been copied to clipboard"
+    },
+    "geofenceAlert": {
+      "title": "Geofences Required",
+      "description": "GPS devices require at least one geofence to be set up before registration.",
+      "explanation": "Geofences define safe zones and important places (like home, work, or medical facilities). They enable location-based alerts when the person enters or exits these areas.",
+      "howToAdd": "To add geofences:",
+      "step1": "Go to Tracking in the navigation",
+      "step2": "Select Outdoor Tracking tab",
+      "step3": "Use the Geofence Manager to add places",
+      "step4": "Return here to register your GPS device",
+      "cancel": "Cancel",
+      "goToTracking": "Go to Tracking"
+    },
+    "history": {
+      "title": "Device History",
+      "titleWithName": "Device History - {{name}}",
+      "description": "Historical data readings from this device",
+      "loading": "Loading history...",
+      "noData": "No data recorded yet",
+      "readings": "readings"
+    },
+    "dataGeneration": {
+      "generated": "Data generated",
+      "generatedDesc": "Sample data has been generated successfully for the device.",
+      "failed": "Generation failed",
+      "sampleDataFailed": "Sample data generation failed"
+    },
+    "validation": {
+      "deviceNameRequired": "Device name is required",
+      "deviceNameMax": "Device name must be less than 100 characters",
+      "deviceTypeRequired": "Device type is required",
+      "deviceIdRequired": "Device ID is required",
+      "deviceIdMax": "Device ID must be less than 50 characters",
+      "deviceIdFormat": "Device ID can only contain letters, numbers, hyphens, and underscores",
+      "locationMax": "Location must be less than 100 characters"
+    },
+    "pairing": {
+      "title": "Device Pairing Requests",
+      "noPending": "No pending pairing requests",
+      "approveTitle": "Approve Device Pairing",
+      "reviewAndApprove": "Review and approve device for {{name}}",
+      "deviceId": "Device ID",
+      "deviceType": "Device Type",
+      "unknown": "Unknown",
+      "pairingCode": "Pairing Code",
+      "requested": "Requested",
+      "deviceNameOptional": "Device Name (Optional)",
+      "deviceNamePlaceholder": "e.g., Living Room Sensor",
+      "locationOptional": "Location (Optional)",
+      "locationPlaceholder": "e.g., Living Room",
+      "approve": "Approve",
+      "reject": "Reject",
+      "backToList": "Back to List",
+      "pendingRequests": "{{count}} pending request",
+      "pendingRequestsPlural": "{{count}} pending requests",
+      "forPerson": "For {{name}}",
+      "newRequestReceived": "New device pairing request received!",
+      "pairedSuccessfully": "Device paired successfully!",
+      "approveFailed": "Failed to approve pairing",
+      "rejected": "Pairing request rejected",
+      "rejectFailed": "Failed to reject pairing"
+    }
   },
   "tracking": {
     "title": "Tracking",
+    "subtitle": "Indoor and outdoor positioning system",
+    "movementTracking": "Movement Tracking",
+    "realTimePositioning": "Real-time indoor and outdoor positioning",
     "location": "Current Location",
-    "indoor": "Indoor Tracking",
-    "outdoor": "Outdoor Tracking",
+    "indoor": "Indoor",
+    "outdoor": "Outdoor",
+    "cameras": "Cameras",
+    "indoorTracking": "Indoor Tracking",
+    "outdoorTracking": "Outdoor Tracking",
     "safeZones": "Safe Zones",
     "geofencing": "Geofencing",
     "history": "Location History",
     "realTime": "Real-Time",
     "addZone": "Add Safe Zone",
     "editZone": "Edit Zone",
-    "deleteZone": "Delete Zone"
+    "deleteZone": "Delete Zone",
+    "floorPlans": "Floor Plans",
+    "selectPeriod": "Select period",
+    "today": "Today",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days",
+    "noFloorPlan": {
+      "title": "No Floor Plan Found",
+      "description": "Register a worker-wearable device to see indoor tracking"
+    },
+    "noGpsData": {
+      "title": "No GPS Data or Geofences",
+      "description": "Register a GPS device to see outdoor tracking and real-time location data",
+      "setupGeofences": "Set up your geofences below! Geofences define important places and safe zones for location-based alerts."
+    },
+    "geofencesConfigured": {
+      "title": "Geofences Configured",
+      "description": "Your geofences are displayed on the map below. Register a GPS device to see real-time tracking."
+    },
+    "securityCameras": "Security Cameras",
+    "noMovementData": {
+      "title": "No movement data available",
+      "description": "To see movement tracking, go to the Dashboard and click \"Populate Device Data\" for a worker-wearable device to generate sample position data.",
+      "goToDashboard": "Go to Dashboard"
+    },
+    "positioningVisualization": "Real-time positioning and movement visualization",
+    "playback": {
+      "title": "Movement Playback",
+      "noData": "No movement data to playback",
+      "zone": "Zone",
+      "speed": "Speed",
+      "accuracy": "Accuracy"
+    },
+    "metrics": {
+      "totalDistance": "Total Distance",
+      "traveled": "traveled",
+      "averageSpeed": "Average Speed",
+      "zoneVisits": "Zone Visits",
+      "most": "Most",
+      "noData": "No data",
+      "activeTime": "Active Time",
+      "acrossZones": "Across {{count}} zones",
+      "zoneStatistics": "Zone Statistics",
+      "visits": "visits"
+    },
+    "gps": {
+      "totalDistance": "Total Distance",
+      "basedOnPoints": "Based on {{count}} GPS points",
+      "locationsVisited": "Locations Visited",
+      "activeGeofences": "Active geofence locations",
+      "totalEvents": "Total Events",
+      "entryExitEvents": "Entry and exit events",
+      "mostVisitedPlaces": "Most Visited Places",
+      "visit": "visit",
+      "visits": "visits"
+    },
+    "geofence": {
+      "title": "Geofence Places",
+      "addPlace": "Add Place",
+      "editPlace": "Edit Geofence Place",
+      "addGeofencePlace": "Add Geofence Place",
+      "loading": "Loading geofence places...",
+      "noPlaces": "No geofence places configured.",
+      "ftRadius": "ft radius",
+      "name": "Name",
+      "namePlaceholder": "e.g., Home",
+      "placeType": "Place Type",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "radius": "Radius (feet)",
+      "address": "Address (optional)",
+      "addressPlaceholder": "123 Main St, City, Country",
+      "getCoordinates": "Get coordinates from address",
+      "color": "Color",
+      "notes": "Notes (optional)",
+      "notesPlaceholder": "Additional notes...",
+      "createPlace": "Create Place",
+      "updatePlace": "Update Place",
+      "cancel": "Cancel",
+      "created": "Geofence place created successfully",
+      "updated": "Geofence place updated successfully",
+      "deleted": "Geofence place deleted successfully",
+      "createError": "Failed to create geofence place",
+      "updateError": "Failed to update geofence place",
+      "deleteError": "Failed to delete geofence place",
+      "enterAddress": "Please enter an address first",
+      "coordinatesUpdated": "Coordinates updated from address",
+      "coordinatesNotFound": "Could not find coordinates for this address",
+      "geocodeError": "Failed to geocode address"
+    },
+    "events": {
+      "title": "Location History",
+      "loading": "Loading events...",
+      "noEvents": "No location events in this time period.",
+      "arrived": "Arrived",
+      "left": "Left",
+      "duration": "Duration",
+      "unknownLocation": "Unknown Location"
+    },
+    "map": {
+      "currentPosition": "Current Position"
+    }
   },
   "pricing": {
     "title": "Pricing",
@@ -831,7 +1259,61 @@
     "noDataPeriod": "No ILQ data available for the selected period",
     "lastDays": "Last {{days}} days",
     "independenceScore": "Independence score over last {{days}} days",
-    "ilqScore": "ILQ Score"
+    "ilqScore": "ILQ Score",
+    "alertsHistory": "ILQ Alerts History",
+    "alertsHistoryDesc": "All alerts related to ILQ score changes",
+    "change": "Change",
+    "points": "points",
+    "analytics": {
+      "title": "ILQ Analytics",
+      "subtitle": "Independent Living Quotient",
+      "description": "Independent Living Quotient - Comprehensive Independence Assessment",
+      "selectPerson": "Select person",
+      "computeILQ": "Compute ILQ",
+      "autoOn": "Auto: ON",
+      "autoOff": "Auto: OFF",
+      "autoRefreshOn": "Auto-refresh is ON (every 10s)",
+      "autoRefreshOff": "Auto-refresh is OFF",
+      "downloadReport": "Download Report",
+      "sevenDayTrend": "7-Day Trend",
+      "loadingTrendData": "Loading trend data...",
+      "improving": "Improving",
+      "needsAttention": "Needs Attention",
+      "notEnoughData": "Not enough data",
+      "activeAlerts": "Active Alerts",
+      "historicalTrends": "Historical Trends",
+      "componentBreakdown": "Component Breakdown",
+      "alertsHistory": "Alerts History",
+      "scoreHistory": "ILQ Score History",
+      "trackIndependence": "Track independence levels over time",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "last90Days": "Last 90 days",
+      "noHistoricalData": "No historical data available",
+      "componentAnalysis": "Component Analysis",
+      "componentAnalysisDesc": "Latest score breakdown across all dimensions",
+      "noComponentData": "No component data available",
+      "componentDetails": "Component Details",
+      "componentDetailsDesc": "Understanding each dimension",
+      "healthVitals": "Health Vitals",
+      "healthVitalsPercent": "Health Vitals (30%)",
+      "healthVitalsDesc": "Heart rate, blood pressure, temperature",
+      "physicalActivity": "Physical Activity",
+      "physicalActivityPercent": "Physical Activity (25%)",
+      "physicalActivityDesc": "Steps, movement patterns, mobility",
+      "cognitiveFunction": "Cognitive Function",
+      "cognitiveFunctionPercent": "Cognitive Function (15%)",
+      "cognitiveFunctionDesc": "Routine adherence, medication compliance",
+      "environmental": "Environmental",
+      "emergency": "Emergency",
+      "social": "Social",
+      "computingScore": "Computing ILQ score...",
+      "computedSuccess": "ILQ computed successfully: {{score}}",
+      "computeFailed": "Failed to compute ILQ",
+      "generatingReport": "Generating PDF report...",
+      "reportDownloaded": "Report downloaded successfully!",
+      "reportFailed": "Failed to generate report"
+    }
   },
   "homeHub": {
     "title": "Home Hub",

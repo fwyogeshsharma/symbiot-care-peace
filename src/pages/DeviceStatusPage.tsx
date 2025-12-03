@@ -11,8 +11,10 @@ import { useNavigate } from 'react-router-dom';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { PairingApprovalPanel } from '@/components/pairing/PairingApprovalPanel';
+import { useTranslation } from 'react-i18next';
 
 const DeviceStatusPage = () => {
+  const { t } = useTranslation();
   const { user, userRole } = useAuth();
   const navigate = useNavigate();
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
@@ -41,34 +43,34 @@ const DeviceStatusPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
-      <Header showBackButton title="Devices" subtitle="Monitor your devices" />
+      <Header showBackButton title={t('devices.title')} subtitle={t('devices.subtitle')} />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-bold">Devices</h1>
-                <HelpTooltip 
-                  title="Device Status Guide"
+                <h1 className="text-3xl font-bold">{t('devices.pageTitle')}</h1>
+                <HelpTooltip
+                  title={t('devices.guide.title')}
                   content={
                     <div className="space-y-2">
-                      <p>Monitor all connected devices and their real-time status.</p>
+                      <p>{t('devices.guide.description')}</p>
                       <div className="mt-2 space-y-1 text-xs">
-                        <div><strong className="text-success">Online:</strong> Device is connected and transmitting</div>
-                        <div><strong className="text-warning">Offline:</strong> No recent data received</div>
-                        <div><strong className="text-muted-foreground">Inactive:</strong> Device not configured</div>
+                        <div><strong className="text-success">{t('devices.online')}:</strong> {t('devices.guide.onlineDesc')}</div>
+                        <div><strong className="text-warning">{t('devices.offline')}:</strong> {t('devices.guide.offlineDesc')}</div>
+                        <div><strong className="text-muted-foreground">{t('devices.inactive')}:</strong> {t('devices.guide.inactiveDesc')}</div>
                       </div>
-                      <p className="text-xs mt-2">Click on any device card to view detailed information and history.</p>
+                      <p className="text-xs mt-2">{t('devices.guide.clickTip')}</p>
                     </div>
                   }
                 />
               </div>
               <p className="text-muted-foreground">
-                Monitor and manage all connected devices
+                {t('devices.pageDescription')}
               </p>
             </div>
-            
+
             {(userRole === 'admin' || userRole === 'super_admin') && (
               <div className="flex gap-2">
                 <Button
@@ -76,14 +78,14 @@ const DeviceStatusPage = () => {
                   onClick={() => navigate('/platform-metrics')}
                 >
                   <BarChart3 className="w-4 h-4 mr-2" />
-                  Platform Metrics
+                  {t('devices.platformMetrics')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/admin/device-types')}
                 >
                   <Settings className="w-4 h-4 mr-2" />
-                  Device Types
+                  {t('devices.deviceTypes')}
                 </Button>
               </div>
             )}

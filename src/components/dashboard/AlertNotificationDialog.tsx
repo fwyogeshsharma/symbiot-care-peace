@@ -6,6 +6,7 @@ import { AlertTriangle, Bell } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface Alert {
   id: string;
@@ -26,6 +27,7 @@ interface AlertNotificationDialogProps {
 }
 
 export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: AlertNotificationDialogProps) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -40,8 +42,8 @@ export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: Al
     // You can add different sounds based on severity
     // For now, we'll use the browser's notification API
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('New Alert', {
-        body: newAlert?.title || 'A new alert has been generated',
+      new Notification(t('alerts.notifications.newAlert'), {
+        body: newAlert?.title || t('alerts.notifications.newAlertGenerated'),
         icon: '/favicon.ico',
         tag: newAlert?.id,
       });
@@ -94,7 +96,7 @@ export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: Al
               {getSeverityIcon(newAlert.severity)}
             </div>
             <div>
-              <DialogTitle className="text-lg">New Alert</DialogTitle>
+              <DialogTitle className="text-lg">{t('alerts.notifications.newAlert')}</DialogTitle>
               <DialogDescription className="text-sm">
                 {format(new Date(newAlert.created_at), 'PPp')}
               </DialogDescription>
@@ -105,10 +107,10 @@ export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: Al
         <div className="space-y-4 py-4">
           <div className="flex items-center gap-2">
             <Badge className={`${getSeverityColor(newAlert.severity)} capitalize`}>
-              {newAlert.severity}
+              {t(`alerts.${newAlert.severity}`, { defaultValue: newAlert.severity })}
             </Badge>
             <Badge variant="outline" className="capitalize">
-              {newAlert.alert_type.replace('_', ' ')}
+              {t(`alerts.types.${newAlert.alert_type}`, { defaultValue: newAlert.alert_type.replace(/_/g, ' ') })}
             </Badge>
           </div>
 
@@ -122,7 +124,7 @@ export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: Al
           {newAlert.elderly_persons?.full_name && (
             <div className="bg-muted/50 p-3 rounded-lg">
               <p className="text-sm">
-                <span className="font-medium">Person:</span> {newAlert.elderly_persons.full_name}
+                <span className="font-medium">{t('alerts.notifications.person')}:</span> {newAlert.elderly_persons.full_name}
               </p>
             </div>
           )}
@@ -130,10 +132,10 @@ export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: Al
 
         <DialogFooter className="flex gap-2 sm:gap-0">
           <Button variant="outline" onClick={handleClose}>
-            View Later
+            {t('alerts.notifications.viewLater')}
           </Button>
           <Button onClick={handleAcknowledge} className="gap-2">
-            Acknowledge Alert
+            {t('alerts.notifications.acknowledgeAlert')}
           </Button>
         </DialogFooter>
       </DialogContent>

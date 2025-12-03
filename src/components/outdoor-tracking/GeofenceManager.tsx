@@ -12,12 +12,14 @@ import { toast } from 'sonner';
 import { Plus, Trash2, Edit, MapPin } from 'lucide-react';
 import { GeofencePlace, getPlaceTypeOptions, getPlaceTypeColor } from '@/lib/geofenceUtils';
 import { metersToFeet, feetToMeters } from '@/lib/unitConversions';
+import { useTranslation } from 'react-i18next';
 
 interface GeofenceManagerProps {
   elderlyPersonId: string;
 }
 
 export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
+  const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPlace, setEditingPlace] = useState<GeofencePlace | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
@@ -200,38 +202,38 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
   };
 
   if (isLoading) {
-    return <div>Loading geofence places...</div>;
+    return <div>{t('tracking.geofence.loading')}</div>;
   }
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Geofence Places</CardTitle>
+          <CardTitle>{t('tracking.geofence.title')}</CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" onClick={resetForm}>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Place
+                {t('tracking.geofence.addPlace')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
-                <DialogTitle>{editingPlace ? 'Edit' : 'Add'} Geofence Place</DialogTitle>
+                <DialogTitle>{editingPlace ? t('tracking.geofence.editPlace') : t('tracking.geofence.addGeofencePlace')}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">{t('tracking.geofence.name')}</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g., Home"
+                    placeholder={t('tracking.geofence.namePlaceholder')}
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="place_type">Place Type</Label>
+                  <Label htmlFor="place_type">{t('tracking.geofence.placeType')}</Label>
                   <Select
                     value={formData.place_type}
                     onValueChange={(value) => setFormData({ ...formData, place_type: value })}
@@ -250,7 +252,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="latitude">Latitude</Label>
+                    <Label htmlFor="latitude">{t('tracking.geofence.latitude')}</Label>
                     <Input
                       id="latitude"
                       type="number"
@@ -262,7 +264,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="longitude">Longitude</Label>
+                    <Label htmlFor="longitude">{t('tracking.geofence.longitude')}</Label>
                     <Input
                       id="longitude"
                       type="number"
@@ -275,7 +277,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="radius">Radius (feet)</Label>
+                  <Label htmlFor="radius">{t('tracking.geofence.radius')}</Label>
                   <Input
                     id="radius"
                     type="number"
@@ -286,13 +288,13 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="address">Address (optional)</Label>
+                  <Label htmlFor="address">{t('tracking.geofence.address')}</Label>
                   <div className="flex gap-2">
                     <Input
                       id="address"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      placeholder="123 Main St, City, Country"
+                      placeholder={t('tracking.geofence.addressPlaceholder')}
                       className="flex-1"
                     />
                     <Button
@@ -301,14 +303,14 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                       size="icon"
                       onClick={handleGeocodeAddress}
                       disabled={isGeocoding || !formData.address.trim()}
-                      title="Get coordinates from address"
+                      title={t('tracking.geofence.getCoordinates')}
                     >
                       <MapPin className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="color">Color</Label>
+                  <Label htmlFor="color">{t('tracking.geofence.color')}</Label>
                   <Input
                     id="color"
                     type="color"
@@ -317,18 +319,18 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="notes">Notes (optional)</Label>
+                  <Label htmlFor="notes">{t('tracking.geofence.notes')}</Label>
                   <Textarea
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Additional notes..."
+                    placeholder={t('tracking.geofence.notesPlaceholder')}
                     rows={3}
                   />
                 </div>
                 <div className="flex gap-2">
                   <Button type="submit" className="flex-1">
-                    {editingPlace ? 'Update' : 'Create'} Place
+                    {editingPlace ? t('tracking.geofence.updatePlace') : t('tracking.geofence.createPlace')}
                   </Button>
                   <Button
                     type="button"
@@ -338,7 +340,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                       setIsDialogOpen(false);
                     }}
                   >
-                    Cancel
+                    {t('tracking.geofence.cancel')}
                   </Button>
                 </div>
               </form>
@@ -348,7 +350,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
       </CardHeader>
       <CardContent>
         {places.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No geofence places configured.</p>
+          <p className="text-muted-foreground text-sm">{t('tracking.geofence.noPlaces')}</p>
         ) : (
           <div className="space-y-2">
             {places.map((place) => (
@@ -364,7 +366,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                   <div>
                     <div className="font-medium">{place.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      {place.place_type} • {Math.round(metersToFeet(place.radius_meters))} ft radius
+                      {place.place_type} • {Math.round(metersToFeet(place.radius_meters))} {t('tracking.geofence.ftRadius')}
                     </div>
                   </div>
                 </div>

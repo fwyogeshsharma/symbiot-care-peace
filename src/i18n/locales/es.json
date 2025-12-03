@@ -715,6 +715,304 @@
     "footer": "© 2025 SymBIoT. Todos los derechos reservados.",
     "billedAnnually": "/mes facturado anualmente"
   },
+  "devices": {
+    "title": "Dispositivos",
+    "subtitle": "Monitorea tus dispositivos",
+    "pageTitle": "Dispositivos",
+    "pageDescription": "Monitorea y gestiona todos los dispositivos conectados",
+    "status": "Estado del Dispositivo",
+    "online": "En Línea",
+    "offline": "Desconectado",
+    "inactive": "Inactivo",
+    "maintenance": "Mantenimiento",
+    "battery": "Batería",
+    "lastSeen": "Última Vez Visto",
+    "addDevice": "Agregar Dispositivo",
+    "removeDevice": "Eliminar Dispositivo",
+    "deviceName": "Nombre del Dispositivo",
+    "deviceType": "Tipo de Dispositivo",
+    "location": "Ubicación",
+    "platformMetrics": "Métricas de Plataforma",
+    "deviceTypes": "Tipos de Dispositivos",
+    "noDevices": "Aún no hay dispositivos registrados",
+    "noData": "Sin Datos",
+    "records": "registros",
+    "generateData": "Generar Datos",
+    "generateDataTooltip": "Genera 7 días de datos de prueba",
+    "unassigned": "Sin Asignar",
+    "guide": {
+      "title": "Guía de Estado de Dispositivos",
+      "description": "Monitorea todos los dispositivos conectados y su estado en tiempo real.",
+      "onlineDesc": "El dispositivo está conectado y transmitiendo",
+      "offlineDesc": "No se han recibido datos recientes",
+      "inactiveDesc": "Dispositivo no configurado",
+      "clickTip": "Haz clic en cualquier tarjeta de dispositivo para ver información detallada e historial."
+    },
+    "apiDetails": {
+      "title": "Detalles de API del Dispositivo",
+      "description": "Usa estos detalles para enviar datos desde tu dispositivo IoT",
+      "apiKey": "Clave API",
+      "saveSecurely": "Guarda esto de forma segura",
+      "apiEndpoint": "Endpoint de API",
+      "exampleRequest": "Ejemplo de Solicitud",
+      "availableDataTypes": "Tipos de datos disponibles",
+      "dataTypesList": "heart_rate, blood_pressure, temperature, fall_detected, steps, sleep, activity, location",
+      "useKeyAuth": "Usa esta clave para autenticar tu dispositivo al enviar datos",
+      "copied": "¡Copiado!",
+      "copiedToClipboard": "Clave API copiada al portapapeles",
+      "viewHistory": "Ver Historial del Dispositivo"
+    },
+    "edit": {
+      "title": "Editar Dispositivo",
+      "description": "Actualizar información del dispositivo",
+      "deviceName": "Nombre del Dispositivo",
+      "deviceType": "Tipo de Dispositivo",
+      "location": "Ubicación",
+      "company": "Empresa/Fabricante",
+      "selectCompany": "Seleccionar empresa (opcional)",
+      "cancel": "Cancelar",
+      "updating": "Actualizando...",
+      "updateDevice": "Actualizar Dispositivo",
+      "updated": "Dispositivo actualizado",
+      "updatedDesc": "La información del dispositivo se ha actualizado correctamente.",
+      "updateFailed": "Error al actualizar"
+    },
+    "delete": {
+      "title": "Eliminar Dispositivo",
+      "confirmMessage": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esta acción no se puede deshacer.",
+      "alsoDeleteData": "También eliminar todos los datos del dispositivo (registros de salud, lecturas de sensores, etc.)",
+      "cancel": "Cancelar",
+      "deleting": "Eliminando...",
+      "deleteDevice": "Eliminar Dispositivo",
+      "deleted": "Dispositivo eliminado",
+      "deletedDesc": "El dispositivo se ha eliminado correctamente.",
+      "deleteFailed": "Error al eliminar"
+    },
+    "register": {
+      "title": "Registrar Nuevo Dispositivo",
+      "dialogTitle": "Agregar Dispositivo IoT",
+      "dialogDescription": "Registra un dispositivo manualmente o usa el flujo de emparejamiento para configuración colaborativa.",
+      "manualRegistration": "Registro Manual",
+      "pairDevice": "Emparejar Dispositivo",
+      "deviceName": "Nombre del Dispositivo",
+      "deviceNamePlaceholder": "ej., Monitor de Sala",
+      "deviceType": "Tipo de Dispositivo",
+      "selectDeviceType": "Seleccionar tipo de dispositivo",
+      "company": "Empresa/Fabricante",
+      "selectCompany": "Seleccionar empresa (opcional)",
+      "model": "Modelo de Dispositivo",
+      "selectModel": "Seleccionar modelo (opcional)",
+      "modelDescription": "Selecciona el modelo específico de tu dispositivo",
+      "deviceId": "ID del Dispositivo",
+      "deviceIdPlaceholder": "ej., DEV-12345",
+      "deviceIdDescription": "Identificador único de tu dispositivo IoT",
+      "location": "Ubicación (Opcional)",
+      "locationPlaceholder": "ej., Dormitorio, Sala",
+      "generateSampleData": "Generar datos de prueba",
+      "generateSampleDataDesc": "Crear automáticamente 7 días de datos falsos para probar paneles",
+      "registering": "Registrando...",
+      "registerDevice": "Registrar Dispositivo",
+      "success": "Dispositivo registrado exitosamente",
+      "successWithData": "Tu dispositivo IoT ha sido agregado con datos de muestra.",
+      "successNoData": "Tu dispositivo IoT ha sido agregado.",
+      "failed": "Error al registrar dispositivo",
+      "missingInfo": "Información faltante",
+      "fillRequired": "Por favor completa todos los campos requeridos",
+      "noProfile": "Perfil no encontrado",
+      "createProfileFirst": "Por favor crea primero un perfil de persona mayor",
+      "noProfileForPairing": "No se encontró perfil de persona mayor.",
+      "setupProfileFirst": "Por favor configura un perfil primero para emparejar dispositivos.",
+      "apiKeyTitle": "Clave API (Guárdala de forma segura)",
+      "apiKeyWarning": "¡Esta clave solo se mostrará una vez. Guárdala ahora!",
+      "useApiKeyAuth": "Usa esta clave API para autenticar tu dispositivo al enviar datos.",
+      "apiEndpoint": "Endpoint de API:",
+      "exampleRequest": "Ejemplo de Solicitud:",
+      "registerAnother": "Registrar Otro Dispositivo",
+      "apiKeyCopied": "Clave API copiada",
+      "apiKeyCopiedDesc": "La clave API se ha copiado al portapapeles"
+    },
+    "geofenceAlert": {
+      "title": "Se Requieren Geocercas",
+      "description": "Los dispositivos GPS requieren al menos una geocerca configurada antes del registro.",
+      "explanation": "Las geocercas definen zonas seguras y lugares importantes (como casa, trabajo o instalaciones médicas). Permiten alertas basadas en ubicación cuando la persona entra o sale de estas áreas.",
+      "howToAdd": "Para agregar geocercas:",
+      "step1": "Ve a Seguimiento en la navegación",
+      "step2": "Selecciona la pestaña Seguimiento Exterior",
+      "step3": "Usa el Gestor de Geocercas para agregar lugares",
+      "step4": "Regresa aquí para registrar tu dispositivo GPS",
+      "cancel": "Cancelar",
+      "goToTracking": "Ir a Seguimiento"
+    },
+    "history": {
+      "title": "Historial del Dispositivo",
+      "titleWithName": "Historial del Dispositivo - {{name}}",
+      "description": "Lecturas de datos históricos de este dispositivo",
+      "loading": "Cargando historial...",
+      "noData": "Aún no hay datos registrados",
+      "readings": "lecturas"
+    },
+    "dataGeneration": {
+      "generated": "Datos generados",
+      "generatedDesc": "Los datos de muestra se han generado correctamente para el dispositivo.",
+      "failed": "Error en generación",
+      "sampleDataFailed": "Error en generación de datos de muestra"
+    },
+    "validation": {
+      "deviceNameRequired": "El nombre del dispositivo es requerido",
+      "deviceNameMax": "El nombre del dispositivo debe tener menos de 100 caracteres",
+      "deviceTypeRequired": "El tipo de dispositivo es requerido",
+      "deviceIdRequired": "El ID del dispositivo es requerido",
+      "deviceIdMax": "El ID del dispositivo debe tener menos de 50 caracteres",
+      "deviceIdFormat": "El ID del dispositivo solo puede contener letras, números, guiones y guiones bajos",
+      "locationMax": "La ubicación debe tener menos de 100 caracteres"
+    },
+    "pairing": {
+      "title": "Solicitudes de Emparejamiento",
+      "noPending": "No hay solicitudes de emparejamiento pendientes",
+      "approveTitle": "Aprobar Emparejamiento",
+      "reviewAndApprove": "Revisar y aprobar dispositivo para {{name}}",
+      "deviceId": "ID del Dispositivo",
+      "deviceType": "Tipo de Dispositivo",
+      "unknown": "Desconocido",
+      "pairingCode": "Código de Emparejamiento",
+      "requested": "Solicitado",
+      "deviceNameOptional": "Nombre del Dispositivo (Opcional)",
+      "deviceNamePlaceholder": "ej., Sensor de Sala",
+      "locationOptional": "Ubicación (Opcional)",
+      "locationPlaceholder": "ej., Sala de Estar",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "backToList": "Volver a la Lista",
+      "pendingRequests": "{{count}} solicitud pendiente",
+      "pendingRequestsPlural": "{{count}} solicitudes pendientes",
+      "forPerson": "Para {{name}}",
+      "newRequestReceived": "¡Nueva solicitud de emparejamiento recibida!",
+      "pairedSuccessfully": "¡Dispositivo emparejado exitosamente!",
+      "approveFailed": "Error al aprobar emparejamiento",
+      "rejected": "Solicitud de emparejamiento rechazada",
+      "rejectFailed": "Error al rechazar emparejamiento"
+    }
+  },
+  "tracking": {
+    "title": "Seguimiento",
+    "subtitle": "Sistema de posicionamiento interior y exterior",
+    "movementTracking": "Seguimiento de Movimiento",
+    "realTimePositioning": "Posicionamiento interior y exterior en tiempo real",
+    "location": "Ubicación Actual",
+    "indoor": "Interior",
+    "outdoor": "Exterior",
+    "cameras": "Cámaras",
+    "indoorTracking": "Seguimiento Interior",
+    "outdoorTracking": "Seguimiento Exterior",
+    "safeZones": "Zonas Seguras",
+    "geofencing": "Geocercas",
+    "history": "Historial de Ubicación",
+    "realTime": "Tiempo Real",
+    "addZone": "Agregar Zona Segura",
+    "editZone": "Editar Zona",
+    "deleteZone": "Eliminar Zona",
+    "floorPlans": "Planos de Piso",
+    "selectPeriod": "Seleccionar período",
+    "today": "Hoy",
+    "last7Days": "Últimos 7 Días",
+    "last30Days": "Últimos 30 Días",
+    "noFloorPlan": {
+      "title": "No se Encontró Plano de Piso",
+      "description": "Registre un dispositivo portátil para ver el seguimiento interior"
+    },
+    "noGpsData": {
+      "title": "Sin Datos GPS ni Geocercas",
+      "description": "Registre un dispositivo GPS para ver el seguimiento exterior y datos de ubicación en tiempo real",
+      "setupGeofences": "¡Configure sus geocercas abajo! Las geocercas definen lugares importantes y zonas seguras para alertas basadas en ubicación."
+    },
+    "geofencesConfigured": {
+      "title": "Geocercas Configuradas",
+      "description": "Sus geocercas se muestran en el mapa a continuación. Registre un dispositivo GPS para ver el seguimiento en tiempo real."
+    },
+    "securityCameras": "Cámaras de Seguridad",
+    "noMovementData": {
+      "title": "No hay datos de movimiento disponibles",
+      "description": "Para ver el seguimiento de movimiento, vaya al Panel y haga clic en \"Generar Datos de Dispositivo\" para un dispositivo portátil para generar datos de posición de muestra.",
+      "goToDashboard": "Ir al Panel"
+    },
+    "positioningVisualization": "Posicionamiento en tiempo real y visualización de movimiento",
+    "playback": {
+      "title": "Reproducción de Movimiento",
+      "noData": "No hay datos de movimiento para reproducir",
+      "zone": "Zona",
+      "speed": "Velocidad",
+      "accuracy": "Precisión"
+    },
+    "metrics": {
+      "totalDistance": "Distancia Total",
+      "traveled": "recorrido",
+      "averageSpeed": "Velocidad Promedio",
+      "zoneVisits": "Visitas a Zonas",
+      "most": "Más",
+      "noData": "Sin datos",
+      "activeTime": "Tiempo Activo",
+      "acrossZones": "En {{count}} zonas",
+      "zoneStatistics": "Estadísticas de Zonas",
+      "visits": "visitas"
+    },
+    "gps": {
+      "totalDistance": "Distancia Total",
+      "basedOnPoints": "Basado en {{count}} puntos GPS",
+      "locationsVisited": "Ubicaciones Visitadas",
+      "activeGeofences": "Ubicaciones de geocerca activas",
+      "totalEvents": "Total de Eventos",
+      "entryExitEvents": "Eventos de entrada y salida",
+      "mostVisitedPlaces": "Lugares Más Visitados",
+      "visit": "visita",
+      "visits": "visitas"
+    },
+    "geofence": {
+      "title": "Lugares de Geocerca",
+      "addPlace": "Agregar Lugar",
+      "editPlace": "Editar Lugar de Geocerca",
+      "addGeofencePlace": "Agregar Lugar de Geocerca",
+      "loading": "Cargando lugares de geocerca...",
+      "noPlaces": "No hay lugares de geocerca configurados.",
+      "ftRadius": "pies de radio",
+      "name": "Nombre",
+      "namePlaceholder": "ej., Casa",
+      "placeType": "Tipo de Lugar",
+      "latitude": "Latitud",
+      "longitude": "Longitud",
+      "radius": "Radio (pies)",
+      "address": "Dirección (opcional)",
+      "addressPlaceholder": "123 Calle Principal, Ciudad, País",
+      "getCoordinates": "Obtener coordenadas de la dirección",
+      "color": "Color",
+      "notes": "Notas (opcional)",
+      "notesPlaceholder": "Notas adicionales...",
+      "createPlace": "Crear Lugar",
+      "updatePlace": "Actualizar Lugar",
+      "cancel": "Cancelar",
+      "created": "Lugar de geocerca creado exitosamente",
+      "updated": "Lugar de geocerca actualizado exitosamente",
+      "deleted": "Lugar de geocerca eliminado exitosamente",
+      "createError": "Error al crear lugar de geocerca",
+      "updateError": "Error al actualizar lugar de geocerca",
+      "deleteError": "Error al eliminar lugar de geocerca",
+      "enterAddress": "Por favor ingrese una dirección primero",
+      "coordinatesUpdated": "Coordenadas actualizadas desde la dirección",
+      "coordinatesNotFound": "No se pudieron encontrar coordenadas para esta dirección",
+      "geocodeError": "Error al geocodificar la dirección"
+    },
+    "events": {
+      "title": "Historial de Ubicación",
+      "loading": "Cargando eventos...",
+      "noEvents": "No hay eventos de ubicación en este período.",
+      "arrived": "Llegó",
+      "left": "Salió",
+      "duration": "Duración",
+      "unknownLocation": "Ubicación Desconocida"
+    },
+    "map": {
+      "currentPosition": "Posición Actual"
+    }
+  },
   "profile": {
     "title": "Perfil",
     "personalInfo": "Información Personal",
@@ -764,6 +1062,178 @@
         "fairDesc": "4,000-8,000 pasos/día",
         "lowDesc": "<4,000 pasos/día",
         "noData": "Sin datos"
+      }
+    }
+  },
+  "alerts": {
+    "title": "Alertas",
+    "management": "Gestión de Alertas",
+    "subtitle": "Monitorear y responder a alertas del sistema",
+    "noAlerts": "No hay alertas en este momento",
+    "noAlertsFound": "No se encontraron alertas",
+    "noAlertsDescription": "¡Todo despejado! No hay alertas que coincidan con sus filtros actuales. Intente ajustar los filtros anteriores para ver diferentes alertas.",
+    "allClear": "¡Todo despejado! No hay alertas activas.",
+    "critical": "Crítico",
+    "high": "Alto",
+    "medium": "Medio",
+    "low": "Bajo",
+    "warning": "Advertencia",
+    "info": "Información",
+    "resolved": "Resuelto",
+    "unresolved": "Sin resolver",
+    "markResolved": "Marcar como Resuelto",
+    "viewDetails": "Ver Detalles",
+    "filterBy": "Filtrar por",
+    "sortBy": "Ordenar por",
+    "date": "Fecha",
+    "severity": "Severidad",
+    "type": "Tipo",
+    "status": "Estado",
+    "stats": {
+      "totalAlerts": "Total de Alertas",
+      "totalAlertsTooltip": "Número total de alertas en el período seleccionado, incluyendo alertas activas, reconocidas y resueltas.",
+      "active": "Activas",
+      "critical": "Críticas",
+      "avgResponse": "Resp. Promedio",
+      "responseTime": "Tiempo de Respuesta",
+      "responseTimeTooltip": "Tiempo promedio para reconocer alertas. Tiempos de respuesta más bajos indican atención más rápida a problemas críticos.",
+      "minutes": "minutos"
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar alertas...",
+      "allSeverity": "Todas las Severidades",
+      "allTypes": "Todos los Tipos",
+      "allStatus": "Todos los Estados",
+      "dateRange": "Rango de Fechas"
+    },
+    "types": {
+      "vital_signs": "Signos Vitales",
+      "panic_sos": "Pánico/SOS",
+      "device_offline": "Dispositivo Desconectado",
+      "geofence": "Geocerca",
+      "inactivity": "Inactividad",
+      "fall_detected": "Caída Detectada",
+      "medication": "Medicación",
+      "wandering": "Deambulación",
+      "environmental": "Ambiental",
+      "battery_low": "Batería Baja",
+      "connection_lost": "Conexión Perdida",
+      "dwell_time": "Tiempo de Permanencia",
+      "heart_rate": "Frecuencia Cardíaca",
+      "blood_pressure": "Presión Arterial",
+      "oxygen_level": "Nivel de Oxígeno",
+      "temperature": "Temperatura"
+    },
+    "statusOptions": {
+      "active": "Activa",
+      "acknowledged": "Reconocida",
+      "resolved": "Resuelta"
+    },
+    "dateRanges": {
+      "last24Hours": "Últimas 24 Horas",
+      "last7Days": "Últimos 7 Días",
+      "last30Days": "Últimos 30 Días",
+      "last90Days": "Últimos 90 Días"
+    },
+    "charts": {
+      "alertTrends": "Tendencias de Alertas",
+      "alertTypesDistribution": "Distribución por Tipo de Alerta",
+      "severityBreakdown": "Desglose por Severidad",
+      "alerts": "alertas",
+      "count": "cantidad"
+    },
+    "recipients": {
+      "title": "Destinatarios Recientes",
+      "alerts": "alertas"
+    },
+    "timeline": {
+      "title": "Cronología de Alertas",
+      "severityLevels": "Niveles de Severidad de Alertas",
+      "criticalDesc": "Se requiere acción inmediata (ej., botón de pánico, anomalía vital severa)",
+      "highDesc": "Se necesita atención urgente (ej., violación de geocerca, dispositivo desconectado)",
+      "mediumDesc": "Debe revisarse pronto (ej., desviación menor de signos vitales)",
+      "lowDesc": "Informativo (ej., notificaciones rutinarias)",
+      "unknown": "Desconocido",
+      "acknowledged": "Reconocida"
+    },
+    "actions": {
+      "acknowledge": "Reconocer"
+    },
+    "notifications": {
+      "newAlert": "Nueva Alerta",
+      "newAlertGenerated": "Se ha generado una nueva alerta",
+      "person": "Persona",
+      "viewLater": "Ver Después",
+      "acknowledgeAlert": "Reconocer Alerta"
+    },
+    "toasts": {
+      "error": "Error",
+      "failedToAcknowledge": "Error al reconocer la alerta",
+      "alertAcknowledged": "Alerta reconocida",
+      "alertAcknowledgedTitle": "Alerta Reconocida",
+      "alertAcknowledgedDesc": "La alerta ha sido marcada como reconocida"
+    },
+    "list": {
+      "activeAlerts": "Alertas Activas",
+      "filtered": "(Filtrado)",
+      "active": "Activas"
+    },
+    "messages": {
+      "panic_sos": {
+        "title": "Botón de Emergencia Activado",
+        "description": "Se ha presionado el botón de emergencia. Se requiere atención inmediata."
+      },
+      "vital_signs": {
+        "title": "Alerta de Signos Vitales",
+        "description": "Se detectaron signos vitales anormales. Por favor revise la condición del paciente."
+      },
+      "device_offline": {
+        "title": "Dispositivo Desconectado",
+        "description": "Un dispositivo se ha desconectado y ya no transmite datos."
+      },
+      "geofence": {
+        "title": "Alerta de Geocerca",
+        "description": "La persona ha salido o entrado a una zona segura designada."
+      },
+      "inactivity": {
+        "title": "Alerta de Inactividad",
+        "description": "Se detectó inactividad prolongada. Por favor verifique a la persona."
+      },
+      "fall_detected": {
+        "title": "Caída Detectada",
+        "description": "Se ha detectado una posible caída. Se requiere atención inmediata."
+      },
+      "heart_rate": {
+        "title": "Alerta de Frecuencia Cardíaca",
+        "description": "Se detectó frecuencia cardíaca anormal."
+      },
+      "blood_pressure": {
+        "title": "Alerta de Presión Arterial",
+        "description": "Se detectó lectura de presión arterial anormal."
+      },
+      "oxygen_level": {
+        "title": "Alerta de Nivel de Oxígeno",
+        "description": "Se detectó nivel bajo de saturación de oxígeno."
+      },
+      "temperature": {
+        "title": "Alerta de Temperatura",
+        "description": "Se detectó temperatura corporal anormal."
+      },
+      "dwell_time": {
+        "title": "Alerta de Tiempo de Permanencia",
+        "description": "Se detectó tiempo inusual en una ubicación."
+      },
+      "battery_low": {
+        "title": "Batería Baja",
+        "description": "La batería del dispositivo está baja."
+      },
+      "medication": {
+        "title": "Recordatorio de Medicación",
+        "description": "Se activó el recordatorio de medicación."
+      },
+      "wandering": {
+        "title": "Alerta de Deambulación",
+        "description": "Se detectó comportamiento de deambulación inusual."
       }
     }
   },
@@ -933,7 +1403,61 @@
     "noDataPeriod": "No hay datos de ILQ disponibles para el período seleccionado",
     "lastDays": "Últimos {{days}} días",
     "independenceScore": "Puntuación de independencia en los últimos {{days}} días",
-    "ilqScore": "Puntuación ILQ"
+    "ilqScore": "Puntuación ILQ",
+    "alertsHistory": "Historial de Alertas ILQ",
+    "alertsHistoryDesc": "Todas las alertas relacionadas con cambios en la puntuación ILQ",
+    "change": "Cambio",
+    "points": "puntos",
+    "analytics": {
+      "title": "Análisis ILQ",
+      "subtitle": "Cociente de Vida Independiente",
+      "description": "Cociente de Vida Independiente - Evaluación Integral de Independencia",
+      "selectPerson": "Seleccionar persona",
+      "computeILQ": "Calcular ILQ",
+      "autoOn": "Auto: ON",
+      "autoOff": "Auto: OFF",
+      "autoRefreshOn": "Auto-actualización ACTIVADA (cada 10s)",
+      "autoRefreshOff": "Auto-actualización DESACTIVADA",
+      "downloadReport": "Descargar Informe",
+      "sevenDayTrend": "Tendencia de 7 Días",
+      "loadingTrendData": "Cargando datos de tendencia...",
+      "improving": "Mejorando",
+      "needsAttention": "Necesita Atención",
+      "notEnoughData": "Datos insuficientes",
+      "activeAlerts": "Alertas Activas",
+      "historicalTrends": "Tendencias Históricas",
+      "componentBreakdown": "Desglose de Componentes",
+      "alertsHistory": "Historial de Alertas",
+      "scoreHistory": "Historial de Puntuación ILQ",
+      "trackIndependence": "Seguimiento de niveles de independencia",
+      "last7Days": "Últimos 7 días",
+      "last30Days": "Últimos 30 días",
+      "last90Days": "Últimos 90 días",
+      "noHistoricalData": "No hay datos históricos disponibles",
+      "componentAnalysis": "Análisis de Componentes",
+      "componentAnalysisDesc": "Desglose de puntuación en todas las dimensiones",
+      "noComponentData": "No hay datos de componentes disponibles",
+      "componentDetails": "Detalles de Componentes",
+      "componentDetailsDesc": "Comprensión de cada dimensión",
+      "healthVitals": "Signos Vitales",
+      "healthVitalsPercent": "Signos Vitales (30%)",
+      "healthVitalsDesc": "Frecuencia cardíaca, presión arterial, temperatura",
+      "physicalActivity": "Actividad Física",
+      "physicalActivityPercent": "Actividad Física (25%)",
+      "physicalActivityDesc": "Pasos, patrones de movimiento, movilidad",
+      "cognitiveFunction": "Función Cognitiva",
+      "cognitiveFunctionPercent": "Función Cognitiva (15%)",
+      "cognitiveFunctionDesc": "Adherencia a rutina, cumplimiento de medicación",
+      "environmental": "Ambiental",
+      "emergency": "Emergencia",
+      "social": "Social",
+      "computingScore": "Calculando puntuación ILQ...",
+      "computedSuccess": "ILQ calculado exitosamente: {{score}}",
+      "computeFailed": "Error al calcular ILQ",
+      "generatingReport": "Generando informe PDF...",
+      "reportDownloaded": "¡Informe descargado exitosamente!",
+      "reportFailed": "Error al generar informe"
+    }
   },
   "homeHub": {
     "title": "Hub del Hogar",

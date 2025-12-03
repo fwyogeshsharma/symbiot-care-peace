@@ -11,8 +11,10 @@ import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { useElderly } from '@/contexts/ElderlyContext';
 import Header from '@/components/layout/Header';
+import { useTranslation } from 'react-i18next';
 
 export default function ILQAnalytics() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { elderlyPersons, selectedPersonId, setSelectedPersonId, isLoading: elderlyLoading } = useElderly();
   const [timeRange, setTimeRange] = useState<string>('30');
@@ -103,7 +105,7 @@ export default function ILQAnalytics() {
 
     try {
       if (!silent) {
-        toast.info('Computing ILQ score...');
+        toast.info(t('ilq.analytics.computingScore'));
       }
 
       const { data, error } = await supabase.functions.invoke('ilq-compute', {
@@ -113,13 +115,13 @@ export default function ILQAnalytics() {
       if (error) throw error;
 
       if (!silent) {
-        toast.success(`ILQ computed successfully: ${data.ilq_score}`);
+        toast.success(t('ilq.analytics.computedSuccess', { score: data.ilq_score }));
       }
       refetch();
     } catch (error: any) {
       console.error('Error computing ILQ:', error);
       if (!silent) {
-        toast.error(error.message || 'Failed to compute ILQ');
+        toast.error(error.message || t('ilq.analytics.computeFailed'));
       }
     }
   };
@@ -128,7 +130,7 @@ export default function ILQAnalytics() {
     if (!selectedPersonId) return;
 
     try {
-      toast.info('Generating PDF report...');
+      toast.info(t('ilq.analytics.generatingReport'));
 
       const { data, error } = await supabase.functions.invoke('ilq-report-generator', {
         body: {
@@ -150,10 +152,10 @@ export default function ILQAnalytics() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      toast.success('Report downloaded successfully!');
+      toast.success(t('ilq.analytics.reportDownloaded'));
     } catch (error: any) {
       console.error('Error generating report:', error);
-      toast.error(error.message || 'Failed to generate report');
+      toast.error(error.message || t('ilq.analytics.reportFailed'));
     }
   };
 
@@ -161,7 +163,7 @@ export default function ILQAnalytics() {
   if (elderlyLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header showBackButton title="ILQ Analytics" subtitle="Independent Living Quotient" />
+        <Header showBackButton title={t('ilq.analytics.title')} subtitle={t('ilq.analytics.subtitle')} />
         <div className="flex items-center justify-center h-[60vh]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -179,35 +181,35 @@ export default function ILQAnalytics() {
   })) || [];
 
   const latestScore = ilqHistory && ilqHistory.length > 0 ? ilqHistory[ilqHistory.length - 1] : null;
-  
+
   const radarData = latestScore ? [
-    { component: 'Health Vitals', value: latestScore.health_vitals_score ? (typeof latestScore.health_vitals_score === 'string' ? parseFloat(latestScore.health_vitals_score) : latestScore.health_vitals_score) : 0 },
-    { component: 'Physical Activity', value: latestScore.physical_activity_score ? (typeof latestScore.physical_activity_score === 'string' ? parseFloat(latestScore.physical_activity_score) : latestScore.physical_activity_score) : 0 },
-    { component: 'Cognitive', value: latestScore.cognitive_function_score ? (typeof latestScore.cognitive_function_score === 'string' ? parseFloat(latestScore.cognitive_function_score) : latestScore.cognitive_function_score) : 0 },
-    { component: 'Environmental', value: latestScore.environmental_safety_score ? (typeof latestScore.environmental_safety_score === 'string' ? parseFloat(latestScore.environmental_safety_score) : latestScore.environmental_safety_score) : 0 },
-    { component: 'Emergency', value: latestScore.emergency_response_score ? (typeof latestScore.emergency_response_score === 'string' ? parseFloat(latestScore.emergency_response_score) : latestScore.emergency_response_score) : 0 },
-    { component: 'Social', value: latestScore.social_engagement_score ? (typeof latestScore.social_engagement_score === 'string' ? parseFloat(latestScore.social_engagement_score) : latestScore.social_engagement_score) : 0 },
+    { component: t('ilq.analytics.healthVitals'), value: latestScore.health_vitals_score ? (typeof latestScore.health_vitals_score === 'string' ? parseFloat(latestScore.health_vitals_score) : latestScore.health_vitals_score) : 0 },
+    { component: t('ilq.analytics.physicalActivity'), value: latestScore.physical_activity_score ? (typeof latestScore.physical_activity_score === 'string' ? parseFloat(latestScore.physical_activity_score) : latestScore.physical_activity_score) : 0 },
+    { component: t('ilq.cognitive'), value: latestScore.cognitive_function_score ? (typeof latestScore.cognitive_function_score === 'string' ? parseFloat(latestScore.cognitive_function_score) : latestScore.cognitive_function_score) : 0 },
+    { component: t('ilq.analytics.environmental'), value: latestScore.environmental_safety_score ? (typeof latestScore.environmental_safety_score === 'string' ? parseFloat(latestScore.environmental_safety_score) : latestScore.environmental_safety_score) : 0 },
+    { component: t('ilq.analytics.emergency'), value: latestScore.emergency_response_score ? (typeof latestScore.emergency_response_score === 'string' ? parseFloat(latestScore.emergency_response_score) : latestScore.emergency_response_score) : 0 },
+    { component: t('ilq.analytics.social'), value: latestScore.social_engagement_score ? (typeof latestScore.social_engagement_score === 'string' ? parseFloat(latestScore.social_engagement_score) : latestScore.social_engagement_score) : 0 },
   ] : [];
 
   return (
     <div className="min-h-screen bg-background">
-      <Header showBackButton title="ILQ Analytics" subtitle="Independent Living Quotient" />
+      <Header showBackButton title={t('ilq.analytics.title')} subtitle={t('ilq.analytics.subtitle')} />
       <main className="container mx-auto p-6 space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Activity className="h-8 w-8" />
-              ILQ Analytics
+              {t('ilq.analytics.title')}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Independent Living Quotient - Comprehensive Independence Assessment
+              {t('ilq.analytics.description')}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-4">
             <Select value={selectedPersonId || ''} onValueChange={setSelectedPersonId}>
               <SelectTrigger className="w-[250px]">
-                <SelectValue placeholder="Select person" />
+                <SelectValue placeholder={t('ilq.analytics.selectPerson')} />
               </SelectTrigger>
               <SelectContent>
                 {elderlyPersons?.map(person => (
@@ -220,21 +222,21 @@ export default function ILQAnalytics() {
 
             <Button onClick={() => computeILQ(false)} disabled={!selectedPersonId}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isAutoRefreshing ? 'animate-spin' : ''}`} />
-              Compute ILQ
+              {t('ilq.analytics.computeILQ')}
             </Button>
 
             <Button
               onClick={() => setIsAutoRefreshing(!isAutoRefreshing)}
               variant={isAutoRefreshing ? 'default' : 'outline'}
-              title={isAutoRefreshing ? 'Auto-refresh is ON (every 10s)' : 'Auto-refresh is OFF'}
+              title={isAutoRefreshing ? t('ilq.analytics.autoRefreshOn') : t('ilq.analytics.autoRefreshOff')}
             >
               <RefreshCw className="h-4 w-4 mr-2" />
-              {isAutoRefreshing ? 'Auto: ON' : 'Auto: OFF'}
+              {isAutoRefreshing ? t('ilq.analytics.autoOn') : t('ilq.analytics.autoOff')}
             </Button>
 
             <Button onClick={downloadReport} disabled={!selectedPersonId || !ilqHistory || ilqHistory.length === 0} variant="outline">
               <Download className="h-4 w-4 mr-2" />
-              Download Report
+              {t('ilq.analytics.downloadReport')}
             </Button>
           </div>
         </div>
@@ -247,13 +249,13 @@ export default function ILQAnalytics() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
-                7-Day Trend
+                {t('ilq.analytics.sevenDayTrend')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {historyLoading ? (
                 <div className="h-40 flex items-center justify-center">
-                  <p className="text-muted-foreground">Loading trend data...</p>
+                  <p className="text-muted-foreground">{t('ilq.analytics.loadingTrendData')}</p>
                 </div>
               ) : chartData.length >= 2 ? (
                 <div className="space-y-2">
@@ -261,20 +263,20 @@ export default function ILQAnalytics() {
                     {(chartData[chartData.length - 1].score - chartData[0].score).toFixed(1)}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {chartData[chartData.length - 1].score > chartData[0].score ? 'Improving' : 'Needs Attention'}
+                    {chartData[chartData.length - 1].score > chartData[0].score ? t('ilq.analytics.improving') : t('ilq.analytics.needsAttention')}
                   </p>
                 </div>
               ) : (
-                <p className="text-muted-foreground">Not enough data</p>
+                <p className="text-muted-foreground">{t('ilq.analytics.notEnoughData')}</p>
               )}
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
-                Active Alerts
+                {t('ilq.analytics.activeAlerts')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -282,12 +284,12 @@ export default function ILQAnalytics() {
                 {ilqAlerts && ilqAlerts.length > 0 ? (
                   ilqAlerts.slice(0, 3).map(alert => (
                     <div key={alert.id} className="text-sm border-l-2 border-destructive pl-2">
-                      <p className="font-semibold">{alert.title}</p>
-                      <p className="text-xs text-muted-foreground">{alert.severity}</p>
+                      <p className="font-semibold">{t(`alerts.messages.${alert.alert_type}.title`, { defaultValue: alert.title })}</p>
+                      <p className="text-xs text-muted-foreground">{t(`alerts.${alert.severity}`, { defaultValue: alert.severity })}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-muted-foreground text-sm">No active alerts</p>
+                  <p className="text-muted-foreground text-sm">{t('alerts.noAlerts')}</p>
                 )}
               </div>
             </CardContent>
@@ -298,9 +300,9 @@ export default function ILQAnalytics() {
         {selectedPersonId && (
           <Tabs defaultValue="history" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="history">Historical Trends</TabsTrigger>
-            <TabsTrigger value="components">Component Breakdown</TabsTrigger>
-            <TabsTrigger value="alerts">Alerts History</TabsTrigger>
+            <TabsTrigger value="history">{t('ilq.analytics.historicalTrends')}</TabsTrigger>
+            <TabsTrigger value="components">{t('ilq.analytics.componentBreakdown')}</TabsTrigger>
+            <TabsTrigger value="alerts">{t('ilq.analytics.alertsHistory')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="history" className="space-y-4">
@@ -308,17 +310,17 @@ export default function ILQAnalytics() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>ILQ Score History</CardTitle>
-                    <CardDescription>Track independence levels over time</CardDescription>
+                    <CardTitle>{t('ilq.analytics.scoreHistory')}</CardTitle>
+                    <CardDescription>{t('ilq.analytics.trackIndependence')}</CardDescription>
                   </div>
                   <Select value={timeRange} onValueChange={setTimeRange}>
                     <SelectTrigger className="w-[150px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="7">Last 7 days</SelectItem>
-                      <SelectItem value="30">Last 30 days</SelectItem>
-                      <SelectItem value="90">Last 90 days</SelectItem>
+                      <SelectItem value="7">{t('ilq.analytics.last7Days')}</SelectItem>
+                      <SelectItem value="30">{t('ilq.analytics.last30Days')}</SelectItem>
+                      <SelectItem value="90">{t('ilq.analytics.last90Days')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -326,7 +328,7 @@ export default function ILQAnalytics() {
               <CardContent>
                 {historyLoading ? (
                   <div className="h-80 flex items-center justify-center">
-                    <p className="text-muted-foreground">Loading chart...</p>
+                    <p className="text-muted-foreground">{t('ilq.loadingChart')}</p>
                   </div>
                 ) : chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={400}>
@@ -336,14 +338,14 @@ export default function ILQAnalytics() {
                       <YAxis domain={[0, 100]} />
                       <Tooltip />
                       <Legend />
-                      <Line type="monotone" dataKey="score" stroke="hsl(var(--primary))" strokeWidth={3} name="ILQ Score" />
-                      <Line type="monotone" dataKey="health" stroke="#10b981" strokeWidth={2} name="Health" />
-                      <Line type="monotone" dataKey="activity" stroke="#3b82f6" strokeWidth={2} name="Activity" />
+                      <Line type="monotone" dataKey="score" stroke="hsl(var(--primary))" strokeWidth={3} name={t('ilq.ilqScore')} />
+                      <Line type="monotone" dataKey="health" stroke="#10b981" strokeWidth={2} name={t('ilq.health')} />
+                      <Line type="monotone" dataKey="activity" stroke="#3b82f6" strokeWidth={2} name={t('ilq.activity')} />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-80 flex items-center justify-center">
-                    <p className="text-muted-foreground">No historical data available</p>
+                    <p className="text-muted-foreground">{t('ilq.analytics.noHistoricalData')}</p>
                   </div>
                 )}
               </CardContent>
@@ -356,9 +358,9 @@ export default function ILQAnalytics() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5" />
-                    Component Analysis
+                    {t('ilq.analytics.componentAnalysis')}
                   </CardTitle>
-                  <CardDescription>Latest score breakdown across all dimensions</CardDescription>
+                  <CardDescription>{t('ilq.analytics.componentAnalysisDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {radarData.length > 0 ? (
@@ -367,41 +369,41 @@ export default function ILQAnalytics() {
                         <PolarGrid />
                         <PolarAngleAxis dataKey="component" />
                         <PolarRadiusAxis domain={[0, 100]} />
-                        <Radar name="Score" dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
+                        <Radar name={t('ilq.score')} dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
                       </RadarChart>
                     </ResponsiveContainer>
                   ) : (
                     <div className="h-80 flex items-center justify-center">
-                      <p className="text-muted-foreground">No component data available</p>
+                      <p className="text-muted-foreground">{t('ilq.analytics.noComponentData')}</p>
                     </div>
                   )}
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader>
-                  <CardTitle>Component Details</CardTitle>
-                  <CardDescription>Understanding each dimension</CardDescription>
+                  <CardTitle>{t('ilq.analytics.componentDetails')}</CardTitle>
+                  <CardDescription>{t('ilq.analytics.componentDetailsDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {latestScore && (
                       <>
                         <div className="border-l-4 border-green-500 pl-4">
-                          <h4 className="font-semibold">Health Vitals (30%)</h4>
-                          <p className="text-sm text-muted-foreground">Heart rate, blood pressure, temperature</p>
+                          <h4 className="font-semibold">{t('ilq.analytics.healthVitalsPercent')}</h4>
+                          <p className="text-sm text-muted-foreground">{t('ilq.analytics.healthVitalsDesc')}</p>
                           <p className="text-2xl font-bold mt-1">{(latestScore.health_vitals_score ? (typeof latestScore.health_vitals_score === 'string' ? parseFloat(latestScore.health_vitals_score) : latestScore.health_vitals_score) : 0).toFixed(0)}</p>
                         </div>
-                        
+
                         <div className="border-l-4 border-blue-500 pl-4">
-                          <h4 className="font-semibold">Physical Activity (25%)</h4>
-                          <p className="text-sm text-muted-foreground">Steps, movement patterns, mobility</p>
+                          <h4 className="font-semibold">{t('ilq.analytics.physicalActivityPercent')}</h4>
+                          <p className="text-sm text-muted-foreground">{t('ilq.analytics.physicalActivityDesc')}</p>
                           <p className="text-2xl font-bold mt-1">{(latestScore.physical_activity_score ? (typeof latestScore.physical_activity_score === 'string' ? parseFloat(latestScore.physical_activity_score) : latestScore.physical_activity_score) : 0).toFixed(0)}</p>
                         </div>
-                        
+
                         <div className="border-l-4 border-purple-500 pl-4">
-                          <h4 className="font-semibold">Cognitive Function (15%)</h4>
-                          <p className="text-sm text-muted-foreground">Routine adherence, medication compliance</p>
+                          <h4 className="font-semibold">{t('ilq.analytics.cognitiveFunctionPercent')}</h4>
+                          <p className="text-sm text-muted-foreground">{t('ilq.analytics.cognitiveFunctionDesc')}</p>
                           <p className="text-2xl font-bold mt-1">{(latestScore.cognitive_function_score ? (typeof latestScore.cognitive_function_score === 'string' ? parseFloat(latestScore.cognitive_function_score) : latestScore.cognitive_function_score) : 0).toFixed(0)}</p>
                         </div>
                       </>
@@ -415,8 +417,8 @@ export default function ILQAnalytics() {
           <TabsContent value="alerts">
             <Card>
               <CardHeader>
-                <CardTitle>ILQ Alerts History</CardTitle>
-                <CardDescription>All alerts related to ILQ score changes</CardDescription>
+                <CardTitle>{t('ilq.alertsHistory', { defaultValue: 'ILQ Alerts History' })}</CardTitle>
+                <CardDescription>{t('ilq.alertsHistoryDesc', { defaultValue: 'All alerts related to ILQ score changes' })}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -425,13 +427,13 @@ export default function ILQAnalytics() {
                       <div key={alert.id} className="border rounded-lg p-4">
                         <div className="flex items-start justify-between">
                           <div className="space-y-1">
-                            <h4 className="font-semibold">{alert.title}</h4>
-                            <p className="text-sm text-muted-foreground">{alert.description}</p>
+                            <h4 className="font-semibold">{t(`alerts.messages.${alert.alert_type}.title`, { defaultValue: alert.title })}</h4>
+                            <p className="text-sm text-muted-foreground">{t(`alerts.messages.${alert.alert_type}.description`, { defaultValue: alert.description })}</p>
                             <div className="flex gap-4 text-xs text-muted-foreground mt-2">
-                              <span>Severity: <strong>{alert.severity}</strong></span>
-                              <span>Status: <strong>{alert.status}</strong></span>
+                              <span>{t('alerts.severity')}: <strong>{t(`alerts.${alert.severity}`, { defaultValue: alert.severity })}</strong></span>
+                              <span>{t('alerts.status')}: <strong>{t(`alerts.statusOptions.${alert.status}`, { defaultValue: alert.status })}</strong></span>
                               {alert.score_change && (
-                                <span>Change: <strong>{alert.score_change.toFixed(1)} points</strong></span>
+                                <span>{t('ilq.change', { defaultValue: 'Change' })}: <strong>{alert.score_change.toFixed(1)} {t('ilq.points', { defaultValue: 'points' })}</strong></span>
                               )}
                             </div>
                           </div>
@@ -442,7 +444,7 @@ export default function ILQAnalytics() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-center text-muted-foreground py-8">No alerts found</p>
+                    <p className="text-center text-muted-foreground py-8">{t('alerts.noAlertsFound')}</p>
                   )}
                 </div>
               </CardContent>

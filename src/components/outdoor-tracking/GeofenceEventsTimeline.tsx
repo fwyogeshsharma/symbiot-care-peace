@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDuration, GeofenceEvent, GeofencePlace } from '@/lib/geofenceUtils';
 import { format } from 'date-fns';
 import { LogIn, LogOut } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface GeofenceEventsTimelineProps {
   elderlyPersonId: string;
@@ -19,6 +20,7 @@ export function GeofenceEventsTimeline({
   endDate,
   places,
 }: GeofenceEventsTimelineProps) {
+  const { t } = useTranslation();
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['geofence-events', elderlyPersonId, startDate, endDate],
     queryFn: async () => {
@@ -44,17 +46,17 @@ export function GeofenceEventsTimeline({
   };
 
   if (isLoading) {
-    return <div>Loading events...</div>;
+    return <div>{t('tracking.events.loading')}</div>;
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Location History</CardTitle>
+        <CardTitle>{t('tracking.events.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         {events.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No location events in this time period.</p>
+          <p className="text-muted-foreground text-sm">{t('tracking.events.noEvents')}</p>
         ) : (
           <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
             {events.map((event) => (
@@ -73,7 +75,7 @@ export function GeofenceEventsTimeline({
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{getPlaceName(event.place_id)}</span>
                     <Badge variant={event.event_type === 'entry' ? 'default' : 'secondary'}>
-                      {event.event_type === 'entry' ? 'Arrived' : 'Left'}
+                      {event.event_type === 'entry' ? t('tracking.events.arrived') : t('tracking.events.left')}
                     </Badge>
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
@@ -81,7 +83,7 @@ export function GeofenceEventsTimeline({
                   </div>
                   {event.duration_minutes && event.event_type === 'exit' && (
                     <div className="text-sm mt-1">
-                      Duration: {formatDuration(event.duration_minutes)}
+                      {t('tracking.events.duration')}: {formatDuration(event.duration_minutes)}
                     </div>
                   )}
                 </div>

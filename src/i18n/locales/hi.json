@@ -715,6 +715,304 @@
     "footer": "© 2025 SymBIoT. सर्वाधिकार सुरक्षित।",
     "billedAnnually": "/माह वार्षिक बिलिंग"
   },
+  "devices": {
+    "title": "उपकरण",
+    "subtitle": "अपने उपकरणों की निगरानी करें",
+    "pageTitle": "उपकरण",
+    "pageDescription": "सभी कनेक्टेड उपकरणों की निगरानी और प्रबंधन करें",
+    "status": "उपकरण स्थिति",
+    "online": "ऑनलाइन",
+    "offline": "ऑफलाइन",
+    "inactive": "निष्क्रिय",
+    "maintenance": "रखरखाव",
+    "battery": "बैटरी",
+    "lastSeen": "अंतिम बार देखा",
+    "addDevice": "उपकरण जोड़ें",
+    "removeDevice": "उपकरण हटाएं",
+    "deviceName": "उपकरण का नाम",
+    "deviceType": "उपकरण प्रकार",
+    "location": "स्थान",
+    "platformMetrics": "प्लेटफॉर्म मेट्रिक्स",
+    "deviceTypes": "उपकरण प्रकार",
+    "noDevices": "अभी तक कोई उपकरण पंजीकृत नहीं",
+    "noData": "कोई डेटा नहीं",
+    "records": "रिकॉर्ड",
+    "generateData": "डेटा जनरेट करें",
+    "generateDataTooltip": "परीक्षण के लिए 7 दिनों का सैंपल डेटा जनरेट करें",
+    "unassigned": "अनअसाइन्ड",
+    "guide": {
+      "title": "उपकरण स्थिति गाइड",
+      "description": "सभी कनेक्टेड उपकरणों और उनकी रीयल-टाइम स्थिति की निगरानी करें।",
+      "onlineDesc": "उपकरण कनेक्टेड है और ट्रांसमिट कर रहा है",
+      "offlineDesc": "कोई हालिया डेटा प्राप्त नहीं हुआ",
+      "inactiveDesc": "उपकरण कॉन्फ़िगर नहीं है",
+      "clickTip": "विस्तृत जानकारी और इतिहास देखने के लिए किसी भी उपकरण कार्ड पर क्लिक करें।"
+    },
+    "apiDetails": {
+      "title": "उपकरण API विवरण",
+      "description": "अपने IoT उपकरण से डेटा भेजने के लिए इन विवरणों का उपयोग करें",
+      "apiKey": "API कुंजी",
+      "saveSecurely": "इसे सुरक्षित रूप से सहेजें",
+      "apiEndpoint": "API एंडपॉइंट",
+      "exampleRequest": "उदाहरण अनुरोध",
+      "availableDataTypes": "उपलब्ध डेटा प्रकार",
+      "dataTypesList": "heart_rate, blood_pressure, temperature, fall_detected, steps, sleep, activity, location",
+      "useKeyAuth": "डेटा भेजते समय अपने उपकरण को प्रमाणित करने के लिए इस कुंजी का उपयोग करें",
+      "copied": "कॉपी किया गया!",
+      "copiedToClipboard": "API कुंजी क्लिपबोर्ड पर कॉपी की गई",
+      "viewHistory": "उपकरण इतिहास देखें"
+    },
+    "edit": {
+      "title": "उपकरण संपादित करें",
+      "description": "उपकरण जानकारी अपडेट करें",
+      "deviceName": "उपकरण का नाम",
+      "deviceType": "उपकरण प्रकार",
+      "location": "स्थान",
+      "company": "कंपनी/निर्माता",
+      "selectCompany": "कंपनी चुनें (वैकल्पिक)",
+      "cancel": "रद्द करें",
+      "updating": "अपडेट हो रहा है...",
+      "updateDevice": "उपकरण अपडेट करें",
+      "updated": "उपकरण अपडेट किया गया",
+      "updatedDesc": "उपकरण जानकारी सफलतापूर्वक अपडेट की गई।",
+      "updateFailed": "अपडेट विफल"
+    },
+    "delete": {
+      "title": "उपकरण हटाएं",
+      "confirmMessage": "क्या आप वाकई \"{{name}}\" को हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।",
+      "alsoDeleteData": "सभी उपकरण डेटा भी हटाएं (स्वास्थ्य रिकॉर्ड, सेंसर रीडिंग आदि)",
+      "cancel": "रद्द करें",
+      "deleting": "हटाया जा रहा है...",
+      "deleteDevice": "उपकरण हटाएं",
+      "deleted": "उपकरण हटा दिया गया",
+      "deletedDesc": "उपकरण सफलतापूर्वक हटा दिया गया।",
+      "deleteFailed": "हटाना विफल"
+    },
+    "register": {
+      "title": "नया उपकरण पंजीकृत करें",
+      "dialogTitle": "IoT उपकरण जोड़ें",
+      "dialogDescription": "मैन्युअल रूप से उपकरण पंजीकृत करें या सहयोगात्मक सेटअप के लिए पेयरिंग फ्लो का उपयोग करें।",
+      "manualRegistration": "मैन्युअल पंजीकरण",
+      "pairDevice": "उपकरण पेयर करें",
+      "deviceName": "उपकरण का नाम",
+      "deviceNamePlaceholder": "जैसे, लिविंग रूम मॉनिटर",
+      "deviceType": "उपकरण प्रकार",
+      "selectDeviceType": "उपकरण प्रकार चुनें",
+      "company": "कंपनी/निर्माता",
+      "selectCompany": "कंपनी चुनें (वैकल्पिक)",
+      "model": "उपकरण मॉडल",
+      "selectModel": "मॉडल चुनें (वैकल्पिक)",
+      "modelDescription": "अपने उपकरण का विशिष्ट मॉडल चुनें",
+      "deviceId": "उपकरण आईडी",
+      "deviceIdPlaceholder": "जैसे, DEV-12345",
+      "deviceIdDescription": "आपके IoT उपकरण की अनूठी पहचान",
+      "location": "स्थान (वैकल्पिक)",
+      "locationPlaceholder": "जैसे, बेडरूम, लिविंग रूम",
+      "generateSampleData": "परीक्षण के लिए सैंपल डेटा जनरेट करें",
+      "generateSampleDataDesc": "डैशबोर्ड परीक्षण के लिए स्वचालित रूप से 7 दिनों का नकली डेटा बनाएं",
+      "registering": "पंजीकृत हो रहा है...",
+      "registerDevice": "उपकरण पंजीकृत करें",
+      "success": "उपकरण सफलतापूर्वक पंजीकृत",
+      "successWithData": "आपका IoT उपकरण सैंपल डेटा के साथ जोड़ा गया।",
+      "successNoData": "आपका IoT उपकरण जोड़ा गया।",
+      "failed": "उपकरण पंजीकरण विफल",
+      "missingInfo": "जानकारी गायब है",
+      "fillRequired": "कृपया सभी आवश्यक फ़ील्ड भरें",
+      "noProfile": "कोई प्रोफ़ाइल नहीं मिली",
+      "createProfileFirst": "कृपया पहले वरिष्ठ व्यक्ति प्रोफ़ाइल बनाएं",
+      "noProfileForPairing": "कोई वरिष्ठ व्यक्ति प्रोफ़ाइल नहीं मिली।",
+      "setupProfileFirst": "उपकरण पेयर करने के लिए पहले प्रोफ़ाइल सेट करें।",
+      "apiKeyTitle": "API कुंजी (इसे सुरक्षित रूप से सहेजें)",
+      "apiKeyWarning": "यह कुंजी केवल एक बार दिखाई जाएगी। इसे अभी सहेजें!",
+      "useApiKeyAuth": "डेटा भेजते समय अपने उपकरण को प्रमाणित करने के लिए इस API कुंजी का उपयोग करें।",
+      "apiEndpoint": "API एंडपॉइंट:",
+      "exampleRequest": "उदाहरण अनुरोध:",
+      "registerAnother": "अन्य उपकरण पंजीकृत करें",
+      "apiKeyCopied": "API कुंजी कॉपी की गई",
+      "apiKeyCopiedDesc": "API कुंजी क्लिपबोर्ड पर कॉपी की गई"
+    },
+    "geofenceAlert": {
+      "title": "जियोफेंस आवश्यक",
+      "description": "GPS उपकरणों को पंजीकरण से पहले कम से कम एक जियोफेंस सेट करना आवश्यक है।",
+      "explanation": "जियोफेंस सुरक्षित क्षेत्रों और महत्वपूर्ण स्थानों (जैसे घर, कार्यस्थल, या चिकित्सा सुविधाएं) को परिभाषित करते हैं। जब व्यक्ति इन क्षेत्रों में प्रवेश करता है या बाहर निकलता है तो ये स्थान-आधारित अलर्ट सक्षम करते हैं।",
+      "howToAdd": "जियोफेंस जोड़ने के लिए:",
+      "step1": "नेविगेशन में ट्रैकिंग पर जाएं",
+      "step2": "आउटडोर ट्रैकिंग टैब चुनें",
+      "step3": "स्थान जोड़ने के लिए जियोफेंस मैनेजर का उपयोग करें",
+      "step4": "अपना GPS उपकरण पंजीकृत करने के लिए यहां वापस आएं",
+      "cancel": "रद्द करें",
+      "goToTracking": "ट्रैकिंग पर जाएं"
+    },
+    "history": {
+      "title": "उपकरण इतिहास",
+      "titleWithName": "उपकरण इतिहास - {{name}}",
+      "description": "इस उपकरण से ऐतिहासिक डेटा रीडिंग",
+      "loading": "इतिहास लोड हो रहा है...",
+      "noData": "अभी तक कोई डेटा रिकॉर्ड नहीं",
+      "readings": "रीडिंग"
+    },
+    "dataGeneration": {
+      "generated": "डेटा जनरेट किया गया",
+      "generatedDesc": "उपकरण के लिए सैंपल डेटा सफलतापूर्वक जनरेट किया गया।",
+      "failed": "जनरेशन विफल",
+      "sampleDataFailed": "सैंपल डेटा जनरेशन विफल"
+    },
+    "validation": {
+      "deviceNameRequired": "उपकरण का नाम आवश्यक है",
+      "deviceNameMax": "उपकरण का नाम 100 अक्षरों से कम होना चाहिए",
+      "deviceTypeRequired": "उपकरण प्रकार आवश्यक है",
+      "deviceIdRequired": "उपकरण आईडी आवश्यक है",
+      "deviceIdMax": "उपकरण आईडी 50 अक्षरों से कम होनी चाहिए",
+      "deviceIdFormat": "उपकरण आईडी में केवल अक्षर, संख्याएं, हाइफ़न और अंडरस्कोर हो सकते हैं",
+      "locationMax": "स्थान 100 अक्षरों से कम होना चाहिए"
+    },
+    "pairing": {
+      "title": "डिवाइस पेयरिंग अनुरोध",
+      "noPending": "कोई लंबित पेयरिंग अनुरोध नहीं",
+      "approveTitle": "डिवाइस पेयरिंग स्वीकृत करें",
+      "reviewAndApprove": "{{name}} के लिए डिवाइस की समीक्षा करें और स्वीकृत करें",
+      "deviceId": "डिवाइस आईडी",
+      "deviceType": "डिवाइस प्रकार",
+      "unknown": "अज्ञात",
+      "pairingCode": "पेयरिंग कोड",
+      "requested": "अनुरोधित",
+      "deviceNameOptional": "डिवाइस का नाम (वैकल्पिक)",
+      "deviceNamePlaceholder": "जैसे, लिविंग रूम सेंसर",
+      "locationOptional": "स्थान (वैकल्पिक)",
+      "locationPlaceholder": "जैसे, लिविंग रूम",
+      "approve": "स्वीकृत करें",
+      "reject": "अस्वीकार करें",
+      "backToList": "सूची पर वापस जाएं",
+      "pendingRequests": "{{count}} लंबित अनुरोध",
+      "pendingRequestsPlural": "{{count}} लंबित अनुरोध",
+      "forPerson": "{{name}} के लिए",
+      "newRequestReceived": "नया डिवाइस पेयरिंग अनुरोध प्राप्त हुआ!",
+      "pairedSuccessfully": "डिवाइस सफलतापूर्वक पेयर हो गया!",
+      "approveFailed": "स्वीकृति विफल",
+      "rejected": "पेयरिंग अनुरोध अस्वीकृत",
+      "rejectFailed": "अस्वीकृति विफल"
+    }
+  },
+  "tracking": {
+    "title": "ट्रैकिंग",
+    "subtitle": "इंडोर और आउटडोर पोजिशनिंग सिस्टम",
+    "movementTracking": "मूवमेंट ट्रैकिंग",
+    "realTimePositioning": "रीयल-टाइम इंडोर और आउटडोर पोजिशनिंग",
+    "location": "वर्तमान स्थान",
+    "indoor": "इंडोर",
+    "outdoor": "आउटडोर",
+    "cameras": "कैमरे",
+    "indoorTracking": "इंडोर ट्रैकिंग",
+    "outdoorTracking": "आउटडोर ट्रैकिंग",
+    "safeZones": "सुरक्षित क्षेत्र",
+    "geofencing": "जियोफेंसिंग",
+    "history": "स्थान इतिहास",
+    "realTime": "रीयल-टाइम",
+    "addZone": "सुरक्षित क्षेत्र जोड़ें",
+    "editZone": "क्षेत्र संपादित करें",
+    "deleteZone": "क्षेत्र हटाएं",
+    "floorPlans": "फ्लोर प्लान",
+    "selectPeriod": "अवधि चुनें",
+    "today": "आज",
+    "last7Days": "पिछले 7 दिन",
+    "last30Days": "पिछले 30 दिन",
+    "noFloorPlan": {
+      "title": "कोई फ्लोर प्लान नहीं मिला",
+      "description": "इंडोर ट्रैकिंग देखने के लिए वर्कर-वियरेबल डिवाइस रजिस्टर करें"
+    },
+    "noGpsData": {
+      "title": "कोई GPS डेटा या जियोफेंस नहीं",
+      "description": "आउटडोर ट्रैकिंग और रीयल-टाइम लोकेशन डेटा देखने के लिए GPS डिवाइस रजिस्टर करें",
+      "setupGeofences": "नीचे अपने जियोफेंस सेट अप करें! जियोफेंस लोकेशन-आधारित अलर्ट के लिए महत्वपूर्ण स्थान और सुरक्षित क्षेत्र परिभाषित करते हैं।"
+    },
+    "geofencesConfigured": {
+      "title": "जियोफेंस कॉन्फ़िगर किए गए",
+      "description": "आपके जियोफेंस नीचे मैप पर दिखाए गए हैं। रीयल-टाइम ट्रैकिंग देखने के लिए GPS डिवाइस रजिस्टर करें।"
+    },
+    "securityCameras": "सुरक्षा कैमरे",
+    "noMovementData": {
+      "title": "कोई मूवमेंट डेटा उपलब्ध नहीं",
+      "description": "मूवमेंट ट्रैकिंग देखने के लिए, डैशबोर्ड पर जाएं और सैंपल पोजीशन डेटा जनरेट करने के लिए वर्कर-वियरेबल डिवाइस के लिए \"डिवाइस डेटा पॉप्युलेट करें\" पर क्लिक करें।",
+      "goToDashboard": "डैशबोर्ड पर जाएं"
+    },
+    "positioningVisualization": "रीयल-टाइम पोजिशनिंग और मूवमेंट विज़ुअलाइज़ेशन",
+    "playback": {
+      "title": "मूवमेंट प्लेबैक",
+      "noData": "प्लेबैक के लिए कोई मूवमेंट डेटा नहीं",
+      "zone": "ज़ोन",
+      "speed": "गति",
+      "accuracy": "सटीकता"
+    },
+    "metrics": {
+      "totalDistance": "कुल दूरी",
+      "traveled": "तय की गई",
+      "averageSpeed": "औसत गति",
+      "zoneVisits": "ज़ोन विज़िट",
+      "most": "सबसे अधिक",
+      "noData": "कोई डेटा नहीं",
+      "activeTime": "सक्रिय समय",
+      "acrossZones": "{{count}} ज़ोन में",
+      "zoneStatistics": "ज़ोन आंकड़े",
+      "visits": "विज़िट"
+    },
+    "gps": {
+      "totalDistance": "कुल दूरी",
+      "basedOnPoints": "{{count}} GPS पॉइंट पर आधारित",
+      "locationsVisited": "विज़िट किए गए स्थान",
+      "activeGeofences": "सक्रिय जियोफेंस स्थान",
+      "totalEvents": "कुल इवेंट",
+      "entryExitEvents": "एंट्री और एक्ज़िट इवेंट",
+      "mostVisitedPlaces": "सबसे अधिक विज़िट किए गए स्थान",
+      "visit": "विज़िट",
+      "visits": "विज़िट"
+    },
+    "geofence": {
+      "title": "जियोफेंस स्थान",
+      "addPlace": "स्थान जोड़ें",
+      "editPlace": "जियोफेंस स्थान संपादित करें",
+      "addGeofencePlace": "जियोफेंस स्थान जोड़ें",
+      "loading": "जियोफेंस स्थान लोड हो रहे हैं...",
+      "noPlaces": "कोई जियोफेंस स्थान कॉन्फ़िगर नहीं किए गए।",
+      "ftRadius": "फीट त्रिज्या",
+      "name": "नाम",
+      "namePlaceholder": "उदा., घर",
+      "placeType": "स्थान प्रकार",
+      "latitude": "अक्षांश",
+      "longitude": "देशांतर",
+      "radius": "त्रिज्या (फीट)",
+      "address": "पता (वैकल्पिक)",
+      "addressPlaceholder": "123 मुख्य सड़क, शहर, देश",
+      "getCoordinates": "पते से निर्देशांक प्राप्त करें",
+      "color": "रंग",
+      "notes": "नोट्स (वैकल्पिक)",
+      "notesPlaceholder": "अतिरिक्त नोट्स...",
+      "createPlace": "स्थान बनाएं",
+      "updatePlace": "स्थान अपडेट करें",
+      "cancel": "रद्द करें",
+      "created": "जियोफेंस स्थान सफलतापूर्वक बनाया गया",
+      "updated": "जियोफेंस स्थान सफलतापूर्वक अपडेट किया गया",
+      "deleted": "जियोफेंस स्थान सफलतापूर्वक हटाया गया",
+      "createError": "जियोफेंस स्थान बनाने में विफल",
+      "updateError": "जियोफेंस स्थान अपडेट करने में विफल",
+      "deleteError": "जियोफेंस स्थान हटाने में विफल",
+      "enterAddress": "कृपया पहले एक पता दर्ज करें",
+      "coordinatesUpdated": "पते से निर्देशांक अपडेट किए गए",
+      "coordinatesNotFound": "इस पते के लिए निर्देशांक नहीं मिल सके",
+      "geocodeError": "पता जियोकोड करने में विफल"
+    },
+    "events": {
+      "title": "स्थान इतिहास",
+      "loading": "इवेंट लोड हो रहे हैं...",
+      "noEvents": "इस अवधि में कोई स्थान इवेंट नहीं।",
+      "arrived": "पहुंचे",
+      "left": "गए",
+      "duration": "अवधि",
+      "unknownLocation": "अज्ञात स्थान"
+    },
+    "map": {
+      "currentPosition": "वर्तमान स्थिति"
+    }
+  },
   "profile": {
     "title": "प्रोफ़ाइल",
     "personalInfo": "व्यक्तिगत जानकारी",
@@ -764,6 +1062,178 @@
         "fairDesc": "4,000-8,000 कदम/दिन",
         "lowDesc": "<4,000 कदम/दिन",
         "noData": "कोई डेटा नहीं"
+      }
+    }
+  },
+  "alerts": {
+    "title": "अलर्ट",
+    "management": "अलर्ट प्रबंधन",
+    "subtitle": "सिस्टम अलर्ट की निगरानी और प्रतिक्रिया करें",
+    "noAlerts": "इस समय कोई अलर्ट नहीं",
+    "noAlertsFound": "कोई अलर्ट नहीं मिला",
+    "noAlertsDescription": "सब ठीक है! आपके वर्तमान फ़िल्टर से कोई अलर्ट मेल नहीं खाता। विभिन्न अलर्ट देखने के लिए ऊपर दिए गए फ़िल्टर समायोजित करें।",
+    "allClear": "सब ठीक है! कोई सक्रिय अलर्ट नहीं।",
+    "critical": "गंभीर",
+    "high": "उच्च",
+    "medium": "मध्यम",
+    "low": "निम्न",
+    "warning": "चेतावनी",
+    "info": "जानकारी",
+    "resolved": "हल किया गया",
+    "unresolved": "अनसुलझा",
+    "markResolved": "हल किया गया के रूप में चिह्नित करें",
+    "viewDetails": "विवरण देखें",
+    "filterBy": "फ़िल्टर करें",
+    "sortBy": "क्रमबद्ध करें",
+    "date": "तारीख",
+    "severity": "गंभीरता",
+    "type": "प्रकार",
+    "status": "स्थिति",
+    "stats": {
+      "totalAlerts": "कुल अलर्ट",
+      "totalAlertsTooltip": "चयनित अवधि में अलर्ट की कुल संख्या, जिसमें सक्रिय, स्वीकृत और हल किए गए अलर्ट शामिल हैं।",
+      "active": "सक्रिय",
+      "critical": "गंभीर",
+      "avgResponse": "औसत प्रतिक्रिया",
+      "responseTime": "प्रतिक्रिया समय",
+      "responseTimeTooltip": "अलर्ट स्वीकार करने का औसत समय। कम प्रतिक्रिया समय गंभीर मुद्दों पर तेज़ ध्यान देने का संकेत देता है।",
+      "minutes": "मिनट"
+    },
+    "filters": {
+      "searchPlaceholder": "अलर्ट खोजें...",
+      "allSeverity": "सभी गंभीरता",
+      "allTypes": "सभी प्रकार",
+      "allStatus": "सभी स्थिति",
+      "dateRange": "तारीख सीमा"
+    },
+    "types": {
+      "vital_signs": "महत्वपूर्ण संकेत",
+      "panic_sos": "पैनिक/SOS",
+      "device_offline": "डिवाइस ऑफलाइन",
+      "geofence": "जियोफेंस",
+      "inactivity": "निष्क्रियता",
+      "fall_detected": "गिरावट का पता चला",
+      "medication": "दवाई",
+      "wandering": "भटकना",
+      "environmental": "पर्यावरणीय",
+      "battery_low": "कम बैटरी",
+      "connection_lost": "कनेक्शन खो गया",
+      "dwell_time": "ठहरने का समय",
+      "heart_rate": "हृदय गति",
+      "blood_pressure": "रक्तचाप",
+      "oxygen_level": "ऑक्सीजन स्तर",
+      "temperature": "तापमान"
+    },
+    "statusOptions": {
+      "active": "सक्रिय",
+      "acknowledged": "स्वीकृत",
+      "resolved": "हल किया गया"
+    },
+    "dateRanges": {
+      "last24Hours": "पिछले 24 घंटे",
+      "last7Days": "पिछले 7 दिन",
+      "last30Days": "पिछले 30 दिन",
+      "last90Days": "पिछले 90 दिन"
+    },
+    "charts": {
+      "alertTrends": "अलर्ट रुझान",
+      "alertTypesDistribution": "अलर्ट प्रकार वितरण",
+      "severityBreakdown": "गंभीरता विश्लेषण",
+      "alerts": "अलर्ट",
+      "count": "गिनती"
+    },
+    "recipients": {
+      "title": "हाल के प्राप्तकर्ता",
+      "alerts": "अलर्ट"
+    },
+    "timeline": {
+      "title": "अलर्ट समयरेखा",
+      "severityLevels": "अलर्ट गंभीरता स्तर",
+      "criticalDesc": "तत्काल कार्रवाई आवश्यक (जैसे, पैनिक बटन, गंभीर महत्वपूर्ण विसंगति)",
+      "highDesc": "तत्काल ध्यान आवश्यक (जैसे, जियोफेंस उल्लंघन, डिवाइस ऑफलाइन)",
+      "mediumDesc": "जल्द समीक्षा करनी चाहिए (जैसे, मामूली महत्वपूर्ण विचलन)",
+      "lowDesc": "सूचनात्मक (जैसे, नियमित सूचनाएं)",
+      "unknown": "अज्ञात",
+      "acknowledged": "स्वीकृत"
+    },
+    "actions": {
+      "acknowledge": "स्वीकार करें"
+    },
+    "notifications": {
+      "newAlert": "नया अलर्ट",
+      "newAlertGenerated": "एक नया अलर्ट जनरेट हुआ है",
+      "person": "व्यक्ति",
+      "viewLater": "बाद में देखें",
+      "acknowledgeAlert": "अलर्ट स्वीकार करें"
+    },
+    "toasts": {
+      "error": "त्रुटि",
+      "failedToAcknowledge": "अलर्ट स्वीकार करने में विफल",
+      "alertAcknowledged": "अलर्ट स्वीकृत",
+      "alertAcknowledgedTitle": "अलर्ट स्वीकृत",
+      "alertAcknowledgedDesc": "अलर्ट को स्वीकृत के रूप में चिह्नित किया गया है"
+    },
+    "list": {
+      "activeAlerts": "सक्रिय अलर्ट",
+      "filtered": "(फ़िल्टर किया गया)",
+      "active": "सक्रिय"
+    },
+    "messages": {
+      "panic_sos": {
+        "title": "आपातकालीन बटन सक्रिय",
+        "description": "आपातकालीन बटन दबाया गया है। तत्काल ध्यान देने की आवश्यकता है।"
+      },
+      "vital_signs": {
+        "title": "महत्वपूर्ण संकेत अलर्ट",
+        "description": "असामान्य महत्वपूर्ण संकेत पाए गए। कृपया रोगी की स्थिति जांचें।"
+      },
+      "device_offline": {
+        "title": "डिवाइस ऑफलाइन",
+        "description": "एक डिवाइस ऑफलाइन हो गई है और अब डेटा नहीं भेज रही।"
+      },
+      "geofence": {
+        "title": "जियोफेंस अलर्ट",
+        "description": "व्यक्ति ने निर्दिष्ट सुरक्षित क्षेत्र छोड़ा या प्रवेश किया है।"
+      },
+      "inactivity": {
+        "title": "निष्क्रियता अलर्ट",
+        "description": "लंबी निष्क्रियता पाई गई। कृपया व्यक्ति की जांच करें।"
+      },
+      "fall_detected": {
+        "title": "गिरावट पाई गई",
+        "description": "संभावित गिरावट पाई गई है। तत्काल ध्यान देने की आवश्यकता है।"
+      },
+      "heart_rate": {
+        "title": "हृदय गति अलर्ट",
+        "description": "असामान्य हृदय गति पाई गई।"
+      },
+      "blood_pressure": {
+        "title": "रक्तचाप अलर्ट",
+        "description": "असामान्य रक्तचाप रीडिंग पाई गई।"
+      },
+      "oxygen_level": {
+        "title": "ऑक्सीजन स्तर अलर्ट",
+        "description": "कम ऑक्सीजन संतृप्ति स्तर पाया गया।"
+      },
+      "temperature": {
+        "title": "तापमान अलर्ट",
+        "description": "असामान्य शरीर का तापमान पाया गया।"
+      },
+      "dwell_time": {
+        "title": "ठहराव समय अलर्ट",
+        "description": "किसी स्थान पर असामान्य समय पाया गया।"
+      },
+      "battery_low": {
+        "title": "कम बैटरी",
+        "description": "डिवाइस की बैटरी कम हो रही है।"
+      },
+      "medication": {
+        "title": "दवा रिमाइंडर",
+        "description": "दवा रिमाइंडर ट्रिगर हुआ।"
+      },
+      "wandering": {
+        "title": "भटकाव अलर्ट",
+        "description": "असामान्य भटकाव व्यवहार पाया गया।"
       }
     }
   },
@@ -933,7 +1403,61 @@
     "noDataPeriod": "चयनित अवधि के लिए कोई ILQ डेटा उपलब्ध नहीं है",
     "lastDays": "पिछले {{days}} दिन",
     "independenceScore": "पिछले {{days}} दिनों में स्वतंत्रता स्कोर",
-    "ilqScore": "ILQ स्कोर"
+    "ilqScore": "ILQ स्कोर",
+    "alertsHistory": "ILQ अलर्ट इतिहास",
+    "alertsHistoryDesc": "ILQ स्कोर परिवर्तनों से संबंधित सभी अलर्ट",
+    "change": "परिवर्तन",
+    "points": "अंक",
+    "analytics": {
+      "title": "ILQ विश्लेषण",
+      "subtitle": "स्वतंत्र जीवन भागफल",
+      "description": "स्वतंत्र जीवन भागफल - व्यापक स्वतंत्रता मूल्यांकन",
+      "selectPerson": "व्यक्ति चुनें",
+      "computeILQ": "ILQ गणना करें",
+      "autoOn": "स्वचालित: चालू",
+      "autoOff": "स्वचालित: बंद",
+      "autoRefreshOn": "स्वचालित-रिफ्रेश चालू (हर 10 सेकंड)",
+      "autoRefreshOff": "स्वचालित-रिफ्रेश बंद",
+      "downloadReport": "रिपोर्ट डाउनलोड करें",
+      "sevenDayTrend": "7-दिन का रुझान",
+      "loadingTrendData": "रुझान डेटा लोड हो रहा है...",
+      "improving": "सुधार हो रहा है",
+      "needsAttention": "ध्यान देने की आवश्यकता",
+      "notEnoughData": "पर्याप्त डेटा नहीं",
+      "activeAlerts": "सक्रिय अलर्ट",
+      "historicalTrends": "ऐतिहासिक रुझान",
+      "componentBreakdown": "घटक विश्लेषण",
+      "alertsHistory": "अलर्ट इतिहास",
+      "scoreHistory": "ILQ स्कोर इतिहास",
+      "trackIndependence": "स्वतंत्रता स्तरों को ट्रैक करें",
+      "last7Days": "पिछले 7 दिन",
+      "last30Days": "पिछले 30 दिन",
+      "last90Days": "पिछले 90 दिन",
+      "noHistoricalData": "कोई ऐतिहासिक डेटा उपलब्ध नहीं",
+      "componentAnalysis": "घटक विश्लेषण",
+      "componentAnalysisDesc": "सभी आयामों पर स्कोर विश्लेषण",
+      "noComponentData": "कोई घटक डेटा उपलब्ध नहीं",
+      "componentDetails": "घटक विवरण",
+      "componentDetailsDesc": "प्रत्येक आयाम को समझना",
+      "healthVitals": "स्वास्थ्य संकेत",
+      "healthVitalsPercent": "स्वास्थ्य संकेत (30%)",
+      "healthVitalsDesc": "हृदय गति, रक्तचाप, तापमान",
+      "physicalActivity": "शारीरिक गतिविधि",
+      "physicalActivityPercent": "शारीरिक गतिविधि (25%)",
+      "physicalActivityDesc": "कदम, गति पैटर्न, गतिशीलता",
+      "cognitiveFunction": "संज्ञानात्मक कार्य",
+      "cognitiveFunctionPercent": "संज्ञानात्मक कार्य (15%)",
+      "cognitiveFunctionDesc": "दिनचर्या पालन, दवा अनुपालन",
+      "environmental": "पर्यावरणीय",
+      "emergency": "आपातकालीन",
+      "social": "सामाजिक",
+      "computingScore": "ILQ स्कोर की गणना हो रही है...",
+      "computedSuccess": "ILQ सफलतापूर्वक गणना हुआ: {{score}}",
+      "computeFailed": "ILQ गणना विफल",
+      "generatingReport": "PDF रिपोर्ट तैयार हो रही है...",
+      "reportDownloaded": "रिपोर्ट सफलतापूर्वक डाउनलोड हुई!",
+      "reportFailed": "रिपोर्ट तैयार करने में विफल"
+    }
   },
   "homeHub": {
     "title": "होम हब",

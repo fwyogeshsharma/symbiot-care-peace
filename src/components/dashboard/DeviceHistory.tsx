@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Activity } from 'lucide-react';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface DeviceHistoryProps {
   device: any;
@@ -13,6 +14,7 @@ interface DeviceHistoryProps {
 }
 
 const DeviceHistory = ({ device, open, onOpenChange }: DeviceHistoryProps) => {
+  const { t } = useTranslation();
   const { data: deviceData, isLoading } = useQuery({
     queryKey: ['device-history', device?.id],
     queryFn: async () => {
@@ -82,17 +84,17 @@ const DeviceHistory = ({ device, open, onOpenChange }: DeviceHistoryProps) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Activity className="w-5 h-5" />
-            Device History - {device?.device_name}
+            {t('devices.history.titleWithName', { name: device?.device_name })}
           </DialogTitle>
           <DialogDescription>
-            Historical data readings from this device
+            {t('devices.history.description')}
           </DialogDescription>
         </DialogHeader>
 
         {isLoading ? (
-          <div className="text-center py-8 text-muted-foreground">Loading history...</div>
+          <div className="text-center py-8 text-muted-foreground">{t('devices.history.loading')}</div>
         ) : !deviceData || deviceData.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">No data recorded yet</div>
+          <div className="text-center py-8 text-muted-foreground">{t('devices.history.noData')}</div>
         ) : (
           <div className="space-y-6">
             {Object.entries(groupedData).map(([date, readings]) => (
@@ -103,7 +105,7 @@ const DeviceHistory = ({ device, open, onOpenChange }: DeviceHistoryProps) => {
                     {format(new Date(date), 'EEEE, MMMM d, yyyy')}
                   </h4>
                   <Badge variant="outline" className="ml-auto">
-                    {readings.length} readings
+                    {readings.length} {t('devices.history.readings')}
                   </Badge>
                 </div>
                 

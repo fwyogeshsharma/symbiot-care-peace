@@ -22,8 +22,10 @@ import { useDeviceCompaniesByDeviceType } from '@/hooks/useDeviceCompanies';
 import { useDeviceModelsByCompanyAndDeviceType } from '@/hooks/useDeviceModels';
 import { generateSampleDataPoints, generateSampleDataFromModelSpecs } from '@/lib/sampleDataGenerator';
 import { DeviceDiscovery } from '@/components/pairing/DeviceDiscovery';
+import { useTranslation } from 'react-i18next';
 
 const DeviceManagement = () => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [deviceName, setDeviceName] = useState('');
   const [deviceType, setDeviceType] = useState('');
@@ -98,17 +100,17 @@ const DeviceManagement = () => {
       queryClient.invalidateQueries({ queryKey: ['floor-plan'] });
       queryClient.invalidateQueries({ queryKey: ['position-data'] });
       toast({
-        title: "Device registered successfully",
-        description: generateFakeData 
-          ? "Your IoT device has been added with sample data."
-          : "Your IoT device has been added.",
+        title: t('devices.register.success'),
+        description: generateFakeData
+          ? t('devices.register.successWithData')
+          : t('devices.register.successNoData'),
       });
       // Generate API key for display
       generateApiKey();
     },
     onError: (error: any) => {
       toast({
-        title: "Failed to register device",
+        title: t('devices.register.failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -250,7 +252,7 @@ const DeviceManagement = () => {
     } catch (error) {
       console.error('Error in generateSampleData:', error);
       toast({
-        title: "Sample data generation failed",
+        title: t('devices.dataGeneration.sampleDataFailed'),
         description: error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
@@ -270,8 +272,8 @@ const DeviceManagement = () => {
 
     if (!deviceName || !deviceType || !deviceId) {
       toast({
-        title: "Missing information",
-        description: "Please fill in all required fields",
+        title: t('devices.register.missingInfo'),
+        description: t('devices.register.fillRequired'),
         variant: "destructive",
       });
       return;
@@ -303,8 +305,8 @@ const DeviceManagement = () => {
 
     if (!userElderlyPerson?.id) {
       toast({
-        title: "No profile found",
-        description: "Please create an elderly person profile first",
+        title: t('devices.register.noProfile'),
+        description: t('devices.register.createProfileFirst'),
         variant: "destructive",
       });
       return;
@@ -386,8 +388,8 @@ const DeviceManagement = () => {
   const copyApiKey = () => {
     navigator.clipboard.writeText(apiKey);
     toast({
-      title: "API Key copied",
-      description: "API key has been copied to clipboard",
+      title: t('devices.register.apiKeyCopied'),
+      description: t('devices.register.apiKeyCopiedDesc'),
     });
   };
 
@@ -401,21 +403,21 @@ const DeviceManagement = () => {
       <DialogTrigger asChild>
         <Button className="w-full">
           <Plus className="w-4 h-4 mr-2" />
-          Register New Device
+          {t('devices.register.title')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add IoT Device</DialogTitle>
+          <DialogTitle>{t('devices.register.dialogTitle')}</DialogTitle>
           <DialogDescription>
-            Register a device manually or use the pairing flow for collaborative setup.
+            {t('devices.register.dialogDescription')}
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="manual" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="manual">Manual Registration</TabsTrigger>
-            <TabsTrigger value="pair">Pair Device</TabsTrigger>
+            <TabsTrigger value="manual">{t('devices.register.manualRegistration')}</TabsTrigger>
+            <TabsTrigger value="pair">{t('devices.register.pairDevice')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="manual" className="space-y-4 mt-4">
@@ -423,21 +425,21 @@ const DeviceManagement = () => {
         {!showApiKey ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="device-name">Device Name *</Label>
+              <Label htmlFor="device-name">{t('devices.register.deviceName')} *</Label>
               <Input
                 id="device-name"
                 value={deviceName}
                 onChange={(e) => setDeviceName(e.target.value)}
-                placeholder="e.g., Living Room Monitor"
+                placeholder={t('devices.register.deviceNamePlaceholder')}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="device-type">Device Type *</Label>
+              <Label htmlFor="device-type">{t('devices.register.deviceType')} *</Label>
               <Select value={deviceType} onValueChange={setDeviceType} required>
                 <SelectTrigger id="device-type">
-                  <SelectValue placeholder="Select device type" />
+                  <SelectValue placeholder={t('devices.register.selectDeviceType')} />
                 </SelectTrigger>
                 <SelectContent>
                   {deviceTypes.map((type) => {
@@ -457,10 +459,10 @@ const DeviceManagement = () => {
 
             {deviceType && deviceCompanies.length > 0 && (
               <div className="space-y-2">
-                <Label htmlFor="device-company">Company/Manufacturer</Label>
+                <Label htmlFor="device-company">{t('devices.register.company')}</Label>
                 <Select value={companyId} onValueChange={setCompanyId}>
                   <SelectTrigger id="device-company">
-                    <SelectValue placeholder="Select company (optional)" />
+                    <SelectValue placeholder={t('devices.register.selectCompany')} />
                   </SelectTrigger>
                   <SelectContent>
                     {deviceCompanies.map((company) => (
@@ -480,10 +482,10 @@ const DeviceManagement = () => {
 
             {companyId && deviceModels.length > 0 && (
               <div className="space-y-2">
-                <Label htmlFor="device-model">Device Model</Label>
+                <Label htmlFor="device-model">{t('devices.register.model')}</Label>
                 <Select value={modelId} onValueChange={setModelId}>
                   <SelectTrigger id="device-model">
-                    <SelectValue placeholder="Select model (optional)" />
+                    <SelectValue placeholder={t('devices.register.selectModel')} />
                   </SelectTrigger>
                   <SelectContent>
                     {deviceModels.map((model) => (
@@ -499,32 +501,32 @@ const DeviceManagement = () => {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  Select the specific model of your device
+                  {t('devices.register.modelDescription')}
                 </p>
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="device-id">Device ID *</Label>
+              <Label htmlFor="device-id">{t('devices.register.deviceId')} *</Label>
               <Input
                 id="device-id"
                 value={deviceId}
                 onChange={(e) => setDeviceId(e.target.value)}
-                placeholder="e.g., DEV-12345"
+                placeholder={t('devices.register.deviceIdPlaceholder')}
                 required
               />
               <p className="text-xs text-muted-foreground">
-                Unique identifier from your IoT device
+                {t('devices.register.deviceIdDescription')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location">Location (Optional)</Label>
+              <Label htmlFor="location">{t('devices.register.location')}</Label>
               <Input
                 id="location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g., Bedroom, Living Room"
+                placeholder={t('devices.register.locationPlaceholder')}
               />
             </div>
 
@@ -538,31 +540,31 @@ const DeviceManagement = () => {
                 htmlFor="generate-fake-data"
                 className="text-sm font-normal cursor-pointer"
               >
-                Generate sample data for testing
+                {t('devices.register.generateSampleData')}
               </Label>
             </div>
             <p className="text-xs text-muted-foreground -mt-2">
-              Automatically create 7 days of fake data to test dashboards
+              {t('devices.register.generateSampleDataDesc')}
             </p>
 
             <Button type="submit" className="w-full" disabled={addDeviceMutation.isPending}>
-              {addDeviceMutation.isPending ? 'Registering...' : 'Register Device'}
+              {addDeviceMutation.isPending ? t('devices.register.registering') : t('devices.register.registerDevice')}
             </Button>
           </form>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-success">
               <CheckCircle className="w-5 h-5" />
-              <span className="font-medium">Device registered successfully!</span>
+              <span className="font-medium">{t('devices.register.success')}</span>
             </div>
 
             <Card className="p-4 bg-muted/30">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-warning">
                   <Key className="w-4 h-4" />
-                  <Label className="font-semibold">API Key (Save this securely)</Label>
+                  <Label className="font-semibold">{t('devices.register.apiKeyTitle')}</Label>
                 </div>
-                
+
                 <div className="flex gap-2">
                   <Input
                     value={apiKey}
@@ -575,21 +577,21 @@ const DeviceManagement = () => {
                 </div>
 
                 <div className="space-y-2 text-xs text-muted-foreground">
-                  <p>Use this API key to authenticate your device when sending data.</p>
-                  <p className="font-semibold text-warning">⚠️ This key will only be shown once. Save it now!</p>
+                  <p>{t('devices.register.useApiKeyAuth')}</p>
+                  <p className="font-semibold text-warning">⚠️ {t('devices.register.apiKeyWarning')}</p>
                 </div>
               </div>
             </Card>
 
             <div className="space-y-2 text-sm">
-              <p className="font-medium">API Endpoint:</p>
+              <p className="font-medium">{t('devices.register.apiEndpoint')}</p>
               <code className="block p-2 bg-muted rounded text-xs break-all">
                 https://wiyfcvypeifbdaqnfgrr.supabase.co/functions/v1/device-ingest
               </code>
             </div>
 
             <div className="space-y-2 text-sm">
-              <p className="font-medium">Example Request:</p>
+              <p className="font-medium">{t('devices.register.exampleRequest')}</p>
               <pre className="p-2 bg-muted rounded text-xs overflow-x-auto">
 {`POST /device-ingest
 Headers:
@@ -607,7 +609,7 @@ Body:
             </div>
 
             <Button onClick={resetForm} className="w-full">
-              Register Another Device
+              {t('devices.register.registerAnother')}
             </Button>
           </div>
         )}
@@ -624,8 +626,8 @@ Body:
               />
             ) : (
               <div className="text-center p-6 text-muted-foreground">
-                <p>No elderly person profile found.</p>
-                <p className="text-sm mt-2">Please set up a profile first to pair devices.</p>
+                <p>{t('devices.register.noProfileForPairing')}</p>
+                <p className="text-sm mt-2">{t('devices.register.setupProfileFirst')}</p>
               </div>
             )}
           </TabsContent>
@@ -640,29 +642,28 @@ Body:
               <div className="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center">
                 <AlertTriangle className="w-6 h-6 text-warning" />
               </div>
-              <AlertDialogTitle className="text-xl">Geofences Required</AlertDialogTitle>
+              <AlertDialogTitle className="text-xl">{t('devices.geofenceAlert.title')}</AlertDialogTitle>
             </div>
             <AlertDialogDescription className="space-y-3 pt-2">
               <p className="text-base">
-                GPS devices require at least one geofence to be set up before registration.
+                {t('devices.geofenceAlert.description')}
               </p>
               <p className="text-sm text-muted-foreground">
-                Geofences define safe zones and important places (like home, work, or medical facilities).
-                They enable location-based alerts when the person enters or exits these areas.
+                {t('devices.geofenceAlert.explanation')}
               </p>
               <div className="bg-muted/50 p-3 rounded-lg mt-3">
-                <p className="text-sm font-medium mb-1">To add geofences:</p>
+                <p className="text-sm font-medium mb-1">{t('devices.geofenceAlert.howToAdd')}</p>
                 <ol className="text-sm text-muted-foreground space-y-1 ml-4 list-decimal">
-                  <li>Go to <span className="font-medium">Tracking</span> in the navigation</li>
-                  <li>Select <span className="font-medium">Outdoor Tracking</span> tab</li>
-                  <li>Use the <span className="font-medium">Geofence Manager</span> to add places</li>
-                  <li>Return here to register your GPS device</li>
+                  <li>{t('devices.geofenceAlert.step1')}</li>
+                  <li>{t('devices.geofenceAlert.step2')}</li>
+                  <li>{t('devices.geofenceAlert.step3')}</li>
+                  <li>{t('devices.geofenceAlert.step4')}</li>
                 </ol>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('devices.geofenceAlert.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 setShowGeofenceAlert(false);
@@ -672,7 +673,7 @@ Body:
               className="gap-2"
             >
               <MapPin className="w-4 h-4" />
-              Go to Tracking
+              {t('devices.geofenceAlert.goToTracking')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -29,8 +29,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { getDateRangePreset } from '@/lib/movementUtils';
+import { useTranslation } from 'react-i18next';
 
 export default function Tracking() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const shouldShowTour = useShouldShowTour();
@@ -257,7 +259,7 @@ export default function Tracking() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header showBackButton title="Tracking" subtitle="Indoor and outdoor positioning system" />
+        <Header showBackButton title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
         <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
           <div className="space-y-6">
             <Skeleton className="h-12 w-64" />
@@ -294,18 +296,18 @@ export default function Tracking() {
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
-      <Header showBackButton title="Tracking" subtitle="Indoor and outdoor positioning system" />
+      <Header showBackButton title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Movement Tracking</h1>
+              <h1 className="text-3xl font-bold">{t('tracking.movementTracking')}</h1>
               <p className="text-muted-foreground">
-                Real-time indoor and outdoor positioning
+                {t('tracking.realTimePositioning')}
               </p>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <Button
                 variant="outline"
@@ -314,18 +316,18 @@ export default function Tracking() {
                 data-tour="floor-plan-manager"
               >
                 <MapPin className="h-4 w-4 mr-2" />
-                Floor Plans
+                {t('tracking.floorPlans')}
               </Button>
 
               <Select value={selectedPreset} onValueChange={handlePresetChange}>
                 <SelectTrigger className="w-[180px]" data-tour="tracking-date-range">
                   <Calendar className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Select period" />
+                  <SelectValue placeholder={t('tracking.selectPeriod')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="today">Today</SelectItem>
-                  <SelectItem value="last7days">Last 7 Days</SelectItem>
-                  <SelectItem value="last30days">Last 30 Days</SelectItem>
+                  <SelectItem value="today">{t('tracking.today')}</SelectItem>
+                  <SelectItem value="last7days">{t('tracking.last7Days')}</SelectItem>
+                  <SelectItem value="last30days">{t('tracking.last30Days')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -343,15 +345,15 @@ export default function Tracking() {
             <TabsList className="grid w-full max-w-xl grid-cols-3" data-tour="tracking-tabs">
               <TabsTrigger value="indoor">
                 <MapPin className="h-4 w-4 mr-2" />
-                Indoor
+                {t('tracking.indoor')}
               </TabsTrigger>
               <TabsTrigger value="outdoor">
                 <Navigation className="h-4 w-4 mr-2" />
-                Outdoor
+                {t('tracking.outdoor')}
               </TabsTrigger>
               <TabsTrigger value="camera">
                 <Camera className="h-4 w-4 mr-2" />
-                Cameras
+                {t('tracking.cameras')}
               </TabsTrigger>
             </TabsList>
 
@@ -359,9 +361,9 @@ export default function Tracking() {
             <TabsContent value="indoor" className="space-y-6">
               {!floorPlan ? (
                 <div className="text-center py-12">
-                  <h2 className="text-2xl font-bold mb-4">No Floor Plan Found</h2>
+                  <h2 className="text-2xl font-bold mb-4">{t('tracking.noFloorPlan.title')}</h2>
                   <p className="text-muted-foreground">
-                    Register a worker-wearable device to see indoor tracking
+                    {t('tracking.noFloorPlan.description')}
                   </p>
                 </div>
               ) : (
@@ -396,13 +398,12 @@ export default function Tracking() {
                 <>
                   <div className="text-center py-8 bg-muted/30 rounded-lg border-2 border-dashed">
                     <Navigation className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                    <h2 className="text-2xl font-bold mb-2">No GPS Data or Geofences</h2>
+                    <h2 className="text-2xl font-bold mb-2">{t('tracking.noGpsData.title')}</h2>
                     <p className="text-muted-foreground mb-4">
-                      Register a GPS device to see outdoor tracking and real-time location data
+                      {t('tracking.noGpsData.description')}
                     </p>
                     <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                      Set up your geofences below! Geofences define important places and safe zones
-                      for location-based alerts.
+                      {t('tracking.noGpsData.setupGeofences')}
                     </p>
                   </div>
 
@@ -432,9 +433,9 @@ export default function Tracking() {
                           <div className="flex items-start gap-3">
                             <MapPin className="w-5 h-5 text-info mt-0.5" />
                             <div>
-                              <h3 className="font-semibold text-info">Geofences Configured</h3>
+                              <h3 className="font-semibold text-info">{t('tracking.geofencesConfigured.title')}</h3>
                               <p className="text-sm text-muted-foreground">
-                                Your geofences are displayed on the map below. Register a GPS device to see real-time tracking.
+                                {t('tracking.geofencesConfigured.description')}
                               </p>
                             </div>
                           </div>
@@ -478,7 +479,7 @@ export default function Tracking() {
 
             {/* Camera Monitoring Tab */}
             <TabsContent value="camera" className="space-y-6">
-              <CameraGrid title="Security Cameras" />
+              <CameraGrid title={t('tracking.securityCameras')} />
             </TabsContent>
           </Tabs>
         </div>

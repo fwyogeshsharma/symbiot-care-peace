@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { GoogleMap, LoadScript, Marker, Circle, Polyline, InfoWindow } from '@react-google-maps/api';
 import { GPSCoordinate } from '@/lib/gpsUtils';
 import { GeofencePlace } from '@/lib/geofenceUtils';
+import { useTranslation } from 'react-i18next';
 
 interface MapViewProps {
   center: [number, number];
@@ -31,6 +32,7 @@ export function MapView({
   gpsTrail,
   zoom = 13,
 }: MapViewProps) {
+  const { t } = useTranslation();
   const [selectedPlace, setSelectedPlace] = useState<GeofencePlace | null>(null);
   const [showCurrentInfo, setShowCurrentInfo] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -161,7 +163,7 @@ export function MapView({
                       onCloseClick={() => setShowCurrentInfo(false)}
                     >
                       <div className="p-2">
-                        <div className="font-semibold text-foreground">Current Position</div>
+                        <div className="font-semibold text-foreground">{t('tracking.map.currentPosition')}</div>
                         <div className="text-xs">
                           {currentPosition.latitude.toFixed(6)}, {currentPosition.longitude.toFixed(6)}
                         </div>
