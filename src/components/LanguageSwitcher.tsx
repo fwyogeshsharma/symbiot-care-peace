@@ -9,12 +9,12 @@ import {
 import { Globe } from 'lucide-react';
 
 const languages = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'en', name: 'English (United States)', flag: '🇺🇸' },
+  { code: 'es', name: 'Español (España)', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français (France)', flag: '🇫🇷' },
   { code: 'fr-CA', name: 'Français (Canada)', flag: '🇨🇦' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  // { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'de', name: 'Deutsch (Deutschland)', flag: '🇩🇪' },
+  // { code: 'hi', name: 'हिन्दी (भारत)', flag: '🇮🇳' },
 ];
 
 export const LanguageSwitcher = () => {
