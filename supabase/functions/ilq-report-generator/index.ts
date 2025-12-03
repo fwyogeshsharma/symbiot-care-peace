@@ -65,13 +65,25 @@ Deno.serve(async (req) => {
       .gte('created_at', startDate)
       .order('created_at', { ascending: false });
 
+    // Fetch medication data
+    const { data: medicationData } = await supabaseClient
+      .from('device_data')
+      .select('*')
+      .eq('elderly_person_id', elderly_person_id)
+      .eq('data_type', 'medication_taken')
+      .gte('recorded_at', startDate)
+      .order('recorded_at', { ascending: false });
+
+    // Process medication data
+    const medicationStats = processMedicationData(medicationData || []);
+
     // Calculate statistics
     const scores = ilqScores.map(s => parseFloat(s.score));
     const avgScore = scores.reduce((sum, s) => sum + s, 0) / scores.length;
     const latestScore = ilqScores[ilqScores.length - 1];
     const oldestScore = ilqScores[0];
     const totalChange = parseFloat(latestScore.score) - parseFloat(oldestScore.score);
-    
+
     // Determine trend
     const recentScores = scores.slice(-7);
     const olderScores = scores.slice(0, 7);
@@ -84,6 +96,7 @@ Deno.serve(async (req) => {
       elderlyPerson,
       ilqScores,
       alerts: alerts || [],
+      medicationStats,
       statistics: {
         avgScore: avgScore.toFixed(2),
         latestScore: parseFloat(latestScore.score).toFixed(2),
@@ -95,14 +108,12 @@ Deno.serve(async (req) => {
 
     // If email requested, send it (requires RESEND_API_KEY)
     if (email_to) {
-      // TODO: Implement email sending with Resend
-      // For now, just return the HTML report
       console.log('Email sending not yet implemented');
     }
 
     // Return HTML report that can be converted to PDF on client-side
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
         html: htmlReport,
         statistics: {
@@ -125,8 +136,8 @@ Deno.serve(async (req) => {
 });
 
 function generateHTMLReport(data: any): string {
-  const { elderlyPerson, ilqScores, alerts, statistics } = data;
-  
+  const { elderlyPerson, ilqScores, alerts, medicationStats, statistics } = data;
+
   return `
     <!DOCTYPE html>
     <html>
@@ -151,6 +162,7 @@ function generateHTMLReport(data: any): string {
         }
         .section {
           margin: 30px 0;
+          page-break-inside: avoid;
         }
         .section h2 {
           color: #1e40af;
@@ -201,11 +213,161 @@ function generateHTMLReport(data: any): string {
         .alert-high { color: #ea580c; }
         .alert-medium { color: #f59e0b; }
         .alert-low { color: #6b7280; }
+        .chart-container {
+          margin: 20px 0;
+          padding: 20px;
+          background: #f9fafb;
+          border-radius: 8px;
+          border: 1px solid #e5e7eb;
+        }
+        .chart-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: #374151;
+          margin-bottom: 15px;
+        }
+        .medication-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 15px;
+          margin: 20px 0;
+        }
+        .medication-stat {
+          text-align: center;
+          padding: 15px;
+          border-radius: 8px;
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+        }
+        .medication-stat .label {
+          font-size: 12px;
+          color: #6b7280;
+          margin-bottom: 5px;
+        }
+        .medication-stat .value {
+          font-size: 24px;
+          font-weight: bold;
+        }
+        .compliance-excellent { color: #10b981; }
+        .compliance-good { color: #3b82f6; }
+        .compliance-fair { color: #f59e0b; }
+        .compliance-poor { color: #ef4444; }
+        .compliance-ring {
+          display: flex;
+          justify-content: center;
+          margin: 20px 0;
+        }
+        .bar-chart {
+          display: flex;
+          align-items: flex-end;
+          height: 200px;
+          gap: 4px;
+          padding: 10px 0;
+          border-bottom: 2px solid #e5e7eb;
+        }
+        .bar-group {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          min-width: 30px;
+        }
+        .bar-stack {
+          width: 100%;
+          display: flex;
+          flex-direction: column-reverse;
+        }
+        .bar-taken {
+          background: #10b981;
+          min-height: 2px;
+        }
+        .bar-missed {
+          background: #ef4444;
+          min-height: 2px;
+        }
+        .bar-label {
+          font-size: 9px;
+          color: #6b7280;
+          margin-top: 5px;
+          writing-mode: vertical-rl;
+          text-orientation: mixed;
+          transform: rotate(180deg);
+        }
+        .legend {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          margin-top: 15px;
+        }
+        .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 12px;
+        }
+        .legend-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 2px;
+        }
+        .legend-taken { background: #10b981; }
+        .legend-missed { background: #ef4444; }
+        .dose-timeline {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin: 15px 0;
+        }
+        .dose-item {
+          padding: 8px 12px;
+          border-radius: 6px;
+          font-size: 11px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .dose-taken {
+          background: #d1fae5;
+          color: #065f46;
+          border: 1px solid #10b981;
+        }
+        .dose-missed {
+          background: #fee2e2;
+          color: #991b1b;
+          border: 1px solid #ef4444;
+        }
+        .dose-time {
+          font-weight: 600;
+        }
+        .dose-date {
+          font-size: 10px;
+          opacity: 0.8;
+        }
+        .ilq-impact-note {
+          background: #eff6ff;
+          border: 1px solid #3b82f6;
+          border-radius: 8px;
+          padding: 15px;
+          margin-top: 20px;
+        }
+        .ilq-impact-note h4 {
+          color: #1e40af;
+          margin: 0 0 10px 0;
+          font-size: 14px;
+        }
+        .ilq-impact-note p {
+          margin: 0;
+          font-size: 13px;
+          color: #374151;
+        }
         .footer {
           margin-top: 60px;
           text-align: center;
           color: #6b7280;
           font-size: 12px;
+        }
+        @media print {
+          .section { page-break-inside: avoid; }
         }
       </style>
     </head>
@@ -241,6 +403,18 @@ function generateHTMLReport(data: any): string {
       </div>
 
       <div class="section">
+        <h2>ILQ Score Trend</h2>
+        <div class="chart-container">
+          <div class="chart-title">ILQ Score Over Time</div>
+          ${generateILQLineChart(ilqScores)}
+        </div>
+        <div class="chart-container">
+          <div class="chart-title">Component Scores Breakdown</div>
+          ${generateComponentBarChart(ilqScores[ilqScores.length - 1])}
+        </div>
+      </div>
+
+      <div class="section">
         <h2>Component Breakdown (Latest)</h2>
         <table>
           <thead>
@@ -255,6 +429,97 @@ function generateHTMLReport(data: any): string {
             ${generateComponentRows(ilqScores[ilqScores.length - 1])}
           </tbody>
         </table>
+      </div>
+
+      <div class="section">
+        <h2>Medication Management</h2>
+        ${medicationStats.totalDoses > 0 ? `
+          <div class="medication-grid">
+            <div class="medication-stat">
+              <div class="label">Total Doses</div>
+              <div class="value">${medicationStats.totalDoses}</div>
+            </div>
+            <div class="medication-stat">
+              <div class="label">Taken</div>
+              <div class="value compliance-excellent">${medicationStats.takenCount}</div>
+            </div>
+            <div class="medication-stat">
+              <div class="label">Missed</div>
+              <div class="value compliance-poor">${medicationStats.missedCount}</div>
+            </div>
+            <div class="medication-stat">
+              <div class="label">Compliance Rate</div>
+              <div class="value ${getComplianceClass(medicationStats.complianceRate)}">${medicationStats.complianceRate}%</div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-title">Medication Compliance Overview</div>
+            <div class="compliance-ring">
+              ${generateComplianceRing(medicationStats.complianceRate)}
+            </div>
+          </div>
+
+          ${medicationStats.dailyStats.length > 0 ? `
+            <div class="chart-container">
+              <div class="chart-title">Daily Medication Adherence</div>
+              <div class="bar-chart">
+                ${medicationStats.dailyStats.slice(-14).map((day: any) => {
+                  const total = day.taken + day.missed;
+                  const maxHeight = 180;
+                  const takenHeight = total > 0 ? (day.taken / total) * maxHeight : 0;
+                  const missedHeight = total > 0 ? (day.missed / total) * maxHeight : 0;
+                  const dateLabel = new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                  return `
+                    <div class="bar-group">
+                      <div class="bar-stack" style="height: ${maxHeight}px;">
+                        <div class="bar-taken" style="height: ${takenHeight}px;" title="Taken: ${day.taken}"></div>
+                        <div class="bar-missed" style="height: ${missedHeight}px;" title="Missed: ${day.missed}"></div>
+                      </div>
+                      <div class="bar-label">${dateLabel}</div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+              <div class="legend">
+                <div class="legend-item"><div class="legend-dot legend-taken"></div>Taken</div>
+                <div class="legend-item"><div class="legend-dot legend-missed"></div>Missed</div>
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="chart-container">
+            <div class="chart-title">Recent Medication Activity</div>
+            <div class="dose-timeline">
+              ${medicationStats.recentDoses.slice(0, 15).map((dose: any) => {
+                const dt = new Date(dose.timestamp);
+                const time = dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                const date = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                return `
+                  <div class="dose-item ${dose.taken ? 'dose-taken' : 'dose-missed'}">
+                    <span class="dose-time">${time}</span>
+                    <span class="dose-date">${date}</span>
+                    <span>${dose.taken ? 'Taken' : 'Missed'}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="ilq-impact-note">
+            <h4>Impact on ILQ Score</h4>
+            <p>
+              Medication adherence directly affects the <strong>Cognitive Function</strong> component of the ILQ score.
+              ${medicationStats.complianceRate >= 90
+                ? 'Excellent compliance is positively contributing to the overall ILQ score.'
+                : medicationStats.complianceRate >= 70
+                  ? 'Good compliance is helping maintain a healthy ILQ score.'
+                  : medicationStats.complianceRate >= 50
+                    ? 'Moderate compliance may be affecting the ILQ score. Consider strategies to improve adherence.'
+                    : 'Low compliance is negatively impacting the ILQ score. Immediate attention to medication management is recommended.'}
+            </p>
+          </div>
+        ` : '<p>No medication data available for this period.</p>'}
       </div>
 
       <div class="section">
@@ -357,4 +622,161 @@ function getScoreLabel(score: number): string {
   if (score >= 55) return 'Fair - Moderate Supervision';
   if (score >= 40) return 'Poor - Significant Assistance';
   return 'Critical - Immediate Intervention';
+}
+
+function getComplianceClass(rate: number): string {
+  if (rate >= 90) return 'compliance-excellent';
+  if (rate >= 70) return 'compliance-good';
+  if (rate >= 50) return 'compliance-fair';
+  return 'compliance-poor';
+}
+
+function generateILQLineChart(ilqScores: any[]): string {
+  if (!ilqScores || ilqScores.length === 0) {
+    return '<p style="text-align: center; color: #6b7280;">No data available for chart</p>';
+  }
+
+  const chartWidth = 700;
+  const chartHeight = 300;
+  const padding = { top: 20, right: 30, bottom: 60, left: 50 };
+  const graphWidth = chartWidth - padding.left - padding.right;
+  const graphHeight = chartHeight - padding.top - padding.bottom;
+
+  const scores = ilqScores.slice(-20);
+  const minScore = 0;
+  const maxScore = 100;
+
+  const points = scores.map((score, index) => {
+    const x = padding.left + (index / (scores.length - 1 || 1)) * graphWidth;
+    const y = padding.top + graphHeight - ((parseFloat(score.score) - minScore) / (maxScore - minScore)) * graphHeight;
+    return { x, y, score: parseFloat(score.score), date: new Date(score.computation_timestamp) };
+  });
+
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  const areaPath = `${linePath} L ${points[points.length - 1].x} ${padding.top + graphHeight} L ${points[0].x} ${padding.top + graphHeight} Z`;
+
+  const gridLines = [0, 25, 50, 75, 100].map(val => {
+    const y = padding.top + graphHeight - (val / 100) * graphHeight;
+    return `<line x1="${padding.left}" y1="${y}" x2="${chartWidth - padding.right}" y2="${y}" stroke="#e5e7eb" stroke-dasharray="4"/><text x="${padding.left - 10}" y="${y + 4}" text-anchor="end" font-size="11" fill="#6b7280">${val}</text>`;
+  }).join('');
+
+  const step = Math.ceil(scores.length / 6);
+  const xLabels = points.filter((_, i) => i % step === 0 || i === points.length - 1).map(p =>
+    `<text x="${p.x}" y="${chartHeight - 25}" text-anchor="middle" font-size="10" fill="#6b7280" transform="rotate(-45 ${p.x} ${chartHeight - 25})">${p.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</text>`
+  ).join('');
+
+  const dots = points.map(p =>
+    `<circle cx="${p.x}" cy="${p.y}" r="4" fill="#3b82f6" stroke="white" stroke-width="2"/><title>${p.date.toLocaleDateString()}: ${p.score.toFixed(1)}</title>`
+  ).join('');
+
+  return `
+    <svg width="100%" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}" style="max-width: 100%;">
+      <defs>
+        <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
+          <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.05" />
+        </linearGradient>
+      </defs>
+      ${gridLines}
+      <path d="${areaPath}" fill="url(#areaGradient)" />
+      <path d="${linePath}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      ${dots}
+      ${xLabels}
+      <text x="15" y="${chartHeight / 2}" text-anchor="middle" font-size="12" fill="#374151" transform="rotate(-90 15 ${chartHeight / 2})">ILQ Score</text>
+    </svg>
+  `;
+}
+
+function generateComponentBarChart(latestScore: any): string {
+  if (!latestScore) {
+    return '<p style="text-align: center; color: #6b7280;">No data available for chart</p>';
+  }
+
+  const components = [
+    { name: 'Health', score: latestScore.health_vitals_score, color: '#10b981' },
+    { name: 'Activity', score: latestScore.physical_activity_score, color: '#3b82f6' },
+    { name: 'Cognitive', score: latestScore.cognitive_function_score, color: '#8b5cf6' },
+    { name: 'Safety', score: latestScore.environmental_safety_score, color: '#f59e0b' },
+    { name: 'Emergency', score: latestScore.emergency_response_score, color: '#ef4444' },
+    { name: 'Social', score: latestScore.social_engagement_score, color: '#ec4899' },
+  ];
+
+  const chartWidth = 600;
+  const chartHeight = 250;
+  const barHeight = 30;
+  const barGap = 10;
+  const labelWidth = 80;
+  const valueWidth = 50;
+  const maxBarWidth = chartWidth - labelWidth - valueWidth - 40;
+
+  const bars = components.map((comp, index) => {
+    const scoreValue = comp.score ? parseFloat(comp.score) : 0;
+    const barWidth = (scoreValue / 100) * maxBarWidth;
+    const y = 20 + index * (barHeight + barGap);
+
+    return `
+      <g>
+        <text x="${labelWidth - 10}" y="${y + barHeight / 2 + 5}" text-anchor="end" font-size="12" fill="#374151">${comp.name}</text>
+        <rect x="${labelWidth}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${comp.color}" rx="4"/>
+        <rect x="${labelWidth}" y="${y}" width="${maxBarWidth}" height="${barHeight}" fill="none" stroke="#e5e7eb" rx="4"/>
+        <text x="${labelWidth + maxBarWidth + 10}" y="${y + barHeight / 2 + 5}" font-size="12" font-weight="bold" fill="${comp.color}">${scoreValue.toFixed(0)}%</text>
+      </g>
+    `;
+  }).join('');
+
+  return `<svg width="100%" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}" style="max-width: 100%;">${bars}</svg>`;
+}
+
+function generateComplianceRing(percentage: number): string {
+  const radius = 70;
+  const strokeWidth = 15;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference - (percentage / 100) * circumference;
+  const color = percentage >= 90 ? '#10b981' : percentage >= 70 ? '#3b82f6' : percentage >= 50 ? '#f59e0b' : '#ef4444';
+
+  return `
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="${radius}" fill="none" stroke="#e5e7eb" stroke-width="${strokeWidth}"/>
+      <circle cx="100" cy="100" r="${radius}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}" transform="rotate(-90 100 100)"/>
+      <text x="100" y="95" text-anchor="middle" font-size="32" font-weight="bold" fill="${color}">${percentage}%</text>
+      <text x="100" y="120" text-anchor="middle" font-size="12" fill="#6b7280">Compliance</text>
+    </svg>
+  `;
+}
+
+function processMedicationData(medicationData: any[]) {
+  if (!medicationData || medicationData.length === 0) {
+    return { totalDoses: 0, takenCount: 0, missedCount: 0, complianceRate: 0, dailyStats: [], recentDoses: [] };
+  }
+
+  const isTaken = (value: any): boolean => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'object' && value !== null) {
+      if (value.medication_taken !== undefined) return value.medication_taken === true;
+      if (value.taken !== undefined) return value.taken === true;
+      if (value.value !== undefined) return isTaken(value.value);
+    }
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'yes' || value.toLowerCase() === 'true';
+    }
+    return false;
+  };
+
+  const totalDoses = medicationData.length;
+  const takenCount = medicationData.filter(d => isTaken(d.value)).length;
+  const missedCount = totalDoses - takenCount;
+  const complianceRate = totalDoses > 0 ? Math.round((takenCount / totalDoses) * 100) : 0;
+
+  const dailyMap: Record<string, { date: string; taken: number; missed: number }> = {};
+  medicationData.forEach(d => {
+    const date = new Date(d.recorded_at).toISOString().split('T')[0];
+    if (!dailyMap[date]) dailyMap[date] = { date, taken: 0, missed: 0 };
+    if (isTaken(d.value)) dailyMap[date].taken++;
+    else dailyMap[date].missed++;
+  });
+
+  const dailyStats = Object.values(dailyMap).sort((a, b) => a.date.localeCompare(b.date));
+  const recentDoses = medicationData.slice(0, 20).map(d => ({ timestamp: d.recorded_at, taken: isTaken(d.value) }));
+
+  return { totalDoses, takenCount, missedCount, complianceRate, dailyStats, recentDoses };
 }
