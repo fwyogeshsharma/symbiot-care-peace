@@ -55,6 +55,35 @@
       "fallDetected": "Sturz Erkannt!",
       "noFalls": "Keine Stürze",
       "steps": "Schritte"
+    },
+    "charts": {
+      "historyTitle": "Gesundheitsmetriken Verlauf",
+      "last24Hours": "Letzte 24 Stunden",
+      "last7Days": "Letzte 7 Tage",
+      "last30Days": "Letzte 30 Tage",
+      "heartRate": "Herzfrequenz",
+      "bloodPressure": "Blutdruck",
+      "oxygen": "Sauerstoff",
+      "temperature": "Temperatur",
+      "sleep": "Schlaf",
+      "panicSos": "Panik/SOS",
+      "heartRateOverTime": "Herzfrequenz im Zeitverlauf",
+      "bloodPressureOverTime": "Blutdruck im Zeitverlauf",
+      "oxygenOverTime": "Sauerstoffsättigung im Zeitverlauf",
+      "temperatureOverTime": "Körpertemperatur im Zeitverlauf",
+      "sleepOverTime": "Schlafqualität im Zeitverlauf",
+      "panicSosOverTime": "Panik/SOS-Ereignisse im Zeitverlauf",
+      "systolic": "Systolisch",
+      "diastolic": "Diastolisch",
+      "oxygenLevel": "Sauerstoffgehalt",
+      "sleepQuality": "Schlafqualität",
+      "buttonPresses": "Tastendruck",
+      "noHeartRateData": "Keine Herzfrequenzdaten für diesen Zeitraum verfügbar",
+      "noBloodPressureData": "Keine Blutdruckdaten für diesen Zeitraum verfügbar",
+      "noOxygenData": "Keine Sauerstoffdaten für diesen Zeitraum verfügbar",
+      "noTemperatureData": "Keine Temperaturdaten für diesen Zeitraum verfügbar",
+      "noSleepData": "Keine Schlafdaten für diesen Zeitraum verfügbar",
+      "noPanicData": "Keine Panik/SOS-Tastendruck für diesen Zeitraum aufgezeichnet"
     }
   },
   "panicSos": {
@@ -73,6 +102,13 @@
       "fallDetected": "Sturz erkannt",
       "sosPressed": "SOS-Taste gedrückt",
       "emergency": "Notfallalarm"
+    },
+    "status": {
+      "alert": "Alarm",
+      "critical": "Kritisch",
+      "emergency": "Notfall",
+      "resolved": "Gelöst",
+      "pending": "Ausstehend"
     }
   },
   "environmental": {
@@ -177,7 +213,8 @@
       "elderly": "Ältere Person",
       "caregiver": "Pflegekraft",
       "relative": "Familienmitglied",
-      "admin": "Administrator"
+      "admin": "Administrator",
+      "super_admin": "Super Administrator"
     },
     "validation": {
       "invalidEmail": "Ungültige E-Mail-Adresse",
@@ -295,7 +332,12 @@
       "title": "Überwachte Personen",
       "noIndividuals": "Es werden noch keine Personen überwacht.",
       "condition": "Zustand",
-      "conditions": "Zustände"
+      "conditions": "Zustände",
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "monitoring": "Überwachung"
+      }
     },
     "heatmap": {
       "activityByLocation": "Aktivität nach Standort",
@@ -721,6 +763,28 @@
     "pageTitle": "Geräte",
     "pageDescription": "Überwachen und verwalten Sie alle verbundenen Geräte",
     "status": "Gerätestatus",
+    "active": "Aktiv",
+    "names": {
+      "fall_detection": "Sturzerkennung",
+      "falldetection": "Sturzerkennung",
+      "heart_rate_monitor": "Herzfrequenzmesser",
+      "blood_pressure_monitor": "Blutdruckmessgerät",
+      "gps_tracker": "GPS-Tracker",
+      "environmental_sensor": "Umweltsensor",
+      "wearable": "Wearable",
+      "smartwatch": "Smartwatch",
+      "panic_button": "Panikknopf",
+      "sos_button": "SOS-Knopf",
+      "medication_dispenser": "Medikamentenspender",
+      "sleep_tracker": "Schlaftracker",
+      "activity_tracker": "Aktivitätstracker",
+      "thermometer": "Thermometer",
+      "oximeter": "Oximeter",
+      "glucose_monitor": "Glukosemessgerät",
+      "scale": "Intelligente Waage",
+      "home_hub": "Home Hub",
+      "smartphone": "Smartphone"
+    },
     "online": "Online",
     "offline": "Offline",
     "inactive": "Inaktiv",

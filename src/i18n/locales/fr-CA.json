@@ -55,6 +55,35 @@
       "fallDetected": "Chute Détectée !",
       "noFalls": "Pas de Chutes",
       "steps": "pas"
+    },
+    "charts": {
+      "historyTitle": "Historique des Métriques de Santé",
+      "last24Hours": "Dernières 24 Heures",
+      "last7Days": "7 Derniers Jours",
+      "last30Days": "30 Derniers Jours",
+      "heartRate": "Fréquence Cardiaque",
+      "bloodPressure": "Pression Artérielle",
+      "oxygen": "Oxygène",
+      "temperature": "Température",
+      "sleep": "Sommeil",
+      "panicSos": "Panique/SOS",
+      "heartRateOverTime": "Fréquence Cardiaque dans le Temps",
+      "bloodPressureOverTime": "Pression Artérielle dans le Temps",
+      "oxygenOverTime": "Saturation en Oxygène dans le Temps",
+      "temperatureOverTime": "Température Corporelle dans le Temps",
+      "sleepOverTime": "Qualité du Sommeil dans le Temps",
+      "panicSosOverTime": "Événements Panique/SOS dans le Temps",
+      "systolic": "Systolique",
+      "diastolic": "Diastolique",
+      "oxygenLevel": "Niveau d'Oxygène",
+      "sleepQuality": "Qualité du Sommeil",
+      "buttonPresses": "Appuis sur le Bouton",
+      "noHeartRateData": "Aucune donnée de fréquence cardiaque pour cette période",
+      "noBloodPressureData": "Aucune donnée de pression artérielle pour cette période",
+      "noOxygenData": "Aucune donnée d'oxygène pour cette période",
+      "noTemperatureData": "Aucune donnée de température pour cette période",
+      "noSleepData": "Aucune donnée de sommeil pour cette période",
+      "noPanicData": "Aucun appui sur le bouton panique/SOS enregistré pour cette période"
     }
   },
   "panicSos": {
@@ -73,6 +102,13 @@
       "fallDetected": "Chute détectée",
       "sosPressed": "Bouton SOS appuyé",
       "emergency": "Alerte d'urgence"
+    },
+    "status": {
+      "alert": "Alerte",
+      "critical": "Critique",
+      "emergency": "Urgence",
+      "resolved": "Résolu",
+      "pending": "En attente"
     }
   },
   "environmental": {
@@ -177,7 +213,8 @@
       "elderly": "Personne Âgée",
       "caregiver": "Soignant",
       "relative": "Membre de la Famille",
-      "admin": "Administrateur"
+      "admin": "Administrateur",
+      "super_admin": "Super Administrateur"
     },
     "validation": {
       "invalidEmail": "Adresse e-mail invalide",
@@ -295,7 +332,12 @@
       "title": "Individus Surveillés",
       "noIndividuals": "Aucun individu n'est encore surveillé.",
       "condition": "condition",
-      "conditions": "conditions"
+      "conditions": "conditions",
+      "status": {
+        "active": "Actif",
+        "inactive": "Inactif",
+        "monitoring": "Surveillance"
+      }
     },
     "heatmap": {
       "activityByLocation": "Activité par Emplacement",
@@ -721,6 +763,28 @@
     "pageTitle": "Appareils",
     "pageDescription": "Surveillez et gérez tous les appareils connectés",
     "status": "État de l'Appareil",
+    "active": "Actif",
+    "names": {
+      "fall_detection": "Détection de Chute",
+      "falldetection": "Détection de Chute",
+      "heart_rate_monitor": "Moniteur de Fréquence Cardiaque",
+      "blood_pressure_monitor": "Tensiomètre",
+      "gps_tracker": "Traceur GPS",
+      "environmental_sensor": "Capteur Environnemental",
+      "wearable": "Appareil Portable",
+      "smartwatch": "Montre Connectée",
+      "panic_button": "Bouton Panique",
+      "sos_button": "Bouton SOS",
+      "medication_dispenser": "Distributeur de Médicaments",
+      "sleep_tracker": "Traceur de Sommeil",
+      "activity_tracker": "Traceur d'Activité",
+      "thermometer": "Thermomètre",
+      "oximeter": "Oxymètre",
+      "glucose_monitor": "Glucomètre",
+      "scale": "Balance Connectée",
+      "home_hub": "Hub Domestique",
+      "smartphone": "Téléphone Intelligent"
+    },
     "online": "En Ligne",
     "offline": "Hors Ligne",
     "inactive": "Inactif",

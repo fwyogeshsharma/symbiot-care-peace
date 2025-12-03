@@ -55,6 +55,35 @@
       "fallDetected": "¡Caída Detectada!",
       "noFalls": "Sin Caídas",
       "steps": "pasos"
+    },
+    "charts": {
+      "historyTitle": "Historial de Métricas de Salud",
+      "last24Hours": "Últimas 24 Horas",
+      "last7Days": "Últimos 7 Días",
+      "last30Days": "Últimos 30 Días",
+      "heartRate": "Ritmo Cardíaco",
+      "bloodPressure": "Presión Arterial",
+      "oxygen": "Oxígeno",
+      "temperature": "Temperatura",
+      "sleep": "Sueño",
+      "panicSos": "Pánico/SOS",
+      "heartRateOverTime": "Ritmo Cardíaco en el Tiempo",
+      "bloodPressureOverTime": "Presión Arterial en el Tiempo",
+      "oxygenOverTime": "Saturación de Oxígeno en el Tiempo",
+      "temperatureOverTime": "Temperatura Corporal en el Tiempo",
+      "sleepOverTime": "Calidad del Sueño en el Tiempo",
+      "panicSosOverTime": "Eventos de Pánico/SOS en el Tiempo",
+      "systolic": "Sistólica",
+      "diastolic": "Diastólica",
+      "oxygenLevel": "Nivel de Oxígeno",
+      "sleepQuality": "Calidad del Sueño",
+      "buttonPresses": "Pulsaciones del Botón",
+      "noHeartRateData": "No hay datos de ritmo cardíaco para este período",
+      "noBloodPressureData": "No hay datos de presión arterial para este período",
+      "noOxygenData": "No hay datos de oxígeno para este período",
+      "noTemperatureData": "No hay datos de temperatura para este período",
+      "noSleepData": "No hay datos de sueño para este período",
+      "noPanicData": "No hay registros de botón de pánico/SOS para este período"
     }
   },
   "panicSos": {
@@ -73,6 +102,13 @@
       "fallDetected": "Caída detectada",
       "sosPressed": "Botón SOS presionado",
       "emergency": "Alerta de emergencia"
+    },
+    "status": {
+      "alert": "Alerta",
+      "critical": "Crítico",
+      "emergency": "Emergencia",
+      "resolved": "Resuelto",
+      "pending": "Pendiente"
     }
   },
   "environmental": {
@@ -177,7 +213,8 @@
       "elderly": "Persona Mayor",
       "caregiver": "Cuidador",
       "relative": "Familiar",
-      "admin": "Administrador"
+      "admin": "Administrador",
+      "super_admin": "Super Administrador"
     },
     "validation": {
       "invalidEmail": "Dirección de correo inválida",
@@ -295,7 +332,12 @@
       "title": "Individuos Monitoreados",
       "noIndividuals": "Aún no se monitorean individuos.",
       "condition": "condición",
-      "conditions": "condiciones"
+      "conditions": "condiciones",
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "monitoring": "Monitoreando"
+      }
     },
     "heatmap": {
       "activityByLocation": "Actividad por Ubicación",
@@ -721,6 +763,28 @@
     "pageTitle": "Dispositivos",
     "pageDescription": "Monitorea y gestiona todos los dispositivos conectados",
     "status": "Estado del Dispositivo",
+    "active": "Activo",
+    "names": {
+      "fall_detection": "Detección de Caídas",
+      "falldetection": "Detección de Caídas",
+      "heart_rate_monitor": "Monitor de Frecuencia Cardíaca",
+      "blood_pressure_monitor": "Monitor de Presión Arterial",
+      "gps_tracker": "Rastreador GPS",
+      "environmental_sensor": "Sensor Ambiental",
+      "wearable": "Dispositivo Portátil",
+      "smartwatch": "Reloj Inteligente",
+      "panic_button": "Botón de Pánico",
+      "sos_button": "Botón SOS",
+      "medication_dispenser": "Dispensador de Medicamentos",
+      "sleep_tracker": "Rastreador de Sueño",
+      "activity_tracker": "Rastreador de Actividad",
+      "thermometer": "Termómetro",
+      "oximeter": "Oxímetro",
+      "glucose_monitor": "Monitor de Glucosa",
+      "scale": "Báscula Inteligente",
+      "home_hub": "Hub Doméstico",
+      "smartphone": "Teléfono Inteligente"
+    },
     "online": "En Línea",
     "offline": "Desconectado",
     "inactive": "Inactivo",

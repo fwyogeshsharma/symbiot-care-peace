@@ -164,8 +164,8 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
           {/* Right side - Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-3">
             {userRole && (
-              <Badge className={`${getRoleColor(userRole)} capitalize`}>
-                {userRole}
+              <Badge className={`${getRoleColor(userRole)}`}>
+                {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
               </Badge>
             )}
             <NavButtons />
@@ -184,8 +184,8 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
           {/* Right side - Mobile/Tablet */}
           <div className="flex lg:hidden items-center gap-2">
             {userRole && (
-              <Badge className={`${getRoleColor(userRole)} capitalize text-xs hidden sm:flex`}>
-                {userRole}
+              <Badge className={`${getRoleColor(userRole)} text-xs hidden sm:flex`}>
+                {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
               </Badge>
             )}
             <Button
@@ -206,8 +206,8 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
                 <div className="flex flex-col gap-4 mt-8">
                   {userRole && (
                     <div className="pb-4 border-b">
-                      <Badge className={`${getRoleColor(userRole)} capitalize`}>
-                        {userRole}
+                      <Badge className={`${getRoleColor(userRole)}`}>
+                        {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
                       </Badge>
                     </div>
                   )}

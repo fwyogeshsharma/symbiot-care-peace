@@ -5,6 +5,20 @@ import { AlertTriangle, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { de, es, fr, frCA, enUS } from 'date-fns/locale';
+
+// Map language codes to date-fns locales
+const getDateLocale = (language: string) => {
+  const localeMap: Record<string, Locale> = {
+    'en': enUS,
+    'de': de,
+    'es': es,
+    'fr': fr,
+    'fr-CA': frCA,
+  };
+  return localeMap[language] || enUS;
+};
 
 interface Alert {
   id: string;
@@ -24,8 +38,9 @@ interface AlertsListProps {
 }
 
 const AlertsList = ({ alerts, selectedPersonId }: AlertsListProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
+  const dateLocale = getDateLocale(i18n.language);
   
   // Filter alerts based on selected person
   const filteredAlerts = selectedPersonId 
@@ -113,7 +128,7 @@ const AlertsList = ({ alerts, selectedPersonId }: AlertsListProps) => {
                     {alert.elderly_persons?.full_name || t('alerts.timeline.unknown')}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(alert.created_at).toLocaleString()}
+                    {format(new Date(alert.created_at), 'MMM d, yyyy HH:mm:ss', { locale: dateLocale })}
                   </p>
                 </div>
 

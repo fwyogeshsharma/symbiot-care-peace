@@ -3,6 +3,7 @@ import { Heart, Activity, Droplet, Thermometer, Wind, Moon, Pill, Footprints, Al
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
+import { de, es, fr, frCA, enUS } from 'date-fns/locale';
 import { isHealthDevice, isHealthDataType } from '@/lib/deviceDataMapping';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -10,6 +11,18 @@ import HealthMetricsCharts from './HealthMetricsCharts';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
 import { extractNumericValue, extractBloodPressure, extractBooleanValue, extractStringValue } from '@/lib/valueExtractor';
 import { useTranslation } from 'react-i18next';
+
+// Map language codes to date-fns locales
+const getDateLocale = (language: string) => {
+  const localeMap: Record<string, Locale> = {
+    'en': enUS,
+    'de': de,
+    'es': es,
+    'fr': fr,
+    'fr-CA': frCA,
+  };
+  return localeMap[language] || enUS;
+};
 
 // Check if temperature unit is Fahrenheit
 const isTemperatureFahrenheit = (unit: string | null | undefined): boolean => {
@@ -24,7 +37,18 @@ interface VitalMetricsProps {
 
 const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   const [showCharts, setShowCharts] = useState(false);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = getDateLocale(i18n.language);
+
+  // Function to translate device name based on device type
+  const getTranslatedDeviceName = (deviceName: string | undefined) => {
+    if (!deviceName) return '';
+    // Create a normalized key from device name (lowercase, replace spaces with underscores)
+    const normalizedKey = deviceName.toLowerCase().replace(/\s+/g, '_');
+    // Try to find a translation, fallback to original name
+    const translated = t(`devices.names.${normalizedKey}`, { defaultValue: '' });
+    return translated || deviceName;
+  };
 
   const { data: recentData = [], isLoading } = useQuery({
     queryKey: ['vital-metrics', selectedPersonId],
@@ -531,7 +555,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
                   <div>
                     <p className="font-medium">{getDisplayName(item.data_type)}</p>
                     <p className="text-xs text-muted-foreground">
-                      {item.devices?.device_name}
+                      {getTranslatedDeviceName(item.devices?.device_name)}
                     </p>
                   </div>
                 </div>
@@ -540,7 +564,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
                     {formatValue(item.value, item.data_type, item.unit)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {format(new Date(item.recorded_at), 'MMM d, HH:mm')}
+                    {format(new Date(item.recorded_at), 'MMM d, HH:mm', { locale: dateLocale })}
                   </p>
                 </div>
               </div>

@@ -70,7 +70,7 @@ const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson }: Elder
                   variant="outline"
                   className={`text-xs whitespace-nowrap ${person.status === 'active' ? 'border-success text-success' : 'border-muted'}`}
                 >
-                  {person.status}
+                  {t(`movement.elderlyList.status.${person.status}`, { defaultValue: person.status })}
                 </Badge>
 
                 {person.medical_conditions && person.medical_conditions.length > 0 && (

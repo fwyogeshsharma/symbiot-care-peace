@@ -62,6 +62,35 @@
       "fallDetected": "Fall Detected!",
       "noFalls": "No Falls",
       "steps": "steps"
+    },
+    "charts": {
+      "historyTitle": "Health Metrics History",
+      "last24Hours": "Last 24 Hours",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "heartRate": "Heart Rate",
+      "bloodPressure": "Blood Pressure",
+      "oxygen": "Oxygen",
+      "temperature": "Temperature",
+      "sleep": "Sleep",
+      "panicSos": "Panic/SOS",
+      "heartRateOverTime": "Heart Rate Over Time",
+      "bloodPressureOverTime": "Blood Pressure Over Time",
+      "oxygenOverTime": "Oxygen Saturation Over Time",
+      "temperatureOverTime": "Body Temperature Over Time",
+      "sleepOverTime": "Sleep Quality Over Time",
+      "panicSosOverTime": "Panic/SOS Events Over Time",
+      "systolic": "Systolic",
+      "diastolic": "Diastolic",
+      "oxygenLevel": "Oxygen Level",
+      "sleepQuality": "Sleep Quality",
+      "buttonPresses": "Button Presses",
+      "noHeartRateData": "No heart rate data available for this period",
+      "noBloodPressureData": "No blood pressure data available for this period",
+      "noOxygenData": "No oxygen data available for this period",
+      "noTemperatureData": "No temperature data available for this period",
+      "noSleepData": "No sleep data available for this period",
+      "noPanicData": "No panic/SOS button presses recorded for this period"
     }
   },
   "panicSos": {
@@ -80,6 +109,13 @@
       "fallDetected": "Fall detected",
       "sosPressed": "SOS button pressed",
       "emergency": "Emergency alert"
+    },
+    "status": {
+      "alert": "Alert",
+      "critical": "Critical",
+      "emergency": "Emergency",
+      "resolved": "Resolved",
+      "pending": "Pending"
     }
   },
   "environmental": {
@@ -209,7 +245,8 @@
       "elderly": "Elderly Person",
       "caregiver": "Caregiver",
       "relative": "Family Member",
-      "admin": "Administrator"
+      "admin": "Administrator",
+      "super_admin": "Super Admin"
     },
     "validation": {
       "invalidEmail": "Invalid email address",
@@ -693,6 +730,28 @@
     "pageTitle": "Devices",
     "pageDescription": "Monitor and manage all connected devices",
     "status": "Device Status",
+    "active": "Active",
+    "names": {
+      "fall_detection": "Fall Detection",
+      "falldetection": "Fall Detection",
+      "heart_rate_monitor": "Heart Rate Monitor",
+      "blood_pressure_monitor": "Blood Pressure Monitor",
+      "gps_tracker": "GPS Tracker",
+      "environmental_sensor": "Environmental Sensor",
+      "wearable": "Wearable",
+      "smartwatch": "Smartwatch",
+      "panic_button": "Panic Button",
+      "sos_button": "SOS Button",
+      "medication_dispenser": "Medication Dispenser",
+      "sleep_tracker": "Sleep Tracker",
+      "activity_tracker": "Activity Tracker",
+      "thermometer": "Thermometer",
+      "oximeter": "Oximeter",
+      "glucose_monitor": "Glucose Monitor",
+      "scale": "Smart Scale",
+      "home_hub": "Home Hub",
+      "smartphone": "Smartphone"
+    },
     "online": "Online",
     "offline": "Offline",
     "inactive": "Inactive",
@@ -1142,7 +1201,12 @@
       "title": "Monitored Individuals",
       "noIndividuals": "No individuals are being monitored yet.",
       "condition": "condition",
-      "conditions": "conditions"
+      "conditions": "conditions",
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "monitoring": "Monitoring"
+      }
     },
     "heatmap": {
       "activityByLocation": "Activity by Location",

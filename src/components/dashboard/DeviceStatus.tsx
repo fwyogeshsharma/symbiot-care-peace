@@ -402,9 +402,9 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                   <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                     <Badge
                       variant="outline"
-                      className={`${getStatusColor(device.status)} text-xs capitalize`}
+                      className={`${getStatusColor(device.status)} text-xs`}
                     >
-                      {device.status}
+                      {t(`devices.${device.status}`, { defaultValue: device.status })}
                     </Badge>
                     <TooltipProvider>
                       <Tooltip>

@@ -4,10 +4,23 @@ import { AlertCircle, Clock, User, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
+import { de, es, fr, frCA, enUS } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { PanicSosCharts } from './PanicSosCharts';
 import { useTranslation } from 'react-i18next';
+
+// Map language codes to date-fns locales
+const getDateLocale = (language: string) => {
+  const localeMap: Record<string, Locale> = {
+    'en': enUS,
+    'de': de,
+    'es': es,
+    'fr': fr,
+    'fr-CA': frCA,
+  };
+  return localeMap[language] || enUS;
+};
 
 interface PanicSosEventsProps {
   selectedPersonId?: string | null;
@@ -16,7 +29,25 @@ interface PanicSosEventsProps {
 const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
   const [showAll, setShowAll] = useState(false);
   const [showCharts, setShowCharts] = useState(false);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = getDateLocale(i18n.language);
+
+  // Function to translate device name based on device type
+  const getTranslatedDeviceName = (deviceName: string | undefined) => {
+    if (!deviceName) return '';
+    // Create a normalized key from device name (lowercase, replace spaces with underscores)
+    const normalizedKey = deviceName.toLowerCase().replace(/\s+/g, '_');
+    // Try to find a translation, fallback to original name
+    const translated = t(`devices.names.${normalizedKey}`, { defaultValue: '' });
+    return translated || deviceName;
+  };
+
+  // Function to translate status
+  const getTranslatedStatus = (status: string | undefined) => {
+    if (!status) return t('panicSos.status.alert');
+    const translatedStatus = t(`panicSos.status.${status.toLowerCase()}`, { defaultValue: '' });
+    return translatedStatus || status;
+  };
 
   const { data: panicEvents, isLoading } = useQuery({
     queryKey: ['panic-sos-events', selectedPersonId, showAll],
@@ -128,7 +159,7 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
         </div>
       ) : (
         <>
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
             {panicEvents.map((event) => {
               const device = event.devices as any;
               const elderlyPerson = device?.elderly_persons as any;
@@ -158,7 +189,7 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
                       variant="outline"
                       className={`${getSeverityColor(eventValue)} text-xs shrink-0`}
                     >
-                      {eventValue?.status || 'Alert'}
+                      {getTranslatedStatus(eventValue?.status)}
                     </Badge>
                   </div>
 
@@ -167,13 +198,14 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
                     <span>
                       {formatDistanceToNow(new Date(event.recorded_at), {
                         addSuffix: true,
+                        locale: dateLocale,
                       })}
                     </span>
                   </div>
 
                   {device?.device_name && (
                     <p className="text-xs text-muted-foreground mt-1 truncate">
-                      {t('panicSos.device')}: {device.device_name}
+                      {t('panicSos.device')}: {getTranslatedDeviceName(device.device_name)}
                     </p>
                   )}
                 </div>
