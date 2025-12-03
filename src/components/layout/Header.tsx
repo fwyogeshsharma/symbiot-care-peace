@@ -139,7 +139,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
                 className="shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span className="hidden sm:inline ml-2">Back</span>
+                <span className="hidden sm:inline ml-2">{t('profile.back')}</span>
               </Button>
             )}
             <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
