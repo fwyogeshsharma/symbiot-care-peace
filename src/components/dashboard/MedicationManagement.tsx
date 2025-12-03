@@ -4,7 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Pill, Clock, CheckCircle2, XCircle, TrendingUp } from 'lucide-react';
 import { format, isToday, parseISO } from 'date-fns';
+import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+
+// Map language codes to date-fns locales
+const getDateLocale = (language: string) => {
+  const localeMap: Record<string, Locale> = {
+    'en': enUS,
+    'de': de,
+    'es': es,
+    'fr': fr,
+    'fr-CA': frCA,
+  };
+  return localeMap[language] || enUS;
+};
 import { extractBooleanValue } from '@/lib/valueExtractor';
 
 interface MedicationManagementProps {
@@ -12,7 +25,8 @@ interface MedicationManagementProps {
 }
 
 export const MedicationManagement = ({ selectedPersonId }: MedicationManagementProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = getDateLocale(i18n.language);
   const { data: medicationData, isLoading } = useQuery({
     queryKey: ['medication-data', selectedPersonId],
     queryFn: async () => {
@@ -174,7 +188,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
             </p>
             {latestDose && (
               <p className="text-xs text-muted-foreground mt-1">
-                {format(parseISO(latestDose.recorded_at), 'HH:mm')}
+                {format(parseISO(latestDose.recorded_at), 'HH:mm', { locale: dateLocale })}
               </p>
             )}
           </div>
@@ -191,7 +205,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
                   ? nextDoseTime
                   : (() => {
                       try {
-                        return format(parseISO(nextDoseTime), 'HH:mm');
+                        return format(parseISO(nextDoseTime), 'HH:mm', { locale: dateLocale });
                       } catch {
                         return nextDoseTime;
                       }
@@ -202,7 +216,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
               <p className="text-xs text-muted-foreground mt-1">
                 {(() => {
                   try {
-                    return format(parseISO(nextDoseTime), 'MMM d');
+                    return format(parseISO(nextDoseTime), 'MMM d', { locale: dateLocale });
                   } catch {
                     return '';
                   }
@@ -228,7 +242,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
                       ? 'bg-green-600'
                       : 'bg-orange-600'
                   }`}
-                  title={`${format(parseISO(dose.recorded_at), 'HH:mm')} - ${isMedicationTaken(dose.value) ? t('medication.taken') : t('medication.missed')}`}
+                  title={`${format(parseISO(dose.recorded_at), 'HH:mm', { locale: dateLocale })} - ${isMedicationTaken(dose.value) ? t('medication.taken') : t('medication.missed')}`}
                 />
               ))}
             </div>
@@ -258,7 +272,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {format(parseISO(dose.recorded_at), 'MMM d, HH:mm')}
+                    {format(parseISO(dose.recorded_at), 'MMM d, HH:mm', { locale: dateLocale })}
                   </span>
                 </div>
               ))
