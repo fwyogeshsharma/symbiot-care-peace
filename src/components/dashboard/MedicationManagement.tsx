@@ -91,7 +91,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
     return false;
   };
 
-  // Helper to extract next dose time
+  // Helper to extract next dose time and convert to 24-hour format
   const extractNextDoseTime = (value: any): string | null => {
     if (!value && value !== 0) return null;
 
@@ -110,7 +110,24 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
       return String(rawValue);
     }
 
-    return String(rawValue);
+    // Convert AM/PM format to 24-hour format if needed
+    const timeStr = String(rawValue);
+    const amPmMatch = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (amPmMatch) {
+      let hours = parseInt(amPmMatch[1], 10);
+      const minutes = amPmMatch[2];
+      const period = amPmMatch[3].toUpperCase();
+
+      if (period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+
+      return `${hours.toString().padStart(2, '0')}:${minutes}`;
+    }
+
+    return timeStr;
   };
 
   // Process medication data

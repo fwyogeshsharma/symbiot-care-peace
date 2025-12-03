@@ -327,14 +327,24 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         return taken ? t('common.yes') : t('common.no');
 
       case 'next_dose_time':
-        // Value is already formatted as "h:mm a" (e.g., "2:30 PM") from simulator
+        // Value is already formatted as "HH:mm" (e.g., "14:30") from simulator
         const time = typeof value === 'object' ? value.value : value;
-        if (typeof time === 'string' && time.includes(':')) {
-          return time; // Already formatted, display as-is
+        if (typeof time === 'string' && time.includes(':') && !time.includes('T')) {
+          // Convert AM/PM to 24-hour if needed
+          const amPmMatch = String(time).match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+          if (amPmMatch) {
+            let hours = parseInt(amPmMatch[1], 10);
+            const minutes = amPmMatch[2];
+            const period = amPmMatch[3].toUpperCase();
+            if (period === 'PM' && hours !== 12) hours += 12;
+            else if (period === 'AM' && hours === 12) hours = 0;
+            return `${hours.toString().padStart(2, '0')}:${minutes}`;
+          }
+          return time; // Already in 24-hour format
         }
         // Fallback for ISO timestamp format
         try {
-          return format(new Date(time), 'h:mm a');
+          return format(new Date(time), 'HH:mm');
         } catch {
           return time;
         }
