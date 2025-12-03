@@ -327,9 +327,14 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         return taken ? t('common.yes') : t('common.no');
 
       case 'next_dose_time':
+        // Value is already formatted as "h:mm a" (e.g., "2:30 PM") from simulator
         const time = typeof value === 'object' ? value.value : value;
+        if (typeof time === 'string' && time.includes(':')) {
+          return time; // Already formatted, display as-is
+        }
+        // Fallback for ISO timestamp format
         try {
-          return format(new Date(time), 'HH:mm');
+          return format(new Date(time), 'h:mm a');
         } catch {
           return time;
         }
