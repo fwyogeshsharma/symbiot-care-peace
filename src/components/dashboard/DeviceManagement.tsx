@@ -444,11 +444,12 @@ const DeviceManagement = () => {
                 <SelectContent>
                   {deviceTypes.map((type) => {
                     const IconComponent = getIconComponent(type.icon);
+                    const translatedName = t(`devices.types.${type.code}`, { defaultValue: '' }) || type.name;
                     return (
                       <SelectItem key={type.id} value={type.code}>
                         <div className="flex items-center gap-2">
                           {IconComponent && <IconComponent className="w-4 h-4" />}
-                          <span>{type.name}</span>
+                          <span>{translatedName}</span>
                         </div>
                       </SelectItem>
                     );

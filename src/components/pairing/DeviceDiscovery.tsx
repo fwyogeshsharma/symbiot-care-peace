@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ interface DeviceDiscoveryProps {
 }
 
 export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryProps) => {
+  const { t } = useTranslation();
   const [deviceId, setDeviceId] = useState("");
   const [deviceType, setDeviceType] = useState("");
   const [companyId, setCompanyId] = useState("");
@@ -35,7 +37,7 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
 
   const startPairing = async () => {
     if (!deviceId.trim()) {
-      toast.error("Please enter a device ID");
+      toast.error(t('devices.discovery.pleaseEnterDeviceId'));
       return;
     }
 
@@ -59,10 +61,10 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
       setPairingCode(data.pairingCode);
       setRequestId(data.pairingRequest.id);
       setStatus('pending');
-      toast.success("Pairing request created! Share the code with a family member.");
+      toast.success(t('devices.discovery.pairingRequestCreated'));
     } catch (error: any) {
       console.error('Error starting pairing:', error);
-      toast.error(error.message || "Failed to start pairing");
+      toast.error(error.message || t('devices.discovery.failedToStartPairing'));
     } finally {
       setLoading(false);
     }
@@ -103,14 +105,14 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
           setStatus(newStatus);
           
           if (newStatus === 'paired') {
-            toast.success("Device paired successfully!");
+            toast.success(t('devices.discovery.devicePairedSuccessfully'));
             setTimeout(() => {
               onSuccess();
             }, 2000);
           } else if (newStatus === 'rejected') {
-            toast.error("Pairing request was rejected");
+            toast.error(t('devices.discovery.pairingRejected'));
           } else if (newStatus === 'expired') {
-            toast.error("Pairing code expired");
+            toast.error(t('devices.discovery.pairingCodeExpired'));
           }
         }
       )
@@ -141,17 +143,17 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
   const getStatusText = () => {
     switch (status) {
       case 'pending':
-        return "Waiting for approval...";
+        return t('devices.discovery.waitingForApproval');
       case 'verified':
-        return "Pairing approved!";
+        return t('devices.discovery.pairingApproved');
       case 'paired':
-        return "Device paired successfully!";
+        return t('devices.discovery.devicePairedSuccessfully');
       case 'rejected':
-        return "Pairing rejected";
+        return t('devices.discovery.pairingRejected');
       case 'expired':
-        return "Pairing code expired";
+        return t('devices.discovery.pairingCodeExpired');
       default:
-        return "Enter device details to start pairing";
+        return t('devices.discovery.enterDeviceDetails');
     }
   };
 
@@ -161,19 +163,19 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             {getStatusIcon()}
-            Pairing in Progress
+            {t('devices.discovery.pairingInProgress')}
           </CardTitle>
           <CardDescription>{getStatusText()}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="text-center space-y-4">
             <div>
-              <Label className="text-sm text-muted-foreground">Pairing Code</Label>
+              <Label className="text-sm text-muted-foreground">{t('devices.discovery.pairingCode')}</Label>
               <div className="text-5xl font-bold tracking-widest mt-2 font-mono">
                 {pairingCode}
               </div>
             </div>
-            
+
             <div className="flex items-center justify-center gap-2">
               <Badge variant={status === 'pending' ? 'default' : status === 'paired' ? 'secondary' : 'destructive'}>
                 {status.toUpperCase()}
@@ -182,8 +184,7 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
 
             {status === 'pending' && (
               <p className="text-sm text-muted-foreground">
-                Share this code with a family member to approve the device pairing remotely.
-                The code will expire in 15 minutes.
+                {t('devices.discovery.shareCodeWithFamily')}
               </p>
             )}
 
@@ -193,7 +194,7 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
                 setStatus('idle');
                 setRequestId(null);
               }}>
-                Try Again
+                {t('devices.discovery.tryAgain')}
               </Button>
             )}
           </div>
@@ -205,36 +206,37 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Discover New Device</CardTitle>
+        <CardTitle>{t('devices.discovery.title')}</CardTitle>
         <CardDescription>
-          Enter device details to start the pairing process
+          {t('devices.discovery.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="deviceId">Device ID *</Label>
+          <Label htmlFor="deviceId">{t('devices.discovery.deviceId')}</Label>
           <Input
             id="deviceId"
-            placeholder="e.g., SENSOR-12345 or MAC address"
+            placeholder={t('devices.discovery.deviceIdPlaceholder')}
             value={deviceId}
             onChange={(e) => setDeviceId(e.target.value)}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="deviceType">Device Type (Optional)</Label>
+          <Label htmlFor="deviceType">{t('devices.discovery.deviceType')}</Label>
           <Select value={deviceType} onValueChange={setDeviceType}>
             <SelectTrigger>
-              <SelectValue placeholder="Select device type" />
+              <SelectValue placeholder={t('devices.discovery.selectDeviceType')} />
             </SelectTrigger>
             <SelectContent>
               {deviceTypes.map((type) => {
                 const IconComponent = getIconComponent(type.icon);
+                const translatedName = t(`devices.types.${type.code}`, { defaultValue: '' }) || type.name;
                 return (
                   <SelectItem key={type.id} value={type.code}>
                     <div className="flex items-center gap-2">
                       {IconComponent && <IconComponent className="w-4 h-4" />}
-                      <span>{type.name}</span>
+                      <span>{translatedName}</span>
                     </div>
                   </SelectItem>
                 );
@@ -244,10 +246,10 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="company">Company/Manufacturer (Optional)</Label>
+          <Label htmlFor="company">{t('devices.discovery.company')}</Label>
           <Select value={companyId} onValueChange={setCompanyId}>
             <SelectTrigger>
-              <SelectValue placeholder="Select company" />
+              <SelectValue placeholder={t('devices.discovery.selectCompany')} />
             </SelectTrigger>
             <SelectContent>
               {deviceCompanies.map((company) => (
@@ -264,18 +266,18 @@ export const DeviceDiscovery = ({ elderlyPersonId, onSuccess }: DeviceDiscoveryP
           </Select>
         </div>
 
-        <Button 
-          onClick={startPairing} 
+        <Button
+          onClick={startPairing}
           disabled={loading || !deviceId.trim()}
           className="w-full"
         >
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Starting Pairing...
+              {t('devices.discovery.startingPairing')}
             </>
           ) : (
-            "Start Pairing"
+            t('devices.discovery.startPairing')
           )}
         </Button>
       </CardContent>

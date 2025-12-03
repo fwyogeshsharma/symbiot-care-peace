@@ -6,15 +6,67 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
+import { de, es, fr, frCA, enUS } from 'date-fns/locale';
 import { formatCoordinates } from '@/lib/gpsUtils';
 import { useTranslation } from 'react-i18next';
+
+// Map language codes to date-fns locales
+const getDateLocale = (language: string) => {
+  const localeMap: Record<string, Locale> = {
+    'en': enUS,
+    'de': de,
+    'es': es,
+    'fr': fr,
+    'fr-CA': frCA,
+  };
+  return localeMap[language] || enUS;
+};
 
 interface SmartPhoneCardProps {
   selectedPersonId: string | null;
 }
 
 const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = getDateLocale(i18n.language);
+
+  // Translate data type names
+  const formatDataType = (dataType: string) => {
+    const translated = t(`dataTypes.${dataType}`, { defaultValue: '' });
+    if (translated) return translated;
+    // Fallback to formatted string
+    return dataType
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Translate data values (status values, booleans)
+  const formatDataValue = (value: any) => {
+    if (typeof value === 'object' && value !== null) {
+      if (value.value !== undefined) {
+        const strValue = String(value.value).toLowerCase();
+        const statusTranslation = t(`dataValues.${strValue}`, { defaultValue: '' });
+        if (statusTranslation) return statusTranslation;
+        return String(value.value);
+      }
+      return JSON.stringify(value);
+    }
+    if (typeof value === 'boolean') {
+      return value ? t('common.yes') : t('common.no');
+    }
+    const strValue = String(value).toLowerCase();
+    const statusTranslation = t(`dataValues.${strValue}`, { defaultValue: '' });
+    if (statusTranslation) return statusTranslation;
+    return String(value);
+  };
+
+  // Translate units
+  const formatUnit = (unit: string) => {
+    const translated = t(`units.${unit}`, { defaultValue: '' });
+    return translated || unit;
+  };
+
   const { data: phoneData, isLoading } = useQuery({
     queryKey: ['smart-phone-data', selectedPersonId],
     queryFn: async () => {
@@ -97,21 +149,6 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
     return 'text-success';
   };
 
-  const formatDataValue = (value: any) => {
-    if (typeof value === 'object' && value !== null) {
-      if (value.value !== undefined) return String(value.value);
-      return JSON.stringify(value);
-    }
-    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
-    return String(value);
-  };
-
-  const formatDataType = (dataType: string) => {
-    return dataType
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
 
   if (!selectedPersonId) {
     return (
@@ -219,7 +256,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t('smartPhone.lastUpdated')}:</span>
                   <span className="font-medium">
-                    {formatDistanceToNow(new Date(phoneData[0].recorded_at), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(phoneData[0].recorded_at), { addSuffix: true, locale: dateLocale })}
                   </span>
                 </div>
               </div>
@@ -240,7 +277,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
                           {formatCoordinates(latestGPS.value.latitude, latestGPS.value.longitude)}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(new Date(latestGPS.recorded_at), { addSuffix: true })}
+                          {formatDistanceToNow(new Date(latestGPS.recorded_at), { addSuffix: true, locale: dateLocale })}
                         </p>
                         {latestGPS.value.accuracy && (
                           <p className="text-xs text-muted-foreground mt-1">
@@ -279,7 +316,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
                             {formatDataType(item.data_type)}
                           </p>
                           <p className="text-xs text-muted-foreground mb-2">
-                            {formatDistanceToNow(new Date(item.recorded_at), { addSuffix: true })}
+                            {formatDistanceToNow(new Date(item.recorded_at), { addSuffix: true, locale: dateLocale })}
                           </p>
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-muted-foreground">{t('smartPhone.value')}:</span>
@@ -287,7 +324,7 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
                               {formatDataValue(item.value)}
                             </span>
                             {item.unit && (
-                              <span className="text-xs text-muted-foreground">{item.unit}</span>
+                              <span className="text-xs text-muted-foreground">{formatUnit(item.unit)}</span>
                             )}
                           </div>
                         </div>

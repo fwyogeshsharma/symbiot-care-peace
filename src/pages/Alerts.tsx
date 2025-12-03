@@ -12,10 +12,40 @@ import { toast } from 'sonner';
 import Header from '@/components/layout/Header';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, subDays } from 'date-fns';
+import { de, es, fr, frCA, enUS } from 'date-fns/locale';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { EmptyState } from '@/components/help/EmptyState';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { useTranslation } from 'react-i18next';
+
+// Map language codes to date-fns locales
+const getDateLocale = (language: string) => {
+  const localeMap: Record<string, Locale> = {
+    'en': enUS,
+    'de': de,
+    'es': es,
+    'fr': fr,
+    'fr-CA': frCA,
+  };
+  return localeMap[language] || enUS;
+};
+
+// Device name mapping for translation
+const deviceNameMap: Record<string, string> = {
+  'home hub': 'home_hub',
+  'home_hub': 'home_hub',
+  'smartphone': 'smartphone',
+  'smart phone': 'smartphone',
+  'fall detection': 'fall_detection',
+  'falldetection': 'falldetection',
+  'emergency button': 'emergency_button',
+  'panic button': 'panic_button',
+  'gps tracker': 'gps_tracker',
+  'heart rate monitor': 'heart_rate_monitor',
+  'blood pressure monitor': 'blood_pressure_monitor',
+  'smartwatch': 'smartwatch',
+  'wearable': 'wearable',
+};
 
 interface Alert {
   id: string;
@@ -39,8 +69,23 @@ const SEVERITY_COLORS = {
 };
 
 const Alerts = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const dateLocale = getDateLocale(i18n.language);
+
+  // Function to translate device names within text
+  const translateDeviceNames = (text: string) => {
+    if (!text) return text;
+    let result = text;
+    Object.entries(deviceNameMap).forEach(([deviceName, translationKey]) => {
+      const regex = new RegExp(deviceName, 'gi');
+      const translated = t(`devices.names.${translationKey}`, { defaultValue: '' });
+      if (translated) {
+        result = result.replace(regex, translated);
+      }
+    });
+    return result;
+  };
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
@@ -441,7 +486,7 @@ const Alerts = () => {
                       <AlertTriangle className="w-5 h-5 text-warning mt-1 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h4 className="font-semibold">{t(`alerts.messages.${alert.alert_type}.title`, { defaultValue: alert.title })}</h4>
+                          <h4 className="font-semibold">{translateDeviceNames(t(`alerts.messages.${alert.alert_type}.title`, { defaultValue: alert.title }))}</h4>
                           <Badge className={`${getSeverityColor(alert.severity)} capitalize text-xs`}>
                             {t(`alerts.${alert.severity}`, { defaultValue: alert.severity })}
                           </Badge>
@@ -450,14 +495,14 @@ const Alerts = () => {
                           </Badge>
                         </div>
                         {alert.description && (
-                          <p className="text-sm text-muted-foreground mb-2">{t(`alerts.messages.${alert.alert_type}.description`, { defaultValue: alert.description })}</p>
+                          <p className="text-sm text-muted-foreground mb-2">{translateDeviceNames(t(`alerts.messages.${alert.alert_type}.description`, { defaultValue: alert.description }))}</p>
                         )}
                         <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                           <span>{alert.elderly_persons?.full_name || t('alerts.timeline.unknown')}</span>
-                          <span>{format(new Date(alert.created_at), 'PPp')}</span>
+                          <span>{format(new Date(alert.created_at), 'MMM d, yyyy HH:mm', { locale: dateLocale })}</span>
                           {alert.acknowledged_at && (
                             <span className="text-success">
-                              ✓ {t('alerts.timeline.acknowledged')} {format(new Date(alert.acknowledged_at), 'PP')}
+                              ✓ {t('alerts.timeline.acknowledged')} {format(new Date(alert.acknowledged_at), 'MMM d, yyyy', { locale: dateLocale })}
                             </span>
                           )}
                         </div>

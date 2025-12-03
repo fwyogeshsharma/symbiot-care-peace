@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -53,6 +54,7 @@ interface CameraCardProps {
   onRefresh: () => void;
   onFullscreen: () => void;
   isFullscreen: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }
 
 const CameraCard = ({
@@ -63,7 +65,8 @@ const CameraCard = ({
   onDisconnect,
   onRefresh,
   onFullscreen,
-  isFullscreen
+  isFullscreen,
+  t
 }: CameraCardProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -91,12 +94,12 @@ const CameraCard = ({
             {isConnected ? (
               <Badge variant="outline" className="border-success text-success text-xs px-1.5 py-0">
                 <Wifi className="w-3 h-3 mr-1" />
-                Live
+                {t('tracking.cameraGrid.live')}
               </Badge>
             ) : (
               <Badge variant="outline" className="border-muted-foreground text-muted-foreground text-xs px-1.5 py-0">
                 <WifiOff className="w-3 h-3 mr-1" />
-                Off
+                {t('tracking.cameraGrid.off')}
               </Badge>
             )}
           </div>
@@ -108,16 +111,16 @@ const CameraCard = ({
           {!isConnected ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-muted/90">
               <VideoOff className="w-8 h-8 mb-2 text-muted-foreground" />
-              <p className="text-muted-foreground mb-2 text-xs">Not connected</p>
+              <p className="text-muted-foreground mb-2 text-xs">{t('tracking.cameraGrid.notConnected')}</p>
               <Button size="sm" onClick={onConnect} disabled={isLoading}>
                 <Play className="w-3 h-3 mr-1" />
-                {isLoading ? 'Connecting...' : 'Connect'}
+                {isLoading ? t('tracking.cameraGrid.connecting') : t('tracking.cameraGrid.connect')}
               </Button>
             </div>
           ) : isLoading ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-10">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mb-2"></div>
-              <p className="text-white text-xs">Loading...</p>
+              <p className="text-white text-xs">{t('tracking.cameraGrid.loading')}</p>
             </div>
           ) : (
             <>
@@ -153,7 +156,7 @@ const CameraCard = ({
             </Button>
             <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={onDisconnect}>
               <Pause className="w-3 h-3 mr-1" />
-              Stop
+              {t('tracking.cameraGrid.stop')}
             </Button>
           </div>
         )}
@@ -166,7 +169,8 @@ interface CameraGridProps {
   title?: string;
 }
 
-const CameraGrid = ({ title = "Security Cameras" }: CameraGridProps) => {
+const CameraGrid = ({ title }: CameraGridProps) => {
+  const { t } = useTranslation();
   const [cameraStates, setCameraStates] = useState<Record<string, { isConnected: boolean; isLoading: boolean }>>(() => {
     const initial: Record<string, { isConnected: boolean; isLoading: boolean }> = {};
     PUBLIC_CAMERAS.forEach(cam => {
@@ -255,10 +259,10 @@ const CameraGrid = ({ title = "Security Cameras" }: CameraGridProps) => {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Grid2X2 className="w-5 h-5 text-primary" />
-            <h2 className="text-xl font-semibold">{title}</h2>
+            <h2 className="text-xl font-semibold">{title || t('tracking.cameraGrid.title')}</h2>
           </div>
           <Badge variant="secondary">
-            {connectedCount}/{PUBLIC_CAMERAS.length} Active
+            {connectedCount}/{PUBLIC_CAMERAS.length} {t('tracking.cameraGrid.active')}
           </Badge>
         </div>
 
@@ -266,12 +270,12 @@ const CameraGrid = ({ title = "Security Cameras" }: CameraGridProps) => {
           {!allConnected ? (
             <Button onClick={handleConnectAll} size="sm">
               <Play className="w-4 h-4 mr-2" />
-              Connect All
+              {t('tracking.cameraGrid.connectAll')}
             </Button>
           ) : (
             <Button onClick={handleDisconnectAll} variant="outline" size="sm">
               <Pause className="w-4 h-4 mr-2" />
-              Disconnect All
+              {t('tracking.cameraGrid.disconnectAll')}
             </Button>
           )}
         </div>
@@ -291,6 +295,7 @@ const CameraGrid = ({ title = "Security Cameras" }: CameraGridProps) => {
               onRefresh={() => handleRefresh(camera.id)}
               onFullscreen={() => handleFullscreen(camera.id)}
               isFullscreen={true}
+              t={t}
             />
           ))}
         </div>
@@ -308,6 +313,7 @@ const CameraGrid = ({ title = "Security Cameras" }: CameraGridProps) => {
               onRefresh={() => handleRefresh(camera.id)}
               onFullscreen={() => handleFullscreen(camera.id)}
               isFullscreen={false}
+              t={t}
             />
           ))}
         </div>

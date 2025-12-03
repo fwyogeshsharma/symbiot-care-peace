@@ -6,14 +6,68 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
+import { de, es, fr, frCA, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+
+// Map language codes to date-fns locales
+const getDateLocale = (language: string) => {
+  const localeMap: Record<string, Locale> = {
+    'en': enUS,
+    'de': de,
+    'es': es,
+    'fr': fr,
+    'fr-CA': frCA,
+  };
+  return localeMap[language] || enUS;
+};
 
 interface HomeHubCardProps {
   selectedPersonId: string | null;
 }
 
 const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = getDateLocale(i18n.language);
+
+  // Translate data type names
+  const formatDataType = (dataType: string) => {
+    const translated = t(`dataTypes.${dataType}`, { defaultValue: '' });
+    if (translated) return translated;
+    // Fallback to formatted string
+    return dataType
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Translate data values (status values, booleans)
+  const formatDataValue = (value: any) => {
+    if (typeof value === 'object' && value !== null) {
+      if (value.value !== undefined) {
+        // Check if it's a status value
+        const strValue = String(value.value).toLowerCase();
+        const statusTranslation = t(`dataValues.${strValue}`, { defaultValue: '' });
+        if (statusTranslation) return statusTranslation;
+        return String(value.value);
+      }
+      return JSON.stringify(value);
+    }
+    if (typeof value === 'boolean') {
+      return value ? t('common.yes') : t('common.no');
+    }
+    // Check if string value is a known status
+    const strValue = String(value).toLowerCase();
+    const statusTranslation = t(`dataValues.${strValue}`, { defaultValue: '' });
+    if (statusTranslation) return statusTranslation;
+    return String(value);
+  };
+
+  // Translate units
+  const formatUnit = (unit: string) => {
+    const translated = t(`units.${unit}`, { defaultValue: '' });
+    return translated || unit;
+  };
+
   const { data: hubData, isLoading } = useQuery({
     queryKey: ['home-hub-data', selectedPersonId],
     queryFn: async () => {
@@ -75,21 +129,6 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
     }
   };
 
-  const formatDataValue = (value: any) => {
-    if (typeof value === 'object' && value !== null) {
-      if (value.value !== undefined) return String(value.value);
-      return JSON.stringify(value);
-    }
-    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
-    return String(value);
-  };
-
-  const formatDataType = (dataType: string) => {
-    return dataType
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
 
   if (!selectedPersonId) {
     return (
@@ -180,7 +219,7 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t('homeHub.lastUpdated')}:</span>
                   <span className="font-medium">
-                    {formatDistanceToNow(new Date(hubData[0].recorded_at), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(hubData[0].recorded_at), { addSuffix: true, locale: dateLocale })}
                   </span>
                 </div>
               </div>
@@ -205,7 +244,7 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
                           {formatDataType(item.data_type)}
                         </p>
                         <p className="text-xs text-muted-foreground mb-2">
-                          {formatDistanceToNow(new Date(item.recorded_at), { addSuffix: true })}
+                          {formatDistanceToNow(new Date(item.recorded_at), { addSuffix: true, locale: dateLocale })}
                         </p>
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-muted-foreground">{t('homeHub.value')}:</span>
@@ -213,7 +252,7 @@ const HomeHubCard = ({ selectedPersonId }: HomeHubCardProps) => {
                             {formatDataValue(item.value)}
                           </span>
                           {item.unit && (
-                            <span className="text-xs text-muted-foreground">{item.unit}</span>
+                            <span className="text-xs text-muted-foreground">{formatUnit(item.unit)}</span>
                           )}
                         </div>
                       </div>
