@@ -1153,6 +1153,119 @@ export type Database = {
           },
         ]
       }
+      medication_adherence_logs: {
+        Row: {
+          caregiver_alerted: boolean | null
+          created_at: string
+          dispenser_confirmed: boolean | null
+          elderly_person_id: string
+          id: string
+          notes: string | null
+          schedule_id: string
+          scheduled_time: string
+          status: string
+          timestamp: string
+        }
+        Insert: {
+          caregiver_alerted?: boolean | null
+          created_at?: string
+          dispenser_confirmed?: boolean | null
+          elderly_person_id: string
+          id?: string
+          notes?: string | null
+          schedule_id: string
+          scheduled_time: string
+          status?: string
+          timestamp?: string
+        }
+        Update: {
+          caregiver_alerted?: boolean | null
+          created_at?: string
+          dispenser_confirmed?: boolean | null
+          elderly_person_id?: string
+          id?: string
+          notes?: string | null
+          schedule_id?: string
+          scheduled_time?: string
+          status?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_adherence_logs_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_adherence_logs_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "medication_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medication_schedules: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          dosage_mg: number | null
+          dosage_unit: string | null
+          elderly_person_id: string
+          end_date: string | null
+          frequency: string
+          id: string
+          instructions: string | null
+          is_active: boolean | null
+          medication_name: string
+          start_date: string
+          times: string[]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          dosage_mg?: number | null
+          dosage_unit?: string | null
+          elderly_person_id: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          instructions?: string | null
+          is_active?: boolean | null
+          medication_name: string
+          start_date?: string
+          times?: string[]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          dosage_mg?: number | null
+          dosage_unit?: string | null
+          elderly_person_id?: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          instructions?: string | null
+          is_active?: boolean | null
+          medication_name?: string
+          start_date?: string
+          times?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_schedules_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_metrics: {
         Row: {
           created_at: string

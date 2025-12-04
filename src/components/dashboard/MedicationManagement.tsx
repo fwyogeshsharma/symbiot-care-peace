@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Pill, Clock, CheckCircle2, XCircle, TrendingUp } from 'lucide-react';
+import { Pill, Clock, CheckCircle2, XCircle, TrendingUp, Settings } from 'lucide-react';
 import { format, isToday, parseISO } from 'date-fns';
 import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 // Map language codes to date-fns locales
 const getDateLocale = (language: string) => {
@@ -26,6 +28,7 @@ interface MedicationManagementProps {
 
 export const MedicationManagement = ({ selectedPersonId }: MedicationManagementProps) => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const dateLocale = getDateLocale(i18n.language);
   const { data: medicationData, isLoading } = useQuery({
     queryKey: ['medication-data', selectedPersonId],
@@ -158,10 +161,20 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
   return (
     <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Pill className="h-5 w-5 text-primary" />
-          {t('medication.title')}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Pill className="h-5 w-5 text-primary" />
+            {t('medication.title')}
+          </CardTitle>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => navigate('/medication-config')}
+            title={t('medication.config.title')}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Compliance Overview */}
