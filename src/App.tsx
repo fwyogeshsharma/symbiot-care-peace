@@ -28,6 +28,7 @@ import PlatformMetrics from "./pages/PlatformMetrics";
 import Pricing from "./pages/Pricing";
 import ILQAnalytics from "./pages/ILQAnalytics";
 import InvestorInfo from "./pages/InvestorInfo";
+import MedicationConfig from "./pages/MedicationConfig";
 
 const queryClient = new QueryClient();
 
@@ -169,6 +170,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ILQAnalytics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/medication-config"
+              element={
+                <ProtectedRoute>
+                  <MedicationConfig />
                 </ProtectedRoute>
               }
             />
