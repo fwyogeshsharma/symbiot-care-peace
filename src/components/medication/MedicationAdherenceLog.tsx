@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CheckCircle2, XCircle, Clock, AlertTriangle, Pill } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { format, formatDistanceToNow } from 'date-fns';
-import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
+import { de, es, fr, frCA, enUS, hi, Locale } from 'date-fns/locale';
 
 const getDateLocale = (language: string): Locale => {
   const localeMap: Record<string, Locale> = {
@@ -15,6 +15,7 @@ const getDateLocale = (language: string): Locale => {
     'es': es,
     'fr': fr,
     'fr-CA': frCA,
+    'hi': hi,
   };
   return localeMap[language] || enUS;
 };

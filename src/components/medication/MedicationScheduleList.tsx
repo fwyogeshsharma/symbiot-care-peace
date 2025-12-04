@@ -9,6 +9,7 @@ import { Pill, Edit2, Trash2, Clock, Calendar, AlertCircle } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import { de, es, fr, frCA, enUS, hi, Locale } from 'date-fns/locale';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +21,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+
+const getDateLocale = (language: string): Locale => {
+  const localeMap: Record<string, Locale> = {
+    'en': enUS,
+    'de': de,
+    'es': es,
+    'fr': fr,
+    'fr-CA': frCA,
+    'hi': hi,
+  };
+  return localeMap[language] || enUS;
+};
 
 interface MedicationSchedule {
   id: string;
@@ -41,9 +54,10 @@ interface MedicationScheduleListProps {
 }
 
 export function MedicationScheduleList({ elderlyPersonId, onEdit }: MedicationScheduleListProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const dateLocale = getDateLocale(i18n.language);
 
   const { data: schedules, isLoading } = useQuery({
     queryKey: ['medication-schedules', elderlyPersonId],
@@ -189,10 +203,10 @@ export function MedicationScheduleList({ elderlyPersonId, onEdit }: MedicationSc
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                <span>{t('medication.config.from')} {format(new Date(schedule.start_date), 'MMM d, yyyy')}</span>
+                <span>{t('medication.config.from')} {format(new Date(schedule.start_date), 'PPP', { locale: dateLocale })}</span>
               </div>
               {schedule.end_date && (
-                <span>{t('medication.config.to')} {format(new Date(schedule.end_date), 'MMM d, yyyy')}</span>
+                <span>{t('medication.config.to')} {format(new Date(schedule.end_date), 'PPP', { locale: dateLocale })}</span>
               )}
             </div>
 

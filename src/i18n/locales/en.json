@@ -208,6 +208,14 @@
     "noDosesToday": "No doses recorded today",
     "recentActivity": "Recent Activity",
     "noRecentActivity": "No recent activity",
+    "calendar": {
+      "allTaken": "All Taken",
+      "missed": "Missed",
+      "someMissed": "Some Missed",
+      "scheduledAt": "Scheduled at",
+      "today": "Today",
+      "noUpcomingDoses": "No upcoming doses scheduled"
+    },
     "config": {
       "pageTitle": "Medication Configuration",
       "pageSubtitle": "Manage medication schedules for elderly persons",

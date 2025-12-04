@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
@@ -30,14 +30,15 @@ const iconMap: Record<string, any> = {
 export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Get translated help topics and quick links
-  const translatedTopics = getTranslatedHelpTopics(t);
-  const translatedQuickLinks = getTranslatedQuickLinks(t);
+  // Get translated help topics and quick links (memoized to prevent infinite loops)
+  // Using i18n.language as dependency since t function changes on every render
+  const translatedTopics = useMemo(() => getTranslatedHelpTopics(t), [i18n.language]);
+  const translatedQuickLinks = useMemo(() => getTranslatedQuickLinks(t), [i18n.language]);
 
-  const [filteredTopics, setFilteredTopics] = useState<HelpTopic[]>(translatedTopics);
+  const [filteredTopics, setFilteredTopics] = useState<HelpTopic[]>(() => getTranslatedHelpTopics(t));
   const [contextTopics, setContextTopics] = useState<HelpTopic[]>([]);
 
   // Get context-aware topics based on current page

@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npm run build:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx supabase functions serve:*)"
+      "Bash(npx supabase functions serve:*)",
+      "Bash(grep:*)",
+      "Bash(npx tsx:*)"
     ],
     "deny": [],
     "ask": []
