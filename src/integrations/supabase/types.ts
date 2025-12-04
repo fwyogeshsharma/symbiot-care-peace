@@ -143,105 +143,39 @@ export type Database = {
       }
       device_companies: {
         Row: {
-          id: string
           code: string
-          name: string
-          description: string | null
-          logo_url: string | null
-          website: string | null
-          is_active: boolean | null
           created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
           updated_at: string | null
+          website: string | null
         }
         Insert: {
-          id?: string
           code: string
-          name: string
-          description?: string | null
-          logo_url?: string | null
-          website?: string | null
-          is_active?: boolean | null
           created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
           updated_at?: string | null
+          website?: string | null
         }
         Update: {
-          id?: string
           code?: string
-          name?: string
-          description?: string | null
-          logo_url?: string | null
-          website?: string | null
-          is_active?: boolean | null
           created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
           updated_at?: string | null
+          website?: string | null
         }
         Relationships: []
-      }
-      device_models: {
-        Row: {
-          id: string
-          device_type_id: string
-          company_id: string | null
-          manufacturer: string | null
-          code: string
-          name: string
-          description: string | null
-          model_number: string | null
-          image_url: string | null
-          specifications: Json | null
-          supported_data_types: string[] | null
-          is_active: boolean | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          device_type_id: string
-          company_id?: string | null
-          manufacturer?: string | null
-          code: string
-          name: string
-          description?: string | null
-          model_number?: string | null
-          image_url?: string | null
-          specifications?: Json | null
-          supported_data_types?: string[] | null
-          is_active?: boolean | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          device_type_id?: string
-          company_id?: string | null
-          manufacturer?: string | null
-          code?: string
-          name?: string
-          description?: string | null
-          model_number?: string | null
-          image_url?: string | null
-          specifications?: Json | null
-          supported_data_types?: string[] | null
-          is_active?: boolean | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "device_models_device_type_id_fkey"
-            columns: ["device_type_id"]
-            isOneToOne: false
-            referencedRelation: "device_types"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "device_models_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "device_companies"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       device_data: {
         Row: {
@@ -334,6 +268,72 @@ export type Database = {
             columns: ["device_id"]
             isOneToOne: false
             referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      device_models: {
+        Row: {
+          code: string
+          company_id: string | null
+          created_at: string | null
+          description: string | null
+          device_type_id: string
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          manufacturer: string | null
+          model_number: string | null
+          name: string
+          specifications: Json | null
+          supported_data_types: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          company_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          device_type_id: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          manufacturer?: string | null
+          model_number?: string | null
+          name: string
+          specifications?: Json | null
+          supported_data_types?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          company_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          device_type_id?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          manufacturer?: string | null
+          model_number?: string | null
+          name?: string
+          specifications?: Json | null
+          supported_data_types?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_models_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "device_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "device_models_device_type_id_fkey"
+            columns: ["device_type_id"]
+            isOneToOne: false
+            referencedRelation: "device_types"
             referencedColumns: ["id"]
           },
         ]
@@ -499,6 +499,7 @@ export type Database = {
           id: string
           last_sync: string | null
           location: string | null
+          model_id: string | null
           status: string | null
           updated_at: string
         }
@@ -514,6 +515,7 @@ export type Database = {
           id?: string
           last_sync?: string | null
           location?: string | null
+          model_id?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -529,6 +531,7 @@ export type Database = {
           id?: string
           last_sync?: string | null
           location?: string | null
+          model_id?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -545,6 +548,13 @@ export type Database = {
             columns: ["elderly_person_id"]
             isOneToOne: false
             referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "devices_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "device_models"
             referencedColumns: ["id"]
           },
           {
@@ -1241,6 +1251,39 @@ export type Database = {
           },
         ]
       }
+      session_logs: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          login_at: string
+          logout_at: string | null
+          session_duration_minutes: number | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          login_at?: string
+          logout_at?: string | null
+          session_duration_minutes?: number | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          login_at?: string
+          logout_at?: string | null
+          session_duration_minutes?: number | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1270,6 +1313,15 @@ export type Database = {
       can_access_elderly_person: {
         Args: { _elderly_person_id: string; _user_id: string }
         Returns: boolean
+      }
+      compute_ilq_for_all_elderly: {
+        Args: never
+        Returns: {
+          computed: boolean
+          elderly_person_id: string
+          message: string
+          score: number
+        }[]
       }
       delete_user_account: {
         Args: { target_email: string }

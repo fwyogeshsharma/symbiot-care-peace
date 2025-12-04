@@ -4,7 +4,7 @@ import { AlertCircle, Clock, User, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
-import { de, es, fr, frCA, enUS } from 'date-fns/locale';
+import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { PanicSosCharts } from './PanicSosCharts';

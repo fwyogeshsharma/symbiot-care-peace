@@ -14,8 +14,8 @@ export function PlatformMetricsCard() {
       const fourteenDaysAgo = subDays(new Date(), 13);
 
       // Get sessions for last 7 days
-      const { data: recentSessions, error: recentError } = await supabase
-        .from('session_logs')
+      const { data: recentSessions, error: recentError } = await (supabase
+        .from('session_logs') as any)
         .select('id, user_id, login_at, logout_at, session_duration_minutes')
         .gte('login_at', sevenDaysAgo.toISOString())
         .order('login_at', { ascending: true });
@@ -33,8 +33,8 @@ export function PlatformMetricsCard() {
       }
 
       // Get sessions for previous 7 days (for trend calculation)
-      const { data: previousSessions } = await supabase
-        .from('session_logs')
+      const { data: previousSessions } = await (supabase
+        .from('session_logs') as any)
         .select('id')
         .gte('login_at', fourteenDaysAgo.toISOString())
         .lt('login_at', sevenDaysAgo.toISOString());
