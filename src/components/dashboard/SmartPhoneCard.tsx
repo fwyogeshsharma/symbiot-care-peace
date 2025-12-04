@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
-import { de, es, fr, frCA, enUS } from 'date-fns/locale';
+import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
 import { formatCoordinates } from '@/lib/gpsUtils';
 import { useTranslation } from 'react-i18next';
 
@@ -191,8 +191,10 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
   const latestGPS = getLatestGPS();
   const latestBattery = getLatestBattery();
 
-  const batteryLevel = latestBattery
-    ? (typeof latestBattery.value === 'object' ? latestBattery.value.value : latestBattery.value)
+  const batteryLevel: number | null = latestBattery
+    ? (typeof latestBattery.value === 'object' && latestBattery.value !== null 
+        ? Number((latestBattery.value as Record<string, unknown>).value) || null
+        : typeof latestBattery.value === 'number' ? latestBattery.value : null)
     : null;
 
   const BatteryIcon = getBatteryIcon(batteryLevel);
@@ -271,17 +273,17 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold mb-2">{t('smartPhone.lastKnownLocation')}</h4>
-                    {typeof latestGPS.value === 'object' && latestGPS.value.latitude && latestGPS.value.longitude ? (
+                    {typeof latestGPS.value === 'object' && latestGPS.value !== null && (latestGPS.value as Record<string, unknown>).latitude && (latestGPS.value as Record<string, unknown>).longitude ? (
                       <>
                         <p className="text-sm font-mono mb-1">
-                          {formatCoordinates(latestGPS.value.latitude, latestGPS.value.longitude)}
+                          {formatCoordinates((latestGPS.value as Record<string, number>).latitude, (latestGPS.value as Record<string, number>).longitude)}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {formatDistanceToNow(new Date(latestGPS.recorded_at), { addSuffix: true, locale: dateLocale })}
                         </p>
-                        {latestGPS.value.accuracy && (
+                        {(latestGPS.value as Record<string, unknown>).accuracy && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            {t('smartPhone.accuracy')}: ±{Math.round(latestGPS.value.accuracy)}m
+                            {t('smartPhone.accuracy')}: ±{Math.round((latestGPS.value as Record<string, number>).accuracy)}m
                           </p>
                         )}
                       </>

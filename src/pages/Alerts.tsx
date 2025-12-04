@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import Header from '@/components/layout/Header';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, subDays } from 'date-fns';
-import { de, es, fr, frCA, enUS } from 'date-fns/locale';
+import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { EmptyState } from '@/components/help/EmptyState';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';

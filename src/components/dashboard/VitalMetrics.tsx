@@ -3,7 +3,7 @@ import { Heart, Activity, Droplet, Thermometer, Wind, Moon, Pill, Footprints, Al
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-import { de, es, fr, frCA, enUS } from 'date-fns/locale';
+import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
 import { isHealthDevice, isHealthDataType } from '@/lib/deviceDataMapping';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';

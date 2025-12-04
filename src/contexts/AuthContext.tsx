@@ -123,7 +123,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (!error && data.user) {
       // Log session start
-      await supabase.from('session_logs').insert({
+      await (supabase.from('session_logs') as any).insert({
         user_id: data.user.id,
         login_at: new Date().toISOString(),
       });
@@ -136,8 +136,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     // Update session log with logout time
     if (user) {
-      const { data: latestSession } = await supabase
-        .from('session_logs')
+      const { data: latestSession } = await (supabase
+        .from('session_logs') as any)
         .select('id, login_at')
         .eq('user_id', user.id)
         .is('logout_at', null)
@@ -150,8 +150,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const logoutAt = new Date();
         const durationMinutes = Math.round((logoutAt.getTime() - loginAt.getTime()) / 60000);
 
-        await supabase
-          .from('session_logs')
+        await (supabase
+          .from('session_logs') as any)
           .update({
             logout_at: logoutAt.toISOString(),
             session_duration_minutes: durationMinutes,
