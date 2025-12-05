@@ -1010,6 +1010,7 @@
       "successWithData": "Your IoT device has been added with sample data.",
       "successNoData": "Your IoT device has been added.",
       "failed": "Failed to register device",
+      "duplicateDeviceId": "A device with this Device ID already exists. Please use a different Device ID.",
       "missingInfo": "Missing information",
       "fillRequired": "Please fill in all required fields",
       "noProfile": "No profile found",
