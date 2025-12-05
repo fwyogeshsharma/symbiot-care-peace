@@ -109,9 +109,15 @@ const DeviceManagement = () => {
       generateApiKey();
     },
     onError: (error: any) => {
+      // Check for duplicate device_id constraint violation
+      const isDuplicateDeviceId = error.message?.includes('devices_elderly_person_device_id_unique') ||
+        error.code === '23505'; // PostgreSQL unique violation error code
+
       toast({
         title: t('devices.register.failed'),
-        description: error.message,
+        description: isDuplicateDeviceId
+          ? t('devices.register.duplicateDeviceId')
+          : error.message,
         variant: "destructive",
       });
     },
