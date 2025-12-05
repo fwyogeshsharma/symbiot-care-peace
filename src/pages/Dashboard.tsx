@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Heart, Activity, AlertTriangle, Users } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 import VitalMetrics from '@/components/dashboard/VitalMetrics';
@@ -15,12 +15,16 @@ import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingT
 import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import { useTranslation } from 'react-i18next';
+import { AlertNotificationDialog } from '@/components/dashboard/AlertNotificationDialog';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const [newAlert, setNewAlert] = useState<any>(null);
   const shouldShowTour = useShouldShowTour();
 
   // Fetch elderly persons based on role
@@ -151,9 +155,32 @@ const Dashboard = () => {
           schema: 'public',
           table: 'device_data'
         },
-        (payload) => {
+        async (payload) => {
           console.log('New device data:', payload);
           setRealtimeData(prev => [payload.new, ...prev.slice(0, 9)]);
+
+          // Check if this is a panic SOS event (emergency_button)
+          const newData = payload.new as any;
+          if (newData.device_id) {
+            // Fetch device info to check if it's an emergency button
+            const { data: device } = await supabase
+              .from('devices')
+              .select('device_type, elderly_person_id, elderly_persons(full_name)')
+              .eq('id', newData.device_id)
+              .single();
+
+            if (device?.device_type === 'emergency_button') {
+              const elderlyPerson = device.elderly_persons as any;
+              // Show toast notification for panic SOS
+              toast.error(t('panicSos.notifications.emergencyAlert'), {
+                description: `${t('panicSos.notifications.sosActivated')} ${elderlyPerson?.full_name || t('panicSos.unknown')}`,
+                duration: 10000,
+              });
+
+              // Refetch panic events
+              queryClient.invalidateQueries({ queryKey: ['panic-sos-events'] });
+            }
+          }
         }
       )
       .on(
@@ -163,9 +190,21 @@ const Dashboard = () => {
           schema: 'public',
           table: 'alerts'
         },
-        (payload) => {
+        async (payload) => {
           console.log('New alert:', payload);
           refetchAlerts();
+
+          // Fetch full alert details with elderly person info
+          const alertData = payload.new as any;
+          const { data: fullAlert } = await supabase
+            .from('alerts')
+            .select('*, elderly_persons(full_name)')
+            .eq('id', alertData.id)
+            .single();
+
+          if (fullAlert) {
+            setNewAlert(fullAlert);
+          }
         }
       )
       .subscribe();
@@ -173,7 +212,7 @@ const Dashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, refetchAlerts]);
+  }, [user, refetchAlerts, queryClient, t]);
 
   if (elderlyLoading) {
     return (
@@ -186,10 +225,35 @@ const Dashboard = () => {
     );
   }
 
+  const handleAlertClose = () => {
+    setNewAlert(null);
+  };
+
+  const handleAlertAcknowledge = async (alertId: string) => {
+    try {
+      await supabase
+        .from('alerts')
+        .update({ status: 'acknowledged' })
+        .eq('id', alertId);
+
+      refetchAlerts();
+      setNewAlert(null);
+    } catch (error) {
+      console.error('Error acknowledging alert:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
       <Header />
+
+      {/* Alert Notification Dialog */}
+      <AlertNotificationDialog
+        newAlert={newAlert}
+        onClose={handleAlertClose}
+        onAcknowledge={handleAlertAcknowledge}
+      />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         {/* Stats Overview */}

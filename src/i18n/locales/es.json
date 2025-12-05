@@ -157,6 +157,10 @@
       "emergency": "Emergencia",
       "resolved": "Resuelto",
       "pending": "Pendiente"
+    },
+    "notifications": {
+      "emergencyAlert": "🚨 Alerta de Emergencia",
+      "sosActivated": "Botón SOS activado por"
     }
   },
   "environmental": {

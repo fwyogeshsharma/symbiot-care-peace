@@ -27,7 +27,6 @@ interface PanicSosEventsProps {
 }
 
 const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
-  const [showAll, setShowAll] = useState(false);
   const [showCharts, setShowCharts] = useState(false);
   const { t, i18n } = useTranslation();
   const dateLocale = getDateLocale(i18n.language);
@@ -50,8 +49,12 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
   };
 
   const { data: panicEvents, isLoading } = useQuery({
-    queryKey: ['panic-sos-events', selectedPersonId, showAll],
+    queryKey: ['panic-sos-events', selectedPersonId],
     queryFn: async () => {
+      // Get events from the last 1 week
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
       let query = supabase
         .from('device_data')
         .select(`
@@ -68,16 +71,11 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
           )
         `)
         .eq('devices.device_type', 'emergency_button')
+        .gte('recorded_at', oneWeekAgo.toISOString())
         .order('recorded_at', { ascending: false });
 
       if (selectedPersonId) {
         query = query.eq('elderly_person_id', selectedPersonId);
-      }
-
-      if (!showAll) {
-        query = query.limit(5);
-      } else {
-        query = query.limit(20);
       }
 
       const { data, error } = await query;
@@ -158,73 +156,67 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
           </p>
         </div>
       ) : (
-        <>
-          <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-            {panicEvents.map((event) => {
-              const device = event.devices as any;
-              const elderlyPerson = device?.elderly_persons as any;
-              const eventValue = event.value as any;
-              
-              return (
-                <div
-                  key={event.id}
-                  className="border rounded-lg p-3 hover:bg-muted/30 transition-colors"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-start gap-2 flex-1">
-                      <AlertCircle className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm">
-                          {getEventDescription(eventValue)}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                          <User className="w-3 h-3" />
-                          <span className="truncate">
-                            {elderlyPerson?.full_name || t('panicSos.unknown')}
-                          </span>
-                        </div>
+        <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+          {panicEvents.map((event) => {
+            const device = event.devices as any;
+            const elderlyPerson = device?.elderly_persons as any;
+            const eventValue = event.value as any;
+
+            return (
+              <div
+                key={event.id}
+                className="border rounded-lg p-3 hover:bg-muted/30 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-start gap-2 flex-1">
+                    <AlertCircle className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm">
+                        {getEventDescription(eventValue)}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                        <User className="w-3 h-3" />
+                        <span className="truncate">
+                          {elderlyPerson?.full_name || t('panicSos.unknown')}
+                        </span>
                       </div>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={`${getSeverityColor(eventValue)} text-xs shrink-0`}
-                    >
-                      {getTranslatedStatus(eventValue?.status)}
-                    </Badge>
                   </div>
-
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    <span>
-                      {formatDistanceToNow(new Date(event.recorded_at), {
-                        addSuffix: true,
-                        locale: dateLocale,
-                      })}
-                    </span>
-                  </div>
-
-                  {device?.device_name && (
-                    <p className="text-xs text-muted-foreground mt-1 truncate">
-                      {t('panicSos.device')}: {getTranslatedDeviceName(device.device_name)}
-                    </p>
-                  )}
+                  <Badge
+                    variant="outline"
+                    className={`${getSeverityColor(eventValue)} text-xs shrink-0`}
+                  >
+                    {getTranslatedStatus(eventValue?.status)}
+                  </Badge>
                 </div>
-              );
-            })}
-          </div>
 
-          {panicEvents.length >= 5 && (
-            <div className="mt-4 text-center">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAll(!showAll)}
-              >
-                {showAll ? t('panicSos.showLess') : t('panicSos.showMore')}
-              </Button>
-            </div>
-          )}
-        </>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Clock className="w-3 h-3" />
+                  <span>
+                    {formatDistanceToNow(new Date(event.recorded_at), {
+                      addSuffix: true,
+                      locale: dateLocale,
+                    })}
+                  </span>
+                </div>
+
+                {device?.device_name && (
+                  <p className="text-xs text-muted-foreground mt-1 truncate">
+                    {t('panicSos.device')}: {getTranslatedDeviceName(device.device_name)}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full text-muted-foreground hover:text-foreground"
+            onClick={() => setShowCharts(true)}
+          >
+            {t('panicSos.showMore')}
+          </Button>
+        </div>
       )}
       </Card>
 

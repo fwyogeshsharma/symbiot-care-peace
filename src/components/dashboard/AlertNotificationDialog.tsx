@@ -42,8 +42,11 @@ export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: Al
     // You can add different sounds based on severity
     // For now, we'll use the browser's notification API
     if ('Notification' in window && Notification.permission === 'granted') {
+      const translatedTitle = newAlert?.alert_type
+        ? t(`alerts.messages.${newAlert.alert_type}.title`, { defaultValue: newAlert?.title })
+        : newAlert?.title;
       new Notification(t('alerts.notifications.newAlert'), {
-        body: newAlert?.title || t('alerts.notifications.newAlertGenerated'),
+        body: translatedTitle || t('alerts.notifications.newAlertGenerated'),
         icon: '/favicon.ico',
         tag: newAlert?.id,
       });
@@ -85,6 +88,18 @@ export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: Al
     return <Bell className="h-6 w-6" />;
   };
 
+  // Get translated alert title based on alert_type
+  const getTranslatedTitle = (alertType: string, fallbackTitle: string) => {
+    const translated = t(`alerts.messages.${alertType}.title`, { defaultValue: '' });
+    return translated || fallbackTitle;
+  };
+
+  // Get translated alert description based on alert_type
+  const getTranslatedDescription = (alertType: string, fallbackDescription: string) => {
+    const translated = t(`alerts.messages.${alertType}.description`, { defaultValue: '' });
+    return translated || fallbackDescription;
+  };
+
   if (!newAlert) return null;
 
   return (
@@ -115,9 +130,13 @@ export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: Al
           </div>
 
           <div>
-            <h4 className="font-semibold text-base mb-2">{newAlert.title}</h4>
+            <h4 className="font-semibold text-base mb-2">
+              {getTranslatedTitle(newAlert.alert_type, newAlert.title)}
+            </h4>
             {newAlert.description && (
-              <p className="text-sm text-muted-foreground">{newAlert.description}</p>
+              <p className="text-sm text-muted-foreground">
+                {getTranslatedDescription(newAlert.alert_type, newAlert.description)}
+              </p>
             )}
           </div>
 
