@@ -72,18 +72,19 @@ export default function FloorPlanEditor() {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       
-      <div className="flex items-center gap-4 p-4 border-b">
+      <div className="flex items-center gap-2 sm:gap-4 p-2 sm:p-4 border-b">
         <Button
           variant="outline"
           size="sm"
           onClick={() => navigate('/floor-plan-management')}
+          className="shrink-0"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          <ArrowLeft className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">Back</span>
         </Button>
-        <div>
-          <h1 className="text-2xl font-bold">{floorPlan.name}</h1>
-          <p className="text-sm text-muted-foreground">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-lg sm:text-2xl font-bold truncate">{floorPlan.name}</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground truncate">
             {floorPlan.width}m × {floorPlan.height}m • Grid: {floorPlan.grid_size}m
           </p>
         </div>

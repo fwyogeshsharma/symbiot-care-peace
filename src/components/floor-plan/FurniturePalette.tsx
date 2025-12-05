@@ -7,9 +7,10 @@ interface FurniturePaletteProps {
   selectedType: string | null;
   onSelectType: (type: 'bed' | 'chair' | 'table' | 'sofa' | 'desk' | 'toilet' | 'sink' | 'door') => void;
   isActive: boolean;
+  isMobile?: boolean;
 }
 
-export function FurniturePalette({ selectedType, onSelectType, isActive }: FurniturePaletteProps) {
+export function FurniturePalette({ selectedType, onSelectType, isActive, isMobile = false }: FurniturePaletteProps) {
   const furnitureItems = [
     { type: 'bed' as const, icon: Bed, label: 'Bed', color: 'text-red-500' },
     { type: 'chair' as const, icon: Armchair, label: 'Chair', color: 'text-orange-500' },
@@ -22,13 +23,20 @@ export function FurniturePalette({ selectedType, onSelectType, isActive }: Furni
   ];
 
   return (
-    <div className="w-48 border-r bg-card flex flex-col">
-      <div className="p-3 border-b">
-        <h3 className="font-semibold text-sm">Furniture</h3>
-        <p className="text-xs text-muted-foreground mt-1">
-          Click to select, then click on canvas to place
+    <div className={isMobile ? "flex flex-col h-full" : "w-48 border-r bg-card flex flex-col"}>
+      {!isMobile && (
+        <div className="p-3 border-b">
+          <h3 className="font-semibold text-sm">Furniture</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Click to select, then click on canvas to place
+          </p>
+        </div>
+      )}
+      {isMobile && (
+        <p className="text-xs text-muted-foreground px-4 py-2">
+          Click to select, then tap on canvas to place
         </p>
-      </div>
+      )}
       
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
@@ -47,18 +55,21 @@ export function FurniturePalette({ selectedType, onSelectType, isActive }: Furni
         </div>
       </ScrollArea>
 
-      <Separator />
-
-      <div className="p-2">
-        <div className="text-xs text-muted-foreground space-y-1">
-          <p className="font-medium">Tips:</p>
-          <ul className="list-disc list-inside space-y-0.5">
-            <li>Select to move/resize</li>
-            <li>Rotate with corners</li>
-            <li>Delete with delete tool</li>
-          </ul>
-        </div>
-      </div>
+      {!isMobile && (
+        <>
+          <Separator />
+          <div className="p-2">
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p className="font-medium">Tips:</p>
+              <ul className="list-disc list-inside space-y-0.5">
+                <li>Select to move/resize</li>
+                <li>Rotate with corners</li>
+                <li>Delete with delete tool</li>
+              </ul>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

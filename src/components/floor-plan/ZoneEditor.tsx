@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Canvas as FabricCanvas, Polygon, Rect, FabricObject, util as fabricUtil, Image as FabricImage } from "fabric";
 import { ZoneDrawingTools, DrawingTool } from "./ZoneDrawingTools";
 import { ZonePropertiesPanel } from "./ZonePropertiesPanel";
 import { FurniturePalette } from "./FurniturePalette";
 import { toast } from "sonner";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Sofa, Layers } from "lucide-react";
 
 interface Zone {
   id: string;
@@ -52,13 +55,42 @@ export function ZoneEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [history, setHistory] = useState<{ zones: Zone[], furniture: FurnitureItem[] }[]>([{ zones: initialZones, furniture: initialFurniture }]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const [showFurniturePalette, setShowFurniturePalette] = useState(false);
+  const [showZonesPanel, setShowZonesPanel] = useState(false);
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
   const zoneObjectsRef = useRef<Map<string, Polygon>>(new Map());
   const furnitureObjectsRef = useRef<Map<string, FabricObject>>(new Map());
   const isModifyingRef = useRef(false);
   const backgroundImageRef = useRef<FabricImage | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const CANVAS_WIDTH = 800;
-  const CANVAS_HEIGHT = 600;
+  // Calculate responsive canvas size
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.clientWidth - 32; // padding
+        const isMobile = window.innerWidth < 768;
+
+        if (isMobile) {
+          // On mobile, fit to container width
+          const aspectRatio = floorPlanHeight / floorPlanWidth;
+          const width = Math.min(containerWidth, 600);
+          const height = width * aspectRatio;
+          setCanvasSize({ width: Math.floor(width), height: Math.floor(Math.min(height, 400)) });
+        } else {
+          // On desktop, use larger fixed size
+          setCanvasSize({ width: 800, height: 600 });
+        }
+      }
+    };
+
+    updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+    return () => window.removeEventListener('resize', updateCanvasSize);
+  }, [floorPlanWidth, floorPlanHeight]);
+
+  const CANVAS_WIDTH = canvasSize.width;
+  const CANVAS_HEIGHT = canvasSize.height;
   const SCALE = Math.min(CANVAS_WIDTH / floorPlanWidth, CANVAS_HEIGHT / floorPlanHeight);
 
   // Sync state with initialZones/initialFurniture when they change (e.g., after save/reload)
@@ -74,6 +106,13 @@ export function ZoneEditor({
   useEffect(() => {
     if (!canvasRef.current) return;
 
+    // Dispose existing canvas if any
+    if (fabricCanvas) {
+      fabricCanvas.dispose();
+      zoneObjectsRef.current.clear();
+      furnitureObjectsRef.current.clear();
+    }
+
     const canvas = new FabricCanvas(canvasRef.current, {
       width: CANVAS_WIDTH,
       height: CANVAS_HEIGHT,
@@ -86,7 +125,7 @@ export function ZoneEditor({
     return () => {
       canvas.dispose();
     };
-  }, []);
+  }, [CANVAS_WIDTH, CANVAS_HEIGHT]);
 
   // Load background image
   useEffect(() => {
@@ -161,9 +200,11 @@ export function ZoneEditor({
     if (!fabricCanvas) return;
 
     const gridSpacing = gridSize * SCALE;
-    const ctx = fabricCanvas.getContext();
-    
-    fabricCanvas.on('after:render', () => {
+
+    const handleAfterRender = () => {
+      const ctx = fabricCanvas.getContext();
+      if (!ctx) return;
+
       ctx.strokeStyle = '#e0e0e0';
       ctx.lineWidth = 1;
 
@@ -182,10 +223,15 @@ export function ZoneEditor({
         ctx.lineTo(CANVAS_WIDTH, y);
         ctx.stroke();
       }
-    });
+    };
 
+    fabricCanvas.on('after:render', handleAfterRender);
     fabricCanvas.renderAll();
-  }, [fabricCanvas, gridSize]);
+
+    return () => {
+      fabricCanvas.off('after:render', handleAfterRender);
+    };
+  }, [fabricCanvas, gridSize, SCALE, CANVAS_WIDTH, CANVAS_HEIGHT]);
 
   // Render zones and furniture on canvas - smart update instead of full recreate
   useEffect(() => {
@@ -634,29 +680,84 @@ export function ZoneEditor({
         isSaving={isSaving}
       />
 
-      <div className="flex flex-1 overflow-hidden">
-        <FurniturePalette
-          selectedType={selectedFurnitureType}
-          onSelectType={(type) => {
-            setSelectedFurnitureType(type);
-            setActiveTool("furniture");
-          }}
-          isActive={activeTool === "furniture"}
-        />
+      {/* Mobile toggle buttons */}
+      <div className="flex md:hidden items-center gap-2 p-2 border-b bg-card">
+        <Sheet open={showFurniturePalette} onOpenChange={setShowFurniturePalette}>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="sm" className="flex-1">
+              <Sofa className="h-4 w-4 mr-2" />
+              Furniture
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[280px] p-0">
+            <SheetHeader className="p-4 border-b">
+              <SheetTitle>Furniture</SheetTitle>
+            </SheetHeader>
+            <FurniturePalette
+              selectedType={selectedFurnitureType}
+              onSelectType={(type) => {
+                setSelectedFurnitureType(type);
+                setActiveTool("furniture");
+                setShowFurniturePalette(false);
+              }}
+              isActive={activeTool === "furniture"}
+              isMobile={true}
+            />
+          </SheetContent>
+        </Sheet>
 
-        <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
+        <Sheet open={showZonesPanel} onOpenChange={setShowZonesPanel}>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="sm" className="flex-1">
+              <Layers className="h-4 w-4 mr-2" />
+              Zones ({zones.length})
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[300px] p-0">
+            <ZonePropertiesPanel
+              zones={zones}
+              selectedZoneId={selectedZoneId}
+              onZoneSelect={(id) => {
+                setSelectedZoneId(id);
+                setShowZonesPanel(false);
+              }}
+              onZoneUpdate={handleZoneUpdate}
+              onZoneDelete={handleZoneDelete}
+              isMobile={true}
+            />
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Desktop furniture palette */}
+        <div className="hidden md:block">
+          <FurniturePalette
+            selectedType={selectedFurnitureType}
+            onSelectType={(type) => {
+              setSelectedFurnitureType(type);
+              setActiveTool("furniture");
+            }}
+            isActive={activeTool === "furniture"}
+          />
+        </div>
+
+        <div ref={containerRef} className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-auto">
           <div className="border rounded-lg shadow-lg overflow-hidden">
             <canvas ref={canvasRef} />
           </div>
         </div>
 
-        <ZonePropertiesPanel
-          zones={zones}
-          selectedZoneId={selectedZoneId}
-          onZoneSelect={setSelectedZoneId}
-          onZoneUpdate={handleZoneUpdate}
-          onZoneDelete={handleZoneDelete}
-        />
+        {/* Desktop zones panel */}
+        <div className="hidden md:block">
+          <ZonePropertiesPanel
+            zones={zones}
+            selectedZoneId={selectedZoneId}
+            onZoneSelect={setSelectedZoneId}
+            onZoneUpdate={handleZoneUpdate}
+            onZoneDelete={handleZoneDelete}
+          />
+        </div>
       </div>
     </div>
   );

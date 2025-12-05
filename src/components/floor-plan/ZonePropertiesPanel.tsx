@@ -18,6 +18,7 @@ interface ZonePropertiesPanelProps {
   onZoneSelect: (zoneId: string) => void;
   onZoneUpdate: (zoneId: string, updates: Partial<Zone>) => void;
   onZoneDelete: (zoneId: string) => void;
+  isMobile?: boolean;
 }
 
 export function ZonePropertiesPanel({
@@ -26,14 +27,17 @@ export function ZonePropertiesPanel({
   onZoneSelect,
   onZoneUpdate,
   onZoneDelete,
+  isMobile = false,
 }: ZonePropertiesPanelProps) {
   const selectedZone = zones.find(z => z.id === selectedZoneId);
 
   return (
-    <div className="w-80 border-l bg-card flex flex-col h-full">
-      <div className="p-4 border-b">
-        <h3 className="font-semibold">Zones</h3>
-      </div>
+    <div className={isMobile ? "flex flex-col h-full" : "w-80 border-l bg-card flex flex-col h-full"}>
+      {!isMobile && (
+        <div className="p-4 border-b">
+          <h3 className="font-semibold">Zones</h3>
+        </div>
+      )}
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-2">
