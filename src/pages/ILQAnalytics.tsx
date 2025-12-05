@@ -299,10 +299,10 @@ export default function ILQAnalytics() {
 
         {selectedPersonId && (
           <Tabs defaultValue="history" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="history">{t('ilq.analytics.historicalTrends')}</TabsTrigger>
-            <TabsTrigger value="components">{t('ilq.analytics.componentBreakdown')}</TabsTrigger>
-            <TabsTrigger value="alerts">{t('ilq.analytics.alertsHistory')}</TabsTrigger>
+          <TabsList className="flex flex-wrap h-auto gap-1 p-1">
+            <TabsTrigger value="history" className="text-xs sm:text-sm">{t('ilq.analytics.historicalTrends')}</TabsTrigger>
+            <TabsTrigger value="components" className="text-xs sm:text-sm">{t('ilq.analytics.componentBreakdown')}</TabsTrigger>
+            <TabsTrigger value="alerts" className="text-xs sm:text-sm">{t('ilq.analytics.alertsHistory')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="history" className="space-y-4">
