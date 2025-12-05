@@ -105,11 +105,11 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
 
   if (isLoading) {
     return (
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-destructive" />
-            {t('panicSos.title')}
+      <Card className="p-6 overflow-hidden">
+        <div className="flex items-center justify-between gap-2 mb-4 flex-wrap">
+          <h3 className="text-lg font-semibold flex items-center gap-2 min-w-0">
+            <AlertCircle className="w-5 h-5 text-destructive shrink-0" />
+            <span className="truncate">{t('panicSos.title')}</span>
           </h3>
         </div>
         <div className="text-center py-8 text-muted-foreground">
@@ -121,13 +121,13 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
 
   return (
     <>
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-destructive" />
-            {t('panicSos.title')}
+      <Card className="p-6 overflow-hidden">
+        <div className="flex items-center justify-between gap-2 mb-4 flex-wrap">
+          <h3 className="text-lg font-semibold flex items-center gap-2 min-w-0">
+            <AlertCircle className="w-5 h-5 text-destructive shrink-0" />
+            <span className="truncate">{t('panicSos.title')}</span>
           </h3>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {panicEvents && panicEvents.length > 0 && (
               <>
                 <Button
@@ -137,9 +137,9 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
                   className="gap-2"
                 >
                   <TrendingUp className="h-4 w-4" />
-                  {t('panicSos.viewCharts')}
+                  <span className="hidden sm:inline">{t('panicSos.viewCharts')}</span>
                 </Button>
-                <Badge variant="outline" className="border-destructive text-destructive">
+                <Badge variant="outline" className="border-destructive text-destructive whitespace-nowrap">
                   {panicEvents.length} {panicEvents.length === 1 ? t('panicSos.event') : t('panicSos.events')}
                 </Badge>
               </>

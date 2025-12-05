@@ -209,9 +209,9 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
                 <Accordion type="multiple" className="w-full">
                   {Object.entries(categorizedTopics).map(([category, topics]) => (
                     <AccordionItem key={category} value={category}>
-                      <AccordionTrigger className="text-sm font-medium">
+                      <AccordionTrigger className="text-sm font-medium hover:no-underline">
                         <div className="flex items-center gap-2">
-                          {category}
+                          <span className="hover:underline">{category}</span>
                           <Badge variant="secondary" className="text-xs">
                             {topics.length}
                           </Badge>
