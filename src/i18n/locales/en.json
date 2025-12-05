@@ -1342,16 +1342,6 @@
     "profileUpdatedDesc": "Your profile has been updated successfully.",
     "updateFailed": "Failed to update profile"
   },
-  "dataSharing": {
-    "title": "Data Sharing",
-    "shareWith": "Share With",
-    "permissions": "Permissions",
-    "addRecipient": "Add Recipient",
-    "removeAccess": "Remove Access",
-    "viewOnly": "View Only",
-    "fullAccess": "Full Access",
-    "customAccess": "Custom Access"
-  },
   "movement": {
     "title": "Activity Dashboard",
     "subtitle": "Track activity patterns over time",
