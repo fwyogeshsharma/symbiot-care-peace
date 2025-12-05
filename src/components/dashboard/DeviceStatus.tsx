@@ -357,7 +357,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
       </div>
 
       <div className="mb-4">
-        <DeviceManagement />
+        <DeviceManagement selectedPersonId={selectedPersonId} />
       </div>
 
       {!devices || devices.length === 0 ? (

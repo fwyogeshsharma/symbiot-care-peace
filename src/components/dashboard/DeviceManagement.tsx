@@ -24,7 +24,11 @@ import { generateSampleDataPoints, generateSampleDataFromModelSpecs } from '@/li
 import { DeviceDiscovery } from '@/components/pairing/DeviceDiscovery';
 import { useTranslation } from 'react-i18next';
 
-const DeviceManagement = () => {
+interface DeviceManagementProps {
+  selectedPersonId?: string | null;
+}
+
+const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [deviceName, setDeviceName] = useState('');
@@ -403,6 +407,14 @@ const DeviceManagement = () => {
     if (!iconName) return null;
     return (Icons as any)[iconName] || null;
   };
+
+  // Only show register button if viewing own profile or no person is selected
+  const isOwnProfile = !selectedPersonId || selectedPersonId === userElderlyPerson?.id;
+
+  // Don't render if viewing another person's profile
+  if (!isOwnProfile) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
