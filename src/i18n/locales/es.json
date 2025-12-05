@@ -161,6 +161,21 @@
     "notifications": {
       "emergencyAlert": "🚨 Alerta de Emergencia",
       "sosActivated": "Botón SOS activado por"
+    },
+    "charts": {
+      "eventHistory": "Historial de Eventos de Pánico/SOS",
+      "pickDateRange": "Seleccionar rango de fechas",
+      "totalEvents": "Total de Eventos",
+      "loadingCharts": "Cargando gráficos...",
+      "noEventsInPeriod": "No hay eventos de pánico/SOS registrados en este período",
+      "eventsOverTime": "Eventos a lo Largo del Tiempo",
+      "eventsByTimeOfDay": "Eventos por Hora del Día",
+      "eventsLabel": "Eventos",
+      "critical": "Crítico",
+      "warning": "Advertencia",
+      "info": "Info",
+      "criticalEvents": "Eventos Críticos",
+      "avgPerDay": "Promedio por Día"
     }
   },
   "environmental": {

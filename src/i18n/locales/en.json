@@ -171,6 +171,21 @@
     "notifications": {
       "emergencyAlert": "🚨 Emergency Alert",
       "sosActivated": "SOS button activated by"
+    },
+    "charts": {
+      "eventHistory": "Panic/SOS Event History",
+      "pickDateRange": "Pick a date range",
+      "totalEvents": "Total Events",
+      "loadingCharts": "Loading charts...",
+      "noEventsInPeriod": "No panic/SOS events recorded in this period",
+      "eventsOverTime": "Events Over Time",
+      "eventsByTimeOfDay": "Events by Time of Day",
+      "eventsLabel": "Events",
+      "critical": "Critical",
+      "warning": "Warning",
+      "info": "Info",
+      "criticalEvents": "Critical Events",
+      "avgPerDay": "Avg Per Day"
     }
   },
   "environmental": {
