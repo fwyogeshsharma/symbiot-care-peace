@@ -4,7 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ElderlyProvider } from "./contexts/ElderlyContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import "./i18n/config";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -18,12 +20,15 @@ import DeviceTypesManagement from "./pages/admin/DeviceTypesManagement";
 import DeviceTypeDataConfigs from "./pages/admin/DeviceTypeDataConfigs";
 import DeviceModelsManagement from "./pages/admin/DeviceModelsManagement";
 import UserManagement from "./pages/admin/UserManagement";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import FloorPlanManagement from "./pages/FloorPlanManagement";
 import FloorPlanEditor from "./pages/FloorPlanEditor";
 import Alerts from "./pages/Alerts";
 import PlatformMetrics from "./pages/PlatformMetrics";
 import Pricing from "./pages/Pricing";
 import ILQAnalytics from "./pages/ILQAnalytics";
+import InvestorInfo from "./pages/InvestorInfo";
+import MedicationConfig from "./pages/MedicationConfig";
 
 const queryClient = new QueryClient();
 
@@ -34,24 +39,25 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <ElderlyProvider>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route 
-              path="/dashboard" 
+            <Route
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/profile" 
+            <Route
+              path="/profile"
               element={
                 <ProtectedRoute>
                   <Profile />
                 </ProtectedRoute>
-              } 
+              }
             />
             <Route 
               path="/device-status" 
@@ -118,12 +124,20 @@ const App = () => (
               }
             />
             <Route
-              path="/admin/user-management" 
+              path="/admin/user-management"
               element={
                 <ProtectedRoute>
                   <UserManagement />
                 </ProtectedRoute>
-              } 
+              }
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
             />
             <Route 
               path="/floor-plan-management" 
@@ -150,17 +164,27 @@ const App = () => (
               } 
             />
             <Route path="/pricing" element={<Pricing />} />
-            <Route 
-              path="/ilq-analytics" 
+            <Route path="/investor-info" element={<InvestorInfo />} />
+            <Route
+              path="/ilq-analytics"
               element={
                 <ProtectedRoute>
                   <ILQAnalytics />
                 </ProtectedRoute>
-              } 
+              }
+            />
+            <Route
+              path="/medication-config"
+              element={
+                <ProtectedRoute>
+                  <MedicationConfig />
+                </ProtectedRoute>
+              }
             />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </ElderlyProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

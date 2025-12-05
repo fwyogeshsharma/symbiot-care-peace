@@ -68,10 +68,18 @@ Deno.serve(async (req) => {
       .eq('elderly_person_id', elderly_person_id)
       .gte('recorded_at', timeWindowStart);
 
+    // 2b. Fetch medication adherence logs (for cognitive function score)
+    const medicationWindowStart = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(); // Last 7 days for medication
+    const { data: adherenceLogs } = await supabaseClient
+      .from('medication_adherence_logs')
+      .select('*')
+      .eq('elderly_person_id', elderly_person_id)
+      .gte('timestamp', medicationWindowStart);
+
     if (!deviceData || deviceData.length === 0) {
       console.log('No device data found in time window');
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Insufficient data',
           message: `No device data found in the last ${time_window_hours} hours`
         }),
@@ -79,10 +87,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`Found ${deviceData.length} data points`);
+    console.log(`Found ${deviceData.length} data points, ${adherenceLogs?.length || 0} medication logs`);
 
     // 3. Compute component scores
-    const componentScores = computeComponentScores(deviceData, config);
+    const componentScores = computeComponentScores(deviceData, config, adherenceLogs || []);
 
     // 4. Calculate ILQ score
     const ilqScore = (
@@ -149,7 +157,7 @@ Deno.serve(async (req) => {
   }
 });
 
-function computeComponentScores(deviceData: any[], config: any) {
+function computeComponentScores(deviceData: any[], config: any, adherenceLogs: any[] = []) {
   const ranges = config.normalization_ranges;
 
   // Group data by type
@@ -161,8 +169,8 @@ function computeComponentScores(deviceData: any[], config: any) {
   // Physical Activity Score (25%)
   const activityScore = computePhysicalActivity(dataByType, ranges);
 
-  // Cognitive Function Score (15%)
-  const cognitiveScore = computeCognitiveFunction(dataByType);
+  // Cognitive Function Score (15%) - Now uses medication adherence logs
+  const cognitiveScore = computeCognitiveFunction(dataByType, adherenceLogs);
 
   // Environmental Safety Score (15%)
   const environmentalScore = computeEnvironmentalSafety(dataByType);
@@ -269,17 +277,77 @@ function computePhysicalActivity(dataByType: Record<string, any[]>, ranges: any)
   return count > 0 ? totalScore / count : 50;
 }
 
-function computeCognitiveFunction(dataByType: Record<string, any[]>): number {
-  // Basic cognitive assessment based on routine consistency
-  let score = 75; // Default baseline
+function computeCognitiveFunction(dataByType: Record<string, any[]>, adherenceLogs: any[] = []): number {
+  // Cognitive function score based on medication adherence and routine consistency
+  // This reflects the person's ability to follow their medication schedule
 
-  // Medication adherence
-  if (dataByType.medication) {
-    const adherenceRate = dataByType.medication.filter(v => v.taken === true).length / dataByType.medication.length;
-    score = score * 0.5 + (adherenceRate * 100) * 0.5;
+  let score = 75; // Default baseline
+  let hasData = false;
+
+  // Primary: Use medication_adherence_logs if available
+  if (adherenceLogs && adherenceLogs.length > 0) {
+    hasData = true;
+    const totalLogs = adherenceLogs.length;
+    const takenCount = adherenceLogs.filter(l => l.status === 'taken').length;
+    const lateCount = adherenceLogs.filter(l => l.status === 'late').length;
+    const missedCount = adherenceLogs.filter(l => l.status === 'missed').length;
+
+    // Calculate adherence rate (taken + late counts as compliant)
+    const complianceRate = ((takenCount + lateCount) / totalLogs) * 100;
+
+    // Calculate on-time rate (only taken counts as on-time)
+    const onTimeRate = (takenCount / totalLogs) * 100;
+
+    // Calculate consistency score based on daily patterns
+    const dailyMap: Record<string, { taken: number; total: number }> = {};
+    adherenceLogs.forEach(log => {
+      const date = new Date(log.timestamp).toISOString().split('T')[0];
+      if (!dailyMap[date]) dailyMap[date] = { taken: 0, total: 0 };
+      dailyMap[date].total++;
+      if (log.status === 'taken' || log.status === 'late') {
+        dailyMap[date].taken++;
+      }
+    });
+
+    const dailyRates = Object.values(dailyMap)
+      .filter(d => d.total > 0)
+      .map(d => (d.taken / d.total) * 100);
+
+    let consistencyScore = 100;
+    if (dailyRates.length > 1) {
+      const mean = dailyRates.reduce((sum, r) => sum + r, 0) / dailyRates.length;
+      const variance = dailyRates.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / dailyRates.length;
+      const stdDev = Math.sqrt(variance);
+      // Lower standard deviation = higher consistency
+      consistencyScore = Math.max(0, 100 - stdDev);
+    }
+
+    // Weighted score calculation
+    // 50% compliance rate, 30% on-time rate, 20% consistency
+    score = (complianceRate * 0.5) + (onTimeRate * 0.3) + (consistencyScore * 0.2);
+
+    // Apply penalties for missed doses
+    const missedPenalty = Math.min(20, missedCount * 2); // Max 20 point penalty
+    score = Math.max(0, score - missedPenalty);
+
+    console.log(`Cognitive score from adherence logs: compliance=${complianceRate.toFixed(1)}%, onTime=${onTimeRate.toFixed(1)}%, consistency=${consistencyScore.toFixed(1)}, final=${score.toFixed(1)}`);
   }
 
-  return score;
+  // Fallback: Use legacy device_data medication field if no adherence logs
+  if (!hasData && dataByType.medication && dataByType.medication.length > 0) {
+    hasData = true;
+    const adherenceRate = dataByType.medication.filter(v => v.taken === true).length / dataByType.medication.length;
+    score = score * 0.5 + (adherenceRate * 100) * 0.5;
+    console.log(`Cognitive score from legacy data: adherence=${(adherenceRate * 100).toFixed(1)}%, final=${score.toFixed(1)}`);
+  }
+
+  // If no medication data at all, use baseline with slight reduction
+  if (!hasData) {
+    score = 70; // Slightly lower baseline when no data available
+    console.log('Cognitive score: No medication data available, using baseline of 70');
+  }
+
+  return Math.min(100, Math.max(0, score));
 }
 
 function computeEnvironmentalSafety(dataByType: Record<string, any[]>): number {

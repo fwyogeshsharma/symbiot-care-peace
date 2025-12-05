@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Heart, Activity, AlertTriangle, Users } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 import VitalMetrics from '@/components/dashboard/VitalMetrics';
@@ -12,13 +12,19 @@ import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
 import Header from '@/components/layout/Header';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
-import { InfoButton } from '@/components/help/InfoButton';
+import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
+import { useTranslation } from 'react-i18next';
+import { AlertNotificationDialog } from '@/components/dashboard/AlertNotificationDialog';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const [newAlert, setNewAlert] = useState<any>(null);
   const shouldShowTour = useShouldShowTour();
 
   // Fetch elderly persons based on role
@@ -117,19 +123,19 @@ const Dashboard = () => {
   // Calculate activity level
   const calculateActivityLevel = () => {
     if (!activityData || activityData.length === 0) return null;
-    
+
     const totalSteps = activityData
       .filter(d => d.data_type === 'steps')
       .reduce((sum, d) => {
-        const steps = typeof d.value === 'object' && d.value !== null && 'count' in d.value 
+        const steps = typeof d.value === 'object' && d.value !== null && 'count' in d.value
           ? Number(d.value.count)
           : Number(d.value);
         return sum + (isNaN(steps) ? 0 : steps);
       }, 0);
-    
-    if (totalSteps > 8000) return 'Good';
-    if (totalSteps > 4000) return 'Fair';
-    if (totalSteps > 0) return 'Low';
+
+    if (totalSteps > 8000) return t('dashboard.stats.activityLevel.good');
+    if (totalSteps > 4000) return t('dashboard.stats.activityLevel.fair');
+    if (totalSteps > 0) return t('dashboard.stats.activityLevel.low');
     return null;
   };
 
@@ -149,9 +155,32 @@ const Dashboard = () => {
           schema: 'public',
           table: 'device_data'
         },
-        (payload) => {
+        async (payload) => {
           console.log('New device data:', payload);
           setRealtimeData(prev => [payload.new, ...prev.slice(0, 9)]);
+
+          // Check if this is a panic SOS event (emergency_button)
+          const newData = payload.new as any;
+          if (newData.device_id) {
+            // Fetch device info to check if it's an emergency button
+            const { data: device } = await supabase
+              .from('devices')
+              .select('device_type, elderly_person_id, elderly_persons(full_name)')
+              .eq('id', newData.device_id)
+              .single();
+
+            if (device?.device_type === 'emergency_button') {
+              const elderlyPerson = device.elderly_persons as any;
+              // Show toast notification for panic SOS
+              toast.error(t('panicSos.notifications.emergencyAlert'), {
+                description: `${t('panicSos.notifications.sosActivated')} ${elderlyPerson?.full_name || t('panicSos.unknown')}`,
+                duration: 10000,
+              });
+
+              // Refetch panic events
+              queryClient.invalidateQueries({ queryKey: ['panic-sos-events'] });
+            }
+          }
         }
       )
       .on(
@@ -161,9 +190,21 @@ const Dashboard = () => {
           schema: 'public',
           table: 'alerts'
         },
-        (payload) => {
+        async (payload) => {
           console.log('New alert:', payload);
           refetchAlerts();
+
+          // Fetch full alert details with elderly person info
+          const alertData = payload.new as any;
+          const { data: fullAlert } = await supabase
+            .from('alerts')
+            .select('*, elderly_persons(full_name)')
+            .eq('id', alertData.id)
+            .single();
+
+          if (fullAlert) {
+            setNewAlert(fullAlert);
+          }
         }
       )
       .subscribe();
@@ -171,23 +212,48 @@ const Dashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, refetchAlerts]);
+  }, [user, refetchAlerts, queryClient, t]);
 
   if (elderlyLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading dashboard...</p>
+          <p className="text-muted-foreground">{t('dashboard.loading')}</p>
         </div>
       </div>
     );
   }
 
+  const handleAlertClose = () => {
+    setNewAlert(null);
+  };
+
+  const handleAlertAcknowledge = async (alertId: string) => {
+    try {
+      await supabase
+        .from('alerts')
+        .update({ status: 'acknowledged' })
+        .eq('id', alertId);
+
+      refetchAlerts();
+      setNewAlert(null);
+    } catch (error) {
+      console.error('Error acknowledging alert:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
       <Header />
+
+      {/* Alert Notification Dialog */}
+      <AlertNotificationDialog
+        newAlert={newAlert}
+        onClose={handleAlertClose}
+        onAcknowledge={handleAlertAcknowledge}
+      />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         {/* Stats Overview */}
@@ -196,8 +262,8 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Monitored Persons</p>
-                  <InfoButton content="Total number of elderly persons you are currently monitoring. This includes all individuals assigned to your care." side="top" />
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.monitoredPersons.label')}</p>
+                  <HelpTooltip content={t('dashboard.stats.monitoredPersons.tooltip')} />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">{elderlyPersons?.length || 0}</p>
               </div>
@@ -211,8 +277,8 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Active Alerts</p>
-                  <InfoButton content="Alerts requiring attention. These may include vital sign anomalies, panic button activations, geofence violations, or device issues. Click on alerts to acknowledge and resolve them." side="top" />
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.activeAlerts.label')}</p>
+                  <HelpTooltip content={t('dashboard.stats.activeAlerts.tooltip')} />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">{alerts?.length || 0}</p>
               </div>
@@ -226,20 +292,19 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Avg Heart Rate</p>
-                  <InfoButton
-                    title="Heart Rate Monitoring"
-                    content="Average heart rate from recent readings. Normal resting heart rate: 60-100 bpm. Alerts are triggered for values outside safe ranges."
-                    side="top"
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.avgHeartRate.label')}</p>
+                  <HelpTooltip
+                    title={t('dashboard.stats.avgHeartRate.title')}
+                    content={t('dashboard.stats.avgHeartRate.tooltip')}
                   />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {avgHeartRate !== null ? avgHeartRate : '—'}
                 </p>
                 {avgHeartRate !== null ? (
-                  <p className="text-xs text-muted-foreground">bpm</p>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.stats.avgHeartRate.bpm')}</p>
                 ) : (
-                  <p className="text-xs text-muted-foreground">No data</p>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.stats.avgHeartRate.noData')}</p>
                 )}
               </div>
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
@@ -252,24 +317,23 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Activity Level</p>
-                  <InfoButton
-                    title="Activity Level Guide"
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.activityLevel.label')}</p>
+                  <HelpTooltip
+                    title={t('dashboard.stats.activityLevel.title')}
                     content={
                       <div className="space-y-1">
-                        <div><strong>Good:</strong> 8,000+ steps/day</div>
-                        <div><strong>Fair:</strong> 4,000-8,000 steps/day</div>
-                        <div><strong>Low:</strong> &lt;4,000 steps/day</div>
+                        <div><strong>{t('dashboard.stats.activityLevel.good')}:</strong> {t('dashboard.stats.activityLevel.goodDesc')}</div>
+                        <div><strong>{t('dashboard.stats.activityLevel.fair')}:</strong> {t('dashboard.stats.activityLevel.fairDesc')}</div>
+                        <div><strong>{t('dashboard.stats.activityLevel.low')}:</strong> {t('dashboard.stats.activityLevel.lowDesc')}</div>
                       </div>
                     }
-                    side="top"
                   />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {activityLevel !== null ? activityLevel : '—'}
                 </p>
                 {activityLevel === null && (
-                  <p className="text-xs text-muted-foreground">No data</p>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.stats.activityLevel.noData')}</p>
                 )}
               </div>
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">

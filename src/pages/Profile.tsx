@@ -7,11 +7,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Globe, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { restartTour } from '@/components/help/OnboardingTour';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import DataSharing from '@/components/dashboard/DataSharing';
 
 const Profile = () => {
   const { user, userRole, signOut } = useAuth();
@@ -19,6 +23,7 @@ const Profile = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const { t } = useTranslation();
 
   // Fetch user profile
   const { data: profile, isLoading } = useQuery({
@@ -29,7 +34,7 @@ const Profile = () => {
         .select('*')
         .eq('id', user?.id)
         .maybeSingle();
-      
+
       if (error) throw error;
       return data;
     },
@@ -58,20 +63,20 @@ const Profile = () => {
         .from('profiles')
         .update(data)
         .eq('id', user?.id);
-      
+
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
       toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully.",
+        title: t('profile.profileUpdated'),
+        description: t('profile.profileUpdatedDesc'),
       });
       setIsEditing(false);
     },
     onError: (error: any) => {
       toast({
-        title: "Failed to update profile",
+        title: t('profile.updateFailed'),
         description: error.message,
         variant: "destructive",
       });
@@ -103,7 +108,7 @@ const Profile = () => {
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading profile...</p>
+          <p className="text-muted-foreground">{t('profile.loading')}</p>
         </div>
       </div>
     );
@@ -112,156 +117,190 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Button variant="ghost" onClick={() => navigate('/dashboard')} size="sm">
+        <div className="container mx-auto px-4 py-4 relative flex items-center justify-center">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            size="sm"
+            className="absolute left-4"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">Back to Dashboard</span>
-            <span className="sm:hidden">Back</span>
+            <span className="hidden sm:inline">{t('profile.backToDashboard')}</span>
+            <span className="sm:hidden">{t('profile.back')}</span>
           </Button>
-          <h1 className="text-lg sm:text-xl font-bold">Profile</h1>
-          <div className="w-16 sm:w-24"></div>
+          <h1 className="text-lg sm:text-xl font-bold">{t('profile.title')}</h1>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-2xl">
-        <Card className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <User className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-xl sm:text-2xl font-bold truncate">{profile?.full_name || 'User'}</h2>
-                {userRole && (
-                  <Badge className={`${getRoleColor(userRole)} capitalize mt-1`}>
-                    {userRole}
-                  </Badge>
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('profile.title')}</span>
+              <span className="sm:hidden">{t('profile.title')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="data-sharing" className="flex items-center gap-2">
+              <Share2 className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('nav.dataSharing')}</span>
+              <span className="sm:hidden">{t('nav.dataSharing')}</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="profile" className="space-y-6">
+            <Card className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <User className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-bold truncate">{profile?.full_name || 'User'}</h2>
+                    {userRole && (
+                      <Badge className={`${getRoleColor(userRole)} capitalize mt-1`}>
+                        {userRole}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                {!isEditing && (
+                  <Button onClick={() => setIsEditing(true)} variant="outline" size="sm" className="shrink-0">
+                    <span className="hidden sm:inline">{t('profile.editProfile')}</span>
+                    <span className="sm:hidden">{t('profile.edit')}</span>
+                  </Button>
                 )}
               </div>
-            </div>
-            {!isEditing && (
-              <Button onClick={() => setIsEditing(true)} variant="outline" size="sm" className="shrink-0">
-                <span className="hidden sm:inline">Edit Profile</span>
-                <span className="sm:hidden">Edit</span>
-              </Button>
-            )}
-          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={user?.email || ''}
-                  disabled
-                  className="bg-muted"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Email cannot be changed
-                </p>
-              </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      {t('auth.email')}
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={user?.email || ''}
+                      disabled
+                      className="bg-muted"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {t('profile.emailCannotChange')}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="full_name" className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  Full Name
-                </Label>
-                <Input
-                  id="full_name"
-                  type="text"
-                  value={formData.full_name}
-                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                  disabled={!isEditing}
-                  placeholder="Enter your full name"
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="full_name" className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      {t('auth.fullName')}
+                    </Label>
+                    <Input
+                      id="full_name"
+                      type="text"
+                      value={formData.full_name}
+                      onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                      disabled={!isEditing}
+                      placeholder={t('profile.enterFullName')}
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  Phone Number
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  disabled={!isEditing}
-                  placeholder="Enter your phone number"
-                />
-              </div>
-            </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      {t('auth.phone')}
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      disabled={!isEditing}
+                      placeholder={t('profile.enterPhone')}
+                    />
+                  </div>
+                </div>
 
-            {isEditing && (
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button
-                  type="submit"
-                  className="flex-1"
-                  disabled={updateProfileMutation.isPending}
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1 sm:flex-none"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setFormData({
-                      full_name: profile?.full_name || '',
-                      phone: profile?.phone || '',
-                    });
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-          </form>
-        </Card>
+                {isEditing && (
+                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                    <Button
+                      type="submit"
+                      className="flex-1"
+                      disabled={updateProfileMutation.isPending}
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {updateProfileMutation.isPending ? t('profile.saving') : t('profile.saveChanges')}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 sm:flex-none"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setFormData({
+                          full_name: profile?.full_name || '',
+                          phone: profile?.phone || '',
+                        });
+                      }}
+                    >
+                      {t('common.cancel')}
+                    </Button>
+                  </div>
+                )}
+              </form>
+            </Card>
 
-        {/* Additional Actions */}
-        <Card className="p-4 sm:p-6 mt-6">
-          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full justify-start overflow-hidden"
-              onClick={restartTour}
-            >
-              <HelpCircle className="w-4 h-4 mr-2 shrink-0" />
-              <span className="truncate">Restart Onboarding Tour</span>
-            </Button>
-            <Separator />
-            {userRole === 'super_admin' && (
-              <>
+            {/* Settings Card */}
+            <Card className="p-4 sm:p-6">
+              <h3 className="text-lg font-semibold mb-4">{t('profile.settings')}</h3>
+              <div className="space-y-3">
+                {/* Language Settings */}
+                <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-4 h-4" />
+                    <span>{t('profile.language')}</span>
+                  </div>
+                  <LanguageSwitcher />
+                </div>
+                <Separator />
                 <Button
                   variant="outline"
-                  className="w-full justify-start overflow-hidden"
-                  onClick={() => navigate('/admin/user-management')}
+                  className="w-full justify-start"
+                  onClick={restartTour}
                 >
-                  <Shield className="w-4 h-4 mr-2 shrink-0" />
-                  <span className="truncate">User Management</span>
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  {t('profile.restartTour')}
                 </Button>
                 <Separator />
-              </>
-            )}
-            <Button
-              variant="outline"
-              className="w-full justify-start text-destructive hover:text-destructive overflow-hidden"
-              onClick={signOut}
-            >
-              <LogOut className="w-4 h-4 mr-2 shrink-0" />
-              <span className="truncate">Sign Out</span>
-            </Button>
-          </div>
-        </Card>
+                {userRole === 'super_admin' && (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => navigate('/admin/user-management')}
+                    >
+                      <Shield className="w-4 h-4 mr-2" />
+                      {t('profile.userManagement')}
+                    </Button>
+                    <Separator />
+                  </>
+                )}
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-destructive hover:text-destructive"
+                  onClick={signOut}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  {t('nav.signOut')}
+                </Button>
+              </div>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="data-sharing">
+            {user && <DataSharing userId={user.id} />}
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );

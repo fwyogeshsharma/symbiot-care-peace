@@ -13,6 +13,7 @@ import { Calendar, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import {
   Select,
   SelectContent,
@@ -23,6 +24,7 @@ import {
 import { getDateRangePreset } from '@/lib/movementUtils';
 
 export default function IndoorTracking() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { userRole } = useAuth();
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
@@ -114,7 +116,7 @@ export default function IndoorTracking() {
   if (elderlyLoading || floorPlanLoading || positionLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header showBackButton title="Indoor Tracking" subtitle="Real-time positioning system" />
+        <Header showBackButton title={t('tracking.indoorTracking')} subtitle={t('tracking.positioningVisualization')} />
         <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
           <div className="space-y-6">
             <Skeleton className="h-12 w-64" />
@@ -129,20 +131,20 @@ export default function IndoorTracking() {
   if (!floorPlan) {
     return (
       <div className="min-h-screen bg-background">
-        <Header showBackButton title="Indoor Tracking" subtitle="Real-time positioning system" />
+        <Header showBackButton title={t('tracking.indoorTracking')} subtitle={t('tracking.positioningVisualization')} />
         <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
           <div className="space-y-6">
             {/* Monitored Individuals Selection */}
-            <ElderlyList 
-              elderlyPersons={elderlyPersons} 
+            <ElderlyList
+              elderlyPersons={elderlyPersons}
               selectedPersonId={selectedPersonId}
               onSelectPerson={setSelectedPersonId}
             />
-            
+
             <div className="text-center py-12">
-              <h2 className="text-2xl font-bold mb-4">No Floor Plan Found</h2>
+              <h2 className="text-2xl font-bold mb-4">{t('tracking.noFloorPlan.title')}</h2>
               <p className="text-muted-foreground">
-                Register a worker-wearable device to see indoor tracking
+                {t('tracking.noFloorPlan.description')}
               </p>
             </div>
           </div>
@@ -163,40 +165,39 @@ export default function IndoorTracking() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header showBackButton title="Indoor Tracking" subtitle="Real-time positioning system" />
+      <Header showBackButton title={t('tracking.indoorTracking')} subtitle={t('tracking.positioningVisualization')} />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">Indoor Tracking</h1>
-              <p className="text-muted-foreground text-sm sm:text-base">
-                Real-time positioning and movement visualization
+              <h1 className="text-3xl font-bold">{t('tracking.indoorTracking')}</h1>
+              <p className="text-muted-foreground">
+                {t('tracking.positioningVisualization')}
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+            <div className="flex items-center gap-4">
               {(userRole === 'admin' || userRole === 'super_admin') && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => navigate('/floor-plan-management')}
-                  className="w-full sm:w-auto"
                 >
                   <MapPin className="h-4 w-4 mr-2" />
-                  Floor Plans
+                  {t('tracking.floorPlans')}
                 </Button>
               )}
 
               <Select value={selectedPreset} onValueChange={handlePresetChange}>
-                <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectTrigger className="w-[180px]">
                   <Calendar className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Select period" />
+                  <SelectValue placeholder={t('tracking.selectPeriod')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="today">Today</SelectItem>
-                  <SelectItem value="last7days">Last 7 Days</SelectItem>
-                  <SelectItem value="last30days">Last 30 Days</SelectItem>
+                  <SelectItem value="today">{t('tracking.today')}</SelectItem>
+                  <SelectItem value="last7days">{t('tracking.last7Days')}</SelectItem>
+                  <SelectItem value="last30days">{t('tracking.last30Days')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -228,10 +229,9 @@ export default function IndoorTracking() {
 
               {positionEvents.length === 0 && (
                 <div className="mt-4 p-4 bg-muted rounded-lg text-sm">
-                  <p className="font-medium mb-2">No movement data available</p>
+                  <p className="font-medium mb-2">{t('tracking.noMovementData.title')}</p>
                   <p className="text-muted-foreground">
-                    To see movement tracking, go to the Dashboard and click "Populate Device Data"
-                    for a worker-wearable device to generate sample position data.
+                    {t('tracking.noMovementData.description')}
                   </p>
                   <Button
                     variant="outline"
@@ -239,7 +239,7 @@ export default function IndoorTracking() {
                     className="mt-3"
                     onClick={() => navigate('/dashboard')}
                   >
-                    Go to Dashboard
+                    {t('tracking.noMovementData.goToDashboard')}
                   </Button>
                 </div>
               )}

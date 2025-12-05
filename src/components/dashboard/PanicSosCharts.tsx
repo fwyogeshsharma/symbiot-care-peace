@@ -33,7 +33,7 @@ export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSo
           elderly_persons!inner(full_name),
           devices!inner(device_type)
         `)
-        .eq('data_type', 'panic_sos')
+        .eq('data_type', 'button_pressed')
         .gte('recorded_at', startOfDay(dateRange.from).toISOString())
         .lte('recorded_at', endOfDay(dateRange.to).toISOString())
         .order('recorded_at', { ascending: true });

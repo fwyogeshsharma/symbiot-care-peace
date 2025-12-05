@@ -143,105 +143,39 @@ export type Database = {
       }
       device_companies: {
         Row: {
-          id: string
           code: string
-          name: string
-          description: string | null
-          logo_url: string | null
-          website: string | null
-          is_active: boolean | null
           created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
           updated_at: string | null
+          website: string | null
         }
         Insert: {
-          id?: string
           code: string
-          name: string
-          description?: string | null
-          logo_url?: string | null
-          website?: string | null
-          is_active?: boolean | null
           created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
           updated_at?: string | null
+          website?: string | null
         }
         Update: {
-          id?: string
           code?: string
-          name?: string
-          description?: string | null
-          logo_url?: string | null
-          website?: string | null
-          is_active?: boolean | null
           created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
           updated_at?: string | null
+          website?: string | null
         }
         Relationships: []
-      }
-      device_models: {
-        Row: {
-          id: string
-          device_type_id: string
-          company_id: string | null
-          manufacturer: string | null
-          code: string
-          name: string
-          description: string | null
-          model_number: string | null
-          image_url: string | null
-          specifications: Json | null
-          supported_data_types: string[] | null
-          is_active: boolean | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          device_type_id: string
-          company_id?: string | null
-          manufacturer?: string | null
-          code: string
-          name: string
-          description?: string | null
-          model_number?: string | null
-          image_url?: string | null
-          specifications?: Json | null
-          supported_data_types?: string[] | null
-          is_active?: boolean | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          device_type_id?: string
-          company_id?: string | null
-          manufacturer?: string | null
-          code?: string
-          name?: string
-          description?: string | null
-          model_number?: string | null
-          image_url?: string | null
-          specifications?: Json | null
-          supported_data_types?: string[] | null
-          is_active?: boolean | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "device_models_device_type_id_fkey"
-            columns: ["device_type_id"]
-            isOneToOne: false
-            referencedRelation: "device_types"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "device_models_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "device_companies"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       device_data: {
         Row: {
@@ -334,6 +268,72 @@ export type Database = {
             columns: ["device_id"]
             isOneToOne: false
             referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      device_models: {
+        Row: {
+          code: string
+          company_id: string | null
+          created_at: string | null
+          description: string | null
+          device_type_id: string
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          manufacturer: string | null
+          model_number: string | null
+          name: string
+          specifications: Json | null
+          supported_data_types: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          company_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          device_type_id: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          manufacturer?: string | null
+          model_number?: string | null
+          name: string
+          specifications?: Json | null
+          supported_data_types?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          company_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          device_type_id?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          manufacturer?: string | null
+          model_number?: string | null
+          name?: string
+          specifications?: Json | null
+          supported_data_types?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_models_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "device_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "device_models_device_type_id_fkey"
+            columns: ["device_type_id"]
+            isOneToOne: false
+            referencedRelation: "device_types"
             referencedColumns: ["id"]
           },
         ]
@@ -499,6 +499,7 @@ export type Database = {
           id: string
           last_sync: string | null
           location: string | null
+          model_id: string | null
           status: string | null
           updated_at: string
         }
@@ -514,6 +515,7 @@ export type Database = {
           id?: string
           last_sync?: string | null
           location?: string | null
+          model_id?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -529,6 +531,7 @@ export type Database = {
           id?: string
           last_sync?: string | null
           location?: string | null
+          model_id?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -545,6 +548,13 @@ export type Database = {
             columns: ["elderly_person_id"]
             isOneToOne: false
             referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "devices_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "device_models"
             referencedColumns: ["id"]
           },
           {
@@ -848,6 +858,414 @@ export type Database = {
           },
         ]
       }
+      ilq_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          affected_components: string[] | null
+          alert_type: string
+          created_at: string | null
+          current_score: number | null
+          description: string
+          elderly_person_id: string
+          id: string
+          ilq_score_id: string | null
+          previous_score: number | null
+          score_change: number | null
+          severity: string
+          status: string | null
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          affected_components?: string[] | null
+          alert_type: string
+          created_at?: string | null
+          current_score?: number | null
+          description: string
+          elderly_person_id: string
+          id?: string
+          ilq_score_id?: string | null
+          previous_score?: number | null
+          score_change?: number | null
+          severity: string
+          status?: string | null
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          affected_components?: string[] | null
+          alert_type?: string
+          created_at?: string | null
+          current_score?: number | null
+          description?: string
+          elderly_person_id?: string
+          id?: string
+          ilq_score_id?: string | null
+          previous_score?: number | null
+          score_change?: number | null
+          severity?: string
+          status?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ilq_alerts_acknowledged_by_fkey"
+            columns: ["acknowledged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ilq_alerts_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ilq_alerts_ilq_score_id_fkey"
+            columns: ["ilq_score_id"]
+            isOneToOne: false
+            referencedRelation: "ilq_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ilq_benchmarks: {
+        Row: {
+          age_range: string
+          avg_score: number
+          gender: string | null
+          id: string
+          last_updated: string | null
+          median_score: number
+          sample_size: number | null
+          std_deviation: number | null
+        }
+        Insert: {
+          age_range: string
+          avg_score: number
+          gender?: string | null
+          id?: string
+          last_updated?: string | null
+          median_score: number
+          sample_size?: number | null
+          std_deviation?: number | null
+        }
+        Update: {
+          age_range?: string
+          avg_score?: number
+          gender?: string | null
+          id?: string
+          last_updated?: string | null
+          median_score?: number
+          sample_size?: number | null
+          std_deviation?: number | null
+        }
+        Relationships: []
+      }
+      ilq_configurations: {
+        Row: {
+          cognitive_function_weight: number | null
+          created_at: string | null
+          description: string | null
+          elderly_person_id: string | null
+          emergency_response_weight: number | null
+          environmental_safety_weight: number | null
+          health_vitals_weight: number | null
+          id: string
+          is_active: boolean | null
+          is_global: boolean | null
+          name: string
+          normalization_ranges: Json
+          physical_activity_weight: number | null
+          social_engagement_weight: number | null
+          thresholds: Json
+          updated_at: string | null
+        }
+        Insert: {
+          cognitive_function_weight?: number | null
+          created_at?: string | null
+          description?: string | null
+          elderly_person_id?: string | null
+          emergency_response_weight?: number | null
+          environmental_safety_weight?: number | null
+          health_vitals_weight?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_global?: boolean | null
+          name: string
+          normalization_ranges?: Json
+          physical_activity_weight?: number | null
+          social_engagement_weight?: number | null
+          thresholds?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          cognitive_function_weight?: number | null
+          created_at?: string | null
+          description?: string | null
+          elderly_person_id?: string | null
+          emergency_response_weight?: number | null
+          environmental_safety_weight?: number | null
+          health_vitals_weight?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_global?: boolean | null
+          name?: string
+          normalization_ranges?: Json
+          physical_activity_weight?: number | null
+          social_engagement_weight?: number | null
+          thresholds?: Json
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ilq_configurations_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ilq_scores: {
+        Row: {
+          cognitive_function_score: number | null
+          computation_timestamp: string
+          confidence_level: number | null
+          created_at: string | null
+          data_points_analyzed: number
+          detailed_metrics: Json | null
+          elderly_person_id: string
+          emergency_response_score: number | null
+          environmental_safety_score: number | null
+          health_vitals_score: number | null
+          id: string
+          physical_activity_score: number | null
+          score: number
+          social_engagement_score: number | null
+          time_window_hours: number
+          triggered_alerts: string[] | null
+        }
+        Insert: {
+          cognitive_function_score?: number | null
+          computation_timestamp?: string
+          confidence_level?: number | null
+          created_at?: string | null
+          data_points_analyzed: number
+          detailed_metrics?: Json | null
+          elderly_person_id: string
+          emergency_response_score?: number | null
+          environmental_safety_score?: number | null
+          health_vitals_score?: number | null
+          id?: string
+          physical_activity_score?: number | null
+          score: number
+          social_engagement_score?: number | null
+          time_window_hours: number
+          triggered_alerts?: string[] | null
+        }
+        Update: {
+          cognitive_function_score?: number | null
+          computation_timestamp?: string
+          confidence_level?: number | null
+          created_at?: string | null
+          data_points_analyzed?: number
+          detailed_metrics?: Json | null
+          elderly_person_id?: string
+          emergency_response_score?: number | null
+          environmental_safety_score?: number | null
+          health_vitals_score?: number | null
+          id?: string
+          physical_activity_score?: number | null
+          score?: number
+          social_engagement_score?: number | null
+          time_window_hours?: number
+          triggered_alerts?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ilq_scores_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ilq_trends: {
+        Row: {
+          avg_score: number | null
+          change_percentage: number | null
+          created_at: string | null
+          data_points_count: number | null
+          elderly_person_id: string
+          id: string
+          max_score: number | null
+          min_score: number | null
+          period_end: string
+          period_start: string
+          period_type: string
+          score_variance: number | null
+          trend_direction: string | null
+        }
+        Insert: {
+          avg_score?: number | null
+          change_percentage?: number | null
+          created_at?: string | null
+          data_points_count?: number | null
+          elderly_person_id: string
+          id?: string
+          max_score?: number | null
+          min_score?: number | null
+          period_end: string
+          period_start: string
+          period_type: string
+          score_variance?: number | null
+          trend_direction?: string | null
+        }
+        Update: {
+          avg_score?: number | null
+          change_percentage?: number | null
+          created_at?: string | null
+          data_points_count?: number | null
+          elderly_person_id?: string
+          id?: string
+          max_score?: number | null
+          min_score?: number | null
+          period_end?: string
+          period_start?: string
+          period_type?: string
+          score_variance?: number | null
+          trend_direction?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ilq_trends_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medication_adherence_logs: {
+        Row: {
+          caregiver_alerted: boolean | null
+          created_at: string
+          dispenser_confirmed: boolean | null
+          elderly_person_id: string
+          id: string
+          notes: string | null
+          schedule_id: string
+          scheduled_time: string
+          status: string
+          timestamp: string
+        }
+        Insert: {
+          caregiver_alerted?: boolean | null
+          created_at?: string
+          dispenser_confirmed?: boolean | null
+          elderly_person_id: string
+          id?: string
+          notes?: string | null
+          schedule_id: string
+          scheduled_time: string
+          status?: string
+          timestamp?: string
+        }
+        Update: {
+          caregiver_alerted?: boolean | null
+          created_at?: string
+          dispenser_confirmed?: boolean | null
+          elderly_person_id?: string
+          id?: string
+          notes?: string | null
+          schedule_id?: string
+          scheduled_time?: string
+          status?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_adherence_logs_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_adherence_logs_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "medication_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medication_schedules: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          dosage_mg: number | null
+          dosage_unit: string | null
+          elderly_person_id: string
+          end_date: string | null
+          frequency: string
+          id: string
+          instructions: string | null
+          is_active: boolean | null
+          medication_name: string
+          start_date: string
+          times: string[]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          dosage_mg?: number | null
+          dosage_unit?: string | null
+          elderly_person_id: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          instructions?: string | null
+          is_active?: boolean | null
+          medication_name: string
+          start_date?: string
+          times?: string[]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          dosage_mg?: number | null
+          dosage_unit?: string | null
+          elderly_person_id?: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          instructions?: string | null
+          is_active?: boolean | null
+          medication_name?: string
+          start_date?: string
+          times?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_schedules_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_metrics: {
         Row: {
           created_at: string
@@ -946,6 +1364,39 @@ export type Database = {
           },
         ]
       }
+      session_logs: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          login_at: string
+          logout_at: string | null
+          session_duration_minutes: number | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          login_at?: string
+          logout_at?: string | null
+          session_duration_minutes?: number | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          login_at?: string
+          logout_at?: string | null
+          session_duration_minutes?: number | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -975,6 +1426,15 @@ export type Database = {
       can_access_elderly_person: {
         Args: { _elderly_person_id: string; _user_id: string }
         Returns: boolean
+      }
+      compute_ilq_for_all_elderly: {
+        Args: never
+        Returns: {
+          computed: boolean
+          elderly_person_id: string
+          message: string
+          score: number
+        }[]
       }
       delete_user_account: {
         Args: { target_email: string }

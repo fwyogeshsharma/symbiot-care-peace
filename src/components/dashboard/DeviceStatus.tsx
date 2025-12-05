@@ -15,15 +15,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { generateSampleDataPoints } from '@/lib/sampleDataGenerator';
+import { generateSampleDataPoints, generateSampleDataFromModelSpecs } from '@/lib/sampleDataGenerator';
 import { useAllDeviceTypes } from '@/hooks/useDeviceTypes';
-import { useDeviceCompanies } from '@/hooks/useDeviceCompanies';
+import { useAllDeviceCompanies } from '@/hooks/useDeviceCompanies';
+import { useTranslation } from 'react-i18next';
 
 interface DeviceStatusProps {
   selectedPersonId?: string | null;
 }
 
 const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
+  const { t } = useTranslation();
   const [selectedDevice, setSelectedDevice] = useState<any>(null);
   const [historyDevice, setHistoryDevice] = useState<any>(null);
   const [editDevice, setEditDevice] = useState<any>(null);
@@ -36,8 +38,8 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   // Fetch all device types for the edit dialog
   const { data: allDeviceTypes = [] } = useAllDeviceTypes();
 
-  // Fetch device companies
-  const { data: deviceCompanies = [] } = useDeviceCompanies();
+  // Fetch all device companies
+  const { data: deviceCompanies = [] } = useAllDeviceCompanies();
   
   const { data: devices } = useQuery({
     queryKey: ['devices', selectedPersonId],
@@ -110,8 +112,8 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
       setCopiedApiKey(true);
       setTimeout(() => setCopiedApiKey(false), 2000);
       toast({
-        title: "Copied!",
-        description: "API key copied to clipboard",
+        title: t('devices.apiDetails.copied'),
+        description: t('devices.apiDetails.copiedToClipboard'),
       });
     }
   };
@@ -130,13 +132,13 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
       setEditDevice(null);
       toast({
-        title: "Device updated",
-        description: "Device information has been updated successfully.",
+        title: t('devices.edit.updated'),
+        description: t('devices.edit.updatedDesc'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Update failed",
+        title: t('devices.edit.updateFailed'),
         description: error.message,
         variant: "destructive",
       });
@@ -147,71 +149,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   const generateDataMutation = useMutation({
     mutationFn: async (device: any) => {
       const now = new Date();
-      const sampleData = [];
-      
-      // Special handling for worker-wearable devices with position data
-      if (device.device_type === 'worker_wearable') {
-        const { getDefaultFloorPlan, generateIndoorMovementPath } = await import('@/lib/positionUtils');
-        
-        // Check if floor plan exists
-        const { data: existingFloorPlan } = await supabase
-          .from('floor_plans')
-          .select('*')
-          .eq('elderly_person_id', device.elderly_person_id)
-          .maybeSingle();
-        
-        let floorPlan = existingFloorPlan;
-        
-        // Create floor plan if it doesn't exist
-        if (!existingFloorPlan) {
-          const defaultFloorPlan = getDefaultFloorPlan(device.elderly_person_id);
-          const { data: newFloorPlan } = await supabase
-            .from('floor_plans')
-            .insert([{
-              ...defaultFloorPlan,
-              furniture: defaultFloorPlan.furniture as any,
-              zones: defaultFloorPlan.zones as any
-            }])
-            .select('*')
-            .single();
-          
-          floorPlan = newFloorPlan;
-        }
-        
-        if (floorPlan) {
-          // Generate 24 hours of indoor movement data
-          const startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-          const positions = generateIndoorMovementPath(
-            floorPlan.zones as any,
-            { width: floorPlan.width, height: floorPlan.height },
-            startTime,
-            24,
-            30 // position every 30 seconds
-          );
-          
-          // Create position data records
-          positions.forEach((position, index) => {
-            const recordedAt = new Date(startTime.getTime() + index * 30 * 1000);
-            sampleData.push({
-              device_id: device.id,
-              elderly_person_id: device.elderly_person_id,
-              data_type: 'position',
-              value: position,
-              unit: 'meters',
-              recorded_at: recordedAt.toISOString(),
-            });
-          });
-        }
-      } else {
-      
-      // Use database-driven data configs for other device types
-      const { data: deviceTypeDataConfigs } = await supabase
-        .from('device_type_data_configs')
-        .select(`
-          *,
-          device_types!inner(code)
-        `)
-        .eq('device_types.code', device.device_type);
+      const sampleData: any[] = [];
 
       // Fetch geofences for GPS devices
       const { data: geofences } = await supabase
@@ -220,16 +158,104 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
         .eq('elderly_person_id', device.elderly_person_id)
         .eq('is_active', true);
 
-      if (deviceTypeDataConfigs && deviceTypeDataConfigs.length > 0) {
-        const generatedData = generateSampleDataPoints(
-          deviceTypeDataConfigs as any,
-          device,
-          168, // 7 days
-          2, // every 2 hours
-          geofences || []
-        );
-        sampleData.push(...generatedData);
+      // Check if device has a model with specifications
+      if (device.model_id) {
+        const { data: deviceModel } = await supabase
+          .from('device_models')
+          .select('specifications, supported_data_types')
+          .eq('id', device.model_id)
+          .single();
+
+        if (deviceModel?.specifications && Object.keys(deviceModel.specifications).length > 0) {
+          console.log('Generating data from model specifications:', deviceModel.specifications);
+          const modelData = generateSampleDataFromModelSpecs(
+            deviceModel.specifications as any,
+            deviceModel.supported_data_types || [],
+            device,
+            168, // 7 days
+            2, // every 2 hours
+            geofences || []
+          );
+          sampleData.push(...modelData);
+        }
       }
+
+      // If no model data was generated, use the default logic
+      if (sampleData.length === 0) {
+        // Special handling for worker-wearable devices with position data
+        if (device.device_type === 'worker_wearable') {
+          const { getDefaultFloorPlan, generateIndoorMovementPath } = await import('@/lib/positionUtils');
+
+          // Check if floor plan exists
+          const { data: existingFloorPlan } = await supabase
+            .from('floor_plans')
+            .select('*')
+            .eq('elderly_person_id', device.elderly_person_id)
+            .maybeSingle();
+
+          let floorPlan = existingFloorPlan;
+
+          // Create floor plan if it doesn't exist
+          if (!existingFloorPlan) {
+            const defaultFloorPlan = getDefaultFloorPlan(device.elderly_person_id);
+            const { data: newFloorPlan } = await supabase
+              .from('floor_plans')
+              .insert([{
+                ...defaultFloorPlan,
+                furniture: defaultFloorPlan.furniture as any,
+                zones: defaultFloorPlan.zones as any
+              }])
+              .select('*')
+              .single();
+
+            floorPlan = newFloorPlan;
+          }
+
+          if (floorPlan) {
+            // Generate 24 hours of indoor movement data
+            const startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const positions = generateIndoorMovementPath(
+              floorPlan.zones as any,
+              { width: floorPlan.width, height: floorPlan.height },
+              startTime,
+              24,
+              30 // position every 30 seconds
+            );
+
+            // Create position data records
+            positions.forEach((position, index) => {
+              const recordedAt = new Date(startTime.getTime() + index * 30 * 1000);
+              sampleData.push({
+                device_id: device.id,
+                elderly_person_id: device.elderly_person_id,
+                data_type: 'position',
+                value: position,
+                unit: 'meters',
+                recorded_at: recordedAt.toISOString(),
+              });
+            });
+          }
+        } else {
+          // Use database-driven data configs for other device types
+          const { data: deviceTypeDataConfigs } = await supabase
+            .from('device_type_data_configs')
+            .select(`
+              *,
+              device_types!inner(code)
+            `)
+            .eq('device_types.code', device.device_type);
+
+          if (deviceTypeDataConfigs && deviceTypeDataConfigs.length > 0) {
+            const generatedData = generateSampleDataPoints(
+              deviceTypeDataConfigs as any,
+              device,
+              168, // 7 days
+              2, // every 2 hours
+              geofences || []
+            );
+            sampleData.push(...generatedData);
+          }
+        }
       }
 
       // Insert sample data
@@ -237,7 +263,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
         const { error } = await supabase
           .from('device_data')
           .insert(sampleData);
-        
+
         if (error) throw error;
       }
     },
@@ -248,13 +274,13 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
       queryClient.invalidateQueries({ queryKey: ['floor-plan'] });
       queryClient.invalidateQueries({ queryKey: ['position-data'] });
       toast({
-        title: "Data generated",
-        description: "Sample data has been generated successfully for the device.",
+        title: t('devices.dataGeneration.generated'),
+        description: t('devices.dataGeneration.generatedDesc'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Generation failed",
+        title: t('devices.dataGeneration.failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -288,13 +314,13 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
       setDeleteDevice(null);
       setDeleteDeviceData(false);
       toast({
-        title: "Device deleted",
-        description: "Device has been removed successfully.",
+        title: t('devices.delete.deleted'),
+        description: t('devices.delete.deletedDesc'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Delete failed",
+        title: t('devices.delete.deleteFailed'),
         description: error.message,
         variant: "destructive",
       });
@@ -327,7 +353,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   return (
     <Card className="p-3 sm:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base sm:text-lg font-semibold">Device Status</h3>
+        <h3 className="text-base sm:text-lg font-semibold">{t('devices.status')}</h3>
       </div>
 
       <div className="mb-4">
@@ -336,7 +362,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
 
       {!devices || devices.length === 0 ? (
         <p className="text-muted-foreground text-center py-8">
-          No devices registered yet
+          {t('devices.noDevices')}
         </p>
       ) : (
         <div className="space-y-3">
@@ -363,11 +389,11 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                     <span className="font-medium text-sm truncate">{device.device_name}</span>
                     {hasNoData ? (
                       <Badge variant="outline" className="text-xs border-warning text-warning flex-shrink-0">
-                        No Data
+                        {t('devices.noData')}
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="text-xs hidden sm:inline-flex flex-shrink-0">
-                        {dataCount} records
+                        {dataCount} {t('devices.records')}
                       </Badge>
                     )}
                   </div>
@@ -376,9 +402,9 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                   <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                     <Badge
                       variant="outline"
-                      className={`${getStatusColor(device.status)} text-xs capitalize`}
+                      className={`${getStatusColor(device.status)} text-xs`}
                     >
-                      {device.status}
+                      {t(`devices.${device.status}`, { defaultValue: device.status })}
                     </Badge>
                     <TooltipProvider>
                       <Tooltip>
@@ -398,13 +424,13 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                             ) : (
                               <>
                                 <Wand2 className="w-3.5 h-3.5" />
-                                {hasNoData && <span className="ml-1 hidden sm:inline">Generate Data</span>}
+                                {hasNoData && <span className="ml-1 hidden sm:inline">{t('devices.generateData')}</span>}
                               </>
                             )}
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Generate 7 days of sample data for testing</p>
+                          <p>{t('devices.generateDataTooltip')}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -437,7 +463,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                   className="flex items-center justify-between text-xs text-muted-foreground cursor-pointer"
                   onClick={() => setSelectedDevice(device)}
                 >
-                  <span className="truncate">{device.elderly_persons?.full_name || 'Unassigned'}</span>
+                  <span className="truncate">{device.elderly_persons?.full_name || t('devices.unassigned')}</span>
                   <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                     {getBatteryIcon(device.battery_level)}
                     {device.battery_level && <span>{device.battery_level}%</span>}
@@ -447,7 +473,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                 {/* Show record count on mobile */}
                 {!hasNoData && (
                   <div className="text-xs text-muted-foreground mt-1 sm:hidden">
-                    {dataCount} records
+                    {dataCount} {t('devices.records')}
                   </div>
                 )}
 
@@ -459,15 +485,6 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                     📍 {device.location}
                   </p>
                 )}
-
-                {device.device_companies?.name && (
-                  <p
-                    className="text-xs text-muted-foreground mt-1 cursor-pointer truncate"
-                    onClick={() => setSelectedDevice(device)}
-                  >
-                    🏭 {device.device_companies.name}
-                  </p>
-                )}
               </div>
             );
           })}
@@ -477,9 +494,9 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
       <Dialog open={!!selectedDevice} onOpenChange={() => setSelectedDevice(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg">Device API Details</DialogTitle>
+            <DialogTitle className="text-base sm:text-lg">{t('devices.apiDetails.title')}</DialogTitle>
             <DialogDescription className="text-sm">
-              Use these details to send data from your IoT device
+              {t('devices.apiDetails.description')}
             </DialogDescription>
           </DialogHeader>
 
@@ -487,9 +504,9 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
             <div className="space-y-4">
               <div>
                 <h4 className="font-semibold mb-2 flex flex-col sm:flex-row sm:items-center gap-2 text-sm sm:text-base">
-                  <span>API Key</span>
+                  <span>{t('devices.apiDetails.apiKey')}</span>
                   <Badge variant="outline" className="text-xs w-fit">
-                    Save this securely
+                    {t('devices.apiDetails.saveSecurely')}
                   </Badge>
                 </h4>
                 <div className="bg-muted p-3 rounded-md flex items-center justify-between gap-2">
@@ -508,12 +525,12 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  ⚠️ Use this key to authenticate your device when sending data
+                  ⚠️ {t('devices.apiDetails.useKeyAuth')}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2 text-sm sm:text-base">API Endpoint</h4>
+                <h4 className="font-semibold mb-2 text-sm sm:text-base">{t('devices.apiDetails.apiEndpoint')}</h4>
                 <div className="bg-muted p-3 rounded-md overflow-x-auto">
                   <code className="text-xs sm:text-sm break-all">
                     https://wiyfcvypeifbdaqnfgrr.supabase.co/functions/v1/device-ingest
@@ -522,7 +539,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2 text-sm sm:text-base">Example Request</h4>
+                <h4 className="font-semibold mb-2 text-sm sm:text-base">{t('devices.apiDetails.exampleRequest')}</h4>
                 <div className="bg-muted p-3 rounded-md overflow-x-auto">
                   <pre className="text-xs overflow-x-auto">
 {`POST /device-ingest
@@ -543,7 +560,7 @@ Body:
 
               <div className="bg-info/10 border border-info/20 p-3 rounded-md">
                 <p className="text-xs text-muted-foreground">
-                  <strong>Available data types:</strong> heart_rate, blood_pressure, temperature, fall_detected, steps, sleep, activity, location
+                  <strong>{t('devices.apiDetails.availableDataTypes')}:</strong> {t('devices.apiDetails.dataTypesList')}
                 </p>
               </div>
 
@@ -557,7 +574,7 @@ Body:
                 }}
               >
                 <History className="w-4 h-4 mr-2" />
-                View Device History
+                {t('devices.apiDetails.viewHistory')}
               </Button>
             </div>
           )}
@@ -574,29 +591,29 @@ Body:
       <Dialog open={!!editDevice} onOpenChange={() => setEditDevice(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Device</DialogTitle>
+            <DialogTitle>{t('devices.edit.title')}</DialogTitle>
             <DialogDescription>
-              Update device information
+              {t('devices.edit.description')}
             </DialogDescription>
           </DialogHeader>
 
           {editDevice && (
             <form onSubmit={handleUpdateDevice} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-device-name">Device Name</Label>
+                <Label htmlFor="edit-device-name">{t('devices.edit.deviceName')}</Label>
                 <Input
                   id="edit-device-name"
                   value={editDevice.device_name}
                   onChange={(e) => setEditDevice({ ...editDevice, device_name: e.target.value })}
-                  placeholder="e.g., Living Room Monitor"
+                  placeholder={t('devices.register.deviceNamePlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-device-type">Device Type</Label>
-                <Select 
-                  value={editDevice.device_type} 
+                <Label htmlFor="edit-device-type">{t('devices.edit.deviceType')}</Label>
+                <Select
+                  value={editDevice.device_type}
                   onValueChange={(value) => setEditDevice({ ...editDevice, device_type: value })}
                 >
                   <SelectTrigger id="edit-device-type">
@@ -615,23 +632,23 @@ Body:
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-location">Location</Label>
+                <Label htmlFor="edit-location">{t('devices.edit.location')}</Label>
                 <Input
                   id="edit-location"
                   value={editDevice.location || ''}
                   onChange={(e) => setEditDevice({ ...editDevice, location: e.target.value })}
-                  placeholder="e.g., Bedroom, Living Room"
+                  placeholder={t('devices.register.locationPlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-company">Company/Manufacturer</Label>
+                <Label htmlFor="edit-company">{t('devices.edit.company')}</Label>
                 <Select
                   value={editDevice.company_id || ''}
                   onValueChange={(value) => setEditDevice({ ...editDevice, company_id: value || null })}
                 >
                   <SelectTrigger id="edit-company">
-                    <SelectValue placeholder="Select company (optional)" />
+                    <SelectValue placeholder={t('devices.edit.selectCompany')} />
                   </SelectTrigger>
                   <SelectContent>
                     {deviceCompanies.map((company) => (
@@ -646,10 +663,10 @@ Body:
 
               <div className="flex gap-2">
                 <Button type="button" variant="outline" className="flex-1" onClick={() => setEditDevice(null)}>
-                  Cancel
+                  {t('devices.edit.cancel')}
                 </Button>
                 <Button type="submit" className="flex-1" disabled={updateDeviceMutation.isPending}>
-                  {updateDeviceMutation.isPending ? 'Updating...' : 'Update Device'}
+                  {updateDeviceMutation.isPending ? t('devices.edit.updating') : t('devices.edit.updateDevice')}
                 </Button>
               </div>
             </form>
@@ -661,9 +678,9 @@ Body:
       <AlertDialog open={!!deleteDevice} onOpenChange={() => setDeleteDevice(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Device</AlertDialogTitle>
+            <AlertDialogTitle>{t('devices.delete.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{deleteDevice?.device_name}"? This action cannot be undone.
+              {t('devices.delete.confirmMessage', { name: deleteDevice?.device_name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -677,7 +694,7 @@ Body:
               htmlFor="delete-data"
               className="text-sm font-normal cursor-pointer"
             >
-              Also delete all device data (health records, sensor readings, etc.)
+              {t('devices.delete.alsoDeleteData')}
             </Label>
           </div>
 
@@ -686,14 +703,14 @@ Body:
               setDeleteDevice(null);
               setDeleteDeviceData(false);
             }}>
-              Cancel
+              {t('devices.delete.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteDevice}
               disabled={deleteDeviceMutation.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleteDeviceMutation.isPending ? 'Deleting...' : 'Delete Device'}
+              {deleteDeviceMutation.isPending ? t('devices.delete.deleting') : t('devices.delete.deleteDevice')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

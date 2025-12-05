@@ -8,14 +8,18 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Edit, Trash2, ArrowLeft, Smartphone } from 'lucide-react';
+import { Plus, Edit, Trash2, ArrowLeft, Smartphone, Building2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import Header from '@/components/layout/Header';
 import { DeviceModel } from '@/hooks/useDeviceModels';
+import { useAllDeviceCompanies, DeviceCompany } from '@/hooks/useDeviceCompanies';
+
+const ADD_NEW_COMPANY = '__ADD_NEW__';
 
 const DeviceModelsManagement = () => {
   const { deviceTypeId } = useParams();
@@ -25,6 +29,16 @@ const DeviceModelsManagement = () => {
   const [open, setOpen] = useState(false);
   const [editingModel, setEditingModel] = useState<DeviceModel | null>(null);
   const [deleteModel, setDeleteModel] = useState<DeviceModel | null>(null);
+  const [addCompanyOpen, setAddCompanyOpen] = useState(false);
+  const [newCompanyData, setNewCompanyData] = useState({
+    code: '',
+    name: '',
+    description: '',
+    website: '',
+  });
+
+  // Fetch all device companies
+  const { data: deviceCompanies = [] } = useAllDeviceCompanies();
 
   const { data: deviceType } = useQuery({
     queryKey: ['device-type', deviceTypeId],
@@ -76,7 +90,7 @@ const DeviceModelsManagement = () => {
     code: '',
     name: '',
     description: '',
-    manufacturer: '',
+    company_id: '',
     model_number: '',
     image_url: '',
     specifications: '{}',
@@ -89,9 +103,13 @@ const DeviceModelsManagement = () => {
       const payload = {
         ...data,
         device_type_id: deviceTypeId,
-        manufacturer: data.manufacturer || null,
+        company_id: data.company_id || null,
         specifications: JSON.parse(data.specifications),
       };
+      // Remove company_id from payload if empty string
+      if (!payload.company_id) {
+        delete payload.company_id;
+      }
 
       if (editingModel) {
         const { error } = await supabase
@@ -150,6 +168,46 @@ const DeviceModelsManagement = () => {
     },
   });
 
+  // Create new company mutation
+  const createCompanyMutation = useMutation({
+    mutationFn: async (data: typeof newCompanyData) => {
+      const { data: newCompany, error } = await supabase
+        .from('device_companies')
+        .insert([{
+          code: data.code.toLowerCase().replace(/\s+/g, '-'),
+          name: data.name,
+          description: data.description || null,
+          website: data.website || null,
+          is_active: true,
+        }])
+        .select()
+        .single();
+      if (error) throw error;
+      return newCompany;
+    },
+    onSuccess: (newCompany) => {
+      queryClient.invalidateQueries({ queryKey: ['all-device-companies'] });
+      queryClient.invalidateQueries({ queryKey: ['device-companies'] });
+      queryClient.invalidateQueries({ queryKey: ['device-companies-with-models'] });
+      toast({
+        title: 'Company created',
+        description: `${newCompany.name} has been added successfully.`,
+      });
+      // Set the new company as selected
+      setFormData({ ...formData, company_id: newCompany.id });
+      // Reset and close the add company dialog
+      setNewCompanyData({ code: '', name: '', description: '', website: '' });
+      setAddCompanyOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error creating company',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -169,7 +227,7 @@ const DeviceModelsManagement = () => {
       code: '',
       name: '',
       description: '',
-      manufacturer: '',
+      company_id: '',
       model_number: '',
       image_url: '',
       specifications: '{}',
@@ -186,7 +244,7 @@ const DeviceModelsManagement = () => {
       code: model.code,
       name: model.name,
       description: model.description || '',
-      manufacturer: model.manufacturer || '',
+      company_id: model.company_id || '',
       model_number: model.model_number || '',
       image_url: model.image_url || '',
       specifications: JSON.stringify(model.specifications || {}, null, 2),
@@ -194,6 +252,27 @@ const DeviceModelsManagement = () => {
       is_active: model.is_active ?? true,
     });
     setOpen(true);
+  };
+
+  const handleCompanyChange = (value: string) => {
+    if (value === ADD_NEW_COMPANY) {
+      setAddCompanyOpen(true);
+    } else {
+      setFormData({ ...formData, company_id: value });
+    }
+  };
+
+  const handleCreateCompany = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCompanyData.code || !newCompanyData.name) {
+      toast({
+        title: 'Missing information',
+        description: 'Company code and name are required.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    createCompanyMutation.mutate(newCompanyData);
   };
 
   const handleDelete = (model: DeviceModel) => {
@@ -280,13 +359,28 @@ const DeviceModelsManagement = () => {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="manufacturer">Company/Manufacturer</Label>
-                          <Input
-                            id="manufacturer"
-                            value={formData.manufacturer}
-                            onChange={(e) => setFormData({ ...formData, manufacturer: e.target.value })}
-                            placeholder="e.g., Apple, Samsung, Fitbit"
-                          />
+                          <Label htmlFor="company_id">Company/Manufacturer</Label>
+                          <Select
+                            value={formData.company_id}
+                            onValueChange={handleCompanyChange}
+                          >
+                            <SelectTrigger id="company_id">
+                              <SelectValue placeholder="Select company" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {deviceCompanies.map((company) => (
+                                <SelectItem key={company.id} value={company.id}>
+                                  {company.name}
+                                </SelectItem>
+                              ))}
+                              <SelectItem value={ADD_NEW_COMPANY} className="text-primary font-medium">
+                                <span className="flex items-center gap-2">
+                                  <Plus className="w-4 h-4" />
+                                  Add New Company
+                                </span>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
 
                         <div className="space-y-2">
@@ -412,7 +506,7 @@ const DeviceModelsManagement = () => {
                         <code className="text-xs bg-muted px-2 py-1 rounded">{model.code}</code>
                       </TableCell>
                       <TableCell>
-                        {model.manufacturer || (
+                        {model.device_companies?.name || (
                           <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
@@ -472,6 +566,84 @@ const DeviceModelsManagement = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Add New Company Dialog */}
+      <Dialog open={addCompanyOpen} onOpenChange={setAddCompanyOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Add New Company
+            </DialogTitle>
+            <DialogDescription>
+              Create a new device company/manufacturer
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateCompany} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="company-code">Code *</Label>
+              <Input
+                id="company-code"
+                value={newCompanyData.code}
+                onChange={(e) => setNewCompanyData({ ...newCompanyData, code: e.target.value })}
+                placeholder="e.g., apple, samsung, fitbit"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Unique identifier (lowercase, no spaces)
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="company-name">Name *</Label>
+              <Input
+                id="company-name"
+                value={newCompanyData.name}
+                onChange={(e) => setNewCompanyData({ ...newCompanyData, name: e.target.value })}
+                placeholder="e.g., Apple, Samsung, Fitbit"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="company-description">Description</Label>
+              <Input
+                id="company-description"
+                value={newCompanyData.description}
+                onChange={(e) => setNewCompanyData({ ...newCompanyData, description: e.target.value })}
+                placeholder="Brief description of the company"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="company-website">Website</Label>
+              <Input
+                id="company-website"
+                value={newCompanyData.website}
+                onChange={(e) => setNewCompanyData({ ...newCompanyData, website: e.target.value })}
+                placeholder="https://www.example.com"
+              />
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setNewCompanyData({ code: '', name: '', description: '', website: '' });
+                  setAddCompanyOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={createCompanyMutation.isPending}>
+                {createCompanyMutation.isPending ? 'Creating...' : 'Create Company'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

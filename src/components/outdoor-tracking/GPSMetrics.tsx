@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GPSCoordinate, calculateTotalDistance, formatDistance } from '@/lib/gpsUtils';
 import { GeofenceEvent, GeofencePlace, getMostVisitedPlaces, formatDuration } from '@/lib/geofenceUtils';
 import { MapPin, Clock, TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface GPSMetricsProps {
   gpsData: GPSCoordinate[];
@@ -10,6 +11,7 @@ interface GPSMetricsProps {
 }
 
 export function GPSMetrics({ gpsData, events, places }: GPSMetricsProps) {
+  const { t } = useTranslation();
   const totalDistance = calculateTotalDistance(gpsData);
   const mostVisited = getMostVisitedPlaces(events, places, 3);
 
@@ -17,39 +19,39 @@ export function GPSMetrics({ gpsData, events, places }: GPSMetricsProps) {
     <div className="grid gap-4 md:grid-cols-3">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Distance</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('tracking.gps.totalDistance')}</CardTitle>
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatDistance(totalDistance)}</div>
           <p className="text-xs text-muted-foreground">
-            Based on {gpsData.length} GPS points
+            {t('tracking.gps.basedOnPoints', { count: gpsData.length })}
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Locations Visited</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('tracking.gps.locationsVisited')}</CardTitle>
           <MapPin className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{places.length}</div>
           <p className="text-xs text-muted-foreground">
-            Active geofence locations
+            {t('tracking.gps.activeGeofences')}
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Events</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('tracking.gps.totalEvents')}</CardTitle>
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{events.length}</div>
           <p className="text-xs text-muted-foreground">
-            Entry and exit events
+            {t('tracking.gps.entryExitEvents')}
           </p>
         </CardContent>
       </Card>
@@ -57,7 +59,7 @@ export function GPSMetrics({ gpsData, events, places }: GPSMetricsProps) {
       {mostVisited.length > 0 && (
         <Card className="md:col-span-3">
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Most Visited Places</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('tracking.gps.mostVisitedPlaces')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -71,7 +73,7 @@ export function GPSMetrics({ gpsData, events, places }: GPSMetricsProps) {
                     <span className="font-medium">{place.name}</span>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {visits} {visits === 1 ? 'visit' : 'visits'} • {formatDuration(totalMinutes)}
+                    {visits} {visits === 1 ? t('tracking.gps.visit') : t('tracking.gps.visits')} • {formatDuration(totalMinutes)}
                   </div>
                 </div>
               ))}

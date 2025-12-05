@@ -12,9 +12,40 @@ import { toast } from 'sonner';
 import Header from '@/components/layout/Header';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, subDays } from 'date-fns';
-import { InfoButton } from '@/components/help/InfoButton';
+import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
+import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { EmptyState } from '@/components/help/EmptyState';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
+import { useTranslation } from 'react-i18next';
+
+// Map language codes to date-fns locales
+const getDateLocale = (language: string) => {
+  const localeMap: Record<string, Locale> = {
+    'en': enUS,
+    'de': de,
+    'es': es,
+    'fr': fr,
+    'fr-CA': frCA,
+  };
+  return localeMap[language] || enUS;
+};
+
+// Device name mapping for translation
+const deviceNameMap: Record<string, string> = {
+  'home hub': 'home_hub',
+  'home_hub': 'home_hub',
+  'smartphone': 'smartphone',
+  'smart phone': 'smartphone',
+  'fall detection': 'fall_detection',
+  'falldetection': 'falldetection',
+  'emergency button': 'emergency_button',
+  'panic button': 'panic_button',
+  'gps tracker': 'gps_tracker',
+  'heart rate monitor': 'heart_rate_monitor',
+  'blood pressure monitor': 'blood_pressure_monitor',
+  'smartwatch': 'smartwatch',
+  'wearable': 'wearable',
+};
 
 interface Alert {
   id: string;
@@ -38,7 +69,23 @@ const SEVERITY_COLORS = {
 };
 
 const Alerts = () => {
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const dateLocale = getDateLocale(i18n.language);
+
+  // Function to translate device names within text
+  const translateDeviceNames = (text: string) => {
+    if (!text) return text;
+    let result = text;
+    Object.entries(deviceNameMap).forEach(([deviceName, translationKey]) => {
+      const regex = new RegExp(deviceName, 'gi');
+      const translated = t(`devices.names.${translationKey}`, { defaultValue: '' });
+      if (translated) {
+        result = result.replace(regex, translated);
+      }
+    });
+    return result;
+  };
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
@@ -64,16 +111,29 @@ const Alerts = () => {
   const { data: alerts, isLoading } = useQuery({
     queryKey: ['all-alerts', user?.id, dateRange],
     queryFn: async () => {
+      if (!user?.id) return [];
+      
+      // First get accessible elderly persons
+      const { data: accessiblePersons, error: personsError } = await supabase
+        .rpc('get_accessible_elderly_persons', { _user_id: user.id });
+      
+      if (personsError) throw personsError;
+      if (!accessiblePersons || accessiblePersons.length === 0) return [];
+      
+      const elderlyIds = accessiblePersons.map((p: any) => p.id);
       const startDate = subDays(new Date(), parseInt(dateRange)).toISOString();
+      
       const { data, error } = await supabase
         .from('alerts')
         .select('*, elderly_persons(full_name)')
+        .in('elderly_person_id', elderlyIds)
         .gte('created_at', startDate)
         .order('created_at', { ascending: false });
+      
       if (error) throw error;
       return data as Alert[];
     },
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   // Real-time subscription
@@ -155,9 +215,9 @@ const Alerts = () => {
       .eq('id', alertId);
 
     if (error) {
-      toast.error('Failed to acknowledge alert');
+      toast.error(t('alerts.toasts.failedToAcknowledge'));
     } else {
-      toast.success('Alert acknowledged');
+      toast.success(t('alerts.toasts.alertAcknowledged'));
       queryClient.invalidateQueries({ queryKey: ['all-alerts'] });
     }
   };
@@ -175,7 +235,7 @@ const Alerts = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header title="Alert Management" />
+        <Header title={t('alerts.management')} />
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -186,7 +246,7 @@ const Alerts = () => {
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
-      <Header title="Alert Management" subtitle="Monitor and respond to system alerts" />
+      <Header title={t('alerts.management')} subtitle={t('alerts.subtitle')} />
 
       <main className="container mx-auto px-4 py-6 space-y-6">
         {/* Summary Cards */}
@@ -195,8 +255,8 @@ const Alerts = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-1 mb-1">
-                  <p className="text-sm text-muted-foreground">Total Alerts</p>
-                  <InfoButton content="Total number of alerts in the selected time period, including active, acknowledged, and resolved alerts." side="top" />
+                  <p className="text-sm text-muted-foreground">{t('alerts.stats.totalAlerts')}</p>
+                  <HelpTooltip content={t('alerts.stats.totalAlertsTooltip')} />
                 </div>
                 <p className="text-3xl font-bold">{totalAlerts}</p>
               </div>
@@ -207,7 +267,7 @@ const Alerts = () => {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Active</p>
+                <p className="text-sm text-muted-foreground">{t('alerts.stats.active')}</p>
                 <p className="text-3xl font-bold">{activeAlerts}</p>
               </div>
               <Clock className="w-10 h-10 text-warning animate-pulse-soft" />
@@ -217,7 +277,7 @@ const Alerts = () => {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Critical</p>
+                <p className="text-sm text-muted-foreground">{t('alerts.stats.critical')}</p>
                 <p className="text-3xl font-bold">{criticalAlerts}</p>
               </div>
               <AlertTriangle className="w-10 h-10 text-destructive" />
@@ -228,15 +288,14 @@ const Alerts = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-1 mb-1">
-                  <p className="text-sm text-muted-foreground">Avg Response</p>
-                  <InfoButton
-                    title="Response Time"
-                    content="Average time taken to acknowledge alerts. Lower response times indicate faster attention to critical issues."
-                    side="top"
+                  <p className="text-sm text-muted-foreground">{t('alerts.stats.avgResponse')}</p>
+                  <HelpTooltip
+                    title={t('alerts.stats.responseTime')}
+                    content={t('alerts.stats.responseTimeTooltip')}
                   />
                 </div>
                 <p className="text-3xl font-bold">{Math.round(avgResponseTime)}</p>
-                <p className="text-xs text-muted-foreground">minutes</p>
+                <p className="text-xs text-muted-foreground">{t('alerts.stats.minutes')}</p>
               </div>
               <TrendingUp className="w-10 h-10 text-success" />
             </div>
@@ -249,7 +308,7 @@ const Alerts = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search alerts..."
+                placeholder={t('alerts.filters.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -257,49 +316,49 @@ const Alerts = () => {
             </div>
             <Select value={severityFilter} onValueChange={setSeverityFilter}>
               <SelectTrigger className="w-full sm:w-[150px]">
-                <SelectValue placeholder="Severity" />
+                <SelectValue placeholder={t('alerts.severity')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Severity</SelectItem>
-                <SelectItem value="critical">Critical</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="all">{t('alerts.filters.allSeverity')}</SelectItem>
+                <SelectItem value="critical">{t('alerts.critical')}</SelectItem>
+                <SelectItem value="high">{t('alerts.high')}</SelectItem>
+                <SelectItem value="medium">{t('alerts.medium')}</SelectItem>
+                <SelectItem value="low">{t('alerts.low')}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-full sm:w-[150px]">
-                <SelectValue placeholder="Type" />
+                <SelectValue placeholder={t('alerts.type')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="vital_signs">Vital Signs</SelectItem>
-                <SelectItem value="panic_sos">Panic/SOS</SelectItem>
-                <SelectItem value="device_offline">Device Offline</SelectItem>
-                <SelectItem value="geofence">Geofence</SelectItem>
-                <SelectItem value="inactivity">Inactivity</SelectItem>
+                <SelectItem value="all">{t('alerts.filters.allTypes')}</SelectItem>
+                <SelectItem value="vital_signs">{t('alerts.types.vital_signs')}</SelectItem>
+                <SelectItem value="panic_sos">{t('alerts.types.panic_sos')}</SelectItem>
+                <SelectItem value="device_offline">{t('alerts.types.device_offline')}</SelectItem>
+                <SelectItem value="geofence">{t('alerts.types.geofence')}</SelectItem>
+                <SelectItem value="inactivity">{t('alerts.types.inactivity')}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-[150px]">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t('alerts.status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="acknowledged">Acknowledged</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="all">{t('alerts.filters.allStatus')}</SelectItem>
+                <SelectItem value="active">{t('alerts.statusOptions.active')}</SelectItem>
+                <SelectItem value="acknowledged">{t('alerts.statusOptions.acknowledged')}</SelectItem>
+                <SelectItem value="resolved">{t('alerts.statusOptions.resolved')}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={dateRange} onValueChange={setDateRange}>
               <SelectTrigger className="w-full sm:w-[150px]">
-                <SelectValue placeholder="Date Range" />
+                <SelectValue placeholder={t('alerts.filters.dateRange')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">Last 24 Hours</SelectItem>
-                <SelectItem value="7">Last 7 Days</SelectItem>
-                <SelectItem value="30">Last 30 Days</SelectItem>
-                <SelectItem value="90">Last 90 Days</SelectItem>
+                <SelectItem value="1">{t('alerts.dateRanges.last24Hours')}</SelectItem>
+                <SelectItem value="7">{t('alerts.dateRanges.last7Days')}</SelectItem>
+                <SelectItem value="30">{t('alerts.dateRanges.last30Days')}</SelectItem>
+                <SelectItem value="90">{t('alerts.dateRanges.last90Days')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -309,7 +368,7 @@ const Alerts = () => {
         <div data-tour="alert-charts" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Alert Trends Chart */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Alert Trends</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('alerts.charts.alertTrends')}</h3>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -317,55 +376,65 @@ const Alerts = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="alerts" stroke="hsl(var(--primary))" strokeWidth={2} />
+                <Line type="monotone" dataKey="alerts" name={t('alerts.charts.alerts')} stroke="hsl(var(--primary))" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </Card>
 
           {/* Alert Type Breakdown */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Alert Types Distribution</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('alerts.charts.alertTypesDistribution')}</h3>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
                   data={pieData}
                   cx="50%"
-                  cy="40%"
+                  cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                  outerRadius={70}
+                  label={({ name, percent }) => `${t(`alerts.types.${name}`, { defaultValue: name.replace(/_/g, ' ') })} (${(percent * 100).toFixed(0)}%)`}
+                  outerRadius={80}
                   fill="hsl(var(--primary))"
                   dataKey="value"
                 >
                   {pieData.map((entry, index) => {
-                    const redShades = ['#dc2626', '#ef4444', '#f87171', '#fca5a5', '#fecaca'];
-                    return <Cell key={`cell-${index}`} fill={redShades[index % redShades.length]} />;
+                    // Red shades from light to dark
+                    const redShades = [
+                      '#fca5a5', // light red
+                      '#f87171', // lighter red
+                      '#ef4444', // red
+                      '#dc2626', // darker red
+                      '#b91c1c', // dark red
+                      '#991b1b', // very dark red
+                      '#7f1d1d', // darkest red
+                    ];
+                    return (
+                      <Cell key={`cell-${index}`} fill={redShades[index % redShades.length]} />
+                    );
                   })}
                 </Pie>
-                <Tooltip />
-                <Legend verticalAlign="bottom" height={36} />
+                <Tooltip formatter={(value, name) => [value, t(`alerts.types.${name}`, { defaultValue: String(name).replace(/_/g, ' ') })]} />
               </PieChart>
             </ResponsiveContainer>
           </Card>
 
           {/* Severity Breakdown */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Severity Breakdown</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('alerts.charts.severityBreakdown')}</h3>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={barData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="severity" />
+                <XAxis dataKey="severity" tickFormatter={(value) => t(`alerts.${value}`, { defaultValue: value })} />
                 <YAxis />
-                <Tooltip />
+                <Tooltip labelFormatter={(value) => t(`alerts.${value}`, { defaultValue: value })} />
                 <Legend />
-                <Bar dataKey="count" fill="hsl(var(--primary))" />
+                <Bar dataKey="count" name={t('alerts.charts.count')} fill="hsl(var(--primary))" />
               </BarChart>
             </ResponsiveContainer>
           </Card>
 
           {/* Notification Recipients */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Recent Recipients</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('alerts.recipients.title')}</h3>
             <div className="space-y-3 max-h-[250px] overflow-y-auto">
               {elderlyPersons?.slice(0, 5).map((person: any) => {
                 const personAlerts = filteredAlerts.filter(a => a.elderly_person_id === person.id);
@@ -375,7 +444,7 @@ const Alerts = () => {
                       <Users className="w-5 h-5 text-primary" />
                       <div>
                         <p className="font-medium">{person.full_name}</p>
-                        <p className="text-xs text-muted-foreground">{personAlerts.length} alerts</p>
+                        <p className="text-xs text-muted-foreground">{personAlerts.length} {t('alerts.recipients.alerts')}</p>
                       </div>
                     </div>
                     <Badge variant="outline">{personAlerts.length}</Badge>
@@ -389,25 +458,24 @@ const Alerts = () => {
         {/* Alert Timeline */}
         <Card className="p-6" data-tour="alert-timeline">
           <div className="flex items-center gap-2 mb-4">
-            <h3 className="text-lg font-semibold">Alert Timeline</h3>
-            <InfoButton
-              title="Alert Severity Levels"
+            <h3 className="text-lg font-semibold">{t('alerts.timeline.title')}</h3>
+            <HelpTooltip
+              title={t('alerts.timeline.severityLevels')}
               content={
                 <div className="space-y-2">
-                  <div><strong className="text-destructive">Critical:</strong> Immediate action required (e.g., panic button, severe vital anomaly)</div>
-                  <div><strong className="text-warning">High:</strong> Urgent attention needed (e.g., geofence breach, device offline)</div>
-                  <div><strong className="text-accent">Medium:</strong> Should be reviewed soon (e.g., minor vital deviation)</div>
-                  <div><strong className="text-muted-foreground">Low:</strong> Informational (e.g., routine notifications)</div>
+                  <div><strong className="text-destructive">{t('alerts.critical')}:</strong> {t('alerts.timeline.criticalDesc')}</div>
+                  <div><strong className="text-warning">{t('alerts.high')}:</strong> {t('alerts.timeline.highDesc')}</div>
+                  <div><strong className="text-accent">{t('alerts.medium')}:</strong> {t('alerts.timeline.mediumDesc')}</div>
+                  <div><strong className="text-muted-foreground">{t('alerts.low')}:</strong> {t('alerts.timeline.lowDesc')}</div>
                 </div>
               }
-              side="bottom"
             />
           </div>
           {filteredAlerts.length === 0 ? (
             <EmptyState
               icon={CheckCircle}
-              title="No alerts found"
-              description="All clear! No alerts match your current filters. Try adjusting the filters above to view different alerts."
+              title={t('alerts.noAlertsFound')}
+              description={t('alerts.noAlertsDescription')}
             />
           ) : (
             <div className="space-y-4 max-h-[600px] overflow-y-auto">
@@ -418,36 +486,36 @@ const Alerts = () => {
                       <AlertTriangle className="w-5 h-5 text-warning mt-1 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h4 className="font-semibold">{alert.title}</h4>
+                          <h4 className="font-semibold">{translateDeviceNames(t(`alerts.messages.${alert.alert_type}.title`, { defaultValue: alert.title }))}</h4>
                           <Badge className={`${getSeverityColor(alert.severity)} capitalize text-xs`}>
-                            {alert.severity}
+                            {t(`alerts.${alert.severity}`, { defaultValue: alert.severity })}
                           </Badge>
                           <Badge variant="outline" className="capitalize text-xs">
-                            {alert.alert_type.replace('_', ' ')}
+                            {t(`alerts.types.${alert.alert_type}`, { defaultValue: alert.alert_type.replace(/_/g, ' ') })}
                           </Badge>
                         </div>
                         {alert.description && (
-                          <p className="text-sm text-muted-foreground mb-2">{alert.description}</p>
+                          <p className="text-sm text-muted-foreground mb-2">{translateDeviceNames(t(`alerts.messages.${alert.alert_type}.description`, { defaultValue: alert.description }))}</p>
                         )}
                         <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                          <span>{alert.elderly_persons?.full_name || 'Unknown'}</span>
-                          <span>{format(new Date(alert.created_at), 'PPp')}</span>
+                          <span>{alert.elderly_persons?.full_name || t('alerts.timeline.unknown')}</span>
+                          <span>{format(new Date(alert.created_at), 'MMM d, yyyy HH:mm', { locale: dateLocale })}</span>
                           {alert.acknowledged_at && (
                             <span className="text-success">
-                              ✓ Acknowledged {format(new Date(alert.acknowledged_at), 'PP')}
+                              ✓ {t('alerts.timeline.acknowledged')} {format(new Date(alert.acknowledged_at), 'MMM d, yyyy', { locale: dateLocale })}
                             </span>
                           )}
                         </div>
                       </div>
                     </div>
                     {alert.status === 'active' && (
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => handleAcknowledge(alert.id)}
                         className="ml-2 shrink-0"
                       >
-                        Acknowledge
+                        {t('alerts.actions.acknowledge')}
                       </Button>
                     )}
                   </div>

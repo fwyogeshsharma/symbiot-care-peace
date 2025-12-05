@@ -10,12 +10,14 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 interface MovementHeatmapProps {
   data: ProcessedMovementData;
 }
 
 export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
+  const { t } = useTranslation();
   // Prepare data for location activity bar chart
   const locationData = Object.entries(data.locationStats).map(([location, count]) => ({
     location,
@@ -45,7 +47,7 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Activity by Location</CardTitle>
+          <CardTitle>{t('movement.heatmap.activityByLocation')}</CardTitle>
         </CardHeader>
         <CardContent>
           {locationData.length > 0 ? (
@@ -62,7 +64,7 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
                     axisLine={false}
                   />
                   <YAxis
-                    label={{ value: 'Events', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+                    label={{ value: t('movement.heatmap.events'), angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
                     tick={{ fontSize: 11 }}
                   />
                   <Tooltip
@@ -103,7 +105,7 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
             </div>
           ) : (
             <p className="text-muted-foreground text-center py-8">
-              No location data available
+              {t('movement.heatmap.noLocationData')}
             </p>
           )}
         </CardContent>
@@ -111,7 +113,7 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Activity by Hour</CardTitle>
+          <CardTitle>{t('movement.heatmap.activityByHour')}</CardTitle>
         </CardHeader>
         <CardContent>
           {hourlyData.length > 0 ? (
@@ -131,7 +133,7 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
                     height={60}
                   />
                   <YAxis
-                    label={{ value: 'Events', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+                    label={{ value: t('movement.heatmap.events'), angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
                     tick={{ fontSize: 11 }}
                   />
                   <Tooltip
@@ -154,19 +156,19 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
               {/* Summary Stats */}
               <div className="grid grid-cols-3 gap-3 px-2">
                 <div className="text-center">
-                  <p className="text-xs text-muted-foreground">Peak Hour</p>
+                  <p className="text-xs text-muted-foreground">{t('movement.heatmap.peakHour')}</p>
                   <p className="text-sm font-semibold">
                     {hourlyData.reduce((max, item) => item.count > max.count ? item : max, hourlyData[0]).hour}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-muted-foreground">Total Events</p>
+                  <p className="text-xs text-muted-foreground">{t('movement.heatmap.totalEvents')}</p>
                   <p className="text-sm font-semibold">
                     {hourlyData.reduce((sum, item) => sum + item.count, 0)}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-muted-foreground">Active Hours</p>
+                  <p className="text-xs text-muted-foreground">{t('movement.heatmap.activeHours')}</p>
                   <p className="text-sm font-semibold">
                     {hourlyData.filter(item => item.count > 0).length}
                   </p>
@@ -175,7 +177,7 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
             </div>
           ) : (
             <p className="text-muted-foreground text-center py-8">
-              No hourly data available
+              {t('movement.heatmap.noHourlyData')}
             </p>
           )}
         </CardContent>

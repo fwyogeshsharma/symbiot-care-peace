@@ -10,6 +10,7 @@ import { Activity, Eye, EyeOff } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from 'react-i18next';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -48,6 +49,7 @@ const Auth = () => {
   const { signUp, signIn, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Check if this is a password reset flow
@@ -257,25 +259,25 @@ const Auth = () => {
         <div className="flex items-center justify-center mb-8">
           <Activity className="w-8 h-8 text-primary" />
           <div className="ml-3">
-            <h1 className="text-2xl font-bold text-foreground">SymBIoT</h1>
-            <p className="text-xs text-muted-foreground">Peace of Mind</p>
+            <h1 className="text-2xl font-bold text-foreground">{t('common.symbiot')}</h1>
+            <p className="text-xs text-muted-foreground">{t('index.tagline')}</p>
           </div>
         </div>
 
         <h2 className="text-xl font-semibold mb-6 text-center">
-          {isResetPassword ? 'Set New Password' : isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back' : 'Create Account'}
+          {isResetPassword ? t('auth.newPassword') : isForgotPassword ? t('auth.resetPassword') : isLogin ? t('auth.welcome') : t('auth.welcomeNew')}
         </h2>
 
         {isResetPassword ? (
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-md">
               <p className="text-sm text-muted-foreground text-center">
-                Please enter your new password below. Your password must be at least 6 characters long.
+                {t('auth.validation.passwordMin')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label htmlFor="newPassword">{t('auth.newPassword')}</Label>
               <div className="relative">
                 <Input
                   id="newPassword"
@@ -284,7 +286,6 @@ const Auth = () => {
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   minLength={6}
-                  placeholder="Enter new password (min 6 characters)"
                   className="pr-10"
                 />
                 <button
@@ -298,7 +299,7 @@ const Auth = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmNewPassword">Confirm New Password</Label>
+              <Label htmlFor="confirmNewPassword">{t('auth.confirmNewPassword')}</Label>
               <div className="relative">
                 <Input
                   id="confirmNewPassword"
@@ -307,7 +308,6 @@ const Auth = () => {
                   onChange={(e) => setConfirmNewPassword(e.target.value)}
                   required
                   minLength={6}
-                  placeholder="Confirm your new password"
                   className="pr-10"
                 />
                 <button
@@ -321,13 +321,13 @@ const Auth = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Updating...' : 'Update Password'}
+              {loading ? t('common.loading') : t('auth.resetPassword')}
             </Button>
           </form>
         ) : isForgotPassword ? (
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -339,7 +339,7 @@ const Auth = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Sending...' : 'Send Reset Link'}
+              {loading ? t('common.loading') : t('auth.sendResetLink')}
             </Button>
 
             <div className="text-center">
@@ -351,7 +351,7 @@ const Auth = () => {
                 }}
                 className="text-sm text-primary hover:underline"
               >
-                Back to Sign In
+                {t('auth.backToLogin')}
               </button>
             </div>
           </form>
@@ -360,39 +360,37 @@ const Auth = () => {
           {!isLogin && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name *</Label>
+                <Label htmlFor="fullName">{t('auth.fullName')} *</Label>
                 <Input
                   id="fullName"
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  placeholder="John Doe"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number *</Label>
+                <Label htmlFor="phone">{t('auth.phone')} *</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
-                  placeholder="+1 (555) 123-4567"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="role">I am a...</Label>
+                <Label htmlFor="role">{t('auth.selectRole')}</Label>
                 <Select value={role} onValueChange={setRole}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="elderly">Elderly Person</SelectItem>
-                    <SelectItem value="caregiver">Caregiver</SelectItem>
-                    <SelectItem value="relative">Family Member / Relative</SelectItem>
+                    <SelectItem value="elderly">{t('auth.roles.elderly')}</SelectItem>
+                    <SelectItem value="caregiver">{t('auth.roles.caregiver')}</SelectItem>
+                    <SelectItem value="relative">{t('auth.roles.relative')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -400,7 +398,7 @@ const Auth = () => {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <Input
               id="email"
               type="email"
@@ -412,7 +410,7 @@ const Auth = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -441,7 +439,7 @@ const Auth = () => {
                   }}
                   className="text-sm text-primary hover:underline"
                 >
-                  Forgot password?
+                  {t('auth.forgotPassword')}
                 </button>
               </div>
             )}
@@ -449,7 +447,7 @@ const Auth = () => {
 
           {!isLogin && (
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
@@ -472,7 +470,7 @@ const Auth = () => {
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
+            {loading ? t('common.loading') : isLogin ? t('auth.signIn') : t('auth.createAccount')}
           </Button>
           </form>
         )}
@@ -484,7 +482,7 @@ const Auth = () => {
             onClick={() => setIsLogin(!isLogin)}
             className="text-sm text-primary hover:underline"
           >
-            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+            {isLogin ? t('auth.noAccount') : t('auth.hasAccount')}
           </button>
           </div>
         )}

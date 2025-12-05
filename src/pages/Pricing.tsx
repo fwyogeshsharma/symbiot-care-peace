@@ -5,10 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Check, Activity, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const Pricing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 
   // Scroll to top when component mounts
@@ -33,63 +36,63 @@ const Pricing = () => {
 
   const plans = [
     {
-      name: "Free Trial",
-      description: "Perfect for trying out our service",
+      name: t('pricing.plans.freeTrial.name'),
+      description: t('pricing.plans.freeTrial.description'),
       price: 0,
       yearlyPrice: 0,
-      duration: "14 days",
-      devices: "5 devices",
+      duration: t('pricing.plans.freeTrial.duration'),
+      devices: t('pricing.plans.freeTrial.devices'),
       features: [
-        "14-day free trial",
-        "Up to 5 devices",
-        "Real-time monitoring",
-        "Basic alerts",
-        "Activity tracking",
-        "Email support"
+        t('pricing.plans.features.freeTrial14'),
+        t('pricing.plans.features.upTo5Devices'),
+        t('pricing.plans.features.realTimeMonitoring'),
+        t('pricing.plans.features.basicAlerts'),
+        t('pricing.plans.features.activityTracking'),
+        t('pricing.plans.features.emailSupport')
       ],
       highlighted: false,
-      badge: "Trial"
+      badge: t('pricing.plans.freeTrial.badge')
     },
     {
-      name: "Basic",
-      description: "Great for small families",
+      name: t('pricing.plans.basic.name'),
+      description: t('pricing.plans.basic.description'),
       price: 10,
       yearlyPrice: calculateYearlyPrice(10),
-      duration: billingCycle === "monthly" ? "per month" : "per year",
-      devices: "5 devices",
+      duration: billingCycle === "monthly" ? t('pricing.perMonth') : t('pricing.perYear'),
+      devices: t('pricing.plans.basic.devices'),
       features: [
-        "Up to 5 devices",
-        "Real-time monitoring",
-        "Advanced alerts",
-        "Activity tracking",
-        "Health insights",
-        "Priority email support",
-        "Data export"
+        t('pricing.plans.features.upTo5Devices'),
+        t('pricing.plans.features.realTimeMonitoring'),
+        t('pricing.plans.features.advancedAlerts'),
+        t('pricing.plans.features.activityTracking'),
+        t('pricing.plans.features.healthInsights'),
+        t('pricing.plans.features.priorityEmailSupport'),
+        t('pricing.plans.features.dataExport')
       ],
       highlighted: false,
       badge: null
     },
     {
-      name: "Premium",
-      description: "Best for larger families and care facilities",
+      name: t('pricing.plans.premium.name'),
+      description: t('pricing.plans.premium.description'),
       price: 25,
       yearlyPrice: calculateYearlyPrice(25),
-      duration: billingCycle === "monthly" ? "per month" : "per year",
-      devices: "Unlimited devices",
+      duration: billingCycle === "monthly" ? t('pricing.perMonth') : t('pricing.perYear'),
+      devices: t('pricing.plans.premium.devices'),
       features: [
-        "Unlimited devices",
-        "Real-time monitoring",
-        "Advanced alerts",
-        "Activity tracking",
-        "Health insights",
-        "24/7 priority support",
-        "Data export",
-        "Custom integrations",
-        "API access",
-        "Dedicated account manager"
+        t('pricing.plans.features.unlimitedDevices'),
+        t('pricing.plans.features.realTimeMonitoring'),
+        t('pricing.plans.features.advancedAlerts'),
+        t('pricing.plans.features.activityTracking'),
+        t('pricing.plans.features.healthInsights'),
+        t('pricing.plans.features.support247'),
+        t('pricing.plans.features.dataExport'),
+        t('pricing.plans.features.customIntegrations'),
+        t('pricing.plans.features.apiAccess'),
+        t('pricing.plans.features.dedicatedManager')
       ],
       highlighted: true,
-      badge: "Most Popular"
+      badge: t('pricing.plans.premium.badge')
     }
   ];
 
@@ -104,11 +107,14 @@ const Pricing = () => {
               onClick={() => navigate("/")}
             >
               <Activity className="w-8 h-8 text-primary" />
-              <h1 className="text-xl font-bold">SymBIoT</h1>
+              <h1 className="text-xl font-bold">{t('common.symbiot')}</h1>
             </div>
-            <Button onClick={() => navigate("/")} variant="outline">
-              Back to Home
-            </Button>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <Button onClick={() => navigate("/")} variant="outline">
+                {t('nav.home')}
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
@@ -119,16 +125,16 @@ const Pricing = () => {
         <section className="py-12 sm:py-20 px-4 text-center">
           <div className="container mx-auto">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-              Simple, Transparent Pricing
+              {t('pricing.heroTitle')}
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              Choose the perfect plan for your family care needs
+              {t('pricing.heroSubtitle')}
             </p>
 
             {/* Billing Toggle */}
             <div className="flex items-center justify-center gap-4 mb-4">
               <span className={`text-sm sm:text-base font-medium ${billingCycle === "monthly" ? "text-primary" : "text-muted-foreground"}`}>
-                Monthly
+                {t('pricing.monthly')}
               </span>
               <button
                 onClick={() => setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")}
@@ -143,14 +149,14 @@ const Pricing = () => {
                 />
               </button>
               <span className={`text-sm sm:text-base font-medium ${billingCycle === "yearly" ? "text-primary" : "text-muted-foreground"}`}>
-                Yearly
+                {t('pricing.yearly')}
               </span>
             </div>
             {billingCycle === "yearly" && (
               <div className="flex items-center justify-center gap-2">
                 <Badge variant="secondary" className="bg-secondary/20 text-secondary">
                   <Zap className="w-3 h-3 mr-1" />
-                  Save 5% with yearly billing
+                  {t('pricing.saveWithYearly')}
                 </Badge>
               </div>
             )}
@@ -203,7 +209,7 @@ const Pricing = () => {
                       )}
                       {billingCycle === "yearly" && plan.price > 0 && (
                         <p className="text-sm text-muted-foreground">
-                          ${plan.price}/month billed annually
+                          ${plan.price}{t('pricing.billedAnnually')}
                         </p>
                       )}
                       <p className="text-sm font-medium text-primary mt-2">
@@ -227,7 +233,7 @@ const Pricing = () => {
                       variant={plan.highlighted ? "default" : "outline"}
                       onClick={handleGetStarted}
                     >
-                      {plan.price === 0 ? "Start Free Trial" : "Get Started"}
+                      {plan.price === 0 ? t('pricing.startFreeTrial') : t('pricing.getStarted')}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -240,43 +246,43 @@ const Pricing = () => {
         <section className="py-12 px-4 bg-muted/30">
           <div className="container mx-auto max-w-4xl text-center">
             <h2 className="text-2xl sm:text-3xl font-bold mb-6">
-              All Plans Include
+              {t('pricing.allPlansInclude')}
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Activity className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-1">Real-time Monitoring</h3>
+                <h3 className="font-semibold mb-1">{t('pricing.realTimeMonitoring')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Track vitals 24/7
+                  {t('pricing.trackVitals')}
                 </p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Activity className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-1">Activity Tracking</h3>
+                <h3 className="font-semibold mb-1">{t('pricing.activityTracking')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Monitor daily activities
+                  {t('pricing.monitorActivities')}
                 </p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Activity className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-1">Smart Alerts</h3>
+                <h3 className="font-semibold mb-1">{t('pricing.smartAlerts')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Instant notifications
+                  {t('pricing.instantNotifications')}
                 </p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Activity className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-1">Secure & Private</h3>
+                <h3 className="font-semibold mb-1">{t('pricing.securePrivate')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  HIPAA compliant
+                  {t('pricing.hipaaCompliant')}
                 </p>
               </div>
             </div>
@@ -287,31 +293,31 @@ const Pricing = () => {
         <section className="py-12 sm:py-20 px-4">
           <div className="container mx-auto max-w-3xl">
             <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
-              Frequently Asked Questions
+              {t('pricing.faq.title')}
             </h2>
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2 text-lg">Can I switch plans later?</h3>
+                <h3 className="font-semibold mb-2 text-lg">{t('pricing.faq.switchPlans.question')}</h3>
                 <p className="text-muted-foreground">
-                  Yes! You can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.
+                  {t('pricing.faq.switchPlans.answer')}
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2 text-lg">What happens after my free trial ends?</h3>
+                <h3 className="font-semibold mb-2 text-lg">{t('pricing.faq.trialEnds.question')}</h3>
                 <p className="text-muted-foreground">
-                  After your 14-day trial, you can choose to continue with a paid plan. If you don't select a plan, your account will be paused until you choose one.
+                  {t('pricing.faq.trialEnds.answer')}
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2 text-lg">How does yearly billing work?</h3>
+                <h3 className="font-semibold mb-2 text-lg">{t('pricing.faq.yearlyBilling.question')}</h3>
                 <p className="text-muted-foreground">
-                  With yearly billing, you pay for 12 months upfront and save 5% compared to monthly billing. The full amount is charged once per year.
+                  {t('pricing.faq.yearlyBilling.answer')}
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2 text-lg">What counts as a device?</h3>
+                <h3 className="font-semibold mb-2 text-lg">{t('pricing.faq.whatIsDevice.question')}</h3>
                 <p className="text-muted-foreground">
-                  A device is any wearable or sensor connected to the SymBIoT platform for monitoring. This includes smartwatches, fitness trackers, and dedicated health monitors.
+                  {t('pricing.faq.whatIsDevice.answer')}
                 </p>
               </div>
             </div>
@@ -323,7 +329,7 @@ const Pricing = () => {
       <footer className="border-t py-8 sm:py-12 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
           <p className="text-sm sm:text-base">
-            © 2025 SymBIoT. All rights reserved.
+            {t('pricing.footer')}
           </p>
         </div>
       </footer>

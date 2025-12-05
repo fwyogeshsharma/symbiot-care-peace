@@ -1,0 +1,163 @@
+import { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { AlertTriangle, Bell } from 'lucide-react';
+import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+
+interface Alert {
+  id: string;
+  alert_type: string;
+  severity: string;
+  title: string;
+  description: string;
+  status: string;
+  created_at: string;
+  elderly_person_id: string;
+  elderly_persons?: { full_name: string };
+}
+
+interface AlertNotificationDialogProps {
+  newAlert: Alert | null;
+  onClose: () => void;
+  onAcknowledge: (alertId: string) => void;
+}
+
+export const AlertNotificationDialog = ({ newAlert, onClose, onAcknowledge }: AlertNotificationDialogProps) => {
+  const { t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (newAlert) {
+      setIsOpen(true);
+      // Play notification sound
+      playNotificationSound(newAlert.severity);
+    }
+  }, [newAlert]);
+
+  const playNotificationSound = (severity: string) => {
+    // You can add different sounds based on severity
+    // For now, we'll use the browser's notification API
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const translatedTitle = newAlert?.alert_type
+        ? t(`alerts.messages.${newAlert.alert_type}.title`, { defaultValue: newAlert?.title })
+        : newAlert?.title;
+      new Notification(t('alerts.notifications.newAlert'), {
+        body: translatedTitle || t('alerts.notifications.newAlertGenerated'),
+        icon: '/favicon.ico',
+        tag: newAlert?.id,
+      });
+    }
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    onClose();
+  };
+
+  const handleAcknowledge = async () => {
+    if (!newAlert) return;
+
+    onAcknowledge(newAlert.id);
+    setIsOpen(false);
+    onClose();
+  };
+
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'critical':
+        return 'bg-destructive text-destructive-foreground';
+      case 'high':
+        return 'bg-warning text-warning-foreground';
+      case 'medium':
+        return 'bg-accent text-accent-foreground';
+      case 'low':
+        return 'bg-muted text-muted-foreground';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const getSeverityIcon = (severity: string) => {
+    if (severity === 'critical' || severity === 'high') {
+      return <AlertTriangle className="h-6 w-6" />;
+    }
+    return <Bell className="h-6 w-6" />;
+  };
+
+  // Get translated alert title based on alert_type
+  const getTranslatedTitle = (alertType: string, fallbackTitle: string) => {
+    const translated = t(`alerts.messages.${alertType}.title`, { defaultValue: '' });
+    return translated || fallbackTitle;
+  };
+
+  // Get translated alert description based on alert_type
+  const getTranslatedDescription = (alertType: string, fallbackDescription: string) => {
+    const translated = t(`alerts.messages.${alertType}.description`, { defaultValue: '' });
+    return translated || fallbackDescription;
+  };
+
+  if (!newAlert) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-full ${getSeverityColor(newAlert.severity)}`}>
+              {getSeverityIcon(newAlert.severity)}
+            </div>
+            <div>
+              <DialogTitle className="text-lg">{t('alerts.notifications.newAlert')}</DialogTitle>
+              <DialogDescription className="text-sm">
+                {format(new Date(newAlert.created_at), 'PPp')}
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <div className="flex items-center gap-2">
+            <Badge className={`${getSeverityColor(newAlert.severity)} capitalize`}>
+              {t(`alerts.${newAlert.severity}`, { defaultValue: newAlert.severity })}
+            </Badge>
+            <Badge variant="outline" className="capitalize">
+              {t(`alerts.types.${newAlert.alert_type}`, { defaultValue: newAlert.alert_type.replace(/_/g, ' ') })}
+            </Badge>
+          </div>
+
+          <div>
+            <h4 className="font-semibold text-base mb-2">
+              {getTranslatedTitle(newAlert.alert_type, newAlert.title)}
+            </h4>
+            {newAlert.description && (
+              <p className="text-sm text-muted-foreground">
+                {getTranslatedDescription(newAlert.alert_type, newAlert.description)}
+              </p>
+            )}
+          </div>
+
+          {newAlert.elderly_persons?.full_name && (
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <p className="text-sm">
+                <span className="font-medium">{t('alerts.notifications.person')}:</span> {newAlert.elderly_persons.full_name}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="flex gap-2 sm:gap-0">
+          <Button variant="outline" onClick={handleClose}>
+            {t('alerts.notifications.viewLater')}
+          </Button>
+          <Button onClick={handleAcknowledge} className="gap-2">
+            {t('alerts.notifications.acknowledgeAlert')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};

@@ -8,6 +8,7 @@ import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 interface PairingRequest {
   id: string;
@@ -26,6 +27,7 @@ interface PairingRequest {
 }
 
 export const PairingApprovalPanel = () => {
+  const { t } = useTranslation();
   const [selectedRequest, setSelectedRequest] = useState<PairingRequest | null>(null);
   const [deviceName, setDeviceName] = useState("");
   const [location, setLocation] = useState("");
@@ -58,7 +60,7 @@ export const PairingApprovalPanel = () => {
           table: 'device_pairing_requests',
         },
         (payload) => {
-          toast.info("New device pairing request received!");
+          toast.info(t('devices.pairing.newRequestReceived'));
           refetch();
         }
       )
@@ -97,14 +99,14 @@ export const PairingApprovalPanel = () => {
 
       if (error) throw error;
 
-      toast.success("Device paired successfully!");
+      toast.success(t('devices.pairing.pairedSuccessfully'));
       setSelectedRequest(null);
       setDeviceName("");
       setLocation("");
       refetch();
     } catch (error: any) {
       console.error('Error approving pairing:', error);
-      toast.error(error.message || "Failed to approve pairing");
+      toast.error(error.message || t('devices.pairing.approveFailed'));
     } finally {
       setLoading(false);
     }
@@ -125,12 +127,12 @@ export const PairingApprovalPanel = () => {
 
       if (error) throw error;
 
-      toast.success("Pairing request rejected");
+      toast.success(t('devices.pairing.rejected'));
       setSelectedRequest(null);
       refetch();
     } catch (error: any) {
       console.error('Error rejecting pairing:', error);
-      toast.error(error.message || "Failed to reject pairing");
+      toast.error(error.message || t('devices.pairing.rejectFailed'));
     } finally {
       setLoading(false);
     }
@@ -140,8 +142,8 @@ export const PairingApprovalPanel = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Device Pairing Requests</CardTitle>
-          <CardDescription>No pending pairing requests</CardDescription>
+          <CardTitle>{t('devices.pairing.title')}</CardTitle>
+          <CardDescription>{t('devices.pairing.noPending')}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -151,46 +153,46 @@ export const PairingApprovalPanel = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Approve Device Pairing</CardTitle>
+          <CardTitle>{t('devices.pairing.approveTitle')}</CardTitle>
           <CardDescription>
-            Review and approve device for {selectedRequest.elderly_persons.full_name}
+            {t('devices.pairing.reviewAndApprove', { name: selectedRequest.elderly_persons.full_name })}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <Label className="text-muted-foreground">Device ID</Label>
+              <Label className="text-muted-foreground">{t('devices.pairing.deviceId')}</Label>
               <p className="font-mono">{selectedRequest.device_id}</p>
             </div>
             <div>
-              <Label className="text-muted-foreground">Device Type</Label>
-              <p>{selectedRequest.device_type || "Unknown"}</p>
+              <Label className="text-muted-foreground">{t('devices.pairing.deviceType')}</Label>
+              <p>{selectedRequest.device_type || t('devices.pairing.unknown')}</p>
             </div>
             <div>
-              <Label className="text-muted-foreground">Pairing Code</Label>
+              <Label className="text-muted-foreground">{t('devices.pairing.pairingCode')}</Label>
               <p className="font-mono text-lg font-bold">{selectedRequest.pairing_code}</p>
             </div>
             <div>
-              <Label className="text-muted-foreground">Requested</Label>
+              <Label className="text-muted-foreground">{t('devices.pairing.requested')}</Label>
               <p>{new Date(selectedRequest.created_at).toLocaleString()}</p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="deviceName">Device Name (Optional)</Label>
+            <Label htmlFor="deviceName">{t('devices.pairing.deviceNameOptional')}</Label>
             <Input
               id="deviceName"
-              placeholder="e.g., Living Room Sensor"
+              placeholder={t('devices.pairing.deviceNamePlaceholder')}
               value={deviceName}
               onChange={(e) => setDeviceName(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">Location (Optional)</Label>
+            <Label htmlFor="location">{t('devices.pairing.locationOptional')}</Label>
             <Input
               id="location"
-              placeholder="e.g., Living Room"
+              placeholder={t('devices.pairing.locationPlaceholder')}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
@@ -207,25 +209,25 @@ export const PairingApprovalPanel = () => {
               ) : (
                 <CheckCircle2 className="mr-2 h-4 w-4" />
               )}
-              Approve
+              {t('devices.pairing.approve')}
             </Button>
-            <Button 
-              onClick={handleReject} 
+            <Button
+              onClick={handleReject}
               disabled={loading}
               variant="destructive"
               className="flex-1"
             >
               <XCircle className="mr-2 h-4 w-4" />
-              Reject
+              {t('devices.pairing.reject')}
             </Button>
           </div>
 
-          <Button 
-            onClick={() => setSelectedRequest(null)} 
+          <Button
+            onClick={() => setSelectedRequest(null)}
             variant="ghost"
             className="w-full"
           >
-            Back to List
+            {t('devices.pairing.backToList')}
           </Button>
         </CardContent>
       </Card>
@@ -235,9 +237,9 @@ export const PairingApprovalPanel = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Device Pairing Requests</CardTitle>
+        <CardTitle>{t('devices.pairing.title')}</CardTitle>
         <CardDescription>
-          {pendingRequests.length} pending request{pendingRequests.length !== 1 ? 's' : ''}
+          {t(pendingRequests.length === 1 ? 'devices.pairing.pendingRequests' : 'devices.pairing.pendingRequestsPlural', { count: pendingRequests.length })}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -250,7 +252,7 @@ export const PairingApprovalPanel = () => {
             <div className="space-y-1">
               <p className="font-medium">{request.device_id}</p>
               <p className="text-sm text-muted-foreground">
-                For {request.elderly_persons.full_name}
+                {t('devices.pairing.forPerson', { name: request.elderly_persons.full_name })}
               </p>
             </div>
             <div className="text-right space-y-1">

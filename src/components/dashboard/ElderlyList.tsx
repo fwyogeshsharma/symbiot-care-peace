@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ElderlyPerson {
   id: string;
@@ -18,6 +19,7 @@ interface ElderlyListProps {
 }
 
 const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson }: ElderlyListProps) => {
+  const { t } = useTranslation();
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -29,12 +31,12 @@ const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson }: Elder
 
   return (
     <Card className="p-4 sm:p-6">
-      <h3 className="text-base sm:text-lg font-semibold mb-4">Monitored Individuals</h3>
+      <h3 className="text-base sm:text-lg font-semibold mb-4">{t('movement.elderlyList.title')}</h3>
 
       {elderlyPersons.length === 0 ? (
         <div className="text-center py-8">
           <User className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground">No individuals are being monitored yet.</p>
+          <p className="text-sm text-muted-foreground">{t('movement.elderlyList.noIndividuals')}</p>
         </div>
       ) : (
         <div className="flex flex-wrap gap-3">
@@ -68,12 +70,12 @@ const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson }: Elder
                   variant="outline"
                   className={`text-xs whitespace-nowrap ${person.status === 'active' ? 'border-success text-success' : 'border-muted'}`}
                 >
-                  {person.status}
+                  {t(`movement.elderlyList.status.${person.status}`, { defaultValue: person.status })}
                 </Badge>
 
                 {person.medical_conditions && person.medical_conditions.length > 0 && (
                   <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                    {person.medical_conditions.length} condition{person.medical_conditions.length > 1 ? 's' : ''}
+                    {person.medical_conditions.length} {person.medical_conditions.length > 1 ? t('movement.elderlyList.conditions') : t('movement.elderlyList.condition')}
                   </Badge>
                 )}
               </div>

@@ -7,6 +7,8 @@ import {
   alertsTourSteps,
   deviceTourSteps,
   navigationTourSteps,
+  trackingTourSteps,
+  dataSharingTourSteps,
 } from '@/data/tour-steps.tsx';
 
 interface OnboardingTourProps {
@@ -67,8 +69,12 @@ export const OnboardingTour = ({ runTour = false, onComplete }: OnboardingTourPr
         tourSteps = activityTourSteps;
       } else if (path === '/alerts') {
         tourSteps = alertsTourSteps;
-      } else if (path === '/devices') {
+      } else if (path === '/devices' || path === '/device-status') {
         tourSteps = deviceTourSteps;
+      } else if (path === '/tracking') {
+        tourSteps = trackingTourSteps;
+      } else if (path === '/data-sharing') {
+        tourSteps = dataSharingTourSteps;
       }
     } else {
       // Auto-run for first-time users on specific pages
@@ -79,8 +85,12 @@ export const OnboardingTour = ({ runTour = false, onComplete }: OnboardingTourPr
           tourSteps = activityTourSteps;
         } else if (path === '/alerts') {
           tourSteps = alertsTourSteps;
-        } else if (path === '/devices') {
+        } else if (path === '/devices' || path === '/device-status') {
           tourSteps = deviceTourSteps;
+        } else if (path === '/tracking') {
+          tourSteps = trackingTourSteps;
+        } else if (path === '/data-sharing') {
+          tourSteps = dataSharingTourSteps;
         }
       }
     }

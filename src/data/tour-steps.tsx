@@ -313,3 +313,171 @@ export const navigationTourSteps: Step[] = [
     placement: 'bottom',
   },
 ];
+
+// Tracking Page Tour Steps
+export const trackingTourSteps: Step[] = [
+  {
+    target: 'body',
+    content: (
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold">Movement Tracking 🗺️</h3>
+        <p>Monitor indoor and outdoor positioning with real-time location tracking, floor plans, and GPS.</p>
+      </div>
+    ),
+    placement: 'center',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-tour="tracking-tabs"]',
+    content: (
+      <div className="space-y-2">
+        <h4 className="font-semibold">Indoor vs Outdoor Tracking</h4>
+        <p>Switch between two tracking modes:</p>
+        <ul className="text-sm space-y-1 list-disc list-inside">
+          <li><strong>Indoor:</strong> Floor plan-based positioning with zone tracking</li>
+          <li><strong>Outdoor:</strong> GPS-based location with geofence monitoring</li>
+        </ul>
+      </div>
+    ),
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="tracking-date-range"]',
+    content: (
+      <div className="space-y-2">
+        <h4 className="font-semibold">Date Range Selection</h4>
+        <p>Choose which time period to view tracking data for - today, last 7 days, or last 30 days.</p>
+      </div>
+    ),
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="floor-plan-manager"]',
+    content: (
+      <div className="space-y-2">
+        <h4 className="font-semibold">Floor Plan Management</h4>
+        <p>Create and edit floor plans to enable indoor tracking.</p>
+        <p className="text-sm text-muted-foreground">Draw rooms, place furniture, and define zones for accurate indoor positioning.</p>
+      </div>
+    ),
+    placement: 'left',
+  },
+  {
+    target: '[data-tour="tracking-floor-plan"]',
+    content: (
+      <div className="space-y-2">
+        <h4 className="font-semibold">Indoor Floor Plan View</h4>
+        <p>See real-time position on your floor plan with:</p>
+        <ul className="text-sm space-y-1 list-disc list-inside">
+          <li>Current position marker</li>
+          <li>Movement trail history</li>
+          <li>Defined zones and furniture</li>
+        </ul>
+      </div>
+    ),
+    placement: 'top',
+  },
+  {
+    target: '[data-tour="tracking-playback"]',
+    content: (
+      <div className="space-y-2">
+        <h4 className="font-semibold">Movement Playback</h4>
+        <p>Replay movement history with playback controls:</p>
+        <ul className="text-sm space-y-1 list-disc list-inside">
+          <li>Play/pause movement replay</li>
+          <li>Adjust playback speed</li>
+          <li>Jump to specific timestamps</li>
+        </ul>
+      </div>
+    ),
+    placement: 'left',
+  },
+  {
+    target: '[data-tour="tracking-map"]',
+    content: (
+      <div className="space-y-2">
+        <h4 className="font-semibold">GPS Map View</h4>
+        <p>Interactive map showing:</p>
+        <ul className="text-sm space-y-1 list-disc list-inside">
+          <li>Current GPS location</li>
+          <li>Movement trail</li>
+          <li>Geofence boundaries</li>
+          <li>Entry/exit events</li>
+        </ul>
+      </div>
+    ),
+    placement: 'top',
+  },
+  {
+    target: '[data-tour="tracking-geofence"]',
+    content: (
+      <div className="space-y-2">
+        <h4 className="font-semibold">Geofence Manager</h4>
+        <p>Create virtual boundaries to receive alerts when someone enters or exits specific areas.</p>
+        <p className="text-sm text-muted-foreground">Perfect for monitoring safe zones like home, work, or care facilities.</p>
+      </div>
+    ),
+    placement: 'top',
+  },
+];
+
+// Data Sharing Page Tour Steps
+export const dataSharingTourSteps: Step[] = [
+  {
+    target: 'body',
+    content: (
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold">Data Sharing 🤝</h3>
+        <p>Grant and manage access to monitoring data for family members, caregivers, and healthcare providers.</p>
+      </div>
+    ),
+    placement: 'center',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-tour="data-sharing-form"]',
+    content: (
+      <div className="space-y-2">
+        <h4 className="font-semibold">Grant Access</h4>
+        <p>Share data with others by:</p>
+        <ol className="text-sm space-y-1 list-decimal list-inside">
+          <li>Enter their email address</li>
+          <li>Optionally specify their relationship (e.g., "Daughter", "Primary Care Physician")</li>
+          <li>Click "Grant Access"</li>
+        </ol>
+        <p className="text-sm text-muted-foreground mt-2">They must have a SymBIoT account to receive access.</p>
+      </div>
+    ),
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="data-sharing-list"]',
+    content: (
+      <div className="space-y-2">
+        <h4 className="font-semibold">Shared Users List</h4>
+        <p>See everyone who has access to your monitoring data.</p>
+        <p className="text-sm">You can:</p>
+        <ul className="text-sm space-y-1 list-disc list-inside">
+          <li>Edit relationship labels</li>
+          <li>Revoke access at any time</li>
+        </ul>
+        <p className="text-sm text-muted-foreground mt-2">Access changes take effect immediately.</p>
+      </div>
+    ),
+    placement: 'top',
+  },
+  {
+    target: '[data-tour="data-sharing-actions"]',
+    content: (
+      <div className="space-y-2">
+        <h4 className="font-semibold">Manage Individual Access</h4>
+        <p>For each shared user, you can:</p>
+        <ul className="text-sm space-y-1 list-disc list-inside">
+          <li><strong>Edit:</strong> Update their relationship label</li>
+          <li><strong>Revoke:</strong> Remove their access completely</li>
+        </ul>
+      </div>
+    ),
+    placement: 'left',
+  },
+];

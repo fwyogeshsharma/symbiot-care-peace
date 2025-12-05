@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsc:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx supabase functions serve:*)",
+      "Bash(grep:*)",
+      "Bash(npx tsx:*)"
     ],
     "deny": [],
     "ask": []

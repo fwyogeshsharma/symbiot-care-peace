@@ -11,8 +11,9 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Settings, Plus, Trash2, CheckCircle, Camera, Edit } from 'lucide-react';
 import { ProcessedMovementData, calculateDwellTimes } from '@/lib/movementUtils';
-import { InfoButton } from '@/components/help/InfoButton';
+import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { EmptyState } from '@/components/help/EmptyState';
+import { useTranslation } from 'react-i18next';
 
 interface IdealProfileManagerProps {
   elderlyPersonId: string;
@@ -20,6 +21,7 @@ interface IdealProfileManagerProps {
 }
 
 export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfileManagerProps) => {
+  const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProfile, setEditingProfile] = useState<any>(null);
   const queryClient = useQueryClient();
@@ -68,12 +70,12 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ideal-profiles'] });
-      toast.success(editingProfile ? 'Profile updated' : 'Profile created');
+      toast.success(editingProfile ? t('movement.idealProfile.profileUpdated') : t('movement.idealProfile.profileCreated'));
       setIsDialogOpen(false);
       resetForm();
     },
     onError: () => {
-      toast.error('Failed to save profile');
+      toast.error(t('movement.idealProfile.failedToSave'));
     },
   });
 
@@ -88,10 +90,10 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ideal-profiles'] });
-      toast.success('Profile deleted');
+      toast.success(t('movement.idealProfile.profileDeleted'));
     },
     onError: () => {
-      toast.error('Failed to delete profile');
+      toast.error(t('movement.idealProfile.failedToDelete'));
     },
   });
 
@@ -106,10 +108,10 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ideal-profiles'] });
-      toast.success('Profile activated');
+      toast.success(t('movement.idealProfile.profileActivated'));
     },
     onError: () => {
-      toast.error('Failed to activate profile');
+      toast.error(t('movement.idealProfile.failedToActivate'));
     },
   });
 
@@ -124,7 +126,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
 
   const handleUseCurrentAsBaseline = () => {
     if (!currentData) {
-      toast.error('No current data available');
+      toast.error(t('movement.idealProfile.noCurrentData'));
       return;
     }
 
@@ -141,7 +143,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
     });
 
     setFormData({ ...formData, baseline_data: baseline });
-    toast.success('Baseline set from current activity');
+    toast.success(t('movement.idealProfile.baselineSet'));
   };
 
   const handleEditProfile = (profile: any) => {
@@ -157,11 +159,11 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.profile_name.trim()) {
-      toast.error('Profile name is required');
+      toast.error(t('movement.idealProfile.profileNameRequired'));
       return;
     }
     if (Object.keys(formData.baseline_data).length === 0) {
-      toast.error('Baseline data is required');
+      toast.error(t('movement.idealProfile.baselineRequired'));
       return;
     }
     saveMutation.mutate(formData);
@@ -184,28 +186,27 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CardTitle className="flex items-center gap-2">
               <Settings className="w-5 h-5" />
-              Ideal Profile Management
+              {t('movement.idealProfile.title')}
             </CardTitle>
-            <InfoButton
-              title="What are Ideal Profiles?"
+            <HelpTooltip
+              title={t('movement.idealProfile.helpTitle')}
               content={
                 <div className="space-y-2">
-                  <p>Ideal profiles define baseline activity patterns for monitoring deviations.</p>
-                  <p className="text-xs mt-2"><strong>How to use:</strong></p>
+                  <p>{t('movement.idealProfile.helpDescription')}</p>
+                  <p className="text-xs mt-2"><strong>{t('movement.idealProfile.helpHowToUse')}</strong></p>
                   <ol className="text-xs space-y-1 list-decimal list-inside">
-                    <li>Create a profile with a descriptive name</li>
-                    <li>Use "Use Current as Baseline" to capture current activity</li>
-                    <li>Adjust min/max thresholds for each location</li>
-                    <li>Activate the profile to start monitoring</li>
+                    <li>{t('movement.idealProfile.helpStep1')}</li>
+                    <li>{t('movement.idealProfile.helpStep2')}</li>
+                    <li>{t('movement.idealProfile.helpStep3')}</li>
+                    <li>{t('movement.idealProfile.helpStep4')}</li>
                   </ol>
-                  <p className="text-xs mt-2">The system will alert you when actual dwell times deviate significantly from the ideal ranges.</p>
+                  <p className="text-xs mt-2">{t('movement.idealProfile.helpAlertInfo')}</p>
                 </div>
               }
-              side="bottom"
             />
           </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
@@ -213,41 +214,41 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
             if (!open) resetForm();
           }}>
             <DialogTrigger asChild>
-              <Button size="sm" className="w-full sm:w-auto">
+              <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />
-                New Profile
+                {t('movement.idealProfile.newProfile')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
-                  {editingProfile ? 'Edit Ideal Profile' : 'Create Ideal Profile'}
+                  {editingProfile ? t('movement.idealProfile.editProfile') : t('movement.idealProfile.createProfile')}
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <Label htmlFor="profile_name">Profile Name</Label>
+                  <Label htmlFor="profile_name">{t('movement.idealProfile.profileName')}</Label>
                   <Input
                     id="profile_name"
                     value={formData.profile_name}
                     onChange={(e) => setFormData({ ...formData, profile_name: e.target.value })}
-                    placeholder="e.g., Weekday Routine, Weekend Pattern"
+                    placeholder={t('movement.idealProfile.profileNamePlaceholder')}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="notes">Notes</Label>
+                  <Label htmlFor="notes">{t('movement.idealProfile.notes')}</Label>
                   <Textarea
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Optional notes about this profile..."
+                    placeholder={t('movement.idealProfile.notesPlaceholder')}
                   />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <Label>Baseline Dwell Times (minutes)</Label>
+                    <Label>{t('movement.idealProfile.baselineDwellTimes')}</Label>
                     {currentData && (
                       <Button
                         type="button"
@@ -256,7 +257,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
                         onClick={handleUseCurrentAsBaseline}
                       >
                         <Camera className="w-4 h-4 mr-2" />
-                        Use Current as Baseline
+                        {t('movement.idealProfile.useCurrentBaseline')}
                       </Button>
                     )}
                   </div>
@@ -264,7 +265,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
                   {Object.keys(formData.baseline_data).length === 0 ? (
                     <div className="text-center py-8 border rounded-lg bg-muted/50">
                       <p className="text-sm text-muted-foreground">
-                        No baseline data. Click "Use Current as Baseline" to start.
+                        {t('movement.idealProfile.noBaselineData')}
                       </p>
                     </div>
                   ) : (
@@ -274,7 +275,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
                           <p className="font-medium text-sm">{location}</p>
                           <div className="grid grid-cols-3 gap-3 ml-4">
                             <div>
-                              <Label className="text-xs">Min</Label>
+                              <Label className="text-xs">{t('movement.idealProfile.min')}</Label>
                               <Input
                                 type="number"
                                 value={values.min_minutes}
@@ -283,7 +284,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
                               />
                             </div>
                             <div>
-                              <Label className="text-xs">Ideal</Label>
+                              <Label className="text-xs">{t('movement.idealProfile.ideal')}</Label>
                               <Input
                                 type="number"
                                 value={values.ideal_minutes}
@@ -292,7 +293,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
                               />
                             </div>
                             <div>
-                              <Label className="text-xs">Max</Label>
+                              <Label className="text-xs">{t('movement.idealProfile.max')}</Label>
                               <Input
                                 type="number"
                                 value={values.max_minutes}
@@ -309,10 +310,10 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
 
                 <div className="flex justify-end gap-2">
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancel
+                    {t('movement.idealProfile.cancel')}
                   </Button>
                   <Button type="submit" disabled={saveMutation.isPending}>
-                    {saveMutation.isPending ? 'Saving...' : editingProfile ? 'Update' : 'Create'}
+                    {saveMutation.isPending ? t('movement.idealProfile.saving') : editingProfile ? t('movement.idealProfile.update') : t('movement.idealProfile.create')}
                   </Button>
                 </div>
               </form>
@@ -331,7 +332,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
                     {profile.is_active && (
                       <Badge className="bg-success text-xs">
                         <CheckCircle className="w-3 h-3 mr-1" />
-                        Active
+                        {t('movement.idealProfile.active')}
                       </Badge>
                     )}
                   </div>
@@ -339,7 +340,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
                     <p className="text-sm text-muted-foreground">{profile.notes}</p>
                   )}
                   <p className="text-xs text-muted-foreground mt-1">
-                    {Object.keys(profile.baseline_data || {}).length} locations configured
+                    {Object.keys(profile.baseline_data || {}).length} {t('movement.idealProfile.locationsConfigured')}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -350,7 +351,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
                       onClick={() => activateMutation.mutate(profile.id)}
                       disabled={activateMutation.isPending}
                     >
-                      Activate
+                      {t('movement.idealProfile.activate')}
                     </Button>
                   )}
                   <Button
@@ -375,8 +376,8 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
         ) : (
           <EmptyState
             icon={Settings}
-            title="No ideal profiles yet"
-            description="Create an ideal profile to establish baseline activity patterns and receive alerts when deviations occur. Use the 'New Profile' button above to get started."
+            title={t('movement.idealProfile.noProfilesYet')}
+            description={t('movement.idealProfile.noProfilesDescription')}
           />
         )}
       </CardContent>

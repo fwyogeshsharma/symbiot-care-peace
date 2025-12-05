@@ -5,6 +5,7 @@ import { Slider } from '@/components/ui/slider';
 import { Play, Pause, SkipBack, SkipForward, FastForward } from 'lucide-react';
 import { Position } from '@/lib/positionUtils';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface MovementPlaybackProps {
   positions: { position: Position; timestamp: Date }[];
@@ -17,6 +18,7 @@ export const MovementPlayback = ({
   onPositionChange,
   currentIndex
 }: MovementPlaybackProps) => {
+  const { t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   
@@ -58,7 +60,7 @@ export const MovementPlayback = ({
   if (positions.length === 0) {
     return (
       <Card className="p-4">
-        <p className="text-center text-muted-foreground">No movement data to playback</p>
+        <p className="text-center text-muted-foreground">{t('tracking.playback.noData')}</p>
       </Card>
     );
   }
@@ -69,7 +71,7 @@ export const MovementPlayback = ({
     <Card className="p-4">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Movement Playback</h3>
+          <h3 className="text-lg font-semibold">{t('tracking.playback.title')}</h3>
           <div className="text-sm text-muted-foreground">
             {format(currentPosition.timestamp, 'PPpp')}
           </div>
@@ -137,17 +139,17 @@ export const MovementPlayback = ({
 
         <div className="grid grid-cols-3 gap-4 pt-2 border-t text-sm">
           <div>
-            <div className="text-muted-foreground">Zone</div>
+            <div className="text-muted-foreground">{t('tracking.playback.zone')}</div>
             <div className="font-medium">{currentPosition.position.zone}</div>
           </div>
           <div>
-            <div className="text-muted-foreground">Speed</div>
+            <div className="text-muted-foreground">{t('tracking.playback.speed')}</div>
             <div className="font-medium">
               {currentPosition.position.speed?.toFixed(2) || '0.00'} m/s
             </div>
           </div>
           <div>
-            <div className="text-muted-foreground">Accuracy</div>
+            <div className="text-muted-foreground">{t('tracking.playback.accuracy')}</div>
             <div className="font-medium">
               ±{currentPosition.position.accuracy?.toFixed(1) || '0.0'}m
             </div>

@@ -5,12 +5,23 @@ import { Thermometer, Droplets, Wind, AlertCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
+import { extractNumericValue } from '@/lib/valueExtractor';
+import { useTranslation } from 'react-i18next';
+
+// Check if temperature unit is Fahrenheit
+const isTemperatureFahrenheit = (unit: string | null | undefined): boolean => {
+  if (!unit) return false;
+  const normalizedUnit = unit.toLowerCase().trim();
+  return normalizedUnit === '°f' || normalizedUnit === 'f' || normalizedUnit === 'fahrenheit';
+};
 
 interface EnvironmentalSensorsProps {
   selectedPersonId: string | null;
 }
 
 const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) => {
+  const { t } = useTranslation();
+
   const { data: environmentalData, isLoading } = useQuery({
     queryKey: ['environmental-data', selectedPersonId],
     queryFn: async () => {
@@ -18,7 +29,10 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
 
       const { data, error } = await supabase
         .from('device_data')
-        .select('*')
+        .select(`
+          *,
+          devices!inner(device_name, device_type, device_types!inner(category))
+        `)
         .eq('elderly_person_id', selectedPersonId)
         .in('data_type', ['temperature', 'humidity', 'aqi'])
         .order('recorded_at', { ascending: false })
@@ -26,8 +40,27 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
 
       if (error) throw error;
 
+      // Filter to only environmental sensors (exclude medical devices)
+      const environmentalOnly = data.filter((item: any) => {
+        const deviceCategory = item.devices?.device_types?.category;
+        const deviceType = item.devices?.device_type;
+
+        // Air quality always comes from environmental sensors, so include it regardless
+        if (item.data_type === 'aqi') {
+          return true;
+        }
+
+        // For temperature and humidity, filter by device category/type to exclude medical devices
+        return deviceCategory === 'environment' ||
+               deviceCategory === 'ENVIRONMENTAL' ||
+               deviceCategory === 'Environmental Sensor' ||
+               deviceType === 'environmental' ||
+               deviceType === 'temp_sensor' ||
+               deviceType === 'environmental_sensor';
+      });
+
       // Group by data_type and get latest value
-      const grouped = data.reduce((acc, item) => {
+      const grouped = environmentalOnly.reduce((acc, item) => {
         if (!acc[item.data_type]) {
           acc[item.data_type] = item;
         }
@@ -37,61 +70,71 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
       return Object.values(grouped);
     },
     enabled: !!selectedPersonId,
+    refetchInterval: 10000, // Refetch every 10 seconds
   });
 
-  const getTemperature = () => {
+  const getTemperature = (): { value: number; unit: string | null } | null => {
     const tempData = environmentalData?.find(d => d.data_type === 'temperature');
     if (!tempData) return null;
-    const value = typeof tempData.value === 'object' ? tempData.value.value : tempData.value;
-    return Number(value);
+    const value = extractNumericValue(tempData.value, 'temperature');
+    if (value === null) return null;
+    return { value, unit: tempData.unit };
   };
 
   const getHumidity = () => {
     const humidityData = environmentalData?.find(d => d.data_type === 'humidity');
     if (!humidityData) return null;
-    const value = typeof humidityData.value === 'object' ? humidityData.value.value : humidityData.value;
-    return Number(value);
+    return extractNumericValue(humidityData.value, 'humidity');
   };
 
   const getAirQuality = () => {
     const aqData = environmentalData?.find(d => d.data_type === 'aqi');
     if (!aqData) return null;
-    const value = typeof aqData.value === 'object' ? aqData.value.value : aqData.value;
-    return Number(value);
+    return extractNumericValue(aqData.value, 'aqi');
   };
 
-  const temperature = getTemperature();
+  const temperatureData = getTemperature();
   const humidity = getHumidity();
   const airQuality = getAirQuality();
 
-  const getTempStatus = (tempCelsius: number | null) => {
-    if (tempCelsius === null) return { color: 'text-muted-foreground', label: 'No data', gradient: 'from-muted to-muted' };
-    const temp = celsiusToFahrenheit(tempCelsius);
-    // Converted ranges: 64°F, 72°F, 79°F, 86°F
-    if (temp < 64) return { color: 'text-info', label: 'Cold', gradient: 'from-info/20 to-info/5' };
-    if (temp < 72) return { color: 'text-success', label: 'Cool', gradient: 'from-success/20 to-success/5' };
-    if (temp < 79) return { color: 'text-success', label: 'Comfortable', gradient: 'from-success/20 to-success/5' };
-    if (temp < 86) return { color: 'text-warning', label: 'Warm', gradient: 'from-warning/20 to-warning/5' };
-    return { color: 'text-destructive', label: 'Hot', gradient: 'from-destructive/20 to-destructive/5' };
+  // Get temperature in Fahrenheit (convert if needed)
+  const getTemperatureInFahrenheit = (): number | null => {
+    if (!temperatureData) return null;
+    // If already in Fahrenheit, use as-is; otherwise convert from Celsius
+    return isTemperatureFahrenheit(temperatureData.unit)
+      ? temperatureData.value
+      : celsiusToFahrenheit(temperatureData.value);
+  };
+
+  const temperatureFahrenheit = getTemperatureInFahrenheit();
+
+  const getTempStatus = (tempF: number | null) => {
+    if (tempF === null) return { color: 'text-muted-foreground', label: t('environmental.status.noData'), gradient: 'from-muted to-muted' };
+    // Ranges in Fahrenheit: 64°F, 72°F, 79°F, 86°F
+    if (tempF < 64) return { color: 'text-info', label: t('environmental.status.cold'), gradient: 'from-info/20 to-info/5' };
+    if (tempF < 72) return { color: 'text-success', label: t('environmental.status.cool'), gradient: 'from-success/20 to-success/5' };
+    if (tempF < 79) return { color: 'text-success', label: t('environmental.status.comfortable'), gradient: 'from-success/20 to-success/5' };
+    if (tempF < 86) return { color: 'text-warning', label: t('environmental.status.warm'), gradient: 'from-warning/20 to-warning/5' };
+    return { color: 'text-destructive', label: t('environmental.status.hot'), gradient: 'from-destructive/20 to-destructive/5' };
   };
 
   const getHumidityStatus = (hum: number | null) => {
-    if (hum === null) return { color: 'text-muted-foreground', label: 'No data', gradient: 'from-muted to-muted' };
-    if (hum < 30) return { color: 'text-warning', label: 'Dry', gradient: 'from-warning/20 to-warning/5' };
-    if (hum < 60) return { color: 'text-success', label: 'Comfortable', gradient: 'from-success/20 to-success/5' };
-    return { color: 'text-info', label: 'Humid', gradient: 'from-info/20 to-info/5' };
+    if (hum === null) return { color: 'text-muted-foreground', label: t('environmental.status.noData'), gradient: 'from-muted to-muted' };
+    if (hum < 30) return { color: 'text-warning', label: t('environmental.status.dry'), gradient: 'from-warning/20 to-warning/5' };
+    if (hum < 60) return { color: 'text-success', label: t('environmental.status.comfortable'), gradient: 'from-success/20 to-success/5' };
+    return { color: 'text-info', label: t('environmental.status.humid'), gradient: 'from-info/20 to-info/5' };
   };
 
   const getAirQualityStatus = (aqi: number | null) => {
-    if (aqi === null) return { color: 'text-muted-foreground', label: 'No data', gradient: 'from-muted to-muted' };
-    if (aqi <= 50) return { color: 'text-success', label: 'Good', gradient: 'from-success/20 to-success/5' };
-    if (aqi <= 100) return { color: 'text-success', label: 'Moderate', gradient: 'from-success/20 to-success/5' };
-    if (aqi <= 150) return { color: 'text-warning', label: 'Unhealthy for Sensitive', gradient: 'from-warning/20 to-warning/5' };
-    if (aqi <= 200) return { color: 'text-warning', label: 'Unhealthy', gradient: 'from-warning/20 to-warning/5' };
-    return { color: 'text-destructive', label: 'Hazardous', gradient: 'from-destructive/20 to-destructive/5' };
+    if (aqi === null) return { color: 'text-muted-foreground', label: t('environmental.status.noData'), gradient: 'from-muted to-muted' };
+    if (aqi <= 50) return { color: 'text-success', label: t('environmental.status.good'), gradient: 'from-success/20 to-success/5' };
+    if (aqi <= 100) return { color: 'text-success', label: t('environmental.status.moderate'), gradient: 'from-success/20 to-success/5' };
+    if (aqi <= 150) return { color: 'text-warning', label: t('environmental.status.unhealthySensitive'), gradient: 'from-warning/20 to-warning/5' };
+    if (aqi <= 200) return { color: 'text-warning', label: t('environmental.status.unhealthy'), gradient: 'from-warning/20 to-warning/5' };
+    return { color: 'text-destructive', label: t('environmental.status.hazardous'), gradient: 'from-destructive/20 to-destructive/5' };
   };
 
-  const tempStatus = getTempStatus(temperature);
+  const tempStatus = getTempStatus(temperatureFahrenheit);
   const humidityStatus = getHumidityStatus(humidity);
   const airQualityStatus = getAirQualityStatus(airQuality);
 
@@ -101,12 +144,12 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Thermometer className="w-5 h-5" />
-            Environmental Sensors
+            {t('environmental.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground text-center py-8">
-            Select a person to view environmental data
+            {t('environmental.selectPerson')}
           </p>
         </CardContent>
       </Card>
@@ -119,7 +162,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Thermometer className="w-5 h-5" />
-            Environmental Sensors
+            {t('environmental.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -131,14 +174,14 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
     );
   }
 
-  const hasData = temperature !== null || humidity !== null || airQuality !== null;
+  const hasData = temperatureFahrenheit !== null || humidity !== null || airQuality !== null;
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Thermometer className="w-5 h-5" />
-          Environmental Sensors
+          {t('environmental.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -146,7 +189,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
           <div className="text-center py-8">
             <AlertCircle className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
             <p className="text-sm text-muted-foreground">
-              No environmental data available
+              {t('environmental.noData')}
             </p>
           </div>
         ) : (
@@ -163,17 +206,17 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
                     <Thermometer className={cn("w-6 h-6", tempStatus.color)} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Temperature</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('environmental.temperature')}</p>
                     <p className="text-xs text-muted-foreground">{tempStatus.label}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  {temperature !== null ? (
+                  {temperatureFahrenheit !== null ? (
                     <>
                       <p className={cn("text-3xl font-bold", tempStatus.color)}>
-                        {celsiusToFahrenheit(temperature).toFixed(1)}°
+                        {temperatureFahrenheit.toFixed(1)}°
                       </p>
-                      <p className="text-xs text-muted-foreground">Fahrenheit</p>
+                      <p className="text-xs text-muted-foreground">{t('environmental.fahrenheit')}</p>
                     </>
                   ) : (
                     <p className="text-xl text-muted-foreground">—</p>
@@ -182,14 +225,14 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
               </div>
               
               {/* Temperature Progress Bar */}
-              {temperature !== null && (
+              {temperatureFahrenheit !== null && (
                 <div className="relative h-2 bg-background/50 rounded-full overflow-hidden">
                   <div
                     className={cn(
                       "absolute top-0 left-0 h-full rounded-full transition-all duration-500",
                       "bg-gradient-to-r from-info via-success to-destructive"
                     )}
-                    style={{ width: `${Math.min(Math.max((celsiusToFahrenheit(temperature) / 104) * 100, 0), 100)}%` }}
+                    style={{ width: `${Math.min(Math.max((temperatureFahrenheit / 104) * 100, 0), 100)}%` }}
                   />
                 </div>
               )}
@@ -207,7 +250,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
                     <Droplets className={cn("w-6 h-6", humidityStatus.color)} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Humidity</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('environmental.humidity')}</p>
                     <p className="text-xs text-muted-foreground">{humidityStatus.label}</p>
                   </div>
                 </div>
@@ -217,7 +260,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
                       <p className={cn("text-3xl font-bold", humidityStatus.color)}>
                         {Math.round(humidity)}%
                       </p>
-                      <p className="text-xs text-muted-foreground">Relative</p>
+                      <p className="text-xs text-muted-foreground">{t('environmental.relative')}</p>
                     </>
                   ) : (
                     <p className="text-xl text-muted-foreground">—</p>
@@ -251,7 +294,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
                     <Wind className={cn("w-6 h-6", airQualityStatus.color)} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Air Quality</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('environmental.airQuality')}</p>
                     <p className="text-xs text-muted-foreground">{airQualityStatus.label}</p>
                   </div>
                 </div>
@@ -261,7 +304,7 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
                       <p className={cn("text-3xl font-bold", airQualityStatus.color)}>
                         {Math.round(airQuality)}
                       </p>
-                      <p className="text-xs text-muted-foreground">AQI</p>
+                      <p className="text-xs text-muted-foreground">{t('environmental.aqi')}</p>
                     </>
                   ) : (
                     <p className="text-xl text-muted-foreground">—</p>
