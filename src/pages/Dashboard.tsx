@@ -271,9 +271,9 @@ const Dashboard = () => {
             onClick={() => scrollToSection('elderly-list-section')}
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 overflow-hidden">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.monitoredPersons.label')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2">{t('dashboard.stats.monitoredPersons.label')}</p>
                   <HelpTooltip content={t('dashboard.stats.monitoredPersons.tooltip')} />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">{elderlyPersons?.length || 0}</p>
@@ -289,9 +289,9 @@ const Dashboard = () => {
             onClick={() => scrollToSection('alerts-list-section')}
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 overflow-hidden">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.activeAlerts.label')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2">{t('dashboard.stats.activeAlerts.label')}</p>
                   <HelpTooltip content={t('dashboard.stats.activeAlerts.tooltip')} />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">{alerts?.length || 0}</p>
@@ -304,9 +304,9 @@ const Dashboard = () => {
 
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 overflow-hidden">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.avgHeartRate.label')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2">{t('dashboard.stats.avgHeartRate.label')}</p>
                   <HelpTooltip
                     title={t('dashboard.stats.avgHeartRate.title')}
                     content={t('dashboard.stats.avgHeartRate.tooltip')}
@@ -329,9 +329,9 @@ const Dashboard = () => {
 
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 overflow-hidden">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.activityLevel.label')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2">{t('dashboard.stats.activityLevel.label')}</p>
                   <HelpTooltip
                     title={t('dashboard.stats.activityLevel.title')}
                     content={
@@ -343,7 +343,7 @@ const Dashboard = () => {
                     }
                   />
                 </div>
-                <p className="text-2xl sm:text-3xl font-bold">
+                <p className="text-2xl sm:text-3xl font-bold break-words">
                   {activityLevel !== null ? activityLevel : '—'}
                 </p>
                 {activityLevel === null && (
