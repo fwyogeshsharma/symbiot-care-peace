@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,11 +8,14 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Pill, Plus, ClipboardList } from 'lucide-react';
+import { Pill, Plus, ClipboardList, Bell, BellOff } from 'lucide-react';
 import { MedicationScheduleForm } from '@/components/medication/MedicationScheduleForm';
 import { MedicationScheduleList } from '@/components/medication/MedicationScheduleList';
 import { MedicationAdherenceLog } from '@/components/medication/MedicationAdherenceLog';
 import { useTranslation } from 'react-i18next';
+import { useCapacitorNotifications } from '@/hooks/useCapacitorNotifications';
+import { NotificationChannels } from '@/lib/capacitor/notifications';
+import { toast } from 'sonner';
 
 interface MedicationSchedule {
   id: string;
@@ -34,6 +37,84 @@ export default function MedicationConfig() {
   const [selectedPersonId, setSelectedPersonId] = useState<string>('');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editSchedule, setEditSchedule] = useState<MedicationSchedule | null>(null);
+  const { isEnabled: notificationsEnabled, scheduleNotification, cancelAllNotifications, getPendingNotifications } = useCapacitorNotifications();
+  const [remindersEnabled, setRemindersEnabled] = useState(false);
+
+  // Check if reminders are already scheduled
+  useEffect(() => {
+    const checkReminders = async () => {
+      const pending = await getPendingNotifications();
+      setRemindersEnabled(pending.length > 0);
+    };
+    checkReminders();
+  }, [getPendingNotifications]);
+
+  // Schedule medication reminders
+  const scheduleMedicationReminders = async () => {
+    if (!notificationsEnabled) {
+      toast.error(t('medication.notifications.notEnabled', 'Notifications are not enabled'));
+      return;
+    }
+
+    try {
+      // Get all active medication schedules
+      const { data: schedules } = await supabase
+        .from('medication_schedules')
+        .select('*')
+        .eq('elderly_person_id', selectedPersonId)
+        .eq('is_active', true);
+
+      if (!schedules || schedules.length === 0) {
+        toast.info(t('medication.notifications.noSchedules', 'No active medication schedules to remind'));
+        return;
+      }
+
+      // Cancel existing reminders first
+      await cancelAllNotifications();
+
+      // Schedule notifications for each medication time
+      for (const schedule of schedules) {
+        const times = schedule.times as string[];
+        for (const time of times) {
+          const [hours, minutes] = time.split(':').map(Number);
+          const scheduleDate = new Date();
+          scheduleDate.setHours(hours, minutes, 0, 0);
+
+          // If time has passed today, schedule for tomorrow
+          if (scheduleDate <= new Date()) {
+            scheduleDate.setDate(scheduleDate.getDate() + 1);
+          }
+
+          await scheduleNotification({
+            title: t('medication.notifications.reminderTitle', 'Medication Reminder'),
+            body: t('medication.notifications.reminderBody', {
+              name: schedule.medication_name,
+              dosage: schedule.dosage_mg ? `${schedule.dosage_mg}${schedule.dosage_unit || 'mg'}` : ''
+            }),
+            severity: 'high',
+            schedule: {
+              at: scheduleDate,
+              repeats: true,
+              every: 'day',
+            },
+          });
+        }
+      }
+
+      setRemindersEnabled(true);
+      toast.success(t('medication.notifications.scheduled', 'Medication reminders scheduled'));
+    } catch (error) {
+      console.error('Failed to schedule reminders:', error);
+      toast.error(t('medication.notifications.error', 'Failed to schedule reminders'));
+    }
+  };
+
+  // Cancel all medication reminders
+  const cancelMedicationReminders = async () => {
+    await cancelAllNotifications();
+    setRemindersEnabled(false);
+    toast.success(t('medication.notifications.cancelled', 'Medication reminders cancelled'));
+  };
 
   const { data: elderlyPersons } = useQuery({
     queryKey: ['elderly-persons', user?.id],
@@ -85,10 +166,30 @@ export default function MedicationConfig() {
                 </Select>
               </div>
               {selectedPersonId && (
-                <Button onClick={() => setShowAddDialog(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t('medication.config.addMedication')}
-                </Button>
+                <div className="flex gap-2">
+                  <Button onClick={() => setShowAddDialog(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t('medication.config.addMedication')}
+                  </Button>
+                  {notificationsEnabled && (
+                    <Button
+                      variant={remindersEnabled ? "destructive" : "secondary"}
+                      onClick={remindersEnabled ? cancelMedicationReminders : scheduleMedicationReminders}
+                    >
+                      {remindersEnabled ? (
+                        <>
+                          <BellOff className="h-4 w-4 mr-2" />
+                          {t('medication.notifications.disable', 'Disable Reminders')}
+                        </>
+                      ) : (
+                        <>
+                          <Bell className="h-4 w-4 mr-2" />
+                          {t('medication.notifications.enable', 'Enable Reminders')}
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
           </CardContent>

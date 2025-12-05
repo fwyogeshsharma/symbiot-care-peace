@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
-import { Heart, Activity, AlertTriangle, Users } from 'lucide-react';
+import { Heart, Activity, AlertTriangle, Users, Wifi, WifiOff } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState, useCallback } from 'react';
@@ -17,6 +17,8 @@ import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import { useTranslation } from 'react-i18next';
 import { AlertNotificationDialog } from '@/components/dashboard/AlertNotificationDialog';
 import { toast } from 'sonner';
+import { useCapacitor } from '@/contexts/CapacitorContext';
+import { vibrateForSeverity } from '@/lib/capacitor/haptics';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -26,6 +28,9 @@ const Dashboard = () => {
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [newAlert, setNewAlert] = useState<any>(null);
   const shouldShowTour = useShouldShowTour();
+
+  // Capacitor integration
+  const { network, notifications } = useCapacitor();
 
   // Fetch elderly persons based on role
   const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
@@ -179,11 +184,25 @@ const Dashboard = () => {
 
             if (device?.device_type === 'emergency_button') {
               const elderlyPerson = device.elderly_persons as any;
+              const personName = elderlyPerson?.full_name || t('panicSos.unknown');
+
               // Show toast notification for panic SOS
               toast.error(t('panicSos.notifications.emergencyAlert'), {
-                description: `${t('panicSos.notifications.sosActivated')} ${elderlyPerson?.full_name || t('panicSos.unknown')}`,
+                description: `${t('panicSos.notifications.sosActivated')} ${personName}`,
                 duration: 10000,
               });
+
+              // Native notification with haptic feedback
+              if (notifications.isEnabled) {
+                notifications.showNotification({
+                  title: t('panicSos.notifications.emergencyAlert'),
+                  body: `${t('panicSos.notifications.sosActivated')} ${personName}`,
+                  severity: 'critical',
+                });
+              }
+
+              // Haptic feedback for emergency
+              vibrateForSeverity('critical');
 
               // Refetch panic events
               queryClient.invalidateQueries({ queryKey: ['panic-sos-events'] });
@@ -212,6 +231,19 @@ const Dashboard = () => {
 
           if (fullAlert) {
             setNewAlert(fullAlert);
+
+            // Native notification for new alerts
+            if (notifications.isEnabled) {
+              const severity = fullAlert.severity || 'medium';
+              notifications.showNotification({
+                title: fullAlert.title || t('alerts.newAlert'),
+                body: fullAlert.message || '',
+                severity: severity as any,
+              });
+            }
+
+            // Haptic feedback based on severity
+            vibrateForSeverity(fullAlert.severity || 'medium');
           }
         }
       )
@@ -255,6 +287,14 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
       <Header />
+
+      {/* Network Status Indicator */}
+      {!network.isOnline && (
+        <div className="bg-destructive text-destructive-foreground px-4 py-2 text-center text-sm flex items-center justify-center gap-2">
+          <WifiOff className="w-4 h-4" />
+          {t('common.offline', 'You are offline. Some features may not be available.')}
+        </div>
+      )}
 
       {/* Alert Notification Dialog */}
       <AlertNotificationDialog

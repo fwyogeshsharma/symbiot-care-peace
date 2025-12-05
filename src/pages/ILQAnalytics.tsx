@@ -5,13 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Activity, TrendingUp, AlertCircle, BarChart3, RefreshCw, Download, Mail } from 'lucide-react';
+import { Activity, TrendingUp, AlertCircle, BarChart3, RefreshCw, Download, Mail, Share2 } from 'lucide-react';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { useElderly } from '@/contexts/ElderlyContext';
 import Header from '@/components/layout/Header';
 import { useTranslation } from 'react-i18next';
+import { useFileSystem } from '@/hooks/useFileSystem';
+import { isNative } from '@/lib/capacitor/platform';
 
 export default function ILQAnalytics() {
   const { t } = useTranslation();
@@ -20,6 +22,41 @@ export default function ILQAnalytics() {
   const [timeRange, setTimeRange] = useState<string>('30');
   const [isAutoRefreshing, setIsAutoRefreshing] = useState(true);
   const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { writeFile, shareText, downloadCSV } = useFileSystem();
+
+  // Helper function for web download fallback
+  const downloadFallback = (content: string, filename: string) => {
+    const blob = new Blob([content], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Export ILQ data as CSV
+  const exportCSVData = async () => {
+    if (!ilqHistory || ilqHistory.length === 0) {
+      toast.error(t('ilq.analytics.noDataToExport', 'No data to export'));
+      return;
+    }
+
+    const csvData = ilqHistory.map(score => ({
+      date: new Date(score.computation_timestamp).toLocaleDateString(),
+      overall_score: score.score,
+      health_vitals: score.health_vitals_score,
+      physical_activity: score.physical_activity_score,
+      cognitive_function: score.cognitive_function_score,
+      environmental_safety: score.environmental_safety_score,
+    }));
+
+    const filename = `ILQ-Data-${new Date().toISOString().split('T')[0]}.csv`;
+    await downloadCSV(filename, csvData);
+    toast.success(t('ilq.analytics.csvExported', 'CSV data exported'));
+  };
 
   const { data: ilqHistory, isLoading: historyLoading, refetch } = useQuery({
     queryKey: ['ilq-history', selectedPersonId, timeRange],
@@ -141,16 +178,21 @@ export default function ILQAnalytics() {
 
       if (error) throw error;
 
-      // Convert HTML to downloadable file
-      const blob = new Blob([data.html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ILQ-Report-${new Date().toISOString().split('T')[0]}.html`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const filename = `ILQ-Report-${new Date().toISOString().split('T')[0]}.html`;
+
+      // On native platforms, save to filesystem
+      if (isNative()) {
+        const filePath = await writeFile(filename, data.html);
+        if (filePath) {
+          toast.success(t('ilq.analytics.reportSaved', { path: filename }));
+        } else {
+          // Fallback if file system fails
+          downloadFallback(data.html, filename);
+        }
+      } else {
+        // Web fallback - download directly
+        downloadFallback(data.html, filename);
+      }
 
       toast.success(t('ilq.analytics.reportDownloaded'));
     } catch (error: any) {
