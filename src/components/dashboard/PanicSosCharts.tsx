@@ -6,10 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
+import { de, es, fr, frCA, enUS, hi, Locale } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
+
+// Map language codes to date-fns locales
+const getDateLocale = (language: string): Locale => {
+  const localeMap: Record<string, Locale> = {
+    'en': enUS,
+    'de': de,
+    'es': es,
+    'fr': fr,
+    'fr-CA': frCA,
+    'hi': hi,
+  };
+  return localeMap[language] || enUS;
+};
 
 interface PanicSosChartsProps {
   open: boolean;
@@ -18,6 +33,8 @@ interface PanicSosChartsProps {
 }
 
 export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSosChartsProps) => {
+  const { t, i18n } = useTranslation();
+  const dateLocale = getDateLocale(i18n.language);
   const [dateRange, setDateRange] = useState({
     from: subDays(new Date(), 30),
     to: new Date(),
@@ -51,7 +68,7 @@ export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSo
 
   // Group events by date
   const eventsByDate = panicData?.reduce((acc: any, event: any) => {
-    const date = format(new Date(event.recorded_at), 'MMM dd');
+    const date = format(new Date(event.recorded_at), 'MMM dd', { locale: dateLocale });
     if (!acc[date]) {
       acc[date] = { date, total: 0, critical: 0, warning: 0, info: 0 };
     }
@@ -87,7 +104,7 @@ export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Panic/SOS Event History</DialogTitle>
+          <DialogTitle>{t('panicSos.charts.eventHistory')}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -106,14 +123,14 @@ export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSo
                   {dateRange?.from ? (
                     dateRange.to ? (
                       <>
-                        {format(dateRange.from, "LLL dd, y")} -{" "}
-                        {format(dateRange.to, "LLL dd, y")}
+                        {format(dateRange.from, "LLL dd, y", { locale: dateLocale })} -{" "}
+                        {format(dateRange.to, "LLL dd, y", { locale: dateLocale })}
                       </>
                     ) : (
-                      format(dateRange.from, "LLL dd, y")
+                      format(dateRange.from, "LLL dd, y", { locale: dateLocale })
                     )
                   ) : (
-                    <span>Pick a date range</span>
+                    <span>{t('panicSos.charts.pickDateRange')}</span>
                   )}
                 </Button>
               </PopoverTrigger>
@@ -134,21 +151,21 @@ export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSo
             </Popover>
 
             <div className="text-sm text-muted-foreground">
-              Total Events: {panicData?.length || 0}
+              {t('panicSos.charts.totalEvents')}: {panicData?.length || 0}
             </div>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-8">Loading charts...</div>
+            <div className="text-center py-8">{t('panicSos.charts.loadingCharts')}</div>
           ) : !panicData || panicData.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No panic/SOS events recorded in this period
+              {t('panicSos.charts.noEventsInPeriod')}
             </div>
           ) : (
             <>
               {/* Events Over Time */}
               <Card className="p-4">
-                <h3 className="text-lg font-semibold mb-4">Events Over Time</h3>
+                <h3 className="text-lg font-semibold mb-4">{t('panicSos.charts.eventsOverTime')}</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -156,16 +173,16 @@ export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSo
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="critical" stackId="a" fill="hsl(var(--destructive))" name="Critical" />
-                    <Bar dataKey="warning" stackId="a" fill="hsl(var(--warning))" name="Warning" />
-                    <Bar dataKey="info" stackId="a" fill="hsl(var(--primary))" name="Info" />
+                    <Bar dataKey="critical" stackId="a" fill="hsl(var(--destructive))" name={t('panicSos.charts.critical')} />
+                    <Bar dataKey="warning" stackId="a" fill="hsl(var(--warning))" name={t('panicSos.charts.warning')} />
+                    <Bar dataKey="info" stackId="a" fill="hsl(var(--primary))" name={t('panicSos.charts.info')} />
                   </BarChart>
                 </ResponsiveContainer>
               </Card>
 
               {/* Events by Time of Day */}
               <Card className="p-4">
-                <h3 className="text-lg font-semibold mb-4">Events by Time of Day</h3>
+                <h3 className="text-lg font-semibold mb-4">{t('panicSos.charts.eventsByTimeOfDay')}</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={hourlyData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -173,11 +190,11 @@ export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSo
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="count" 
-                      stroke="hsl(var(--primary))" 
-                      name="Events"
+                    <Line
+                      type="monotone"
+                      dataKey="count"
+                      stroke="hsl(var(--primary))"
+                      name={t('panicSos.charts.eventsLabel')}
                       strokeWidth={2}
                     />
                   </LineChart>
@@ -187,11 +204,11 @@ export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSo
               {/* Summary Statistics */}
               <div className="grid grid-cols-3 gap-4">
                 <Card className="p-4">
-                  <div className="text-base font-semibold">Total Events</div>
+                  <div className="text-base font-semibold">{t('panicSos.charts.totalEvents')}</div>
                   <div className="text-xl font-bold">{panicData.length}</div>
                 </Card>
                 <Card className="p-4">
-                  <div className="text-base font-semibold">Critical Events</div>
+                  <div className="text-base font-semibold">{t('panicSos.charts.criticalEvents')}</div>
                   <div className="text-xl font-bold text-destructive">
                     {panicData.filter((e: any) =>
                       e.value?.status === 'critical' || e.value?.status === 'emergency'
@@ -199,7 +216,7 @@ export const PanicSosCharts = ({ open, onOpenChange, selectedPersonId }: PanicSo
                   </div>
                 </Card>
                 <Card className="p-4">
-                  <div className="text-base font-semibold">Avg Per Day</div>
+                  <div className="text-base font-semibold">{t('panicSos.charts.avgPerDay')}</div>
                   <div className="text-xl font-bold">
                     {chartData.length > 0
                       ? (panicData.length / chartData.length).toFixed(1)
