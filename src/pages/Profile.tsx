@@ -117,14 +117,18 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Button variant="ghost" onClick={() => navigate('/dashboard')} size="sm">
+        <div className="container mx-auto px-4 py-4 relative flex items-center justify-center">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            size="sm"
+            className="absolute left-4"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">{t('profile.backToDashboard')}</span>
             <span className="sm:hidden">{t('profile.back')}</span>
           </Button>
           <h1 className="text-lg sm:text-xl font-bold">{t('profile.title')}</h1>
-          <div className="w-16 sm:w-24"></div>
         </div>
       </header>
 
