@@ -86,12 +86,12 @@ const AlertsList = ({ alerts, selectedPersonId }: AlertsListProps) => {
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">
+    <Card className="p-4 sm:p-6 overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+        <h3 className="text-base sm:text-lg font-semibold">
           {t('alerts.list.activeAlerts')} {selectedPersonId && t('alerts.list.filtered')}
         </h3>
-        <Badge variant="outline" className="animate-pulse-soft">
+        <Badge variant="outline" className="animate-pulse-soft w-fit">
           {filteredAlerts.length} {t('alerts.list.active')}
         </Badge>
       </div>

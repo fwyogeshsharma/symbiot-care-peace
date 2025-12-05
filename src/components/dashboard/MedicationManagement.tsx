@@ -365,11 +365,11 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
   }
 
   return (
-    <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Pill className="h-5 w-5 text-primary" />
+    <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20 overflow-hidden">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Pill className="h-5 w-5 text-primary shrink-0" />
             {t('medication.title')}
           </CardTitle>
           <Button
@@ -377,6 +377,7 @@ export const MedicationManagement = ({ selectedPersonId }: MedicationManagementP
             size="sm"
             onClick={() => navigate('/medication-config')}
             title={t('medication.config.title')}
+            className="w-fit"
           >
             <Settings className="h-4 w-4" />
           </Button>

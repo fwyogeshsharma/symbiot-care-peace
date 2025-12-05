@@ -536,15 +536,16 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>{t('healthMetrics.title')}</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <CardTitle className="text-base sm:text-lg">{t('healthMetrics.title')}</CardTitle>
             {selectedPersonId && recentData.length > 0 && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowCharts(true)}
+                className="w-fit"
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
                 {t('healthMetrics.viewCharts')}

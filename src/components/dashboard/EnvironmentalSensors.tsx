@@ -140,10 +140,10 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
 
   if (!selectedPersonId) {
     return (
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Thermometer className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Thermometer className="w-5 h-5 shrink-0" />
             {t('environmental.title')}
           </CardTitle>
         </CardHeader>
@@ -158,10 +158,10 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Thermometer className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Thermometer className="w-5 h-5 shrink-0" />
             {t('environmental.title')}
           </CardTitle>
         </CardHeader>
@@ -177,10 +177,10 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
   const hasData = temperatureFahrenheit !== null || humidity !== null || airQuality !== null;
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Thermometer className="w-5 h-5" />
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <Thermometer className="w-5 h-5 shrink-0" />
           {t('environmental.title')}
         </CardTitle>
       </CardHeader>
