@@ -186,7 +186,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-2">
             <CardTitle className="flex items-center gap-2">
               <Settings className="w-5 h-5" />
@@ -214,7 +214,7 @@ export const IdealProfileManager = ({ elderlyPersonId, currentData }: IdealProfi
             if (!open) resetForm();
           }}>
             <DialogTrigger asChild>
-              <Button size="sm">
+              <Button size="sm" className="w-fit">
                 <Plus className="w-4 h-4 mr-2" />
                 {t('movement.idealProfile.newProfile')}
               </Button>

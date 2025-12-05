@@ -300,7 +300,7 @@ export default function Tracking() {
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="space-y-4">
             <div>
               <h1 className="text-3xl font-bold">{t('tracking.movementTracking')}</h1>
               <p className="text-muted-foreground">

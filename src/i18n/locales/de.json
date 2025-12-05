@@ -1659,6 +1659,18 @@
     "poor": "Schlecht",
     "critical": "Kritisch",
     "trend": "ILQ-Trend",
+    "info": {
+      "ariaLabel": "ILQ-Informationen",
+      "title": "Unabhängiger Lebensquotient (ILQ)",
+      "description": "Eine Punktzahl von 0-100, die die Fähigkeit einer älteren Person misst, unabhängig zu leben.",
+      "components": "Komponenten",
+      "healthVitals": "Gesundheitswerte (30%)",
+      "physicalActivity": "Körperliche Aktivität (25%)",
+      "cognitiveFunction": "Kognitive Funktion (15%)",
+      "environmentalSafety": "Umweltsicherheit (15%)",
+      "emergencyResponse": "Notfallreaktion (10%)",
+      "socialEngagement": "Soziales Engagement (5%)"
+    },
     "loadingChart": "Diagramm wird geladen...",
     "noDataPeriod": "Keine ILQ-Daten für den ausgewählten Zeitraum verfügbar",
     "lastDays": "Letzte {{days}} Tage",

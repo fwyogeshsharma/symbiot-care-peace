@@ -1478,6 +1478,18 @@
     "poor": "खराब",
     "critical": "गंभीर",
     "trend": "ILQ रुझान",
+    "info": {
+      "ariaLabel": "ILQ जानकारी",
+      "title": "स्वतंत्र जीवन भागफल (ILQ)",
+      "description": "0-100 का स्कोर जो बुजुर्ग व्यक्ति की स्वतंत्र रूप से जीने की क्षमता को मापता है।",
+      "components": "घटक",
+      "healthVitals": "स्वास्थ्य संकेत (30%)",
+      "physicalActivity": "शारीरिक गतिविधि (25%)",
+      "cognitiveFunction": "संज्ञानात्मक कार्य (15%)",
+      "environmentalSafety": "पर्यावरणीय सुरक्षा (15%)",
+      "emergencyResponse": "आपातकालीन प्रतिक्रिया (10%)",
+      "socialEngagement": "सामाजिक जुड़ाव (5%)"
+    },
     "loadingChart": "चार्ट लोड हो रहा है...",
     "noDataPeriod": "चयनित अवधि के लिए कोई ILQ डेटा उपलब्ध नहीं है",
     "lastDays": "पिछले {{days}} दिन",

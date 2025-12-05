@@ -366,13 +366,13 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           </div>
         ) : (
           <Tabs defaultValue="heart_rate" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
-              <TabsTrigger value="heart_rate">{t('healthMetrics.charts.heartRate')}</TabsTrigger>
-              <TabsTrigger value="blood_pressure">{t('healthMetrics.charts.bloodPressure')}</TabsTrigger>
-              <TabsTrigger value="oxygen">{t('healthMetrics.charts.oxygen')}</TabsTrigger>
-              <TabsTrigger value="temperature">{t('healthMetrics.charts.temperature')}</TabsTrigger>
-              <TabsTrigger value="sleep_quality">{t('healthMetrics.charts.sleep')}</TabsTrigger>
-              <TabsTrigger value="panic_sos">{t('healthMetrics.charts.panicSos')}</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto gap-1 p-1">
+              <TabsTrigger value="heart_rate" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.heartRate')}</TabsTrigger>
+              <TabsTrigger value="blood_pressure" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.bloodPressure')}</TabsTrigger>
+              <TabsTrigger value="oxygen" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.oxygen')}</TabsTrigger>
+              <TabsTrigger value="temperature" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.temperature')}</TabsTrigger>
+              <TabsTrigger value="sleep_quality" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.sleep')}</TabsTrigger>
+              <TabsTrigger value="panic_sos" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.panicSos')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="heart_rate" className="mt-4">

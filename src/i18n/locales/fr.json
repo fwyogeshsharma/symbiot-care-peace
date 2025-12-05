@@ -1659,6 +1659,18 @@
     "poor": "Faible",
     "critical": "Critique",
     "trend": "Tendance ILQ",
+    "info": {
+      "ariaLabel": "Informations ILQ",
+      "title": "Quotient de Vie Indépendante (ILQ)",
+      "description": "Un score de 0 à 100 mesurant la capacité d'une personne âgée à vivre de manière indépendante.",
+      "components": "Composants",
+      "healthVitals": "Signes Vitaux (30%)",
+      "physicalActivity": "Activité Physique (25%)",
+      "cognitiveFunction": "Fonction Cognitive (15%)",
+      "environmentalSafety": "Sécurité Environnementale (15%)",
+      "emergencyResponse": "Réponse d'Urgence (10%)",
+      "socialEngagement": "Engagement Social (5%)"
+    },
     "loadingChart": "Chargement du graphique...",
     "noDataPeriod": "Aucune donnée ILQ disponible pour la période sélectionnée",
     "lastDays": "{{days}} derniers jours",

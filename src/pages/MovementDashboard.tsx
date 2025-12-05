@@ -135,10 +135,10 @@ export default function MovementDashboard() {
       <OnboardingTour runTour={shouldShowTour} />
       <Header showBackButton title={t('movement.title')} subtitle={t('movement.subtitle')} />
       <main className="container mx-auto p-6 space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="space-y-4">
           <div>
-            <h1 className="text-3xl font-bold">{t('movement.title')}</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold">{t('movement.title')}</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               {t('movement.description')}
             </p>
           </div>

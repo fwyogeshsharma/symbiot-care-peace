@@ -83,7 +83,7 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
   return (
     <Card className="col-span-full">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-2">
             <CardTitle className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
@@ -113,7 +113,7 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
             />
           </div>
           {idealProfile && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs w-fit">
               {t('movement.dwellTime.comparingTo')}: {idealProfile?.baseline_data ? t('movement.dwellTime.activeProfile') : t('movement.dwellTime.noProfile')}
             </Badge>
           )}

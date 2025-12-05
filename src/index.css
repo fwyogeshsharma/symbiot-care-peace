@@ -175,4 +175,55 @@ All colors MUST be HSL.
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
+
+  /* Touch-hover utilities for mobile devices */
+  /* On touch devices, convert hover effects to active (tap) effects */
+  @media (hover: none) {
+    .touch-hover {
+      /* Remove hover effects on touch devices */
+      @apply transition-all;
+    }
+
+    .touch-hover:active,
+    .touch-hover[data-touch-active="true"] {
+      /* Apply the hover-like styles on tap/active */
+      @apply scale-[0.98];
+    }
+  }
+
+  /* Ensure hover effects only apply on hover-capable devices */
+  @media (hover: hover) {
+    .hover-only\:bg-accent:hover {
+      @apply bg-accent;
+    }
+    .hover-only\:bg-muted\/30:hover {
+      @apply bg-muted/30;
+    }
+    .hover-only\:shadow-md:hover {
+      @apply shadow-md;
+    }
+    .hover-only\:shadow-lg:hover {
+      @apply shadow-lg;
+    }
+  }
+
+  /* Touch-specific active states */
+  @media (hover: none) {
+    .touch-active\:bg-accent:active,
+    .touch-active\:bg-accent[data-touch-active="true"] {
+      @apply bg-accent;
+    }
+    .touch-active\:bg-muted\/30:active,
+    .touch-active\:bg-muted\/30[data-touch-active="true"] {
+      @apply bg-muted/30;
+    }
+    .touch-active\:shadow-md:active,
+    .touch-active\:shadow-md[data-touch-active="true"] {
+      @apply shadow-md;
+    }
+    .touch-active\:shadow-lg:active,
+    .touch-active\:shadow-lg[data-touch-active="true"] {
+      @apply shadow-lg;
+    }
+  }
 }

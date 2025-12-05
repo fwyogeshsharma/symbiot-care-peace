@@ -49,7 +49,7 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
   };
 
   const { data: panicEvents, isLoading } = useQuery({
-    queryKey: ['panic-sos-events', selectedPersonId, showAll],
+    queryKey: ['panic-sos-events', selectedPersonId],
     queryFn: async () => {
       // Get events from the last 1 week
       const oneWeekAgo = new Date();

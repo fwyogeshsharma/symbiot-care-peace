@@ -38,7 +38,7 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
               <LanguageSwitcher />
-              {!user && <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="hidden sm:inline-flex">
+              {!user && <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
                   {t('index.login')}
                 </Button>}
               <Button onClick={handleGetStarted} size="sm">
@@ -90,7 +90,7 @@ const Index = () => {
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-healthcare flex items-center justify-center mb-3 sm:mb-4">
                 <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">{t('index.features.realTimeVitals.title')}</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 break-words">{t('index.features.realTimeVitals.title')}</h3>
               <p className="text-sm sm:text-base text-muted-foreground">
                 {t('index.features.realTimeVitals.description')}
               </p>
@@ -100,7 +100,7 @@ const Index = () => {
               <div className="w-12 h-12 rounded-xl gradient-wellness flex items-center justify-center mb-4">
                 <Activity className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">{t('index.features.activityTracking.title')}</h3>
+              <h3 className="text-xl font-semibold mb-3 break-words">{t('index.features.activityTracking.title')}</h3>
               <p className="text-muted-foreground">
                 {t('index.features.activityTracking.description')}
               </p>
@@ -110,7 +110,7 @@ const Index = () => {
               <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center mb-4">
                 <Bell className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">{t('index.features.smartAlerts.title')}</h3>
+              <h3 className="text-xl font-semibold mb-3 break-words">{t('index.features.smartAlerts.title')}</h3>
               <p className="text-muted-foreground">
                 {t('index.features.smartAlerts.description')}
               </p>
@@ -120,7 +120,7 @@ const Index = () => {
               <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">{t('index.features.privacyFirst.title')}</h3>
+              <h3 className="text-xl font-semibold mb-3 break-words">{t('index.features.privacyFirst.title')}</h3>
               <p className="text-muted-foreground">
                 {t('index.features.privacyFirst.description')}
               </p>
@@ -130,7 +130,7 @@ const Index = () => {
               <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4">
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">{t('index.features.predictiveAnalytics.title')}</h3>
+              <h3 className="text-xl font-semibold mb-3 break-words">{t('index.features.predictiveAnalytics.title')}</h3>
               <p className="text-muted-foreground">
                 {t('index.features.predictiveAnalytics.description')}
               </p>
@@ -140,7 +140,7 @@ const Index = () => {
               <div className="w-12 h-12 rounded-xl bg-warning flex items-center justify-center mb-4">
                 <Users className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">{t('index.features.familyCollaboration.title')}</h3>
+              <h3 className="text-xl font-semibold mb-3 break-words">{t('index.features.familyCollaboration.title')}</h3>
               <p className="text-muted-foreground">
                 {t('index.features.familyCollaboration.description')}
               </p>

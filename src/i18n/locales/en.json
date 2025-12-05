@@ -1518,6 +1518,18 @@
     "poor": "Poor",
     "critical": "Critical",
     "trend": "ILQ Trend",
+    "info": {
+      "ariaLabel": "ILQ Information",
+      "title": "Independent Living Quotient (ILQ)",
+      "description": "A score from 0-100 measuring an elderly person's ability to live independently.",
+      "components": "Components",
+      "healthVitals": "Health Vitals (30%)",
+      "physicalActivity": "Physical Activity (25%)",
+      "cognitiveFunction": "Cognitive Function (15%)",
+      "environmentalSafety": "Environmental Safety (15%)",
+      "emergencyResponse": "Emergency Response (10%)",
+      "socialEngagement": "Social Engagement (5%)"
+    },
     "loadingChart": "Loading chart...",
     "noDataPeriod": "No ILQ data available for the selected period",
     "lastDays": "Last {{days}} days",

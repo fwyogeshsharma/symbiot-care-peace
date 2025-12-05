@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Heart, Activity, AlertTriangle, Users } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import VitalMetrics from '@/components/dashboard/VitalMetrics';
 import AlertsList from '@/components/dashboard/AlertsList';
 import ElderlyList from '@/components/dashboard/ElderlyList';
@@ -142,6 +142,14 @@ const Dashboard = () => {
   const avgHeartRate = calculateAvgHeartRate();
   const activityLevel = calculateActivityLevel();
 
+  // Scroll to section handlers for mobile - must be before any early returns
+  const scrollToSection = useCallback((sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
+
   // Subscribe to real-time updates
   useEffect(() => {
     if (!user) return;
@@ -258,7 +266,10 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         {/* Stats Overview */}
         <div data-tour="stats-overview" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <Card className="p-4 sm:p-6">
+          <Card
+            className="p-4 sm:p-6 cursor-pointer lg:cursor-default active:bg-muted/50 lg:active:bg-transparent transition-colors"
+            onClick={() => scrollToSection('elderly-list-section')}
+          >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
@@ -273,7 +284,10 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          <Card className="p-4 sm:p-6">
+          <Card
+            className="p-4 sm:p-6 cursor-pointer lg:cursor-default active:bg-muted/50 lg:active:bg-transparent transition-colors"
+            onClick={() => scrollToSection('alerts-list-section')}
+          >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
@@ -352,9 +366,9 @@ const Dashboard = () => {
                 <ILQWidget elderlyPersonId={selectedPersonId} />
               </div>
             )}
-            <div data-tour="elderly-list">
-              <ElderlyList 
-                elderlyPersons={elderlyPersons || []} 
+            <div id="elderly-list-section" data-tour="elderly-list">
+              <ElderlyList
+                elderlyPersons={elderlyPersons || []}
                 selectedPersonId={selectedPersonId}
                 onSelectPerson={setSelectedPersonId}
               />
@@ -369,7 +383,7 @@ const Dashboard = () => {
             <MedicationManagement selectedPersonId={selectedPersonId} />
             <EnvironmentalSensors selectedPersonId={selectedPersonId} />
             <PanicSosEvents selectedPersonId={selectedPersonId} />
-            <div data-tour="alerts-list">
+            <div id="alerts-list-section" data-tour="alerts-list">
               <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
             </div>
           </div>

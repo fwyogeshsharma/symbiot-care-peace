@@ -1659,6 +1659,18 @@
     "poor": "Deficiente",
     "critical": "Crítico",
     "trend": "Tendencia ILQ",
+    "info": {
+      "ariaLabel": "Información de ILQ",
+      "title": "Cociente de Vida Independiente (ILQ)",
+      "description": "Una puntuación de 0-100 que mide la capacidad de una persona mayor para vivir de forma independiente.",
+      "components": "Componentes",
+      "healthVitals": "Signos Vitales de Salud (30%)",
+      "physicalActivity": "Actividad Física (25%)",
+      "cognitiveFunction": "Función Cognitiva (15%)",
+      "environmentalSafety": "Seguridad Ambiental (15%)",
+      "emergencyResponse": "Respuesta de Emergencia (10%)",
+      "socialEngagement": "Compromiso Social (5%)"
+    },
     "loadingChart": "Cargando gráfico...",
     "noDataPeriod": "No hay datos de ILQ disponibles para el período seleccionado",
     "lastDays": "Últimos {{days}} días",
