@@ -41,7 +41,7 @@ const Index = () => {
               {!user && <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
                   {t('index.login')}
                 </Button>}
-              <Button onClick={handleGetStarted} size="sm" className="hidden sm:inline-flex">
+              <Button onClick={handleGetStarted} size="sm" className={user ? "" : "hidden sm:inline-flex"}>
                 {user ? t('index.goToDashboard') : t('nav.getStarted')}
               </Button>
             </div>
