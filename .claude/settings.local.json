@@ -5,7 +5,8 @@
       "Bash(npx tsc:*)",
       "Bash(npx supabase functions serve:*)",
       "Bash(grep:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(node -e:*)"
     ],
     "deny": [],
     "ask": []
