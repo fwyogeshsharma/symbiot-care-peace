@@ -76,29 +76,30 @@ export default function DataSharing({ userId }: DataSharingProps) {
           elderly_persons!inner(full_name, user_id)
         `)
         .eq('elderly_persons.user_id', userId);
-      
+
       if (assignmentsError) throw assignmentsError;
       if (!assignments || assignments.length === 0) return [];
 
       // Get unique user IDs
       const userIds = [...new Set(assignments.map((a: any) => a.relative_user_id))];
 
-      // Fetch profiles for these users
+      // Use the secure function to get profiles
       const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, email, full_name')
-        .in('id', userIds);
-      
-      if (profilesError) throw profilesError;
+        .rpc('get_shared_user_profiles', { _owner_user_id: userId });
+
+      if (profilesError) {
+        console.error('Error fetching shared user profiles:', profilesError);
+        throw profilesError;
+      }
 
       // Create a map for quick profile lookup
       const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
-      
+
       return assignments.map((item: any) => {
         const profile = profileMap.get(item.relative_user_id);
         return {
           id: item.id,
-          email: profile?.email || '',
+          email: profile?.email || 'Unknown User',
           full_name: profile?.full_name || null,
           relationship: item.relationship,
           elderly_person_name: item.elderly_persons?.full_name || '',

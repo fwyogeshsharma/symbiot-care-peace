@@ -6,7 +6,8 @@
       "Bash(npx supabase functions serve:*)",
       "Bash(grep:*)",
       "Bash(npx tsx:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(npx supabase db --help:*)"
     ],
     "deny": [],
     "ask": []
