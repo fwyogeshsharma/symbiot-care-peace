@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
 import { formatCoordinates } from '@/lib/gpsUtils';
 import { useTranslation } from 'react-i18next';
+import { usePrioritizedDeviceData } from '@/hooks/usePrioritizedDeviceData';
 
 // Map language codes to date-fns locales
 const getDateLocale = (language: string) => {
@@ -67,27 +68,15 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
     return translated || unit;
   };
 
-  const { data: phoneData, isLoading } = useQuery({
-    queryKey: ['smart-phone-data', selectedPersonId],
-    queryFn: async () => {
-      if (!selectedPersonId) return [];
-
-      const { data, error } = await supabase
-        .from('device_data')
-        .select(`
-          *,
-          devices!inner(device_name, device_type, device_types!inner(category))
-        `)
-        .eq('elderly_person_id', selectedPersonId)
-        .eq('devices.device_type', 'smart_phone')
-        .order('recorded_at', { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!selectedPersonId,
+  // Use prioritized device data: mobile-first, then fallback to database
+  const { battery, gps, isFromMobile, allData, isLoading } = usePrioritizedDeviceData({
+    selectedPersonId,
+    enableGPSTracking: true, // Enable real-time GPS tracking if on mobile
+    gpsUpdateInterval: 30000, // Update GPS every 30 seconds
   });
+
+  // Keep the original phoneData for backward compatibility with activity list
+  const phoneData = allData;
 
   const { data: phoneDevices } = useQuery({
     queryKey: ['smart-phone-devices', selectedPersonId],
@@ -128,11 +117,38 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
     }
   };
 
+  // GPS and battery now come from prioritized hook
+  // No need for these functions anymore, but keeping for backward compatibility
   const getLatestGPS = () => {
+    // Return prioritized GPS if available
+    if (gps) {
+      return {
+        data_type: 'gps',
+        value: {
+          latitude: gps.latitude,
+          longitude: gps.longitude,
+          accuracy: gps.accuracy,
+          altitude: gps.altitude,
+          heading: gps.heading,
+          speed: gps.speed,
+        },
+        recorded_at: gps.timestamp.toISOString(),
+        source: gps.source,
+      };
+    }
     return phoneData?.find(d => d.data_type === 'gps');
   };
 
   const getLatestBattery = () => {
+    // Return prioritized battery if available
+    if (battery) {
+      return {
+        data_type: 'battery_level',
+        value: { value: battery.level },
+        recorded_at: battery.timestamp.toISOString(),
+        source: battery.source,
+      };
+    }
     return phoneData?.find(d => d.data_type === 'battery_level');
   };
 
@@ -236,7 +252,14 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
             {/* Device Info & Status */}
             <div className="border rounded-lg p-4 bg-muted/30">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="font-semibold">{t('smartPhone.deviceInformation')}</h4>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-semibold">{t('smartPhone.deviceInformation')}</h4>
+                  {isFromMobile && (
+                    <Badge variant="default" className="text-xs bg-green-500 hover:bg-green-600">
+                      {t('smartPhone.liveData', { defaultValue: 'Live' })}
+                    </Badge>
+                  )}
+                </div>
                 {batteryLevel !== null && (
                   <div className="flex items-center gap-2">
                     <BatteryIcon className={cn("w-5 h-5", batteryColor)} />
@@ -272,7 +295,14 @@ const SmartPhoneCard = ({ selectedPersonId }: SmartPhoneCardProps) => {
                     <MapPin className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold mb-2">{t('smartPhone.lastKnownLocation')}</h4>
+                    <div className="flex items-center gap-2 mb-2">
+                      <h4 className="font-semibold">{t('smartPhone.lastKnownLocation')}</h4>
+                      {(latestGPS as any).source === 'mobile' && (
+                        <Badge variant="default" className="text-xs bg-green-500 hover:bg-green-600">
+                          {t('smartPhone.liveGPS', { defaultValue: 'Live GPS' })}
+                        </Badge>
+                      )}
+                    </div>
                     {typeof latestGPS.value === 'object' && latestGPS.value !== null && (latestGPS.value as Record<string, unknown>).latitude && (latestGPS.value as Record<string, unknown>).longitude ? (
                       <>
                         <p className="text-sm font-mono mb-1">
