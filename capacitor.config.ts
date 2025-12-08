@@ -24,6 +24,11 @@ const config: CapacitorConfig = {
       androidScaleType: 'CENTER_CROP',
       showSpinner: false
     },
+    StatusBar: {
+      style: 'DARK',
+      backgroundColor: '#0095DB',
+      overlaysWebView: false
+    },
     Geolocation: {
       // High accuracy for elderly tracking
     },

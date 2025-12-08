@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { alertNotificationService } from '@/lib/alertNotificationService';
 
 interface AuthContextType {
   user: User | null;
@@ -28,7 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         // Fetch user role and check if blocked when session changes
         if (session?.user) {
           setTimeout(async () => {
@@ -38,11 +39,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .select('blocked_at')
               .eq('id', session.user.id)
               .single();
-            
+
             if (profileData?.blocked_at) {
               // User is blocked, sign them out
               await supabase.auth.signOut();
               setUserRole(null);
+              alertNotificationService.cleanup();
               return;
             }
 
@@ -50,18 +52,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .from('user_roles')
               .select('role')
               .eq('user_id', session.user.id);
-            
+
             // Check if user has super_admin role, otherwise use first role
             const roles = data?.map(r => r.role) ?? [];
-            const role = roles.includes('super_admin') ? 'super_admin' 
+            const role = roles.includes('super_admin') ? 'super_admin'
                        : roles.includes('admin') ? 'admin'
                        : roles[0] ?? null;
             setUserRole(role);
+
+            // Initialize alert notifications for logged-in user
+            await alertNotificationService.initialize(session.user.id);
           }, 0);
         } else {
           setUserRole(null);
+          // Cleanup alert notifications on sign out
+          alertNotificationService.cleanup();
         }
-        
+
         setLoading(false);
       }
     );
@@ -70,18 +77,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
         supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', session.user.id)
-          .then(({ data }) => {
+          .then(async ({ data }) => {
             const roles = data?.map(r => r.role) ?? [];
-            const role = roles.includes('super_admin') ? 'super_admin' 
+            const role = roles.includes('super_admin') ? 'super_admin'
                        : roles.includes('admin') ? 'admin'
                        : roles[0] ?? null;
             setUserRole(role);
+
+            // Initialize alert notifications for existing session
+            await alertNotificationService.initialize(session.user.id);
+
             setLoading(false);
           });
       } else {
@@ -89,7 +100,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      alertNotificationService.cleanup();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string, phone: string, role: string) => {

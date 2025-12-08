@@ -1,14 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run build:*)",
-      "Bash(npx tsc:*)",
-      "Bash(npx supabase functions serve:*)",
-      "Bash(grep:*)",
-      "Bash(npx tsx:*)",
-      "Bash(npm install:*)",
-      "Bash(npx cap init:*)",
-      "Bash(npx cap:*)"
+      "Bash(\"$USERPROFILE/AppData/Local/Android/Sdk/platform-tools/adb.exe\" shell \"dumpsys activity activities | grep -E ''mResumedActivity|mFocusedActivity''\")"
     ],
     "deny": [],
     "ask": []
