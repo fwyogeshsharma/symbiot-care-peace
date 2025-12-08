@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(\"$USERPROFILE/AppData/Local/Android/Sdk/platform-tools/adb.exe\" shell \"dumpsys activity activities | grep -E ''mResumedActivity|mFocusedActivity''\")"
+      "Bash(\"$USERPROFILE/AppData/Local/Android/Sdk/platform-tools/adb.exe\" shell \"dumpsys activity activities | grep -E ''mResumedActivity|mFocusedActivity''\")",
+      "Bash(findstr:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(npx @capacitor/assets generate:*)",
+      "Bash(npm run build:*)",
+      "Bash(./gradlew assembleRelease:*)",
+      "Bash(test:*)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []
