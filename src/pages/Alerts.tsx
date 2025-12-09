@@ -136,12 +136,17 @@ const Alerts = () => {
     enabled: !!user?.id,
   });
 
-  // Real-time subscription
+  // Real-time subscription - only for alerts this user has access to
   useEffect(() => {
     if (!user) return;
     const channel = supabase
       .channel('alerts-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'alerts' }, () => {
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'alert_recipients',
+        filter: `user_id=eq.${user.id}`
+      }, () => {
         queryClient.invalidateQueries({ queryKey: ['all-alerts'] });
       })
       .subscribe();

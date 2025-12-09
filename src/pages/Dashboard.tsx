@@ -188,18 +188,19 @@ const Dashboard = () => {
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'alerts'
+          table: 'alert_recipients',
+          filter: `user_id=eq.${user.id}`
         },
         async (payload) => {
-          console.log('New alert:', payload);
+          console.log('New alert for user:', payload);
           refetchAlerts();
 
           // Fetch full alert details with elderly person info
-          const alertData = payload.new as any;
+          const recipientData = payload.new as any;
           const { data: fullAlert } = await supabase
             .from('alerts')
             .select('*, elderly_persons(full_name)')
-            .eq('id', alertData.id)
+            .eq('id', recipientData.alert_id)
             .single();
 
           if (fullAlert) {

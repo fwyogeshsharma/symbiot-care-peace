@@ -5,7 +5,9 @@
       "Bash(npx tsc:*)",
       "Bash(npx supabase functions serve:*)",
       "Bash(grep:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(ls -la \"D:\\Projects\\symbiot-care-peace\\src\\components\\dashboard\"\" | grep -i \"alert|notif \")",
+      "Bash(xargs -I {} sh -c 'echo \"\"=== {} ===\"\" && head -20 \"\"{}\"\"')"
     ],
     "deny": [],
     "ask": []
