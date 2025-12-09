@@ -171,24 +171,6 @@ export default function MedicationConfig() {
                     <Plus className="h-4 w-4 mr-2" />
                     {t('medication.config.addMedication')}
                   </Button>
-                  {notificationsEnabled && (
-                    <Button
-                      variant={remindersEnabled ? "destructive" : "secondary"}
-                      onClick={remindersEnabled ? cancelMedicationReminders : scheduleMedicationReminders}
-                    >
-                      {remindersEnabled ? (
-                        <>
-                          <BellOff className="h-4 w-4 mr-2" />
-                          {t('medication.notifications.disable', 'Disable Reminders')}
-                        </>
-                      ) : (
-                        <>
-                          <Bell className="h-4 w-4 mr-2" />
-                          {t('medication.notifications.enable', 'Enable Reminders')}
-                        </>
-                      )}
-                    </Button>
-                  )}
                 </div>
               )}
             </div>

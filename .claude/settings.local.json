@@ -10,7 +10,10 @@
       "Bash(./gradlew assembleRelease:*)",
       "Bash(test:*)",
       "Bash(echo:*)",
-      "Bash(supabase functions deploy:*)"
+      "Bash(supabase functions deploy:*)",
+      "Bash(npx cap sync:*)",
+      "Bash(\"$USERPROFILE/AppData/Local/Android/Sdk/platform-tools/adb.exe\" devices)",
+      "Bash(\"$USERPROFILE/AppData/Local/Android/Sdk/platform-tools/adb.exe\" install -r android/app/build/outputs/apk/release/app-release.apk)"
     ],
     "deny": [],
     "ask": []
