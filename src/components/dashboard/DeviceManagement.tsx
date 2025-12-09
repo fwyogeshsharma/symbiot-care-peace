@@ -24,7 +24,11 @@ import { generateSampleDataPoints, generateSampleDataFromModelSpecs } from '@/li
 import { DeviceDiscovery } from '@/components/pairing/DeviceDiscovery';
 import { useTranslation } from 'react-i18next';
 
-const DeviceManagement = () => {
+interface DeviceManagementProps {
+  selectedPersonId?: string | null;
+}
+
+const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [deviceName, setDeviceName] = useState('');
@@ -109,9 +113,15 @@ const DeviceManagement = () => {
       generateApiKey();
     },
     onError: (error: any) => {
+      // Check for duplicate device_id constraint violation
+      const isDuplicateDeviceId = error.message?.includes('devices_elderly_person_device_id_unique') ||
+        error.code === '23505'; // PostgreSQL unique violation error code
+
       toast({
         title: t('devices.register.failed'),
-        description: error.message,
+        description: isDuplicateDeviceId
+          ? t('devices.register.duplicateDeviceId')
+          : error.message,
         variant: "destructive",
       });
     },
@@ -397,6 +407,14 @@ const DeviceManagement = () => {
     if (!iconName) return null;
     return (Icons as any)[iconName] || null;
   };
+
+  // Only show register button if viewing own profile or no person is selected
+  const isOwnProfile = !selectedPersonId || selectedPersonId === userElderlyPerson?.id;
+
+  // Don't render if viewing another person's profile
+  if (!isOwnProfile) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

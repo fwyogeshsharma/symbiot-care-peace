@@ -134,17 +134,19 @@ const Profile = () => {
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-2xl">
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsList className={`grid w-full mb-6 ${userRole === 'caregiver' ? 'grid-cols-1' : 'grid-cols-2'}`}>
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="w-4 h-4" />
               <span className="hidden sm:inline">{t('profile.title')}</span>
               <span className="sm:hidden">{t('profile.title')}</span>
             </TabsTrigger>
-            <TabsTrigger value="data-sharing" className="flex items-center gap-2">
-              <Share2 className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('nav.dataSharing')}</span>
-              <span className="sm:hidden">{t('nav.dataSharing')}</span>
-            </TabsTrigger>
+            {userRole !== 'caregiver' && (
+              <TabsTrigger value="data-sharing" className="flex items-center gap-2">
+                <Share2 className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('nav.dataSharing')}</span>
+                <span className="sm:hidden">{t('nav.dataSharing')}</span>
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
@@ -297,9 +299,11 @@ const Profile = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="data-sharing">
-            {user && <DataSharing userId={user.id} />}
-          </TabsContent>
+          {userRole !== 'caregiver' && (
+            <TabsContent value="data-sharing">
+              {user && <DataSharing userId={user.id} />}
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>

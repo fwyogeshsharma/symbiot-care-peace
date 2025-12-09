@@ -1010,6 +1010,7 @@
       "successWithData": "Your IoT device has been added with sample data.",
       "successNoData": "Your IoT device has been added.",
       "failed": "Failed to register device",
+      "duplicateDeviceId": "A device with this Device ID already exists. Please use a different Device ID.",
       "missingInfo": "Missing information",
       "fillRequired": "Please fill in all required fields",
       "noProfile": "No profile found",
@@ -1356,16 +1357,6 @@
     "profileUpdated": "Profile updated",
     "profileUpdatedDesc": "Your profile has been updated successfully.",
     "updateFailed": "Failed to update profile"
-  },
-  "dataSharing": {
-    "title": "Data Sharing",
-    "shareWith": "Share With",
-    "permissions": "Permissions",
-    "addRecipient": "Add Recipient",
-    "removeAccess": "Remove Access",
-    "viewOnly": "View Only",
-    "fullAccess": "Full Access",
-    "customAccess": "Custom Access"
   },
   "movement": {
     "title": "Activity Dashboard",
