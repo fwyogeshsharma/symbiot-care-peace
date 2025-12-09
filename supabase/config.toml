@@ -23,3 +23,9 @@ verify_jwt = true
 
 [functions.ilq-report-generator]
 verify_jwt = true
+
+[functions.medication-analytics]
+verify_jwt = true
+
+[functions.send-push-notification]
+verify_jwt = false
