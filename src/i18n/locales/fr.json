@@ -283,6 +283,11 @@
         "missed": "Manquée",
         "pending": "En attente",
         "late": "En retard"
+      },
+      "notes": {
+        "Missed evening dose": "Dose du soir manquée",
+        "Missed morning dose": "Dose du matin manquée",
+        "Missed afternoon dose": "Dose de l'après-midi manquée"
       }
     }
   },

@@ -293,6 +293,11 @@
         "missed": "Missed",
         "pending": "Pending",
         "late": "Late"
+      },
+      "notes": {
+        "Missed evening dose": "Missed evening dose",
+        "Missed morning dose": "Missed morning dose",
+        "Missed afternoon dose": "Missed afternoon dose"
       }
     }
   },

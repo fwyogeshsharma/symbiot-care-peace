@@ -283,6 +283,11 @@
         "missed": "Perdido",
         "pending": "Pendiente",
         "late": "Tardío"
+      },
+      "notes": {
+        "Missed evening dose": "Dosis de la noche perdida",
+        "Missed morning dose": "Dosis de la mañana perdida",
+        "Missed afternoon dose": "Dosis de la tarde perdida"
       }
     }
   },
