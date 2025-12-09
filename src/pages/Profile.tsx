@@ -159,8 +159,8 @@ const Profile = () => {
                   <div className="min-w-0">
                     <h2 className="text-xl sm:text-2xl font-bold truncate">{profile?.full_name || 'User'}</h2>
                     {userRole && (
-                      <Badge className={`${getRoleColor(userRole)} capitalize mt-1`}>
-                        {userRole}
+                      <Badge className={`${getRoleColor(userRole)} mt-1`}>
+                        {t(`auth.roles.${userRole}`)}
                       </Badge>
                     )}
                   </div>
