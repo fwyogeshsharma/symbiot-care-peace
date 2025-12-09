@@ -283,6 +283,11 @@
         "missed": "Verpasst",
         "pending": "Ausstehend",
         "late": "Verspätet"
+      },
+      "notes": {
+        "Missed evening dose": "Abenddosis verpasst",
+        "Missed morning dose": "Morgendosis verpasst",
+        "Missed afternoon dose": "Nachmittagsdosis verpasst"
       }
     }
   },

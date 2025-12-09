@@ -206,6 +206,11 @@
         "missed": "छूट गई",
         "pending": "लंबित",
         "late": "विलंबित"
+      },
+      "notes": {
+        "Missed evening dose": "शाम की खुराक छूट गई",
+        "Missed morning dose": "सुबह की खुराक छूट गई",
+        "Missed afternoon dose": "दोपहर की खुराक छूट गई"
       }
     }
   },

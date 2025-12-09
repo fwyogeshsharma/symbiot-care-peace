@@ -184,7 +184,7 @@ export function MedicationAdherenceLog({ elderlyPersonId, limit = 20 }: Medicati
                 </p>
                 {log.notes && (
                   <p className="text-xs text-muted-foreground mt-1 italic">
-                    {log.notes}
+                    {t(`medication.adherence.notes.${log.notes}`, { defaultValue: log.notes })}
                   </p>
                 )}
               </div>
