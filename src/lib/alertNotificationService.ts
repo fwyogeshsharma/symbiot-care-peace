@@ -36,6 +36,9 @@ class AlertNotificationService {
 
     console.log('Initializing alert notification service for user:', userId);
 
+    // Register FCM token for push notifications
+    await this.registerFCMToken(userId);
+
     // Subscribe to real-time changes in alerts table
     this.channel = supabase
       .channel('alert-notifications')
@@ -184,6 +187,73 @@ class AlertNotificationService {
     }
 
     return { title, body };
+  }
+
+  /**
+   * Register FCM token for push notifications
+   */
+  private async registerFCMToken(userId: string) {
+    try {
+      // Import push notifications dynamically to avoid issues on web
+      const { PushNotifications } = await import('@capacitor/push-notifications');
+      const { Device } = await import('@capacitor/device');
+
+      // Check if we're on a native platform
+      if (!isNative()) {
+        console.log('Not on native platform, skipping FCM registration');
+        return;
+      }
+
+      // Get device info
+      const deviceInfo = await Device.getInfo();
+
+      // Request permissions
+      const permResult = await PushNotifications.requestPermissions();
+
+      if (permResult.receive === 'granted') {
+        // Register with FCM
+        await PushNotifications.register();
+
+        // Listen for registration success
+        await PushNotifications.addListener('registration', async (token) => {
+          console.log('FCM token received:', token.value);
+
+          // Store token in database
+          const { error } = await supabase
+            .from('fcm_tokens')
+            .upsert({
+              user_id: userId,
+              token: token.value,
+              device_info: {
+                platform: deviceInfo.platform,
+                model: deviceInfo.model,
+                manufacturer: deviceInfo.manufacturer,
+                osVersion: deviceInfo.osVersion,
+              },
+              last_used_at: new Date().toISOString(),
+            }, {
+              onConflict: 'user_id,token',
+            });
+
+          if (error) {
+            console.error('Failed to store FCM token:', error);
+          } else {
+            console.log('FCM token stored successfully');
+          }
+        });
+
+        // Listen for registration errors
+        await PushNotifications.addListener('registrationError', (error) => {
+          console.error('FCM registration failed:', error);
+        });
+
+        console.log('FCM registration initiated');
+      } else {
+        console.log('Push notification permission not granted');
+      }
+    } catch (error) {
+      console.error('Failed to register FCM token:', error);
+    }
   }
 
   /**

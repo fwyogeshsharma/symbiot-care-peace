@@ -9,7 +9,8 @@
       "Bash(npm run build:*)",
       "Bash(./gradlew assembleRelease:*)",
       "Bash(test:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(supabase functions deploy:*)"
     ],
     "deny": [],
     "ask": []
