@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { FloorPlanGrid } from '@/components/indoor-tracking/FloorPlanGrid';
@@ -48,7 +48,8 @@ export default function Tracking() {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       return user;
-    }
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   // Fetch all accessible elderly persons
@@ -56,14 +57,15 @@ export default function Tracking() {
     queryKey: ['elderly-persons', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      
+
       const { data, error } = await supabase
         .rpc('get_accessible_elderly_persons', { _user_id: user.id });
-      
+
       if (error) throw error;
       return data || [];
     },
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   });
 
   // Auto-select first person if none selected
@@ -79,20 +81,21 @@ export default function Tracking() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('floor_plans')
-        .select('*')
+        .select('id, elderly_person_id, image_url, width_meters, height_meters, furniture, zones, grid_size')
         .eq('elderly_person_id', selectedPersonId)
         .maybeSingle();
-      
+
       if (error) throw error;
       if (!data) return null;
-      
+
       return {
         ...data,
         furniture: (data.furniture as any) || [],
         zones: (data.zones as any) || []
       };
     },
-    enabled: !!selectedPersonId && activeTab === 'indoor'
+    enabled: !!selectedPersonId && activeTab === 'indoor',
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   // Fetch position data for indoor tracking
@@ -101,18 +104,19 @@ export default function Tracking() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('device_data')
-        .select('*, devices(*)')
+        .select('id, value, recorded_at, data_type')
         .eq('elderly_person_id', selectedPersonId)
         .eq('data_type', 'position')
         .gte('recorded_at', dateRange.start)
         .lte('recorded_at', dateRange.end)
         .order('recorded_at', { ascending: true })
-        .limit(1000);
-      
+        .limit(500); // Reduced from 1000
+
       if (error) throw error;
       return data || [];
     },
-    enabled: !!selectedPersonId && activeTab === 'indoor'
+    enabled: !!selectedPersonId && activeTab === 'indoor',
+    staleTime: 30 * 1000, // Cache for 30 seconds
   });
 
   // Fetch GPS data for outdoor tracking
@@ -121,22 +125,22 @@ export default function Tracking() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('device_data')
-        .select('*')
+        .select('value, recorded_at, data_type')
         .eq('elderly_person_id', selectedPersonId)
         .in('data_type', ['gps', 'location', 'latitude', 'longitude'])
         .gte('recorded_at', dateRange.start)
         .lte('recorded_at', dateRange.end)
         .order('recorded_at', { ascending: true })
-        .limit(1000);
-      
+        .limit(500); // Reduced from 1000
+
       if (error) throw error;
-      
+
       // Parse GPS coordinates from different data type formats
       const coordinates: GPSCoordinate[] = [];
-      
+
       data.forEach(d => {
         const value = d.value as any;
-        
+
         if (d.data_type === 'location' || d.data_type === 'gps') {
           // Location or GPS object with latitude/longitude
           if (value.latitude && value.longitude) {
@@ -149,10 +153,11 @@ export default function Tracking() {
           }
         }
       });
-      
+
       return coordinates;
     },
-    enabled: !!selectedPersonId && activeTab === 'outdoor'
+    enabled: !!selectedPersonId && activeTab === 'outdoor',
+    staleTime: 30 * 1000, // Cache for 30 seconds
   });
 
   // Fetch geofence places
@@ -161,14 +166,15 @@ export default function Tracking() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('geofence_places' as any)
-        .select('*')
+        .select('id, elderly_person_id, name, latitude, longitude, radius_meters, is_active')
         .eq('elderly_person_id', selectedPersonId)
         .eq('is_active', true);
-      
+
       if (error) throw error;
       return data as any as GeofencePlace[];
     },
-    enabled: !!selectedPersonId && activeTab === 'outdoor'
+    enabled: !!selectedPersonId && activeTab === 'outdoor',
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   });
 
   // Fetch geofence events
@@ -177,16 +183,18 @@ export default function Tracking() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('geofence_events' as any)
-        .select('*')
+        .select('id, elderly_person_id, place_id, event_type, timestamp')
         .eq('elderly_person_id', selectedPersonId)
         .gte('timestamp', dateRange.start)
         .lte('timestamp', dateRange.end)
-        .order('timestamp', { ascending: false });
+        .order('timestamp', { ascending: false })
+        .limit(100); // Add limit to prevent fetching too many events
 
       if (error) throw error;
       return data as any;
     },
-    enabled: !!selectedPersonId && activeTab === 'outdoor'
+    enabled: !!selectedPersonId && activeTab === 'outdoor',
+    staleTime: 30 * 1000, // Cache for 30 seconds
   });
 
   // Real-time subscription for GPS data and geofence detection
@@ -252,11 +260,10 @@ export default function Tracking() {
     }
   };
 
-  const isLoading = elderlyLoading || 
-    (activeTab === 'indoor' && (floorPlanLoading || positionLoading)) ||
-    (activeTab === 'outdoor' && (gpsLoading || placesLoading || eventsLoading));
+  // Only block on critical queries - user and elderly persons
+  const isCriticalLoading = elderlyLoading;
 
-  if (isLoading) {
+  if (isCriticalLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Header showBackButton title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
@@ -271,27 +278,53 @@ export default function Tracking() {
     );
   }
 
-  // Process indoor tracking data
-  const processedData = activeTab === 'indoor' ? processPositionData(positionData) : null;
-  const positionEvents = processedData ? processedData.events.map(event => ({
-    position: event.position,
-    timestamp: event.timestamp
-  })) : [];
+  // Tab-specific loading states (non-blocking)
+  const isTabLoading =
+    (activeTab === 'indoor' && (floorPlanLoading || positionLoading)) ||
+    (activeTab === 'outdoor' && (gpsLoading || placesLoading || eventsLoading));
+
+  // Process indoor tracking data - Memoized to avoid recomputation on every render
+  const processedData = useMemo(
+    () => activeTab === 'indoor' ? processPositionData(positionData) : null,
+    [positionData, activeTab]
+  );
+
+  const positionEvents = useMemo(
+    () => processedData ? processedData.events.map(event => ({
+      position: event.position,
+      timestamp: event.timestamp
+    })) : [],
+    [processedData]
+  );
 
   const currentPosition = positionEvents[currentPositionIndex]?.position;
-  const trail = positionEvents.slice(Math.max(0, currentPositionIndex - 50), currentPositionIndex)
-    .map(p => p.position);
 
-  // Process outdoor tracking data
-  const gpsTrail = activeTab === 'outdoor' ? processGPSTrail(gpsData) : [];
-  const currentGPSPosition = gpsData.length > 0 ? gpsData[gpsData.length - 1] : undefined;
+  const trail = useMemo(
+    () => positionEvents.slice(Math.max(0, currentPositionIndex - 50), currentPositionIndex)
+      .map(p => p.position),
+    [positionEvents, currentPositionIndex]
+  );
 
-  // Determine map center: use current GPS position, first geofence, or default location
-  const mapCenter: [number, number] = currentGPSPosition
-    ? [currentGPSPosition.latitude, currentGPSPosition.longitude]
-    : geofencePlaces.length > 0
-      ? [geofencePlaces[0].latitude, geofencePlaces[0].longitude]
-      : [40.7128, -74.0060]; // Default to NYC
+  // Process outdoor tracking data - Memoized to avoid recomputation on every render
+  const gpsTrail = useMemo(
+    () => activeTab === 'outdoor' ? processGPSTrail(gpsData) : [],
+    [gpsData, activeTab]
+  );
+
+  const currentGPSPosition = useMemo(
+    () => gpsData.length > 0 ? gpsData[gpsData.length - 1] : undefined,
+    [gpsData]
+  );
+
+  // Determine map center: use current GPS position, first geofence, or default location - Memoized
+  const mapCenter: [number, number] = useMemo(
+    () => currentGPSPosition
+      ? [currentGPSPosition.latitude, currentGPSPosition.longitude]
+      : geofencePlaces.length > 0
+        ? [geofencePlaces[0].latitude, geofencePlaces[0].longitude]
+        : [40.7128, -74.0060], // Default to NYC
+    [currentGPSPosition, geofencePlaces]
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -359,7 +392,12 @@ export default function Tracking() {
 
             {/* Indoor Tracking Tab */}
             <TabsContent value="indoor" className="space-y-6">
-              {!floorPlan ? (
+              {(floorPlanLoading || positionLoading) ? (
+                <div className="space-y-6">
+                  <Skeleton className="h-96 w-full" />
+                  <Skeleton className="h-48 w-full" />
+                </div>
+              ) : !floorPlan ? (
                 <div className="text-center py-12">
                   <h2 className="text-2xl font-bold mb-4">{t('tracking.noFloorPlan.title')}</h2>
                   <p className="text-muted-foreground">
@@ -394,7 +432,12 @@ export default function Tracking() {
 
             {/* Outdoor GPS Tab */}
             <TabsContent value="outdoor" className="space-y-6">
-              {gpsData.length === 0 && geofencePlaces.length === 0 ? (
+              {(gpsLoading || placesLoading) ? (
+                <div className="space-y-6">
+                  <Skeleton className="h-96 w-full" />
+                  <Skeleton className="h-48 w-full" />
+                </div>
+              ) : gpsData.length === 0 && geofencePlaces.length === 0 ? (
                 <>
                   <div className="text-center py-8 bg-muted/30 rounded-lg border-2 border-dashed">
                     <Navigation className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
