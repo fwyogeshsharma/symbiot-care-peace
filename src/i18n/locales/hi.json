@@ -276,7 +276,8 @@
       "elderly": "वृद्ध व्यक्ति",
       "caregiver": "देखभालकर्ता",
       "relative": "परिवार का सदस्य",
-      "admin": "प्रशासक"
+      "admin": "प्रशासक",
+      "super_admin": "सुपर प्रशासक"
     },
     "validation": {
       "invalidEmail": "अमान्य ईमेल पता",
