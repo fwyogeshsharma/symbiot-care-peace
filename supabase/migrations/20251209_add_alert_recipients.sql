@@ -96,6 +96,9 @@ CREATE POLICY "Users can update alerts for their elderly persons"
     )
   );
 
+-- Enable Realtime for alert_recipients table
+ALTER PUBLICATION supabase_realtime ADD TABLE alert_recipients;
+
 -- Grant permissions
 GRANT SELECT ON alert_recipients TO authenticated;
 GRANT SELECT, UPDATE ON alerts TO authenticated;
