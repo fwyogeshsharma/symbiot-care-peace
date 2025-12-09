@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_recipients: {
+        Row: {
+          alert_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_recipients_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alerts: {
         Row: {
           acknowledged_at: string | null
@@ -60,35 +89,6 @@ export type Database = {
             columns: ["elderly_person_id"]
             isOneToOne: false
             referencedRelation: "elderly_persons"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      alert_recipients: {
-        Row: {
-          alert_id: string
-          created_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          alert_id: string
-          created_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          alert_id?: string
-          created_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "alert_recipients_alert_id_fkey"
-            columns: ["alert_id"]
-            isOneToOne: false
-            referencedRelation: "alerts"
             referencedColumns: ["id"]
           },
         ]
@@ -637,6 +637,36 @@ export type Database = {
           status?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      fcm_tokens: {
+        Row: {
+          created_at: string | null
+          device_info: Json | null
+          id: string
+          last_used_at: string | null
+          token: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_info?: Json | null
+          id?: string
+          last_used_at?: string | null
+          token: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_info?: Json | null
+          id?: string
+          last_used_at?: string | null
+          token?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -1452,6 +1482,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      backfill_alert_recipients: { Args: never; Returns: undefined }
       can_access_elderly_person: {
         Args: { _elderly_person_id: string; _user_id: string }
         Returns: boolean
@@ -1497,6 +1528,22 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      get_fcm_tokens_for_elderly_person: {
+        Args: { elderly_person_id: string }
+        Returns: {
+          device_info: Json
+          token: string
+          user_id: string
+        }[]
+      }
+      get_shared_user_profiles: {
+        Args: { _owner_user_id: string }
+        Returns: {
+          email: string
+          full_name: string
+          id: string
+        }[]
       }
       has_role: {
         Args: {

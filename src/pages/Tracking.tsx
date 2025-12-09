@@ -81,7 +81,7 @@ export default function Tracking() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('floor_plans')
-        .select('id, elderly_person_id, image_url, width_meters, height_meters, furniture, zones, grid_size')
+        .select('id, elderly_person_id, name, image_url, width, height, furniture, zones, grid_size, created_at, updated_at')
         .eq('elderly_person_id', selectedPersonId)
         .maybeSingle();
 
@@ -89,9 +89,17 @@ export default function Tracking() {
       if (!data) return null;
 
       return {
-        ...data,
+        id: data.id,
+        elderly_person_id: data.elderly_person_id,
+        name: data.name,
+        image_url: data.image_url || undefined,
+        width: data.width,
+        height: data.height,
+        grid_size: data.grid_size || 20,
         furniture: (data.furniture as any) || [],
-        zones: (data.zones as any) || []
+        zones: (data.zones as any) || [],
+        created_at: data.created_at || '',
+        updated_at: data.updated_at || ''
       };
     },
     enabled: !!selectedPersonId && activeTab === 'indoor',

@@ -83,17 +83,19 @@ export default function DataSharing({ userId }: DataSharingProps) {
       // Get unique user IDs
       const userIds = [...new Set(assignments.map((a: any) => a.relative_user_id))];
 
-      // Use the secure function to get profiles
+      // Get profiles for the relative users
       const { data: profiles, error: profilesError } = await supabase
-        .rpc('get_shared_user_profiles', { _owner_user_id: userId });
+        .from('profiles')
+        .select('id, email, full_name')
+        .in('id', userIds);
 
       if (profilesError) {
-        console.error('Error fetching shared user profiles:', profilesError);
+        console.error('Error fetching profiles:', profilesError);
         throw profilesError;
       }
 
       // Create a map for quick profile lookup
-      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      const profileMap = new Map((profiles || []).map(p => [p.id, p]));
 
       return assignments.map((item: any) => {
         const profile = profileMap.get(item.relative_user_id);
