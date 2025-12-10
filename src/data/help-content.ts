@@ -9,6 +9,7 @@ export interface HelpTopic {
   relatedPages?: string[];
   mediaUrl?: string;
   mediaType?: 'video' | 'gif';
+  youtubeUrl?: string;
 }
 
 export interface QuickLink {
@@ -126,6 +127,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.devices'),
     keywords: ['device', 'monitor', 'status', 'online', 'offline', 'battery'],
     relatedPages: ['/device-status'],
+    youtubeUrl: 'https://youtu.be/tfB-o3ov4RQ',
   },
   {
     id: 'device-types',
@@ -168,6 +170,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.dataSharing'),
     keywords: ['share', 'family', 'access', 'permission', 'invite'],
     relatedPages: ['/data-sharing'],
+    youtubeUrl: 'https://youtu.be/Kb3QtZ9t8Ds',
   },
   // Troubleshooting
   {
@@ -344,6 +347,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Devices',
     keywords: ['device', 'monitor', 'status', 'online', 'offline', 'battery'],
     relatedPages: ['/device-status'],
+    youtubeUrl: 'https://youtu.be/tfB-o3ov4RQ',
   },
   {
     id: 'device-types',
@@ -388,6 +392,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Data Sharing',
     keywords: ['share', 'family', 'access', 'permission', 'invite'],
     relatedPages: ['/data-sharing'],
+    youtubeUrl: 'https://youtu.be/Kb3QtZ9t8Ds',
   },
 
   // Troubleshooting
