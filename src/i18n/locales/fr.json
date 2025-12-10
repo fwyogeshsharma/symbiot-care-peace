@@ -1145,7 +1145,14 @@
       "pairedSuccessfully": "Appareil appairé avec succès!",
       "approveFailed": "Échec de l'approbation",
       "rejected": "Demande d'appairage rejetée",
-      "rejectFailed": "Échec du rejet"
+      "rejectFailed": "Échec du rejet",
+      "expired": "Expiré",
+      "expiredTitle": "Demande d'Appairage Expirée",
+      "expiredDescription": "Cette demande d'appairage a expiré et ne peut plus être approuvée.",
+      "expiresAt": "Expiré le",
+      "deleteExpired": "Supprimer la Demande Expirée",
+      "deleted": "Demande d'appairage supprimée",
+      "deleteFailed": "Échec de la suppression de la demande d'appairage"
     }
   },
   "tracking": {

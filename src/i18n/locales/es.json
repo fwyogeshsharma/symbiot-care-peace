@@ -1145,7 +1145,14 @@
       "pairedSuccessfully": "¡Dispositivo emparejado exitosamente!",
       "approveFailed": "Error al aprobar emparejamiento",
       "rejected": "Solicitud de emparejamiento rechazada",
-      "rejectFailed": "Error al rechazar emparejamiento"
+      "rejectFailed": "Error al rechazar emparejamiento",
+      "expired": "Expirado",
+      "expiredTitle": "Solicitud de Emparejamiento Expirada",
+      "expiredDescription": "Esta solicitud de emparejamiento ha expirado y ya no puede ser aprobada.",
+      "expiresAt": "Expiró el",
+      "deleteExpired": "Eliminar Solicitud Expirada",
+      "deleted": "Solicitud de emparejamiento eliminada",
+      "deleteFailed": "Error al eliminar solicitud de emparejamiento"
     }
   },
   "tracking": {

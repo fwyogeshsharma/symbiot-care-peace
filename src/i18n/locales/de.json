@@ -1145,7 +1145,14 @@
       "pairedSuccessfully": "Gerät erfolgreich gekoppelt!",
       "approveFailed": "Genehmigung fehlgeschlagen",
       "rejected": "Kopplungsanfrage abgelehnt",
-      "rejectFailed": "Ablehnung fehlgeschlagen"
+      "rejectFailed": "Ablehnung fehlgeschlagen",
+      "expired": "Abgelaufen",
+      "expiredTitle": "Abgelaufene Kopplungsanfrage",
+      "expiredDescription": "Diese Kopplungsanfrage ist abgelaufen und kann nicht mehr genehmigt werden.",
+      "expiresAt": "Abgelaufen am",
+      "deleteExpired": "Abgelaufene Anfrage löschen",
+      "deleted": "Kopplungsanfrage gelöscht",
+      "deleteFailed": "Löschen der Kopplungsanfrage fehlgeschlagen"
     }
   },
   "tracking": {
