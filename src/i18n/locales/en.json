@@ -1115,7 +1115,14 @@
       "pairedSuccessfully": "Device paired successfully!",
       "approveFailed": "Failed to approve pairing",
       "rejected": "Pairing request rejected",
-      "rejectFailed": "Failed to reject pairing"
+      "rejectFailed": "Failed to reject pairing",
+      "expired": "Expired",
+      "expiredTitle": "Expired Pairing Request",
+      "expiredDescription": "This pairing request has expired and can no longer be approved.",
+      "expiresAt": "Expired At",
+      "deleteExpired": "Delete Expired Request",
+      "deleted": "Pairing request deleted",
+      "deleteFailed": "Failed to delete pairing request"
     }
   },
   "tracking": {
