@@ -61,11 +61,25 @@ export default function DataSharing({ userId }: DataSharingProps) {
     enabled: !!userId,
   });
 
-  // Fetch current shared users
+  // Fetch current shared users using RPC function to bypass RLS issues
   const { data: sharedUsers = [], isLoading } = useQuery({
     queryKey: ['shared-users', userId],
     queryFn: async () => {
-      // First get assignments with elderly_persons info
+      // Use secure RPC function to get shared user profiles
+      const { data: sharedProfiles, error: profilesError } = await supabase
+        .rpc('get_shared_user_profiles', { _owner_user_id: userId });
+
+      if (profilesError) {
+        console.error('Error fetching shared profiles:', profilesError);
+        throw profilesError;
+      }
+
+      if (!sharedProfiles || sharedProfiles.length === 0) return [];
+
+      // Create a map for quick profile lookup
+      const profileMap = new Map(sharedProfiles.map((p: any) => [p.id, p]));
+
+      // Get assignments with elderly_persons info
       const { data: assignments, error: assignmentsError } = await supabase
         .from('relative_assignments')
         .select(`
@@ -79,21 +93,6 @@ export default function DataSharing({ userId }: DataSharingProps) {
 
       if (assignmentsError) throw assignmentsError;
       if (!assignments || assignments.length === 0) return [];
-
-      // Get unique user IDs
-      const userIds = [...new Set(assignments.map((a: any) => a.relative_user_id))];
-
-      // Use the secure function to get profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .rpc('get_shared_user_profiles', { _owner_user_id: userId });
-
-      if (profilesError) {
-        console.error('Error fetching shared user profiles:', profilesError);
-        throw profilesError;
-      }
-
-      // Create a map for quick profile lookup
-      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
       return assignments.map((item: any) => {
         const profile = profileMap.get(item.relative_user_id);
