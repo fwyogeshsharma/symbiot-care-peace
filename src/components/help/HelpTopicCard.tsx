@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Play, Image as ImageIcon } from 'lucide-react';
+import { ArrowRight, Play, Image as ImageIcon, Youtube } from 'lucide-react';
 import { HelpTopic } from '@/data/help-content';
 import { cn } from '@/lib/utils';
 
@@ -47,6 +47,17 @@ export const HelpTopicCard = ({
                 </>
               )}
             </Badge>
+          )}
+          {topic.youtubeUrl && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 shrink-0"
+              onClick={() => window.open(topic.youtubeUrl, '_blank')}
+              title="Watch on YouTube"
+            >
+              <Youtube className="w-4 h-4 text-red-600" />
+            </Button>
           )}
         </div>
         {showCategory && (
