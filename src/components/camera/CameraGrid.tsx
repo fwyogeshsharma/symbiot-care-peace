@@ -255,25 +255,23 @@ const CameraGrid = ({ title }: CameraGridProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Grid2X2 className="w-5 h-5 text-primary" />
-            <h2 className="text-xl font-semibold">{title || t('tracking.cameraGrid.title')}</h2>
-          </div>
-          <Badge variant="secondary">
-            {connectedCount}/{PUBLIC_CAMERAS.length} {t('tracking.cameraGrid.active')}
-          </Badge>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <Grid2X2 className="w-5 h-5 text-primary flex-shrink-0" />
+          <h2 className="text-xl font-semibold truncate">{title || t('tracking.cameraGrid.title')}</h2>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Badge variant="secondary" className="flex-shrink-0">
+            {connectedCount}/{PUBLIC_CAMERAS.length} {t('tracking.cameraGrid.active')}
+          </Badge>
           {!allConnected ? (
-            <Button onClick={handleConnectAll} size="sm">
+            <Button onClick={handleConnectAll} size="sm" className="flex-shrink-0">
               <Play className="w-4 h-4 mr-2" />
               {t('tracking.cameraGrid.connectAll')}
             </Button>
           ) : (
-            <Button onClick={handleDisconnectAll} variant="outline" size="sm">
+            <Button onClick={handleDisconnectAll} variant="outline" size="sm" className="flex-shrink-0">
               <Pause className="w-4 h-4 mr-2" />
               {t('tracking.cameraGrid.disconnectAll')}
             </Button>
