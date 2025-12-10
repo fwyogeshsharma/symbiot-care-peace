@@ -48,6 +48,25 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
     to: new Date(),
   });
 
+  // Query to get the earliest data point to determine available data range
+  const { data: earliestDataPoint } = useQuery({
+    queryKey: ['earliest-health-data', selectedPersonId],
+    queryFn: async () => {
+      if (!selectedPersonId) return null;
+
+      const { data, error } = await supabase
+        .from('device_data')
+        .select('recorded_at')
+        .eq('elderly_person_id', selectedPersonId)
+        .order('recorded_at', { ascending: true })
+        .limit(1);
+
+      if (error) throw error;
+      return data && data.length > 0 ? new Date(data[0].recorded_at) : null;
+    },
+    enabled: !!selectedPersonId && open,
+  });
+
   const { data: historicalData, isLoading } = useQuery({
     queryKey: ['health-metrics-history', selectedPersonId, dateRange],
     queryFn: async () => {
@@ -69,6 +88,13 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
     },
     enabled: !!selectedPersonId && open,
   });
+
+  // Calculate how many days of data are available
+  const daysOfDataAvailable = earliestDataPoint
+    ? Math.floor((new Date().getTime() - earliestDataPoint.getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
+
+  const hasMoreThan30Days = daysOfDataAvailable > 30;
 
   const processChartData = (dataType: string) => {
     if (!historicalData) return [];
@@ -343,17 +369,32 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
                   >
                     {t('healthMetrics.charts.last7Days')}
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => setDateRange({
-                      from: subDays(new Date(), 30),
-                      to: new Date(),
-                    })}
-                  >
-                    {t('healthMetrics.charts.last30Days')}
-                  </Button>
+                  {daysOfDataAvailable >= 30 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setDateRange({
+                        from: subDays(new Date(), 30),
+                        to: new Date(),
+                      })}
+                    >
+                      {t('healthMetrics.charts.last30Days')}
+                    </Button>
+                  )}
+                  {hasMoreThan30Days && earliestDataPoint && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setDateRange({
+                        from: earliestDataPoint,
+                        to: new Date(),
+                      })}
+                    >
+                      {t('healthMetrics.charts.allAvailableData', { defaultValue: 'All Available Data' })}
+                    </Button>
+                  )}
                 </div>
               </PopoverContent>
             </Popover>
