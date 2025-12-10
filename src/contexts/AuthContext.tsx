@@ -134,35 +134,55 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
-    // Update session log with logout time
-    if (user) {
-      const { data: latestSession } = await (supabase
-        .from('session_logs') as any)
-        .select('id, login_at')
-        .eq('user_id', user.id)
-        .is('logout_at', null)
-        .order('login_at', { ascending: false })
-        .limit(1)
-        .single();
+    try {
+      // Update session log with logout time (best effort, don't block logout)
+      if (user) {
+        try {
+          const { data: latestSession } = await (supabase
+            .from('session_logs') as any)
+            .select('id, login_at')
+            .eq('user_id', user.id)
+            .is('logout_at', null)
+            .order('login_at', { ascending: false })
+            .limit(1)
+            .single();
 
-      if (latestSession) {
-        const loginAt = new Date(latestSession.login_at);
-        const logoutAt = new Date();
-        const durationMinutes = Math.round((logoutAt.getTime() - loginAt.getTime()) / 60000);
+          if (latestSession) {
+            const loginAt = new Date(latestSession.login_at);
+            const logoutAt = new Date();
+            const durationMinutes = Math.round((logoutAt.getTime() - loginAt.getTime()) / 60000);
 
-        await (supabase
-          .from('session_logs') as any)
-          .update({
-            logout_at: logoutAt.toISOString(),
-            session_duration_minutes: durationMinutes,
-          })
-          .eq('id', latestSession.id);
+            await (supabase
+              .from('session_logs') as any)
+              .update({
+                logout_at: logoutAt.toISOString(),
+                session_duration_minutes: durationMinutes,
+              })
+              .eq('id', latestSession.id);
+          }
+        } catch (sessionLogError) {
+          // Ignore session log errors - don't block logout
+          console.warn('Failed to update session log:', sessionLogError);
+        }
       }
-    }
 
-    await supabase.auth.signOut();
-    setUserRole(null);
-    navigate('/auth');
+      // Attempt Supabase signout - may fail if session already expired
+      const { error } = await supabase.auth.signOut();
+      
+      // Even if signOut fails (e.g., session_not_found), clear local state
+      if (error) {
+        console.warn('SignOut warning:', error.message);
+      }
+    } catch (err) {
+      // Catch any unexpected errors
+      console.warn('SignOut error:', err);
+    } finally {
+      // Always clear local state and redirect, regardless of Supabase response
+      setUser(null);
+      setSession(null);
+      setUserRole(null);
+      navigate('/auth');
+    }
   };
 
   return (
