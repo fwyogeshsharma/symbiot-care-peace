@@ -323,7 +323,7 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
     }
 
     // Check if device type is GPS-related and validate geofences
-    const gpsDeviceTypes = ['smart_phone', 'gps', 'worker_wearable', 'phone', 'mobile'];
+    const gpsDeviceTypes = ['smart_phone', 'gps', 'gps_tracker', 'worker_wearable', 'phone', 'mobile'];
     const isGPSDevice = gpsDeviceTypes.includes(validation.data.device_type.toLowerCase());
 
     if (isGPSDevice) {
