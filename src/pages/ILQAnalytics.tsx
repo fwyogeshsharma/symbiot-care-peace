@@ -15,6 +15,24 @@ import { useTranslation } from 'react-i18next';
 import { useFileSystem } from '@/hooks/useFileSystem';
 import { isNative } from '@/lib/capacitor/platform';
 
+// Custom hook to detect mobile screen size
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return isMobile;
+};
+
 export default function ILQAnalytics() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -23,6 +41,7 @@ export default function ILQAnalytics() {
   const [isAutoRefreshing, setIsAutoRefreshing] = useState(true);
   const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const { writeFile, shareText, downloadCSV } = useFileSystem();
+  const isMobile = useIsMobile();
 
   // Helper function for web download fallback
   const downloadFallback = (content: string, filename: string) => {
@@ -224,13 +243,32 @@ export default function ILQAnalytics() {
 
   const latestScore = ilqHistory && ilqHistory.length > 0 ? ilqHistory[ilqHistory.length - 1] : null;
 
+  // Use shorter labels on mobile for better fit
   const radarData = latestScore ? [
-    { component: t('ilq.analytics.healthVitals'), value: latestScore.health_vitals_score ? (typeof latestScore.health_vitals_score === 'string' ? parseFloat(latestScore.health_vitals_score) : latestScore.health_vitals_score) : 0 },
-    { component: t('ilq.analytics.physicalActivity'), value: latestScore.physical_activity_score ? (typeof latestScore.physical_activity_score === 'string' ? parseFloat(latestScore.physical_activity_score) : latestScore.physical_activity_score) : 0 },
-    { component: t('ilq.cognitive'), value: latestScore.cognitive_function_score ? (typeof latestScore.cognitive_function_score === 'string' ? parseFloat(latestScore.cognitive_function_score) : latestScore.cognitive_function_score) : 0 },
-    { component: t('ilq.analytics.environmental'), value: latestScore.environmental_safety_score ? (typeof latestScore.environmental_safety_score === 'string' ? parseFloat(latestScore.environmental_safety_score) : latestScore.environmental_safety_score) : 0 },
-    { component: t('ilq.analytics.emergency'), value: latestScore.emergency_response_score ? (typeof latestScore.emergency_response_score === 'string' ? parseFloat(latestScore.emergency_response_score) : latestScore.emergency_response_score) : 0 },
-    { component: t('ilq.analytics.social'), value: latestScore.social_engagement_score ? (typeof latestScore.social_engagement_score === 'string' ? parseFloat(latestScore.social_engagement_score) : latestScore.social_engagement_score) : 0 },
+    {
+      component: isMobile ? t('ilq.analytics.healthVitalsShort') : t('ilq.analytics.healthVitals'),
+      value: latestScore.health_vitals_score ? (typeof latestScore.health_vitals_score === 'string' ? parseFloat(latestScore.health_vitals_score) : latestScore.health_vitals_score) : 0
+    },
+    {
+      component: isMobile ? t('ilq.analytics.physicalActivityShort') : t('ilq.analytics.physicalActivity'),
+      value: latestScore.physical_activity_score ? (typeof latestScore.physical_activity_score === 'string' ? parseFloat(latestScore.physical_activity_score) : latestScore.physical_activity_score) : 0
+    },
+    {
+      component: isMobile ? t('ilq.analytics.cognitiveFunctionShort') : t('ilq.analytics.cognitiveFunction'),
+      value: latestScore.cognitive_function_score ? (typeof latestScore.cognitive_function_score === 'string' ? parseFloat(latestScore.cognitive_function_score) : latestScore.cognitive_function_score) : 0
+    },
+    {
+      component: isMobile ? t('ilq.analytics.environmentalShort') : t('ilq.analytics.environmentalSafety'),
+      value: latestScore.environmental_safety_score ? (typeof latestScore.environmental_safety_score === 'string' ? parseFloat(latestScore.environmental_safety_score) : latestScore.environmental_safety_score) : 0
+    },
+    {
+      component: isMobile ? t('ilq.analytics.emergencyShort') : t('ilq.analytics.emergencyResponse'),
+      value: latestScore.emergency_response_score ? (typeof latestScore.emergency_response_score === 'string' ? parseFloat(latestScore.emergency_response_score) : latestScore.emergency_response_score) : 0
+    },
+    {
+      component: isMobile ? t('ilq.analytics.socialShort') : t('ilq.analytics.socialEngagement'),
+      value: latestScore.social_engagement_score ? (typeof latestScore.social_engagement_score === 'string' ? parseFloat(latestScore.social_engagement_score) : latestScore.social_engagement_score) : 0
+    },
   ] : [];
 
   return (
@@ -350,7 +388,7 @@ export default function ILQAnalytics() {
           <TabsContent value="history" className="space-y-4">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="space-y-4">
                   <div>
                     <CardTitle>{t('ilq.analytics.scoreHistory')}</CardTitle>
                     <CardDescription>{t('ilq.analytics.trackIndependence')}</CardDescription>
@@ -406,12 +444,30 @@ export default function ILQAnalytics() {
                 </CardHeader>
                 <CardContent>
                   {radarData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={400}>
-                      <RadarChart data={radarData}>
+                    <ResponsiveContainer width="100%" height={isMobile ? 400 : 500}>
+                      <RadarChart
+                        data={radarData}
+                        margin={isMobile ? { top: 40, right: 30, bottom: 40, left: 30 } : { top: 20, right: 80, bottom: 20, left: 80 }}
+                      >
                         <PolarGrid />
-                        <PolarAngleAxis dataKey="component" />
-                        <PolarRadiusAxis domain={[0, 100]} />
+                        <PolarAngleAxis
+                          dataKey="component"
+                          tick={{ fill: 'hsl(var(--foreground))', fontSize: isMobile ? 10 : 12 }}
+                          tickLine={false}
+                        />
+                        <PolarRadiusAxis
+                          domain={[0, 100]}
+                          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: isMobile ? 8 : 10 }}
+                          axisLine={false}
+                        />
                         <Radar name={t('ilq.score')} dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                          }}
+                        />
                       </RadarChart>
                     </ResponsiveContainer>
                   ) : (
