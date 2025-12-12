@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -8,6 +9,8 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { HelpPanel } from '@/components/help/HelpPanel';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -16,11 +19,32 @@ interface HeaderProps {
 }
 
 const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
-  const { userRole, signOut } = useAuth();
+  const { user, userRole, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [helpPanelOpen, setHelpPanelOpen] = useState(false);
   const { t } = useTranslation();
+
+  // Fetch user profile for avatar
+  const { data: profile } = useQuery({
+    queryKey: ['profile-header', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url, full_name')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const getInitials = (name: string | null) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
 
   // Keyboard shortcut to open help panel (F1)
   useEffect(() => {
@@ -116,9 +140,14 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         variant={isActive('/profile') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/profile')}
-        className={cn(isMobile && 'w-full justify-start')}
+        className={cn(isMobile && 'w-full justify-start', 'gap-2')}
       >
-        <User className="w-4 h-4 mr-2" />
+        <Avatar className="w-5 h-5">
+          <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || 'User'} />
+          <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+            {getInitials(profile?.full_name)}
+          </AvatarFallback>
+        </Avatar>
         {t('nav.profile')}
       </Button>
     </>

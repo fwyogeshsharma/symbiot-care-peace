@@ -1,8 +1,8 @@
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ElderlyPhotoUpload } from './ElderlyPhotoUpload';
 
 interface ElderlyPerson {
   id: string;
@@ -20,14 +20,6 @@ interface ElderlyListProps {
 
 const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson }: ElderlyListProps) => {
   const { t } = useTranslation();
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   return (
     <Card className="p-4 sm:p-6">
@@ -51,12 +43,13 @@ const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson }: Elder
               }`}
             >
               <div className="flex items-center gap-3 mb-3">
-                <Avatar className="w-12 h-12 flex-shrink-0">
-                  <AvatarImage src={person.photo_url || undefined} alt={person.full_name} />
-                  <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
-                    {getInitials(person.full_name)}
-                  </AvatarFallback>
-                </Avatar>
+                <ElderlyPhotoUpload
+                  elderlyPersonId={person.id}
+                  currentPhotoUrl={person.photo_url}
+                  fullName={person.full_name}
+                  size="md"
+                  editable={true}
+                />
 
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-base leading-tight mb-1 break-words">
