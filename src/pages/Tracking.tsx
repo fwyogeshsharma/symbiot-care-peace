@@ -268,29 +268,6 @@ export default function Tracking() {
     }
   };
 
-  // Only block on critical queries - user and elderly persons
-  const isCriticalLoading = elderlyLoading;
-
-  if (isCriticalLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header showBackButton title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
-        <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
-          <div className="space-y-6">
-            <Skeleton className="h-12 w-64" />
-            <Skeleton className="h-96 w-full" />
-            <Skeleton className="h-48 w-full" />
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Tab-specific loading states (non-blocking)
-  const isTabLoading =
-    (activeTab === 'indoor' && (floorPlanLoading || positionLoading)) ||
-    (activeTab === 'outdoor' && (gpsLoading || placesLoading || eventsLoading));
-
   // Process indoor tracking data - Memoized to avoid recomputation on every render
   const processedData = useMemo(
     () => activeTab === 'indoor' ? processPositionData(positionData) : null,
@@ -333,6 +310,29 @@ export default function Tracking() {
         : [40.7128, -74.0060], // Default to NYC
     [currentGPSPosition, geofencePlaces]
   );
+
+  // Only block on critical queries - user and elderly persons
+  const isCriticalLoading = elderlyLoading;
+
+  if (isCriticalLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header showBackButton title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
+        <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
+          <div className="space-y-6">
+            <Skeleton className="h-12 w-64" />
+            <Skeleton className="h-96 w-full" />
+            <Skeleton className="h-48 w-full" />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Tab-specific loading states (non-blocking)
+  const isTabLoading =
+    (activeTab === 'indoor' && (floorPlanLoading || positionLoading)) ||
+    (activeTab === 'outdoor' && (gpsLoading || placesLoading || eventsLoading));
 
   return (
     <div className="min-h-screen bg-background">
