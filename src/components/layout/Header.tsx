@@ -82,16 +82,6 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         {t('nav.movement')}
       </Button>
       <Button
-        data-tour="nav-alerts"
-        variant={isActive('/alerts') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/alerts')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <AlertTriangle className="w-4 h-4 mr-2" />
-        {t('nav.alerts')}
-      </Button>
-      <Button
         data-tour="nav-tracking"
         variant={isActive('/tracking') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
@@ -110,6 +100,16 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
       >
         <Wifi className="w-4 h-4 mr-2" />
         {t('nav.devices')}
+      </Button>
+      <Button
+        data-tour="nav-alerts"
+        variant={isActive('/alerts') ? 'default' : 'ghost'}
+        size={isMobile ? 'default' : 'sm'}
+        onClick={() => navigate('/alerts')}
+        className={cn(isMobile && 'w-full justify-start')}
+      >
+        <AlertTriangle className="w-4 h-4 mr-2" />
+        {t('nav.alerts')}
       </Button>
       <Button
         data-tour="user-menu"
