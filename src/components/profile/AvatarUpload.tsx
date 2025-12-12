@@ -1,13 +1,11 @@
 import { useState, useRef, useCallback } from 'react';
-import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera, Upload, Loader2, User } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Camera, Upload, Loader2, ZoomIn, ZoomOut } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from 'react-i18next';
 
 interface AvatarUploadProps {
   userId: string;
@@ -16,42 +14,24 @@ interface AvatarUploadProps {
   onAvatarChange: (url: string) => void;
 }
 
-function centerAspectCrop(
-  mediaWidth: number,
-  mediaHeight: number,
-  aspect: number,
-) {
-  return centerCrop(
-    makeAspectCrop(
-      {
-        unit: '%',
-        width: 90,
-      },
-      aspect,
-      mediaWidth,
-      mediaHeight,
-    ),
-    mediaWidth,
-    mediaHeight,
-  );
-}
-
 export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChange }: AvatarUploadProps) => {
   const [imgSrc, setImgSrc] = useState('');
-  const [crop, setCrop] = useState<Crop>();
-  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const { t } = useTranslation();
 
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         toast({
           title: 'Invalid file type',
@@ -61,7 +41,6 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
         return;
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast({
           title: 'File too large',
@@ -73,93 +52,150 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
 
       const reader = new FileReader();
       reader.addEventListener('load', () => {
-        setImgSrc(reader.result?.toString() || '');
-        setIsDialogOpen(true);
+        const img = new Image();
+        img.onload = () => {
+          imageRef.current = img;
+          setImgSrc(reader.result?.toString() || '');
+          setScale(1);
+          setPosition({ x: 0, y: 0 });
+          setIsDialogOpen(true);
+        };
+        img.src = reader.result?.toString() || '';
       });
       reader.readAsDataURL(file);
     }
+    // Reset input so same file can be selected again
+    e.target.value = '';
   };
 
-  const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = e.currentTarget;
-    setCrop(centerAspectCrop(width, height, 1));
-  }, []);
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+  };
 
-  const getCroppedImg = async (
-    image: HTMLImageElement,
-    crop: PixelCrop,
-  ): Promise<Blob> => {
-    const canvas = document.createElement('canvas');
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setPosition({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y,
+    });
+  }, [isDragging, dragStart]);
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({ 
+        x: e.touches[0].clientX - position.x, 
+        y: e.touches[0].clientY - position.y 
+      });
+    }
+  };
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    setPosition({
+      x: e.touches[0].clientX - dragStart.x,
+      y: e.touches[0].clientY - dragStart.y,
+    });
+  }, [isDragging, dragStart]);
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  const getCroppedImage = async (): Promise<Blob> => {
+    const canvas = canvasRef.current;
+    const img = imageRef.current;
     
-    // Set canvas size to desired output (256x256 for avatars)
-    canvas.width = 256;
-    canvas.height = 256;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      throw new Error('No 2d context');
+    if (!canvas || !img) {
+      throw new Error('Canvas or image not available');
     }
 
-    ctx.imageSmoothingQuality = 'high';
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Canvas context not available');
+    }
 
-    const cropX = crop.x * scaleX;
-    const cropY = crop.y * scaleY;
-    const cropWidth = crop.width * scaleX;
-    const cropHeight = crop.height * scaleY;
+    // Output size
+    const outputSize = 256;
+    canvas.width = outputSize;
+    canvas.height = outputSize;
 
+    // Preview container size (matches the preview div)
+    const previewSize = 200;
+    
+    // Calculate how the image is displayed in the preview
+    const imgAspect = img.naturalWidth / img.naturalHeight;
+    let displayWidth, displayHeight;
+    
+    if (imgAspect > 1) {
+      displayHeight = previewSize * scale;
+      displayWidth = displayHeight * imgAspect;
+    } else {
+      displayWidth = previewSize * scale;
+      displayHeight = displayWidth / imgAspect;
+    }
+
+    // Calculate crop region in source image coordinates
+    const scaleFactorX = img.naturalWidth / displayWidth;
+    const scaleFactorY = img.naturalHeight / displayHeight;
+
+    // Center of preview
+    const centerX = previewSize / 2;
+    const centerY = previewSize / 2;
+
+    // Image position in preview (centered + user offset)
+    const imgCenterX = centerX + position.x;
+    const imgCenterY = centerY + position.y;
+
+    // Crop area in preview coordinates
+    const cropStartX = centerX - previewSize / 2;
+    const cropStartY = centerY - previewSize / 2;
+
+    // Source coordinates
+    const srcX = (cropStartX - (imgCenterX - displayWidth / 2)) * scaleFactorX;
+    const srcY = (cropStartY - (imgCenterY - displayHeight / 2)) * scaleFactorY;
+    const srcWidth = previewSize * scaleFactorX;
+    const srcHeight = previewSize * scaleFactorY;
+
+    // Clear and draw
+    ctx.clearRect(0, 0, outputSize, outputSize);
     ctx.drawImage(
-      image,
-      cropX,
-      cropY,
-      cropWidth,
-      cropHeight,
-      0,
-      0,
-      256,
-      256,
+      img,
+      srcX, srcY, srcWidth, srcHeight,
+      0, 0, outputSize, outputSize
     );
 
     return new Promise((resolve, reject) => {
       canvas.toBlob(
         (blob) => {
-          if (blob) {
-            resolve(blob);
-          } else {
-            reject(new Error('Canvas is empty'));
-          }
+          if (blob) resolve(blob);
+          else reject(new Error('Failed to create blob'));
         },
         'image/jpeg',
-        0.9,
+        0.9
       );
     });
   };
 
   const handleUpload = async () => {
-    if (!imgRef.current || !completedCrop) {
-      toast({
-        title: 'No crop selected',
-        description: 'Please select a crop area',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     setIsUploading(true);
     try {
-      const croppedBlob = await getCroppedImg(imgRef.current, completedCrop);
+      const croppedBlob = await getCroppedImage();
       const fileName = `${userId}/avatar-${Date.now()}.jpg`;
 
       // Delete old avatar if exists
-      if (currentAvatarUrl) {
+      if (currentAvatarUrl && currentAvatarUrl.includes('/avatars/')) {
         const oldPath = currentAvatarUrl.split('/avatars/').pop();
         if (oldPath) {
           await supabase.storage.from('avatars').remove([oldPath]);
         }
       }
 
-      // Upload new avatar
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, croppedBlob, {
@@ -169,12 +205,10 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      // Update profile with new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: publicUrl })
@@ -238,34 +272,68 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md sm:max-w-lg">
+        <DialogContent className="max-w-sm sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Crop Profile Photo</DialogTitle>
+            <DialogTitle>Adjust Profile Photo</DialogTitle>
           </DialogHeader>
           
           <div className="flex flex-col items-center gap-4">
-            {imgSrc && (
-              <ReactCrop
-                crop={crop}
-                onChange={(_, percentCrop) => setCrop(percentCrop)}
-                onComplete={(c) => setCompletedCrop(c)}
-                aspect={1}
-                circularCrop
-                className="max-h-[60vh] rounded-lg overflow-hidden"
-              >
+            {/* Preview area with circular mask */}
+            <div 
+              ref={containerRef}
+              className="relative w-[200px] h-[200px] rounded-full overflow-hidden bg-muted cursor-move select-none touch-none"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {imgSrc && (
                 <img
-                  ref={imgRef}
-                  alt="Crop preview"
                   src={imgSrc}
-                  onLoad={onImageLoad}
-                  className="max-w-full max-h-[60vh] object-contain"
+                  alt="Preview"
+                  className="absolute pointer-events-none"
+                  style={{
+                    transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+                    transformOrigin: 'center',
+                    left: '50%',
+                    top: '50%',
+                    marginLeft: '-50%',
+                    marginTop: '-50%',
+                    maxWidth: 'none',
+                    height: '100%',
+                    width: 'auto',
+                  }}
+                  draggable={false}
                 />
-              </ReactCrop>
-            )}
+              )}
+              {/* Circular overlay guide */}
+              <div className="absolute inset-0 border-4 border-primary/30 rounded-full pointer-events-none" />
+            </div>
+
+            {/* Zoom controls */}
+            <div className="flex items-center gap-3 w-full max-w-[200px]">
+              <ZoomOut className="w-4 h-4 text-muted-foreground" />
+              <Slider
+                value={[scale]}
+                onValueChange={(value) => setScale(value[0])}
+                min={0.5}
+                max={3}
+                step={0.1}
+                className="flex-1"
+              />
+              <ZoomIn className="w-4 h-4 text-muted-foreground" />
+            </div>
+
             <p className="text-sm text-muted-foreground text-center">
-              Drag to reposition. The circular area will be used as your profile photo.
+              Drag to reposition, use slider to zoom
             </p>
           </div>
+
+          {/* Hidden canvas for cropping */}
+          <canvas ref={canvasRef} className="hidden" />
 
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button
@@ -278,7 +346,7 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
             >
               Cancel
             </Button>
-            <Button onClick={handleUpload} disabled={isUploading || !completedCrop}>
+            <Button onClick={handleUpload} disabled={isUploading}>
               {isUploading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
