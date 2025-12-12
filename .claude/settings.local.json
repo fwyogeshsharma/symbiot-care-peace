@@ -1,19 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(\"$USERPROFILE/AppData/Local/Android/Sdk/platform-tools/adb.exe\" shell \"dumpsys activity activities | grep -E ''mResumedActivity|mFocusedActivity''\")",
-      "Bash(findstr:*)",
-      "Bash(mkdir:*)",
-      "Bash(cp:*)",
-      "Bash(npx @capacitor/assets generate:*)",
       "Bash(npm run build:*)",
-      "Bash(./gradlew assembleRelease:*)",
-      "Bash(test:*)",
-      "Bash(echo:*)",
-      "Bash(supabase functions deploy:*)",
-      "Bash(npx cap sync:*)",
-      "Bash(\"$USERPROFILE/AppData/Local/Android/Sdk/platform-tools/adb.exe\" devices)",
-      "Bash(\"$USERPROFILE/AppData/Local/Android/Sdk/platform-tools/adb.exe\" install -r android/app/build/outputs/apk/release/app-release.apk)"
+      "Bash(npx tsc:*)",
+      "Bash(npx supabase functions serve:*)",
+      "Bash(grep:*)",
+      "Bash(npx tsx:*)",
+      "Bash(node -e:*)",
+      "Bash(npx supabase db --help:*)",
+      "Bash(find:*)",
+      "Bash(npx supabase db reset --help:*)",
+      "Bash(npx supabase:*)"
     ],
     "deny": [],
     "ask": []
