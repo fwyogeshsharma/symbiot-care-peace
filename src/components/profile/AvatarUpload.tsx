@@ -296,15 +296,14 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
                   alt="Preview"
                   className="absolute pointer-events-none"
                   style={{
-                    transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+                    transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px)) scale(${scale})`,
                     transformOrigin: 'center',
                     left: '50%',
                     top: '50%',
-                    marginLeft: '-50%',
-                    marginTop: '-50%',
                     maxWidth: 'none',
-                    height: '100%',
-                    width: 'auto',
+                    minWidth: '100%',
+                    minHeight: '100%',
+                    objectFit: 'cover',
                   }}
                   draggable={false}
                 />
