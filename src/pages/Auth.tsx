@@ -24,6 +24,10 @@ const signupSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits').regex(/^[0-9+\-\s()]*$/, 'Invalid phone number format'),
   role: z.enum(['elderly', 'caregiver', 'relative', 'admin']),
+  yearOfBirth: z.number({
+    required_error: "Year of birth is required",
+    invalid_type_error: "Please enter a valid year",
+  }).min(1900, 'Year must be at least 1900').max(new Date().getFullYear(), 'Year cannot be in the future'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -41,6 +45,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<string>('relative');
+  const [yearOfBirth, setYearOfBirth] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -208,7 +213,15 @@ const Auth = () => {
           });
         }
       } else {
-        const validation = signupSchema.safeParse({ email, password, confirmPassword, fullName, phone, role });
+        const validation = signupSchema.safeParse({
+          email,
+          password,
+          confirmPassword,
+          fullName,
+          phone,
+          role,
+          yearOfBirth: yearOfBirth ? parseInt(yearOfBirth) : undefined
+        });
         if (!validation.success) {
           toast({
             title: "Validation Error",
@@ -219,7 +232,7 @@ const Auth = () => {
           return;
         }
 
-        const { error, isDuplicate } = await signUp(email, password, fullName, phone, role);
+        const { error, isDuplicate } = await signUp(email, password, fullName, phone, role, yearOfBirth ? parseInt(yearOfBirth) : undefined);
         
         if (isDuplicate) {
           toast({
@@ -378,6 +391,20 @@ const Auth = () => {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="yearOfBirth">Year of Birth *</Label>
+                <Input
+                  id="yearOfBirth"
+                  type="number"
+                  value={yearOfBirth}
+                  onChange={(e) => setYearOfBirth(e.target.value)}
+                  required
+                  min="1900"
+                  max={new Date().getFullYear()}
+                  placeholder={`e.g., ${new Date().getFullYear() - 30}`}
                 />
               </div>
 

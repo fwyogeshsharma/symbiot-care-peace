@@ -9,7 +9,7 @@ interface AuthContextType {
   session: Session | null;
   userRole: string | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, phone: string, role: string) => Promise<{ error: any; isDuplicate?: boolean }>;
+  signUp: (email: string, password: string, fullName: string, phone: string, role: string, yearOfBirth?: number) => Promise<{ error: any; isDuplicate?: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, phone: string, role: string) => {
+  const signUp = async (email: string, password: string, fullName: string, phone: string, role: string, yearOfBirth?: number) => {
     const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
     const redirectUrl = `${baseUrl}/dashboard`;
 
@@ -118,14 +118,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         data: {
           full_name: fullName,
           phone: phone,
-          role: role
+          role: role,
+          year_of_birth: yearOfBirth
         }
       }
     });
-    
+
     // Check if user already exists (Supabase returns success but with identities array empty for existing users)
     const isDuplicate = !error && data.user && (!data.user.identities || data.user.identities.length === 0);
-    
+
     return { error, isDuplicate };
   };
 

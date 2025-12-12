@@ -221,6 +221,21 @@ const Profile = () => {
                       placeholder={t('profile.enterPhone')}
                     />
                   </div>
+
+                  {profile?.year_of_birth && (
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        Approximate Age
+                      </Label>
+                      <Input
+                        type="text"
+                        value={`${new Date().getFullYear() - profile.year_of_birth} years (Born in ${profile.year_of_birth})`}
+                        disabled
+                        className="bg-muted"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {isEditing && (
