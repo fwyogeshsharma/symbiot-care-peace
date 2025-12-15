@@ -259,39 +259,39 @@ const Dashboard = () => {
         {/* Stats Overview */}
         <div data-tour="stats-overview" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Card className="p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-3 min-h-[80px]">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 mb-2">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.monitoredPersons.label')}</p>
                   <HelpTooltip content={t('dashboard.stats.monitoredPersons.tooltip')} />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">{elderlyPersons?.length || 0}</p>
               </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Users className="w-6 h-6 text-primary" />
               </div>
             </div>
           </Card>
 
           <Card className="p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-3 min-h-[80px]">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 mb-2">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.activeAlerts.label')}</p>
                   <HelpTooltip content={t('dashboard.stats.activeAlerts.tooltip')} />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">{alerts?.length || 0}</p>
               </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-warning" />
+              <div className="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-6 h-6 text-warning" />
               </div>
             </div>
           </Card>
 
           <Card className="p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-3 min-h-[80px]">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 mb-2">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.avgHeartRate.label')}</p>
                   <HelpTooltip
                     title={t('dashboard.stats.avgHeartRate.title')}
@@ -307,16 +307,16 @@ const Dashboard = () => {
                   <p className="text-xs text-muted-foreground">{t('dashboard.stats.avgHeartRate.noData')}</p>
                 )}
               </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
-                <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-success" />
+              <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
+                <Heart className="w-6 h-6 text-success" />
               </div>
             </div>
           </Card>
 
           <Card className="p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-3 min-h-[80px]">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 mb-2">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.activityLevel.label')}</p>
                   <HelpTooltip
                     title={t('dashboard.stats.activityLevel.title')}
@@ -336,8 +336,8 @@ const Dashboard = () => {
                   <p className="text-xs text-muted-foreground">{t('dashboard.stats.activityLevel.noData')}</p>
                 )}
               </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
-                <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
+              <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
+                <Activity className="w-6 h-6 text-secondary" />
               </div>
             </div>
           </Card>
