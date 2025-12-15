@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Map language codes to date-fns locales
 const getDateLocale = (language: string) => {
@@ -40,10 +41,11 @@ interface AlertsListProps {
 const AlertsList = ({ alerts, selectedPersonId }: AlertsListProps) => {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const dateLocale = getDateLocale(i18n.language);
-  
+
   // Filter alerts based on selected person
-  const filteredAlerts = selectedPersonId 
+  const filteredAlerts = selectedPersonId
     ? alerts.filter(alert => alert.elderly_person_id === selectedPersonId)
     : alerts;
 
@@ -62,27 +64,37 @@ const AlertsList = ({ alerts, selectedPersonId }: AlertsListProps) => {
     }
   };
 
-  const handleAcknowledge = async (alertId: string) => {
-    const { error } = await supabase
-      .from('alerts')
-      .update({
-        status: 'acknowledged',
-        acknowledged_at: new Date().toISOString()
-      })
-      .eq('id', alertId);
+  const acknowledgeMutation = useMutation({
+    mutationFn: async (alertId: string) => {
+      const { error } = await supabase
+        .from('alerts')
+        .update({
+          status: 'acknowledged',
+          acknowledged_at: new Date().toISOString()
+        })
+        .eq('id', alertId);
 
-    if (error) {
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch alerts
+      queryClient.invalidateQueries({ queryKey: ['alerts'] });
+      toast({
+        title: t('alerts.toasts.alertAcknowledgedTitle'),
+        description: t('alerts.toasts.alertAcknowledgedDesc'),
+      });
+    },
+    onError: () => {
       toast({
         title: t('alerts.toasts.error'),
         description: t('alerts.toasts.failedToAcknowledge'),
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: t('alerts.toasts.alertAcknowledgedTitle'),
-        description: t('alerts.toasts.alertAcknowledgedDesc'),
-      });
     }
+  });
+
+  const handleAcknowledge = (alertId: string) => {
+    acknowledgeMutation.mutate(alertId);
   };
 
   return (
@@ -137,8 +149,9 @@ const AlertsList = ({ alerts, selectedPersonId }: AlertsListProps) => {
                     size="sm"
                     variant="outline"
                     onClick={() => handleAcknowledge(alert.id)}
+                    disabled={acknowledgeMutation.isPending}
                   >
-                    {t('alerts.actions.acknowledge')}
+                    {acknowledgeMutation.isPending ? t('common.loading', { defaultValue: 'Loading...' }) : t('alerts.actions.acknowledge')}
                   </Button>
                 )}
               </div>
