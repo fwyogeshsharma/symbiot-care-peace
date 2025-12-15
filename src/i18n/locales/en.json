@@ -345,6 +345,7 @@
     "health": "Health",
     "profile": "Profile",
     "alerts": "Alerts",
+    "reports": "Reports",
     "tracking": "Tracking",
     "devices": "Devices",
     "dataSharing": "Data Sharing",
@@ -1848,6 +1849,93 @@
     "footer": {
       "copyright": "© 2025 SymBIoT. All rights reserved. Version: 1.0.10",
       "tagline": "Bringing families and technology together for better care."
+    },
+    "reports": {
+      "title": "Reports",
+      "subtitle": "Generate comprehensive reports and analytics",
+      "filters": "Report Filters",
+      "selectPerson": "Select Person",
+      "allPersons": "All Persons",
+      "dateRange": "Date Range",
+      "pickDate": "Pick a date range",
+      "quickSelect": "Quick Select",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "last3Months": "Last 3 Months",
+      "generate": "Generate",
+      "exportAll": "Export All",
+      "categories": {
+        "health": "Health Summary",
+        "healthDesc": "Vital signs and health metrics overview",
+        "activity": "Activity & Mobility",
+        "activityDesc": "Movement patterns and physical activity",
+        "sleep": "Sleep Analysis",
+        "sleepDesc": "Sleep quality and patterns",
+        "medication": "Medication Adherence",
+        "medicationDesc": "Medication compliance tracking",
+        "alerts": "Alert Summary",
+        "alertsDesc": "Alert history and response times",
+        "environment": "Environmental Safety",
+        "environmentDesc": "Home environment conditions",
+        "wellness": "Wellness Score",
+        "wellnessDesc": "Independent living quality assessment",
+        "comparative": "Comparative Analysis",
+        "comparativeDesc": "Period-over-period comparisons"
+      },
+      "health": {
+        "vitalTrends": "Vital Signs Trends",
+        "vitalTrendsDesc": "Heart rate, blood pressure, oxygen levels over time",
+        "anomalies": "Health Anomalies",
+        "anomaliesDesc": "Out-of-range readings and concerning patterns",
+        "bloodSugar": "Blood Sugar Analysis",
+        "bloodSugarDesc": "Glucose levels and patterns"
+      },
+      "activity": {
+        "dailyActivity": "Daily Activity Summary",
+        "dailyActivityDesc": "Steps, active time, and sedentary periods",
+        "movementPatterns": "Movement Patterns",
+        "movementPatternsDesc": "Room transitions and mobility analysis",
+        "fallIncidents": "Fall Incidents",
+        "fallIncidentsDesc": "Fall detection events and risk analysis"
+      },
+      "sleep": {
+        "quality": "Sleep Quality Report",
+        "qualityDesc": "Duration, quality scores, and disturbances",
+        "patterns": "Sleep Patterns",
+        "patternsDesc": "Sleep stages and cycle analysis"
+      },
+      "medication": {
+        "adherence": "Adherence Report",
+        "adherenceDesc": "Doses taken vs missed",
+        "timing": "Timing Analysis",
+        "timingDesc": "Medication schedule compliance"
+      },
+      "alerts": {
+        "history": "Alert History",
+        "historyDesc": "All alerts with resolution status",
+        "emergency": "Emergency Events",
+        "emergencyDesc": "Panic button and critical alerts",
+        "responseTime": "Response Time Analysis",
+        "responseTimeDesc": "Average time to acknowledge and resolve"
+      },
+      "environment": {
+        "airQuality": "Air Quality Report",
+        "airQualityDesc": "Temperature, humidity, and air quality trends",
+        "comfort": "Comfort Analysis",
+        "comfortDesc": "Optimal vs actual environmental conditions"
+      },
+      "wellness": {
+        "ilqTrends": "ILQ Score Trends",
+        "ilqTrendsDesc": "Independence quality over time",
+        "factors": "Contributing Factors",
+        "factorsDesc": "Key metrics affecting wellness score"
+      },
+      "comparative": {
+        "weekly": "Week-over-Week",
+        "weeklyDesc": "Weekly comparison of key metrics",
+        "monthly": "Month-over-Month",
+        "monthlyDesc": "Monthly trends and changes"
+      }
     }
   }
 }

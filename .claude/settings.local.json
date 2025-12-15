@@ -10,7 +10,10 @@
       "Bash(npx supabase db --help:*)",
       "Bash(find:*)",
       "Bash(npx supabase db reset --help:*)",
-      "Bash(npx supabase:*)"
+      "Bash(npx supabase:*)",
+      "Bash(python scripts/create_liability_doc.py:*)",
+      "Bash(py scripts/create_liability_doc.py)",
+      "Bash(py -m pip install:*)"
     ],
     "deny": [],
     "ask": []
