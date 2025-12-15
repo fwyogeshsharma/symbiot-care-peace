@@ -59,7 +59,7 @@
     "kW": "kW",
     "%": "%",
     "steps": "pas",
-    "bpm": "bpm",
+    "bpm": "BPM",
     "mmHg": "mmHg",
     "°C": "°C",
     "°F": "°F",
@@ -1336,8 +1336,8 @@
       "avgHeartRate": {
         "label": "Fréquence Cardiaque Moy.",
         "title": "Surveillance de la Fréquence Cardiaque",
-        "tooltip": "Fréquence cardiaque moyenne des lectures récentes. Fréquence cardiaque normale au repos : 60-100 bpm. Les alertes sont déclenchées pour les valeurs hors des plages sûres.",
-        "bpm": "bpm",
+        "tooltip": "Fréquence cardiaque moyenne des lectures récentes. Fréquence cardiaque normale au repos : 60-100 BPM. Les alertes sont déclenchées pour les valeurs hors des plages sûres.",
+        "bpm": "BPM",
         "noData": "Aucune donnée"
       },
       "activityLevel": {

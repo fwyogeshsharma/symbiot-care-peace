@@ -275,7 +275,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       case 'heart_rate':
         const hr = extractNumericValue(value, type);
         if (hr === null) return 'N/A';
-        return `${Math.round(hr)} bpm`;
+        return `${Math.round(hr)} BPM`;
 
       case 'oxygen_saturation':
       case 'oxygen_level':
@@ -436,7 +436,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       case 'respiratory_rate':
         const respRate = extractNumericValue(value, type);
         if (respRate === null) return 'N/A';
-        return `${Math.round(respRate)} bpm`;
+        return `${Math.round(respRate)} BPM`;
 
       default:
         // Try to extract numeric value first
