@@ -30,6 +30,7 @@ import Pricing from "./pages/Pricing";
 import ILQAnalytics from "./pages/ILQAnalytics";
 import InvestorInfo from "./pages/InvestorInfo";
 import MedicationConfig from "./pages/MedicationConfig";
+import Reports from "./pages/Reports";
 
 const queryClient = new QueryClient();
 
@@ -180,6 +181,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <MedicationConfig />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <ProtectedRoute>
+                  <Reports />
                 </ProtectedRoute>
               }
             />

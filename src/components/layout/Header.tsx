@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -100,6 +100,16 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
       >
         <Wifi className="w-4 h-4 mr-2" />
         {t('nav.devices')}
+      </Button>
+      <Button
+        data-tour="nav-reports"
+        variant={isActive('/reports') ? 'default' : 'ghost'}
+        size={isMobile ? 'default' : 'sm'}
+        onClick={() => navigate('/reports')}
+        className={cn(isMobile && 'w-full justify-start')}
+      >
+        <FileText className="w-4 h-4 mr-2" />
+        {t('nav.reports')}
       </Button>
       <Button
         data-tour="nav-alerts"
