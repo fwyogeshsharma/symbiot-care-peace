@@ -10,6 +10,8 @@
     "add": "Add",
     "update": "Update",
     "close": "Close",
+    "expand": "Expand",
+    "minimize": "Minimize",
     "search": "Search",
     "filter": "Filter",
     "export": "Export",

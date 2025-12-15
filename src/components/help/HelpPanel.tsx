@@ -7,7 +7,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Search, X, ExternalLink, LayoutDashboard, Activity, AlertTriangle, Wifi, MapPin, HelpCircle, ArrowRight, Play } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Search, X, ExternalLink, LayoutDashboard, Activity, AlertTriangle, Wifi, MapPin, HelpCircle, ArrowRight, Play, Maximize2, Minimize2 } from 'lucide-react';
 import { helpTopics, quickLinks, categorizeTopics, searchHelpTopics, HelpTopic, getTranslatedHelpTopics, getTranslatedQuickLinks } from '@/data/help-content';
 import { restartTour } from './OnboardingTour';
 import { HelpTopicCard } from './HelpTopicCard';
@@ -32,6 +33,7 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
   const location = useLocation();
   const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Get translated help topics and quick links (memoized to prevent infinite loops)
   // Using i18n.language as dependency since t function changes on every render
@@ -40,6 +42,13 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
 
   const [filteredTopics, setFilteredTopics] = useState<HelpTopic[]>(() => getTranslatedHelpTopics(t));
   const [contextTopics, setContextTopics] = useState<HelpTopic[]>([]);
+
+  // Reset expanded state when panel closes
+  useEffect(() => {
+    if (!open) {
+      setIsExpanded(false);
+    }
+  }, [open]);
 
   // Get context-aware topics based on current page
   useEffect(() => {
@@ -81,9 +90,43 @@ export const HelpPanel = ({ open, onOpenChange }: HelpPanelProps) => {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col">
-        <SheetHeader className="p-6 pb-4">
-          <SheetTitle className="text-2xl">{getPageTitle()}</SheetTitle>
+      <SheetContent side="right" className={`${isExpanded ? '!w-screen !max-w-none !h-screen !inset-0 !left-0 !right-0 !top-0 !bottom-0' : 'w-full sm:max-w-lg'} p-0 flex flex-col`} hideDefaultClose>
+        <SheetHeader className="p-6 pb-4 relative">
+          <div className="absolute right-6 top-6 flex items-center gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                  >
+                    {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {isExpanded ? t('common.minimize') : t('common.expand')}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => onOpenChange(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {t('common.close')}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <SheetTitle className="text-2xl pr-20">{getPageTitle()}</SheetTitle>
           <SheetDescription>
             {t('help.description')}
           </SheetDescription>
