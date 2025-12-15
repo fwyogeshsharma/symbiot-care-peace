@@ -69,7 +69,7 @@
     "kW": "kW",
     "%": "%",
     "steps": "steps",
-    "bpm": "bpm",
+    "bpm": "BPM",
     "mmHg": "mmHg",
     "°C": "°C",
     "°F": "°F",
@@ -678,8 +678,8 @@
       "avgHeartRate": {
         "label": "Avg Heart Rate",
         "title": "Heart Rate Monitoring",
-        "tooltip": "Average heart rate from recent readings. Normal resting heart rate: 60-100 bpm. Alerts are triggered for values outside safe ranges.",
-        "bpm": "bpm",
+        "tooltip": "Average heart rate from recent readings. Normal resting heart rate: 60-100 BPM. Alerts are triggered for values outside safe ranges.",
+        "bpm": "BPM",
         "noData": "No data"
       },
       "activityLevel": {

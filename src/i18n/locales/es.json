@@ -59,7 +59,7 @@
     "kW": "kW",
     "%": "%",
     "steps": "pasos",
-    "bpm": "lpm",
+    "bpm": "LPM",
     "mmHg": "mmHg",
     "°C": "°C",
     "°F": "°F",
@@ -1336,8 +1336,8 @@
       "avgHeartRate": {
         "label": "Frecuencia Cardíaca Prom.",
         "title": "Monitoreo de Frecuencia Cardíaca",
-        "tooltip": "Frecuencia cardíaca promedio de lecturas recientes. Frecuencia cardíaca normal en reposo: 60-100 lpm. Se activan alertas para valores fuera de rangos seguros.",
-        "bpm": "lpm",
+        "tooltip": "Frecuencia cardíaca promedio de lecturas recientes. Frecuencia cardíaca normal en reposo: 60-100 LPM. Se activan alertas para valores fuera de rangos seguros.",
+        "bpm": "LPM",
         "noData": "Sin datos"
       },
       "activityLevel": {

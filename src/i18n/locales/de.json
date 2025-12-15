@@ -59,7 +59,7 @@
     "kW": "kW",
     "%": "%",
     "steps": "Schritte",
-    "bpm": "bpm",
+    "bpm": "BPM",
     "mmHg": "mmHg",
     "°C": "°C",
     "°F": "°F",
@@ -1336,7 +1336,7 @@
       "avgHeartRate": {
         "label": "Durchschn. Herzfrequenz",
         "title": "Herzfrequenzüberwachung",
-        "tooltip": "Durchschnittliche Herzfrequenz aus aktuellen Messungen. Normale Ruheherzfrequenz: 60-100 Schläge/min. Warnungen werden für Werte außerhalb sicherer Bereiche ausgelöst.",
+        "tooltip": "Durchschnittliche Herzfrequenz aus aktuellen Messungen. Normale Ruheherzfrequenz: 60-100 BPM. Warnungen werden für Werte außerhalb sicherer Bereiche ausgelöst.",
         "bpm": "Schläge/min",
         "noData": "Keine Daten"
       },
