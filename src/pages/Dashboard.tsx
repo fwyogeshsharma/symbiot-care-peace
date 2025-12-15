@@ -1,9 +1,9 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
-import { Heart, Activity, AlertTriangle, Users, Wifi, WifiOff } from 'lucide-react';
+import { Heart, Activity, AlertTriangle, Users } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import VitalMetrics from '@/components/dashboard/VitalMetrics';
 import AlertsList from '@/components/dashboard/AlertsList';
 import ElderlyList from '@/components/dashboard/ElderlyList';
@@ -13,12 +13,9 @@ import { MedicationManagement } from '@/components/dashboard/MedicationManagemen
 import Header from '@/components/layout/Header';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
-import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import { useTranslation } from 'react-i18next';
 import { AlertNotificationDialog } from '@/components/dashboard/AlertNotificationDialog';
 import { toast } from 'sonner';
-import { useCapacitor } from '@/contexts/CapacitorContext';
-import { vibrateForSeverity } from '@/lib/capacitor/haptics';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -28,9 +25,6 @@ const Dashboard = () => {
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [newAlert, setNewAlert] = useState<any>(null);
   const shouldShowTour = useShouldShowTour();
-
-  // Capacitor integration
-  const { network, notifications } = useCapacitor();
 
   // Fetch elderly persons based on role
   const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
@@ -147,14 +141,6 @@ const Dashboard = () => {
   const avgHeartRate = calculateAvgHeartRate();
   const activityLevel = calculateActivityLevel();
 
-  // Scroll to section handlers for mobile - must be before any early returns
-  const scrollToSection = useCallback((sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, []);
-
   // Subscribe to real-time updates
   useEffect(() => {
     if (!user) return;
@@ -184,25 +170,11 @@ const Dashboard = () => {
 
             if (device?.device_type === 'emergency_button') {
               const elderlyPerson = device.elderly_persons as any;
-              const personName = elderlyPerson?.full_name || t('panicSos.unknown');
-
               // Show toast notification for panic SOS
               toast.error(t('panicSos.notifications.emergencyAlert'), {
-                description: `${t('panicSos.notifications.sosActivated')} ${personName}`,
+                description: `${t('panicSos.notifications.sosActivated')} ${elderlyPerson?.full_name || t('panicSos.unknown')}`,
                 duration: 10000,
               });
-
-              // Native notification with haptic feedback
-              if (notifications.isEnabled) {
-                notifications.showNotification({
-                  title: t('panicSos.notifications.emergencyAlert'),
-                  body: `${t('panicSos.notifications.sosActivated')} ${personName}`,
-                  severity: 'critical',
-                });
-              }
-
-              // Haptic feedback for emergency
-              vibrateForSeverity('critical');
 
               // Refetch panic events
               queryClient.invalidateQueries({ queryKey: ['panic-sos-events'] });
@@ -232,19 +204,6 @@ const Dashboard = () => {
 
           if (fullAlert) {
             setNewAlert(fullAlert);
-
-            // Native notification for new alerts
-            if (notifications.isEnabled) {
-              const severity = fullAlert.severity || 'medium';
-              notifications.showNotification({
-                title: fullAlert.title || t('alerts.newAlert'),
-                body: fullAlert.message || '',
-                severity: severity as any,
-              });
-            }
-
-            // Haptic feedback based on severity
-            vibrateForSeverity(fullAlert.severity || 'medium');
           }
         }
       )
@@ -289,14 +248,6 @@ const Dashboard = () => {
       <OnboardingTour runTour={shouldShowTour} />
       <Header />
 
-      {/* Network Status Indicator */}
-      {!network.isOnline && (
-        <div className="bg-destructive text-destructive-foreground px-4 py-2 text-center text-sm flex items-center justify-center gap-2">
-          <WifiOff className="w-4 h-4" />
-          {t('common.offline', 'You are offline. Some features may not be available.')}
-        </div>
-      )}
-
       {/* Alert Notification Dialog */}
       <AlertNotificationDialog
         newAlert={newAlert}
@@ -307,14 +258,11 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         {/* Stats Overview */}
         <div data-tour="stats-overview" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <Card
-            className="p-4 sm:p-6 cursor-pointer lg:cursor-default active:bg-muted/50 lg:active:bg-transparent transition-colors"
-            onClick={() => scrollToSection('elderly-list-section')}
-          >
+          <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex-1 min-w-0 overflow-hidden">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2">{t('dashboard.stats.monitoredPersons.label')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.monitoredPersons.label')}</p>
                   <HelpTooltip content={t('dashboard.stats.monitoredPersons.tooltip')} />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">{elderlyPersons?.length || 0}</p>
@@ -325,14 +273,11 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          <Card
-            className="p-4 sm:p-6 cursor-pointer lg:cursor-default active:bg-muted/50 lg:active:bg-transparent transition-colors"
-            onClick={() => scrollToSection('alerts-list-section')}
-          >
+          <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex-1 min-w-0 overflow-hidden">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2">{t('dashboard.stats.activeAlerts.label')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.activeAlerts.label')}</p>
                   <HelpTooltip content={t('dashboard.stats.activeAlerts.tooltip')} />
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold">{alerts?.length || 0}</p>
@@ -345,9 +290,9 @@ const Dashboard = () => {
 
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex-1 min-w-0 overflow-hidden">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2">{t('dashboard.stats.avgHeartRate.label')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.avgHeartRate.label')}</p>
                   <HelpTooltip
                     title={t('dashboard.stats.avgHeartRate.title')}
                     content={t('dashboard.stats.avgHeartRate.tooltip')}
@@ -370,9 +315,9 @@ const Dashboard = () => {
 
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex-1 min-w-0 overflow-hidden">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2">{t('dashboard.stats.activityLevel.label')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.activityLevel.label')}</p>
                   <HelpTooltip
                     title={t('dashboard.stats.activityLevel.title')}
                     content={
@@ -384,7 +329,7 @@ const Dashboard = () => {
                     }
                   />
                 </div>
-                <p className="text-2xl sm:text-3xl font-bold break-words">
+                <p className="text-2xl sm:text-3xl font-bold">
                   {activityLevel !== null ? activityLevel : '—'}
                 </p>
                 {activityLevel === null && (
@@ -402,14 +347,9 @@ const Dashboard = () => {
         <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column - Elderly Persons & Devices */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            {selectedPersonId && (
-              <div data-tour="ilq-widget">
-                <ILQWidget elderlyPersonId={selectedPersonId} />
-              </div>
-            )}
-            <div id="elderly-list-section" data-tour="elderly-list">
-              <ElderlyList
-                elderlyPersons={elderlyPersons || []}
+            <div data-tour="elderly-list">
+              <ElderlyList 
+                elderlyPersons={elderlyPersons || []} 
                 selectedPersonId={selectedPersonId}
                 onSelectPerson={setSelectedPersonId}
               />
@@ -424,7 +364,7 @@ const Dashboard = () => {
             <MedicationManagement selectedPersonId={selectedPersonId} />
             <EnvironmentalSensors selectedPersonId={selectedPersonId} />
             <PanicSosEvents selectedPersonId={selectedPersonId} />
-            <div id="alerts-list-section" data-tour="alerts-list">
+            <div data-tour="alerts-list">
               <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
             </div>
           </div>
