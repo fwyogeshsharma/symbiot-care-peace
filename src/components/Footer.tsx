@@ -70,7 +70,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link to="/liability-disclaimer" className="text-muted-foreground hover:text-primary transition-colors">
-                  Liability Disclaimer
+                  {t('footer.liabilityDisclaimer')}
                 </Link>
               </li>
               <li>

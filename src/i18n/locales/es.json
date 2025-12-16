@@ -1788,5 +1788,16 @@
     "offline": "Desconectado",
     "idle": "Inactivo",
     "value": "Valor"
+  },
+  "footer": {
+    "tagline": "Tranquilidad para Sus Seres Queridos",
+    "quickLinks": "Enlaces Rápidos",
+    "legal": "Legal",
+    "privacyPolicy": "Política de Privacidad",
+    "termsOfService": "Términos de Servicio",
+    "liabilityDisclaimer": "Descargo de Responsabilidad",
+    "cookiePolicy": "Política de Cookies",
+    "followUs": "Síguenos",
+    "allRightsReserved": "Todos los derechos reservados"
   }
 }

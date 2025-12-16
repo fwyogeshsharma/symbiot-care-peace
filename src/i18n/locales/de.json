@@ -1788,5 +1788,16 @@
     "offline": "Getrennt",
     "idle": "Inaktiv",
     "value": "Wert"
+  },
+  "footer": {
+    "tagline": "Seelenfrieden für Ihre Lieben",
+    "quickLinks": "Schnellzugriff",
+    "legal": "Rechtliches",
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "termsOfService": "Nutzungsbedingungen",
+    "liabilityDisclaimer": "Haftungsausschluss",
+    "cookiePolicy": "Cookie-Richtlinie",
+    "followUs": "Folgen Sie uns",
+    "allRightsReserved": "Alle Rechte vorbehalten"
   }
 }

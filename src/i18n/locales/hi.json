@@ -1614,5 +1614,16 @@
     "offline": "ऑफ़लाइन",
     "idle": "निष्क्रिय",
     "value": "मान"
+  },
+  "footer": {
+    "tagline": "आपके प्रियजनों के लिए मानसिक शांति",
+    "quickLinks": "त्वरित लिंक",
+    "legal": "कानूनी",
+    "privacyPolicy": "गोपनीयता नीति",
+    "termsOfService": "सेवा की शर्तें",
+    "liabilityDisclaimer": "दायित्व अस्वीकरण",
+    "cookiePolicy": "कुकी नीति",
+    "followUs": "हमें फॉलो करें",
+    "allRightsReserved": "सर्वाधिकार सुरक्षित"
   }
 }

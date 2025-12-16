@@ -1788,5 +1788,16 @@
     "offline": "Hors ligne",
     "idle": "Inactif",
     "value": "Valeur"
+  },
+  "footer": {
+    "tagline": "Paix d'Esprit pour Vos Proches",
+    "quickLinks": "Liens Rapides",
+    "legal": "Légal",
+    "privacyPolicy": "Politique de Confidentialité",
+    "termsOfService": "Conditions d'Utilisation",
+    "liabilityDisclaimer": "Avis de Non-Responsabilité",
+    "cookiePolicy": "Politique des Témoins",
+    "followUs": "Suivez-Nous",
+    "allRightsReserved": "Tous droits réservés"
   }
 }

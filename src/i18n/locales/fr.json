@@ -1788,5 +1788,16 @@
     "offline": "Hors ligne",
     "idle": "Inactif",
     "value": "Valeur"
+  },
+  "footer": {
+    "tagline": "Tranquillité d'Esprit pour Vos Proches",
+    "quickLinks": "Liens Rapides",
+    "legal": "Légal",
+    "privacyPolicy": "Politique de Confidentialité",
+    "termsOfService": "Conditions d'Utilisation",
+    "liabilityDisclaimer": "Avertissement de Responsabilité",
+    "cookiePolicy": "Politique des Cookies",
+    "followUs": "Suivez-Nous",
+    "allRightsReserved": "Tous droits réservés"
   }
 }
