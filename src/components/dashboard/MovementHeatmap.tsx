@@ -45,51 +45,55 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <Card>
+      <Card className="flex flex-col">
         <CardHeader>
           <CardTitle>{t('movement.heatmap.activityByLocation')}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 pt-6">
           {locationData.length > 0 ? (
-            <div className="space-y-4">
-              <ResponsiveContainer width="100%" height={320}>
-                <BarChart
-                  data={locationData}
-                  margin={{ top: 20, right: 20, left: 10, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis
-                    dataKey="location"
-                    tick={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    label={{ value: t('movement.heatmap.events'), angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                    }}
-                    wrapperStyle={{
-                      zIndex: 1000,
-                      pointerEvents: 'none',
-                    }}
-                    cursor={{ fill: 'hsl(var(--muted) / 0.2)' }}
-                  />
-                  <Bar dataKey="count" radius={[8, 8, 0, 0]}>
-                    {locationData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={getBarColor(index)} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="h-full flex flex-col">
+              <div className="flex-1">
+                <ResponsiveContainer width="100%" height="100%" minHeight={330}>
+                  <BarChart
+                    data={locationData}
+                    margin={{ top: 10, right: 20, left: 20, bottom: 50 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis
+                      dataKey="location"
+                      tick={false}
+                      axisLine={{ stroke: 'hsl(var(--border))' }}
+                      height={50}
+                    />
+                    <YAxis
+                      label={{ value: t('movement.heatmap.events'), angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+                      tick={{ fontSize: 11 }}
+                      axisLine={{ stroke: 'hsl(var(--border))' }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                      }}
+                      wrapperStyle={{
+                        zIndex: 1000,
+                        pointerEvents: 'none',
+                      }}
+                      cursor={{ fill: 'hsl(var(--muted) / 0.2)' }}
+                    />
+                    <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                      {locationData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={getBarColor(index)} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
 
               {/* Custom Legend */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 px-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 px-2 pt-4 min-h-[80px]">
                 {locationData.map((item, index) => (
                   <div key={item.location} className="flex items-center gap-2">
                     <div
@@ -111,50 +115,54 @@ export const MovementHeatmap = ({ data }: MovementHeatmapProps) => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="flex flex-col">
         <CardHeader>
           <CardTitle>{t('movement.heatmap.activityByHour')}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 pt-6">
           {hourlyData.length > 0 ? (
-            <div className="space-y-4">
-              <ResponsiveContainer width="100%" height={320}>
-                <BarChart
-                  data={hourlyData}
-                  margin={{ top: 20, right: 20, left: 10, bottom: 60 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis
-                    dataKey="hour"
-                    tick={{ fontSize: 10 }}
-                    angle={-45}
-                    textAnchor="end"
-                    interval={1}
-                    height={60}
-                  />
-                  <YAxis
-                    label={{ value: t('movement.heatmap.events'), angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                    }}
-                    wrapperStyle={{
-                      zIndex: 1000,
-                      pointerEvents: 'none',
-                    }}
-                    cursor={{ fill: 'hsl(var(--muted) / 0.2)' }}
-                  />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="h-full flex flex-col">
+              <div className="flex-1">
+                <ResponsiveContainer width="100%" height="100%" minHeight={280}>
+                  <BarChart
+                    data={hourlyData}
+                    margin={{ top: 10, right: 20, left: 20, bottom: 50 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis
+                      dataKey="hour"
+                      tick={{ fontSize: 10 }}
+                      angle={-45}
+                      textAnchor="end"
+                      interval={0}
+                      height={50}
+                      axisLine={{ stroke: 'hsl(var(--border))' }}
+                    />
+                    <YAxis
+                      label={{ value: t('movement.heatmap.events'), angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+                      tick={{ fontSize: 11 }}
+                      axisLine={{ stroke: 'hsl(var(--border))' }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                      }}
+                      wrapperStyle={{
+                        zIndex: 1000,
+                        pointerEvents: 'none',
+                      }}
+                      cursor={{ fill: 'hsl(var(--muted) / 0.2)' }}
+                    />
+                    <Bar dataKey="count" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
 
               {/* Summary Stats */}
-              <div className="grid grid-cols-3 gap-3 px-2">
+              <div className="grid grid-cols-3 gap-3 px-2 pt-4 min-h-[80px]">
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground">{t('movement.heatmap.peakHour')}</p>
                   <p className="text-sm font-semibold">

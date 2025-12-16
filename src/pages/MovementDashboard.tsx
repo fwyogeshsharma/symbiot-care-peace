@@ -9,7 +9,6 @@ import { MovementHeatmap } from "@/components/dashboard/MovementHeatmap";
 import { DwellTimeAnalysis } from "@/components/dashboard/DwellTimeAnalysis";
 import { IdealProfileManager } from "@/components/dashboard/IdealProfileManager";
 import { ILQWidget } from "@/components/dashboard/ILQWidget";
-import { ILQHistoryChart } from "@/components/dashboard/ILQHistoryChart";
 import ElderlyList from "@/components/dashboard/ElderlyList";
 import HomeHubCard from "@/components/dashboard/HomeHubCard";
 import SmartPhoneCard from "@/components/dashboard/SmartPhoneCard";
@@ -198,12 +197,7 @@ export default function MovementDashboard() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           <MovementTimeline events={processedData.events} />
-          <div className="space-y-6">
-            <MovementHeatmap data={processedData} />
-            {selectedPersonId && (
-              <ILQHistoryChart elderlyPersonId={selectedPersonId} days={30} />
-            )}
-          </div>
+          <MovementHeatmap data={processedData} />
         </div>
       </main>
     </div>
