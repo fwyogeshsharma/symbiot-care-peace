@@ -1365,6 +1365,7 @@ export type Database = {
           full_name: string | null
           id: string
           phone: string | null
+          postal_address: string | null
           updated_at: string
           year_of_birth: number | null
         }
@@ -1377,6 +1378,7 @@ export type Database = {
           full_name?: string | null
           id: string
           phone?: string | null
+          postal_address?: string | null
           updated_at?: string
           year_of_birth?: number | null
         }
@@ -1389,6 +1391,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone?: string | null
+          postal_address?: string | null
           updated_at?: string
           year_of_birth?: number | null
         }
