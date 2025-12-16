@@ -163,7 +163,7 @@ const Profile = () => {
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
-            <Card className="p-4 sm:p-6">
+            <Card className="p-4 sm:p-6 overflow-visible">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <AvatarUpload
@@ -194,7 +194,7 @@ const Profile = () => {
                 )}
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6 overflow-visible">
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="flex items-center gap-2">
@@ -244,27 +244,30 @@ const Profile = () => {
                   </div>
 
                   {profile?.year_of_birth && typeof profile.year_of_birth === 'number' && (
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        Year of Birth
-                      </Label>
-                      <Input
-                        type="text"
-                        value={`${profile.year_of_birth} (Age: ~${new Date().getFullYear() - Number(profile.year_of_birth)} years)`}
-                        disabled
-                        className="bg-muted"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Year of birth cannot be changed
-                      </p>
-                    </div>
+                    <>
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          {t('profile.yearOfBirth') || 'Year of Birth'}
+                        </Label>
+                        <Input
+                          type="text"
+                          value={`${profile.year_of_birth} (Age: ~${new Date().getFullYear() - Number(profile.year_of_birth)} years)`}
+                          disabled
+                          className="bg-muted"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          {t('profile.yearOfBirthCannotChange') || 'Year of birth cannot be changed'}
+                        </p>
+                      </div>
+                      <Separator className="my-4" />
+                    </>
                   )}
 
                   <div className="space-y-2">
                     <Label htmlFor="postal_address" className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
-                      Postal Address
+                      {t('profile.postalAddress') || 'Postal Address'}
                     </Label>
                     <Input
                       id="postal_address"
@@ -272,7 +275,8 @@ const Profile = () => {
                       value={formData.postal_address}
                       onChange={(e) => setFormData({ ...formData, postal_address: e.target.value })}
                       disabled={!isEditing}
-                      placeholder="Enter your postal address"
+                      placeholder={t('profile.enterPostalAddress') || 'Enter your postal address'}
+                      className={!isEditing ? 'bg-muted' : ''}
                     />
                   </div>
                 </div>
