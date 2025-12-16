@@ -96,12 +96,19 @@ const Profile = () => {
       case 'caregiver':
         return 'bg-primary';
       case 'elderly':
-        return 'bg-secondary';
+        return '';
       case 'relative':
         return 'bg-accent';
       default:
         return 'bg-muted';
     }
+  };
+
+  const getRoleStyle = (role: string | null) => {
+    if (role === 'elderly') {
+      return { backgroundColor: '#228B22', color: 'white' };
+    }
+    return {};
   };
 
   if (isLoading) {
@@ -165,7 +172,7 @@ const Profile = () => {
                   <div className="min-w-0">
                     <h2 className="text-xl sm:text-2xl font-bold truncate">{profile?.full_name || 'User'}</h2>
                     {userRole && (
-                      <Badge className={`${getRoleColor(userRole)} mt-1`}>
+                      <Badge className={`${getRoleColor(userRole)} mt-1`} style={getRoleStyle(userRole)}>
                         {t(`auth.roles.${userRole}`)}
                       </Badge>
                     )}
@@ -228,7 +235,7 @@ const Profile = () => {
                     />
                   </div>
 
-                  {profile?.year_of_birth && (
+                  {profile?.year_of_birth && typeof profile.year_of_birth === 'number' && (
                     <div className="space-y-2">
                       <Label className="flex items-center gap-2">
                         <User className="w-4 h-4" />
@@ -236,7 +243,7 @@ const Profile = () => {
                       </Label>
                       <Input
                         type="text"
-                        value={`${new Date().getFullYear() - profile.year_of_birth} years (Born in ${profile.year_of_birth})`}
+                        value={`${new Date().getFullYear() - Number(profile.year_of_birth)} years (Born in ${profile.year_of_birth})`}
                         disabled
                         className="bg-muted"
                       />

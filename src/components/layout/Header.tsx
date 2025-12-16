@@ -49,12 +49,19 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
       case 'caregiver':
         return 'bg-primary';
       case 'elderly':
-        return 'bg-secondary';
+        return '';
       case 'relative':
         return 'bg-accent';
       default:
         return 'bg-muted';
     }
+  };
+
+  const getRoleStyle = (role: string | null) => {
+    if (role === 'elderly') {
+      return { backgroundColor: '#228B22', color: 'white' };
+    }
+    return {};
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -174,7 +181,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
           {/* Right side - Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-3">
             {userRole && (
-              <Badge className={`${getRoleColor(userRole)}`}>
+              <Badge className={`${getRoleColor(userRole)}`} style={getRoleStyle(userRole)}>
                 {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
               </Badge>
             )}
@@ -194,7 +201,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
           {/* Right side - Mobile/Tablet */}
           <div className="flex lg:hidden items-center gap-2">
             {userRole && (
-              <Badge className={`${getRoleColor(userRole)} text-xs hidden sm:flex`}>
+              <Badge className={`${getRoleColor(userRole)} text-xs hidden sm:flex`} style={getRoleStyle(userRole)}>
                 {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
               </Badge>
             )}
@@ -216,7 +223,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
                 <div className="flex flex-col gap-4 mt-8">
                   {userRole && (
                     <div className="pb-4 border-b">
-                      <Badge className={`${getRoleColor(userRole)}`}>
+                      <Badge className={`${getRoleColor(userRole)}`} style={getRoleStyle(userRole)}>
                         {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
                       </Badge>
                     </div>
