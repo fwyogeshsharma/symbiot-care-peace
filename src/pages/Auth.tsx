@@ -28,6 +28,7 @@ const signupSchema = z.object({
     required_error: "Year of birth is required",
     invalid_type_error: "Please enter a valid year",
   }).min(1900, 'Year must be at least 1900').max(new Date().getFullYear(), 'Year cannot be in the future'),
+  postalAddress: z.string().min(5, 'Postal address must be at least 5 characters'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -46,6 +47,7 @@ const Auth = () => {
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<string>('relative');
   const [yearOfBirth, setYearOfBirth] = useState<string>('');
+  const [postalAddress, setPostalAddress] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -220,7 +222,8 @@ const Auth = () => {
           fullName,
           phone,
           role,
-          yearOfBirth: yearOfBirth ? parseInt(yearOfBirth) : undefined
+          yearOfBirth: yearOfBirth ? parseInt(yearOfBirth) : undefined,
+          postalAddress
         });
         if (!validation.success) {
           toast({
@@ -232,7 +235,7 @@ const Auth = () => {
           return;
         }
 
-        const { error, isDuplicate } = await signUp(email, password, fullName, phone, role, yearOfBirth ? parseInt(yearOfBirth) : undefined);
+        const { error, isDuplicate } = await signUp(email, password, fullName, phone, role, yearOfBirth ? parseInt(yearOfBirth) : undefined, postalAddress);
         
         if (isDuplicate) {
           toast({
@@ -405,6 +408,18 @@ const Auth = () => {
                   min="1900"
                   max={new Date().getFullYear()}
                   placeholder={`e.g., ${new Date().getFullYear() - 30}`}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="postalAddress">Postal Address *</Label>
+                <Input
+                  id="postalAddress"
+                  type="text"
+                  value={postalAddress}
+                  onChange={(e) => setPostalAddress(e.target.value)}
+                  required
+                  placeholder="Enter your full postal address"
                 />
               </div>
 
