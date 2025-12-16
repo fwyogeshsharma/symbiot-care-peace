@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DataSharing from '@/components/dashboard/DataSharing';
+import { AvatarUpload } from '@/components/profile/AvatarUpload';
 
 const Profile = () => {
   const { user, userRole, signOut } = useAuth();
@@ -68,6 +69,9 @@ const Profile = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['accessible-elderly-persons'] });
+      queryClient.invalidateQueries({ queryKey: ['elderly-persons'] });
+      queryClient.invalidateQueries({ queryKey: ['profiles'] });
       toast({
         title: t('profile.profileUpdated'),
         description: t('profile.profileUpdatedDesc'),
@@ -160,9 +164,17 @@ const Profile = () => {
             <Card className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <User className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                  </div>
+                  <AvatarUpload
+                    userId={user?.id || ''}
+                    currentAvatarUrl={profile?.avatar_url || null}
+                    fullName={profile?.full_name || null}
+                    onAvatarChange={(url) => {
+                      queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+                      queryClient.invalidateQueries({ queryKey: ['accessible-elderly-persons'] });
+                      queryClient.invalidateQueries({ queryKey: ['elderly-persons'] });
+                      queryClient.invalidateQueries({ queryKey: ['profiles'] });
+                    }}
+                  />
                   <div className="min-w-0">
                     <h2 className="text-xl sm:text-2xl font-bold truncate">{profile?.full_name || 'User'}</h2>
                     {userRole && (
