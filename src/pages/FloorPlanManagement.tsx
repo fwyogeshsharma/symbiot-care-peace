@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Footer } from "@/components/Footer";
 
 export default function FloorPlanManagement() {
   const { user } = useAuth();
@@ -243,6 +244,7 @@ export default function FloorPlanManagement() {
           </AlertDialog>
         </>
       )}
+      <Footer />
     </div>
   );
 }

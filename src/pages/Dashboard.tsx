@@ -16,6 +16,7 @@ import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { useTranslation } from 'react-i18next';
 import { AlertNotificationDialog } from '@/components/dashboard/AlertNotificationDialog';
 import { toast } from 'sonner';
+import { Footer } from '@/components/Footer';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -370,6 +371,7 @@ const Dashboard = () => {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

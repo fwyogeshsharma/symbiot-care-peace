@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/select';
 import { getDateRangePreset } from '@/lib/movementUtils';
 import { useTranslation } from 'react-i18next';
+import { Footer } from '@/components/Footer';
 
 export default function Tracking() {
   const { t } = useTranslation();
@@ -535,6 +536,7 @@ export default function Tracking() {
           </Tabs>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

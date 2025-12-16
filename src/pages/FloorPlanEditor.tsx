@@ -6,6 +6,7 @@ import { ZoneEditor } from "@/components/floor-plan/ZoneEditor";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Footer } from "@/components/Footer";
 
 export default function FloorPlanEditor() {
   const { elderlyPersonId, floorPlanId } = useParams();
@@ -100,6 +101,7 @@ export default function FloorPlanEditor() {
           onSave={handleSave}
         />
       </div>
+      <Footer />
     </div>
   );
 }

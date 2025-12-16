@@ -13,6 +13,7 @@ import { MedicationScheduleForm } from '@/components/medication/MedicationSchedu
 import { MedicationScheduleList } from '@/components/medication/MedicationScheduleList';
 import { MedicationAdherenceLog } from '@/components/medication/MedicationAdherenceLog';
 import { useTranslation } from 'react-i18next';
+import { Footer } from '@/components/Footer';
 
 interface MedicationSchedule {
   id: string;
@@ -148,6 +149,7 @@ export default function MedicationConfig() {
           </DialogContent>
         </Dialog>
       </main>
+      <Footer />
     </div>
   );
 }

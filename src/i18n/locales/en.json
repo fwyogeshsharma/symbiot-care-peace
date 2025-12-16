@@ -1941,5 +1941,267 @@
         "monthlyDesc": "Monthly trends and changes"
       }
     }
+  },
+  "footer": {
+    "tagline": "Peace of Mind for Your Loved Ones",
+    "quickLinks": "Quick Links",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "cookiePolicy": "Cookie Policy",
+    "followUs": "Follow Us",
+    "allRightsReserved": "All rights reserved"
+  },
+  "privacyPolicy": {
+    "lastUpdated": "Last Updated",
+    "introduction": {
+      "title": "Introduction",
+      "content": "SymBIoT (\"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our elder care monitoring platform. By using SymBIoT, you agree to the collection and use of information in accordance with this policy."
+    },
+    "informationWeCollect": {
+      "title": "Information We Collect",
+      "personalInfo": {
+        "title": "Personal Information",
+        "items": {
+          "name": "Name and contact information",
+          "email": "Email address",
+          "phone": "Phone number",
+          "address": "Postal address",
+          "birthYear": "Year of birth"
+        }
+      },
+      "healthData": {
+        "title": "Health and Monitoring Data",
+        "items": {
+          "vitals": "Vital signs (heart rate, blood pressure, temperature, oxygen levels)",
+          "activity": "Activity and movement patterns",
+          "location": "Location data (indoor and outdoor tracking)",
+          "environmental": "Environmental sensor data (temperature, humidity, air quality)",
+          "medication": "Medication adherence information"
+        }
+      },
+      "deviceData": {
+        "title": "Device and Technical Information",
+        "items": {
+          "deviceInfo": "Device identifiers and technical specifications",
+          "ipAddress": "IP address and geolocation data",
+          "browserType": "Browser type and operating system"
+        }
+      }
+    },
+    "howWeUseInfo": {
+      "title": "How We Use Your Information",
+      "items": {
+        "provideServices": "Provide and maintain our monitoring services",
+        "monitoring": "Monitor health metrics and activity patterns",
+        "alerts": "Send alerts and notifications to caregivers",
+        "analytics": "Generate analytics and reports",
+        "communication": "Communicate with you about your account and services",
+        "improvement": "Improve our services and develop new features"
+      }
+    },
+    "dataSharing": {
+      "title": "Data Sharing and Disclosure",
+      "intro": "We do not sell your personal information. We may share your data in the following circumstances:",
+      "items": {
+        "authorizedUsers": "With family members and caregivers you have authorized",
+        "serviceProviders": "With service providers who assist in operating our platform",
+        "healthcare": "With healthcare providers as authorized by you",
+        "legal": "When required by law or to protect our legal rights",
+        "emergency": "In emergency situations to protect health and safety"
+      }
+    },
+    "dataSecurity": {
+      "title": "Data Security",
+      "content": "We implement industry-standard security measures to protect your information:",
+      "items": {
+        "encryption": "End-to-end encryption for data transmission",
+        "accessControls": "Role-based access controls",
+        "regularAudits": "Regular security audits and monitoring",
+        "hipaaCompliance": "HIPAA-compliant data storage and handling"
+      }
+    },
+    "yourRights": {
+      "title": "Your Rights",
+      "items": {
+        "access": "Access your personal information",
+        "correction": "Request correction of inaccurate data",
+        "deletion": "Request deletion of your data",
+        "portability": "Export your data in a portable format",
+        "optOut": "Opt-out of non-essential data collection"
+      }
+    },
+    "dataRetention": {
+      "title": "Data Retention",
+      "content": "We retain your information for as long as your account is active or as needed to provide services. Health data may be retained longer as required by law or for legitimate business purposes."
+    },
+    "childrenPrivacy": {
+      "title": "Children's Privacy",
+      "content": "Our service is not intended for individuals under 18 years of age. We do not knowingly collect personal information from children."
+    },
+    "changes": {
+      "title": "Changes to This Policy",
+      "content": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the \"Last Updated\" date."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "If you have questions about this Privacy Policy, please contact us:",
+      "email": "Email"
+    }
+  },
+  "termsOfService": {
+    "lastUpdated": "Last Updated",
+    "acceptance": {
+      "title": "Acceptance of Terms",
+      "content": "By accessing and using SymBIoT's services, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services."
+    },
+    "description": {
+      "title": "Service Description",
+      "content": "SymBIoT provides an IoT-based health monitoring platform for elderly care. Our services include real-time health monitoring, activity tracking, location tracking, alert systems, and analytics for caregivers and family members."
+    },
+    "userAccounts": {
+      "title": "User Accounts",
+      "items": {
+        "accurate": "Provide accurate and complete information when creating your account",
+        "confidential": "Keep your account credentials confidential",
+        "responsible": "Be responsible for all activities under your account",
+        "notify": "Notify us immediately of any unauthorized access"
+      }
+    },
+    "acceptableUse": {
+      "title": "Acceptable Use",
+      "intro": "You agree not to:",
+      "items": {
+        "lawful": "Use the service for any unlawful purpose",
+        "authorized": "Access or monitor data of individuals without proper authorization",
+        "noInterference": "Interfere with or disrupt the service",
+        "noHarm": "Transmit any harmful code or malware",
+        "noImpersonation": "Impersonate any person or entity",
+        "noUnauthorizedAccess": "Attempt to gain unauthorized access to any systems or data"
+      }
+    },
+    "medicalDisclaimer": {
+      "title": "Medical Disclaimer",
+      "warning": "IMPORTANT MEDICAL DISCLAIMER",
+      "content": "SymBIoT is a monitoring tool and does not provide medical advice, diagnosis, or treatment. The information provided should not replace professional medical care. Always consult with qualified healthcare providers for medical decisions. In case of emergency, call emergency services immediately."
+    },
+    "dataAccuracy": {
+      "title": "Data Accuracy",
+      "content": "While we strive for accuracy, we cannot guarantee that all data collected from devices is completely accurate. Sensor readings may be affected by device placement, interference, or technical issues. You should not rely solely on our platform for critical health decisions."
+    },
+    "intellectualProperty": {
+      "title": "Intellectual Property",
+      "content": "All content, features, and functionality of SymBIoT are owned by us and protected by intellectual property laws. You may not copy, modify, distribute, or reverse engineer any part of our service without written permission."
+    },
+    "payment": {
+      "title": "Payment and Subscriptions",
+      "items": {
+        "fees": "Subscription fees are billed in advance based on your selected plan",
+        "billing": "You authorize us to charge your payment method automatically",
+        "refunds": "Refunds are provided according to our refund policy",
+        "cancellation": "You may cancel your subscription at any time"
+      }
+    },
+    "termination": {
+      "title": "Termination",
+      "content": "We reserve the right to suspend or terminate your account if you violate these terms or engage in fraudulent or harmful activities. Upon termination, your right to use the service will cease immediately."
+    },
+    "limitation": {
+      "title": "Limitation of Liability",
+      "content": "To the maximum extent permitted by law, SymBIoT shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the service. Our total liability shall not exceed the amount you paid for the service in the past 12 months."
+    },
+    "indemnification": {
+      "title": "Indemnification",
+      "content": "You agree to indemnify and hold SymBIoT harmless from any claims, damages, or expenses arising from your use of the service or violation of these terms."
+    },
+    "changes": {
+      "title": "Changes to Terms",
+      "content": "We may modify these terms at any time. Continued use of the service after changes constitutes acceptance of the new terms."
+    },
+    "governingLaw": {
+      "title": "Governing Law",
+      "content": "These terms are governed by the laws of the jurisdiction in which SymBIoT operates, without regard to conflict of law principles."
+    },
+    "contact": {
+      "title": "Contact Information",
+      "content": "For questions about these Terms of Service, please contact us:",
+      "email": "Email"
+    }
+  },
+  "cookiePolicy": {
+    "lastUpdated": "Last Updated",
+    "whatAreCookies": {
+      "title": "What Are Cookies",
+      "content": "Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and understanding how you use our service."
+    },
+    "howWeUseCookies": {
+      "title": "How We Use Cookies",
+      "intro": "We use cookies to enhance your experience, analyze usage, and improve our services."
+    },
+    "typesOfCookies": {
+      "title": "Types of Cookies We Use",
+      "essential": {
+        "title": "Essential Cookies",
+        "description": "These cookies are necessary for the website to function properly.",
+        "items": {
+          "authentication": "Authentication and security",
+          "security": "Session management",
+          "preferences": "User preferences and settings"
+        }
+      },
+      "functional": {
+        "title": "Functional Cookies",
+        "description": "These cookies enhance functionality and personalization.",
+        "items": {
+          "language": "Language preferences",
+          "dashboard": "Dashboard customization",
+          "accessibility": "Accessibility settings"
+        }
+      },
+      "performance": {
+        "title": "Performance Cookies",
+        "description": "These cookies help us understand how visitors use our website.",
+        "items": {
+          "analytics": "Analytics and metrics",
+          "usage": "Usage patterns and feature adoption",
+          "errors": "Error tracking and debugging"
+        }
+      },
+      "targeting": {
+        "title": "Targeting/Advertising Cookies",
+        "description": "These cookies are used to deliver relevant advertisements.",
+        "items": {
+          "marketing": "Marketing campaign tracking",
+          "social": "Social media integration"
+        }
+      }
+    },
+    "thirdPartyCookies": {
+      "title": "Third-Party Cookies",
+      "content": "We may use third-party services that set cookies on your device:",
+      "items": {
+        "analytics": "Google Analytics for usage analytics",
+        "maps": "Google Maps for location services",
+        "payments": "Payment processors for subscription management"
+      }
+    },
+    "manageCookies": {
+      "title": "Managing Cookies",
+      "content": "You can control and manage cookies through your browser settings. Most browsers allow you to:",
+      "warning": "Please note that disabling certain cookies may affect the functionality of our service."
+    },
+    "doNotTrack": {
+      "title": "Do Not Track Signals",
+      "content": "Some browsers include a \"Do Not Track\" feature. Currently, there is no industry standard for how to respond to these signals. We will update this policy if a standard is established."
+    },
+    "changes": {
+      "title": "Changes to This Policy",
+      "content": "We may update this Cookie Policy from time to time. Any changes will be posted on this page with an updated revision date."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "If you have questions about our use of cookies, please contact us:",
+      "email": "Email"
+    }
   }
 }

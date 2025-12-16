@@ -31,6 +31,10 @@ import ILQAnalytics from "./pages/ILQAnalytics";
 import InvestorInfo from "./pages/InvestorInfo";
 import MedicationConfig from "./pages/MedicationConfig";
 import Reports from "./pages/Reports";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import CookiePolicy from "./pages/CookiePolicy";
+import LiabilityDisclaimer from "./pages/LiabilityDisclaimer";
 
 const queryClient = new QueryClient();
 
@@ -192,6 +196,10 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/liability-disclaimer" element={<LiabilityDisclaimer />} />
+            <Route path="/cookie-policy" element={<CookiePolicy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

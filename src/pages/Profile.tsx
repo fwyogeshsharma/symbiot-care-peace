@@ -17,6 +17,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DataSharing from '@/components/dashboard/DataSharing';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
+import { Footer } from '@/components/Footer';
 
 const Profile = () => {
   const { user, userRole, signOut } = useAuth();
@@ -365,6 +366,7 @@ const Profile = () => {
           )}
         </Tabs>
       </main>
+      <Footer />
     </div>
   );
 };

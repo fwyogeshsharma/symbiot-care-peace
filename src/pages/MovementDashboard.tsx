@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { processMovementData, getDateRangePreset } from "@/lib/movementUtils";
 import { isActivityDevice, isActivityDataType } from "@/lib/deviceDataMapping";
+import { Footer } from "@/components/Footer";
 import { checkDwellTimeDeviations } from "@/lib/dwellTimeAlerts";
 import { OnboardingTour, useShouldShowTour } from "@/components/help/OnboardingTour";
 import { useElderly } from "@/contexts/ElderlyContext";
@@ -200,6 +201,7 @@ export default function MovementDashboard() {
           <MovementHeatmap data={processedData} />
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

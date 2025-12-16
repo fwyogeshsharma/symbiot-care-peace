@@ -6,6 +6,7 @@ import heroImage from "@/assets/hero-healthcare.jpg";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Footer } from "@/components/Footer";
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -163,12 +164,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 sm:py-12 px-4">
-        <div className="container mx-auto text-center text-muted-foreground">
-          <p className="text-sm sm:text-base">{t('index.footer.copyright')}</p>
-          <p className="mt-2 text-sm sm:text-base">{t('index.footer.tagline')}</p>
-        </div>
-      </footer>
+      <Footer />
     </div>;
 };
 export default Index;

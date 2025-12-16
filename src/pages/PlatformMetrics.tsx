@@ -8,6 +8,7 @@ import Header from "@/components/layout/Header";
 import { RefreshCw, Activity, Database, AlertCircle, Users, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Footer } from "@/components/Footer";
 
 export default function PlatformMetrics() {
   const [computing, setComputing] = useState(false);
@@ -191,6 +192,7 @@ export default function PlatformMetrics() {
           </TabsContent>
         </Tabs>
       </main>
+      <Footer />
     </div>
   );
 }

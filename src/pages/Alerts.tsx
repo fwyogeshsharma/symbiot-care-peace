@@ -17,6 +17,7 @@ import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { EmptyState } from '@/components/help/EmptyState';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { useTranslation } from 'react-i18next';
+import { Footer } from '@/components/Footer';
 
 // Map language codes to date-fns locales
 const getDateLocale = (language: string) => {
@@ -530,6 +531,7 @@ const Alerts = () => {
           )}
         </Card>
       </main>
+      <Footer />
     </div>
   );
 };

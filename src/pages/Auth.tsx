@@ -11,6 +11,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from 'react-i18next';
+import { Footer } from '@/components/Footer';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -529,6 +530,7 @@ const Auth = () => {
           </div>
         )}
       </Card>
+      <Footer />
     </div>
   );
 };

@@ -12,6 +12,7 @@ import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { PairingApprovalPanel } from '@/components/pairing/PairingApprovalPanel';
 import { useTranslation } from 'react-i18next';
+import { Footer } from '@/components/Footer';
 
 const DeviceStatusPage = () => {
   const { t } = useTranslation();
@@ -108,6 +109,7 @@ const DeviceStatusPage = () => {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

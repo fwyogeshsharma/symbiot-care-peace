@@ -12,6 +12,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { useElderly } from '@/contexts/ElderlyContext';
 import Header from '@/components/layout/Header';
 import { useTranslation } from 'react-i18next';
+import { Footer } from '@/components/Footer';
 
 export default function ILQAnalytics() {
   const { t } = useTranslation();
@@ -453,6 +454,7 @@ export default function ILQAnalytics() {
           </Tabs>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

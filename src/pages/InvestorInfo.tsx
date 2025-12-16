@@ -31,6 +31,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Footer } from "@/components/Footer";
 
 const InvestorInfo = () => {
   const navigate = useNavigate();
@@ -611,11 +612,7 @@ const InvestorInfo = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 bg-white dark:bg-blue-950">
-        <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>{t('common.copyright')}</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
