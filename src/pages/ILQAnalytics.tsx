@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -156,6 +156,67 @@ export default function ILQAnalytics() {
     };
   }, [selectedPersonId, queryClient]);
 
+  // Group data by day and calculate averages - MUST be before early returns (Rules of Hooks)
+  const chartData = useMemo(() => {
+    if (!ilqHistory || ilqHistory.length === 0) return [];
+
+    // Group scores by day
+    const groupedByDay = ilqHistory.reduce((acc, score) => {
+      const date = new Date(score.computation_timestamp);
+      const dayKey = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+
+      if (!acc[dayKey]) {
+        acc[dayKey] = {
+          date: date,
+          scores: [],
+          health: [],
+          activity: [],
+          cognitive: [],
+          safety: [],
+        };
+      }
+
+      acc[dayKey].scores.push(typeof score.score === 'string' ? parseFloat(score.score) : score.score);
+      if (score.health_vitals_score) {
+        acc[dayKey].health.push(typeof score.health_vitals_score === 'string' ? parseFloat(score.health_vitals_score) : score.health_vitals_score);
+      }
+      if (score.physical_activity_score) {
+        acc[dayKey].activity.push(typeof score.physical_activity_score === 'string' ? parseFloat(score.physical_activity_score) : score.physical_activity_score);
+      }
+      if (score.cognitive_function_score) {
+        acc[dayKey].cognitive.push(typeof score.cognitive_function_score === 'string' ? parseFloat(score.cognitive_function_score) : score.cognitive_function_score);
+      }
+      if (score.environmental_safety_score) {
+        acc[dayKey].safety.push(typeof score.environmental_safety_score === 'string' ? parseFloat(score.environmental_safety_score) : score.environmental_safety_score);
+      }
+
+      return acc;
+    }, {} as Record<string, { date: Date; scores: number[]; health: number[]; activity: number[]; cognitive: number[]; safety: number[] }>);
+
+    // Calculate averages and format dates
+    const aggregatedData = Object.entries(groupedByDay)
+      .map(([dayKey, dayData]) => {
+        const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+
+        // Format date as "2 Dec"
+        const date = dayData.date;
+        const formattedDate = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+
+        return {
+          date: formattedDate,
+          fullDate: date,
+          score: Math.round(avg(dayData.scores) * 10) / 10,
+          health: Math.round(avg(dayData.health) * 10) / 10,
+          activity: Math.round(avg(dayData.activity) * 10) / 10,
+          cognitive: Math.round(avg(dayData.cognitive) * 10) / 10,
+          safety: Math.round(avg(dayData.safety) * 10) / 10,
+        };
+      })
+      .sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime());
+
+    return aggregatedData;
+  }, [ilqHistory]);
+
   const computeILQ = async (silent = false) => {
     if (!selectedPersonId) return;
 
@@ -231,15 +292,6 @@ export default function ILQAnalytics() {
       </div>
     );
   }
-
-  const chartData = ilqHistory?.map(score => ({
-    date: new Date(score.computation_timestamp).toLocaleDateString(),
-    score: typeof score.score === 'string' ? parseFloat(score.score) : score.score,
-    health: score.health_vitals_score ? (typeof score.health_vitals_score === 'string' ? parseFloat(score.health_vitals_score) : score.health_vitals_score) : 0,
-    activity: score.physical_activity_score ? (typeof score.physical_activity_score === 'string' ? parseFloat(score.physical_activity_score) : score.physical_activity_score) : 0,
-    cognitive: score.cognitive_function_score ? (typeof score.cognitive_function_score === 'string' ? parseFloat(score.cognitive_function_score) : score.cognitive_function_score) : 0,
-    safety: score.environmental_safety_score ? (typeof score.environmental_safety_score === 'string' ? parseFloat(score.environmental_safety_score) : score.environmental_safety_score) : 0,
-  })) || [];
 
   const latestScore = ilqHistory && ilqHistory.length > 0 ? ilqHistory[ilqHistory.length - 1] : null;
 
@@ -411,16 +463,70 @@ export default function ILQAnalytics() {
                     <p className="text-muted-foreground">{t('ilq.loadingChart')}</p>
                   </div>
                 ) : chartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={400}>
-                    <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis domain={[0, 100]} />
-                      <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="score" stroke="hsl(var(--primary))" strokeWidth={3} name={t('ilq.ilqScore')} />
-                      <Line type="monotone" dataKey="health" stroke="#10b981" strokeWidth={2} name={t('ilq.health')} />
-                      <Line type="monotone" dataKey="activity" stroke="#3b82f6" strokeWidth={2} name={t('ilq.activity')} />
+                  <ResponsiveContainer width="100%" height={450}>
+                    <LineChart
+                      data={chartData}
+                      margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" opacity={0.3} />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12 }}
+                        axisLine={{ stroke: 'hsl(var(--border))' }}
+                        tickLine={{ stroke: 'hsl(var(--border))' }}
+                        angle={chartData.length > 14 ? -45 : 0}
+                        textAnchor={chartData.length > 14 ? "end" : "middle"}
+                        height={chartData.length > 14 ? 60 : 30}
+                      />
+                      <YAxis
+                        domain={[0, 100]}
+                        tick={{ fontSize: 12 }}
+                        axisLine={{ stroke: 'hsl(var(--border))' }}
+                        tickLine={{ stroke: 'hsl(var(--border))' }}
+                        label={{ value: 'Score', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                        }}
+                        wrapperStyle={{
+                          zIndex: 1000,
+                        }}
+                      />
+                      <Legend
+                        wrapperStyle={{ fontSize: '14px', paddingTop: '10px' }}
+                        iconType="line"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="score"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={3}
+                        name={t('ilq.ilqScore')}
+                        dot={{ fill: 'hsl(var(--primary))', r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="health"
+                        stroke="#10b981"
+                        strokeWidth={2}
+                        name={t('ilq.health')}
+                        dot={{ fill: '#10b981', r: 3 }}
+                        activeDot={{ r: 5 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="activity"
+                        stroke="#3b82f6"
+                        strokeWidth={2}
+                        name={t('ilq.activity')}
+                        dot={{ fill: '#3b82f6', r: 3 }}
+                        activeDot={{ r: 5 }}
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
