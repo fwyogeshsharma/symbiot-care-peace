@@ -13,7 +13,8 @@
       "Bash(npx supabase:*)",
       "Bash(python scripts/create_liability_doc.py:*)",
       "Bash(py scripts/create_liability_doc.py)",
-      "Bash(py -m pip install:*)"
+      "Bash(py -m pip install:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

@@ -49,12 +49,19 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
       case 'caregiver':
         return 'bg-primary';
       case 'elderly':
-        return 'bg-secondary';
+        return '';
       case 'relative':
         return 'bg-accent';
       default:
         return 'bg-muted';
     }
+  };
+
+  const getRoleStyle = (role: string | null) => {
+    if (role === 'elderly') {
+      return { backgroundColor: '#228B22', color: 'white' };
+    }
+    return {};
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -137,44 +144,67 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
   return (
     <header className="border-b bg-card shadow-sm sticky top-0 z-10">
       <HelpPanel open={helpPanelOpen} onOpenChange={setHelpPanelOpen} />
-      <div className="container mx-auto px-4 py-4 space-y-3">
-        {/* Row 1 - Logo/Title */}
-        <div className="flex items-center gap-2 min-w-0">
-          {showBackButton && (
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between gap-4">
+          {/* Left side - Logo/Title */}
+          <div className="flex items-center gap-2 min-w-0">
+            {showBackButton && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline ml-2">{t('profile.back')}</span>
+              </Button>
+            )}
+            <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
             <Button
+              data-tour="nav-dashboard"
               variant="ghost"
               size="sm"
               onClick={() => navigate('/dashboard')}
-              className="shrink-0"
+              className="min-w-0 p-0 hover:bg-transparent"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline ml-2">{t('profile.back')}</span>
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-xl font-bold text-foreground truncate">
+                  {title || t('common.symbiot')}
+                </h1>
+                <p className="text-xs text-muted-foreground hidden sm:block truncate">
+                  {subtitle || t('index.tagline')}
+                </p>
+              </div>
             </Button>
-          )}
-          <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
-          <Button
-            data-tour="nav-dashboard"
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/dashboard')}
-            className="min-w-0 p-0 hover:bg-transparent"
-          >
-            <div className="min-w-0">
-              <h1 className="text-base sm:text-xl font-bold text-foreground truncate">
-                {title || t('common.symbiot')}
-              </h1>
-              <p className="text-xs text-muted-foreground hidden sm:block truncate">
-                {subtitle || t('index.tagline')}
-              </p>
-            </div>
-          </Button>
-          {userRole && (
-            <Badge className={`${getRoleColor(userRole)} ml-auto`}>
-              {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
-            </Badge>
-          )}
-          {/* Mobile/Tablet menu */}
+          </div>
+
+          {/* Right side - Desktop Navigation */}
+          <div className="hidden lg:flex items-center gap-3">
+            {userRole && (
+              <Badge className={`${getRoleColor(userRole)}`} style={getRoleStyle(userRole)}>
+                {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
+              </Badge>
+            )}
+            <NavButtons />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setHelpPanelOpen(true)}
+              className="gap-2"
+              title="Help & Support (F1)"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="hidden xl:inline">{t('nav.help')}</span>
+            </Button>
+          </div>
+
+          {/* Right side - Mobile/Tablet */}
           <div className="flex lg:hidden items-center gap-2">
+            {userRole && (
+              <Badge className={`${getRoleColor(userRole)} text-xs hidden sm:flex`} style={getRoleStyle(userRole)}>
+                {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
+              </Badge>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -193,7 +223,7 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
                 <div className="flex flex-col gap-4 mt-8">
                   {userRole && (
                     <div className="pb-4 border-b">
-                      <Badge className={`${getRoleColor(userRole)}`}>
+                      <Badge className={`${getRoleColor(userRole)}`} style={getRoleStyle(userRole)}>
                         {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
                       </Badge>
                     </div>
@@ -203,21 +233,6 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
               </SheetContent>
             </Sheet>
           </div>
-        </div>
-
-        {/* Row 2 - Desktop Navigation */}
-        <div className="hidden lg:flex items-center gap-3">
-          <NavButtons />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setHelpPanelOpen(true)}
-            className="gap-2 ml-auto"
-            title="Help & Support (F1)"
-          >
-            <HelpCircle className="w-4 h-4" />
-            <span className="hidden xl:inline">{t('nav.help')}</span>
-          </Button>
         </div>
       </div>
     </header>
