@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Globe, Share2 } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Globe, Share2, MapPin, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -45,6 +45,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     phone: profile?.phone || '',
+    postal_address: profile?.postal_address || '',
   });
 
   // Update form when profile loads
@@ -53,6 +54,7 @@ const Profile = () => {
       setFormData({
         full_name: profile.full_name || '',
         phone: profile.phone || '',
+        postal_address: (profile as any).postal_address || '',
       });
     }
   }, [profile]);
@@ -244,17 +246,35 @@ const Profile = () => {
                   {profile?.year_of_birth && typeof profile.year_of_birth === 'number' && (
                     <div className="space-y-2">
                       <Label className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        Approximate Age
+                        <Calendar className="w-4 h-4" />
+                        Year of Birth
                       </Label>
                       <Input
                         type="text"
-                        value={`${new Date().getFullYear() - Number(profile.year_of_birth)} years (Born in ${profile.year_of_birth})`}
+                        value={`${profile.year_of_birth} (Age: ~${new Date().getFullYear() - Number(profile.year_of_birth)} years)`}
                         disabled
                         className="bg-muted"
                       />
+                      <p className="text-xs text-muted-foreground">
+                        Year of birth cannot be changed
+                      </p>
                     </div>
                   )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="postal_address" className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Postal Address
+                    </Label>
+                    <Input
+                      id="postal_address"
+                      type="text"
+                      value={formData.postal_address}
+                      onChange={(e) => setFormData({ ...formData, postal_address: e.target.value })}
+                      disabled={!isEditing}
+                      placeholder="Enter your postal address"
+                    />
+                  </div>
                 </div>
 
                 {isEditing && (
@@ -276,6 +296,7 @@ const Profile = () => {
                         setFormData({
                           full_name: profile?.full_name || '',
                           phone: profile?.phone || '',
+                          postal_address: (profile as any)?.postal_address || '',
                         });
                       }}
                     >
