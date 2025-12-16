@@ -69,6 +69,9 @@ const Profile = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['accessible-elderly-persons'] });
+      queryClient.invalidateQueries({ queryKey: ['elderly-persons'] });
+      queryClient.invalidateQueries({ queryKey: ['profiles'] });
       toast({
         title: t('profile.profileUpdated'),
         description: t('profile.profileUpdatedDesc'),
@@ -167,6 +170,9 @@ const Profile = () => {
                     fullName={profile?.full_name || null}
                     onAvatarChange={(url) => {
                       queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+                      queryClient.invalidateQueries({ queryKey: ['accessible-elderly-persons'] });
+                      queryClient.invalidateQueries({ queryKey: ['elderly-persons'] });
+                      queryClient.invalidateQueries({ queryKey: ['profiles'] });
                     }}
                   />
                   <div className="min-w-0">
