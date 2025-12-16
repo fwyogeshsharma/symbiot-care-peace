@@ -1499,38 +1499,29 @@ export type Database = {
           score: number
         }[]
       }
-      delete_user_account: {
-        Args: { target_email: string }
+      delete_user_data_by_email: {
+        Args: { user_email: string }
         Returns: {
-          deleted_device_data_count: number
-          deleted_devices_count: number
-          deleted_elderly_persons_count: number
-          deleted_profiles_count: number
+          message: string
           status: string
         }[]
       }
       get_accessible_elderly_persons: {
         Args: { _user_id: string }
         Returns: {
-          address: string | null
+          address: string
           created_at: string
-          date_of_birth: string | null
-          emergency_contact: string | null
+          date_of_birth: string
+          emergency_contact: string
           full_name: string
           id: string
-          medical_conditions: string[] | null
-          medications: string[] | null
-          photo_url: string | null
-          status: string | null
+          medical_conditions: string[]
+          medications: string[]
+          photo_url: string
+          status: string
           updated_at: string
-          user_id: string | null
+          user_id: string
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "elderly_persons"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       get_fcm_tokens_for_elderly_person: {
         Args: { elderly_person_id: string }
