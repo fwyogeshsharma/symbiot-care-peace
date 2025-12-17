@@ -232,8 +232,13 @@ export const AlertHistoryReport = ({ selectedPerson, dateRange }: AlertHistoryRe
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {alert.message || 'No message'}
+                    {alert.title || 'No title'}
                   </p>
+                  {alert.description && (
+                    <p className="text-sm text-muted-foreground">
+                      {alert.description}
+                    </p>
+                  )}
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span>{format(new Date(alert.created_at), 'MMM dd, yyyy HH:mm')}</span>
                     {(alert as any).elderly_persons?.full_name && (

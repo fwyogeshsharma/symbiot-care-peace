@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { format } from 'date-fns';
-import { Pill, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Pill, CheckCircle2, XCircle, AlertCircle, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Progress } from '@/components/ui/progress';
 
@@ -57,7 +57,7 @@ export const MedicationAdherenceReport = ({ selectedPerson, dateRange }: Medicat
 
   // Group by day
   const dailyAdherence = medicationData.reduce((acc: any[], item) => {
-    const date = format(new Date(item.recorded_at), 'MMM dd');
+    const date = format(new Date(item.recorded_at), 'dMMM');
     let val = item.value;
     if (typeof val === 'object' && val !== null) {
       val = val.taken ?? val.value;
@@ -77,7 +77,10 @@ export const MedicationAdherenceReport = ({ selectedPerson, dateRange }: Medicat
     }
 
     return acc;
-  }, []);
+  }, []).map(day => ({
+    ...day,
+    adherenceRate: Math.round((day.taken / (day.taken + day.missed)) * 100)
+  }));
 
   if (isLoading) {
     return <div className="text-center py-8">{t('common.loading')}</div>;
@@ -135,68 +138,79 @@ export const MedicationAdherenceReport = ({ selectedPerson, dateRange }: Medicat
         </Card>
       </div>
 
-      {/* Pie Chart */}
+      {/* Charts */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Pie Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Overall Adherence</CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Weekly Trend */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Weekly Adherence Trend
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={dailyAdherence.slice(-7)}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis domain={[0, 100]} label={{ value: 'Rate (%)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Bar dataKey="adherenceRate" fill="#10b981" name="Adherence Rate (%)" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Daily Doses Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Adherence Overview</CardTitle>
+          <CardTitle>Daily Medication Tracking</CardTitle>
         </CardHeader>
-        <CardContent className="flex justify-center">
+        <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
+            <BarChart data={dailyAdherence}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis label={{ value: 'Doses', angle: -90, position: 'insideLeft' }} />
               <Tooltip />
               <Legend />
-            </PieChart>
+              <Bar dataKey="taken" stackId="a" fill="#10b981" name="Taken" />
+              <Bar dataKey="missed" stackId="a" fill="#ef4444" name="Missed" />
+            </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      {/* Daily Breakdown */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Daily Adherence</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {dailyAdherence.map((day, index) => {
-              const total = day.taken + day.missed;
-              const rate = Math.round((day.taken / total) * 100);
-              const status = rate === 100 ? 'Perfect' : rate >= 80 ? 'Good' : rate >= 50 ? 'Fair' : 'Poor';
-              const statusColor = rate === 100 ? 'text-success' : rate >= 80 ? 'text-success' : rate >= 50 ? 'text-warning' : 'text-destructive';
-
-              return (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{day.date}</span>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm">
-                        {day.taken}/{total} taken
-                      </span>
-                      <span className={`text-sm font-semibold ${statusColor}`}>
-                        {status}
-                      </span>
-                    </div>
-                  </div>
-                  <Progress value={rate} />
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Recommendations */}
       {adherenceRate < 80 && (

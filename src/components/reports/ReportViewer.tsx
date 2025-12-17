@@ -4,10 +4,12 @@ import { Download, Printer, X } from 'lucide-react';
 import { VitalSignsTrendsReport } from './VitalSignsTrendsReport';
 import { DailyActivityReport } from './DailyActivityReport';
 import { MedicationAdherenceReport } from './MedicationAdherenceReport';
+import { MedicationTimingAnalysisReport } from './MedicationTimingAnalysisReport';
 import { AlertHistoryReport } from './AlertHistoryReport';
 import { HealthAnomaliesReport } from './HealthAnomaliesReport';
 import { BloodSugarAnalysisReport } from './BloodSugarAnalysisReport';
 import { SleepQualityReport } from './SleepQualityReport';
+import { SleepPatternsReport } from './SleepPatternsReport';
 import { AirQualityReport } from './AirQualityReport';
 import { EnvironmentalComfortReport } from './EnvironmentalComfortReport';
 import { ILQScoreTrendsReport } from './ILQScoreTrendsReport';
@@ -15,6 +17,7 @@ import { ContributingFactorsReport } from './ContributingFactorsReport';
 import { WeekOverWeekReport } from './WeekOverWeekReport';
 import { MonthOverMonthReport } from './MonthOverMonthReport';
 import { EndOfDayReport } from './EndOfDayReport';
+import { FallIncidentsReport } from './FallIncidentsReport';
 import { useTranslation } from 'react-i18next';
 
 interface ReportViewerProps {
@@ -44,10 +47,12 @@ export const ReportViewer = ({
   };
 
   const renderReport = () => {
+    console.log('Rendering report:', reportName);
     switch (reportName) {
       // Special Reports
       case 'End of Day Summary':
       case t('reports.special.eodSummary'):
+      case t('reports.daily.eodSummary'):
         return <EndOfDayReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Health Summary Reports
@@ -74,13 +79,7 @@ export const ReportViewer = ({
 
       case 'Fall Incidents':
       case t('reports.activity.fallIncidents'):
-        return (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              Fall detection report - Please ensure fall detection devices are configured.
-            </p>
-          </div>
-        );
+        return <FallIncidentsReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Sleep Analysis Reports
       case 'Sleep Quality Report':
@@ -89,7 +88,7 @@ export const ReportViewer = ({
 
       case 'Sleep Patterns':
       case t('reports.sleep.patterns'):
-        return <SleepQualityReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+        return <SleepPatternsReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Medication Reports
       case 'Adherence Report':
@@ -98,7 +97,7 @@ export const ReportViewer = ({
 
       case 'Timing Analysis':
       case t('reports.medication.timing'):
-        return <MedicationAdherenceReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+        return <MedicationTimingAnalysisReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Alert Summary Reports
       case 'Alert History':

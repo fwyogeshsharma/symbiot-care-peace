@@ -67,7 +67,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
     queryKey: ['eod-medications', selectedPerson, reportDate],
     queryFn: async () => {
       let query = supabase
-        .from('medication_logs')
+        .from('medication_adherence_logs')
         .select('*, medications(*)')
         .gte('scheduled_time', dayStart.toISOString())
         .lte('scheduled_time', dayEnd.toISOString())
@@ -656,7 +656,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                       }>
                         {alert.severity}
                       </Badge>
-                      <span>{alert.message}</span>
+                      <span>{alert.title}</span>
                     </div>
                     <span className="text-xs text-muted-foreground">
                       {format(new Date(alert.created_at), 'HH:mm')}
@@ -701,7 +701,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                   time: new Date(alert.created_at),
                   type: 'alert',
                   severity: alert.severity,
-                  description: alert.message,
+                  description: alert.title,
                   icon: AlertCircle,
                   color: alert.severity === 'critical' ? 'text-destructive' : alert.severity === 'high' ? 'text-warning' : 'text-info'
                 });
