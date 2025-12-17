@@ -196,15 +196,20 @@ const handler = async (req: Request): Promise<Response> => {
     const results: any[] = [];
 
     for (const subscription of subscriptions || []) {
-      // Parse the schedule time
-      const [scheduleHour] = subscription.schedule_time.split(':').map(Number);
-      
-      // Simple check: if current hour matches schedule hour, send the report
-      // In production, you'd want to handle timezone conversion properly
-      if (scheduleHour !== currentHour) {
-        console.log(`Skipping subscription ${subscription.id}: scheduled for ${scheduleHour}:00, current hour is ${currentHour}`);
+      // Parse the schedule time (HH:MM:SS format)
+      const [scheduleHour, scheduleMinute] = subscription.schedule_time.split(':').map(Number);
+
+      // Convert user's local time to UTC for comparison
+      // The schedule_time is stored in user's local time, we need to check if it's time to send
+      // For now, we'll check if we're within the same hour and within 5 minutes of the scheduled time
+      const minuteDiff = Math.abs(currentMinute - scheduleMinute);
+
+      if (scheduleHour !== currentHour || minuteDiff > 5) {
+        console.log(`Skipping subscription ${subscription.id}: scheduled for ${scheduleHour}:${scheduleMinute}, current time is ${currentHour}:${currentMinute} UTC`);
         continue;
       }
+
+      console.log(`Time match for subscription ${subscription.id}: scheduled ${scheduleHour}:${scheduleMinute}, current ${currentHour}:${currentMinute} UTC`);
 
       console.log(`Processing report for subscription ${subscription.id}`);
 
@@ -286,8 +291,11 @@ const handler = async (req: Request): Promise<Response> => {
 
       // Send email
       try {
+        // Use configured sender email or fall back to default
+        const fromEmail = Deno.env.get("SENDER_EMAIL") || "SymBIoT Health <noreply@yourdomain.com>";
+
         const { error: emailError } = await resend.emails.send({
-          from: "SymBIoT Health <onboarding@resend.dev>",
+          from: fromEmail,
           to: [userEmail],
           subject: `Daily Health Report - ${subscription.elderly_persons.full_name} - ${now.toLocaleDateString()}`,
           html,
