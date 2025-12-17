@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format, startOfDay, endOfDay } from 'date-fns';
-import { Heart, Activity, Moon, Pill, AlertCircle, CheckCircle2, TrendingUp, TrendingDown, Clock, Thermometer, Droplets } from 'lucide-react';
+import { Heart, Activity, Moon, Pill, AlertCircle, CheckCircle2, TrendingUp, TrendingDown, Clock, Thermometer, Droplets, Wind, Home, Wifi, Watch, Smartphone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -83,6 +83,25 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
     },
   });
 
+  // Fetch connected devices
+  const { data: devices = [], isLoading: loadingDevices } = useQuery({
+    queryKey: ['eod-devices', selectedPerson],
+    queryFn: async () => {
+      let query = supabase
+        .from('devices')
+        .select('*')
+        .eq('status', 'active');
+
+      if (selectedPerson !== 'all') {
+        query = query.eq('elderly_person_id', selectedPerson);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   const extractValue = (value: any, field?: string) => {
     if (typeof value === 'number') return value;
     if (typeof value === 'object' && value !== null) {
@@ -130,6 +149,44 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
   const avgTemp = tempData.length > 0
     ? Math.round(tempData.reduce((sum: number, d: any) => sum + extractValue(d.value), 0) / tempData.length)
     : null;
+
+  // Blood Pressure data
+  const bpData = dataByType.blood_pressure || [];
+  const latestBP = bpData.length > 0 ? bpData[0].value : null;
+  const avgSystolic = bpData.length > 0
+    ? Math.round(bpData.reduce((sum: number, d: any) => {
+        const val = d.value;
+        return sum + (typeof val === 'object' && val?.systolic ? val.systolic : 0);
+      }, 0) / bpData.length)
+    : null;
+  const avgDiastolic = bpData.length > 0
+    ? Math.round(bpData.reduce((sum: number, d: any) => {
+        const val = d.value;
+        return sum + (typeof val === 'object' && val?.diastolic ? val.diastolic : 0);
+      }, 0) / bpData.length)
+    : null;
+
+  // Environmental data
+  const airQualityData = dataByType.air_quality || [];
+  const avgAirQuality = airQualityData.length > 0
+    ? Math.round(airQualityData.reduce((sum: number, d: any) => sum + extractValue(d.value), 0) / airQualityData.length)
+    : null;
+
+  const humidityData = dataByType.humidity || [];
+  const avgHumidity = humidityData.length > 0
+    ? Math.round(humidityData.reduce((sum: number, d: any) => sum + extractValue(d.value), 0) / humidityData.length)
+    : null;
+
+  const envTempData = dataByType.room_temperature || dataByType.environment_temperature || [];
+  const avgEnvTemp = envTempData.length > 0
+    ? Math.round(envTempData.reduce((sum: number, d: any) => sum + extractValue(d.value), 0) / envTempData.length)
+    : null;
+
+  // Detailed sleep data
+  const sleepDurationData = dataByType.sleep_duration || [];
+  const totalSleepMinutes = sleepDurationData.reduce((sum: number, d: any) => sum + extractValue(d.value), 0);
+  const sleepHours = totalSleepMinutes > 0 ? Math.floor(totalSleepMinutes / 60) : null;
+  const sleepMinutes = totalSleepMinutes > 0 ? totalSleepMinutes % 60 : null;
 
   // Calculate medication adherence
   const totalMeds = medications.length;
@@ -204,7 +261,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
   if (avgO2 && avgO2 < 90) concerns.push('Low oxygen saturation detected');
   if (alerts.length === 0 && healthData.length > 0) highlights.push('No alerts today');
 
-  const isLoading = loadingHealth || loadingAlerts || loadingMeds;
+  const isLoading = loadingHealth || loadingAlerts || loadingMeds || loadingDevices;
 
   if (isLoading) {
     return <div className="text-center py-8">{t('common.loading')}</div>;
@@ -245,6 +302,46 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
           </p>
         </CardContent>
       </Card>
+
+      {/* Connected Devices */}
+      {devices.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Wifi className="h-5 w-5" />
+              Connected Devices
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {devices.map((device: any) => {
+                const deviceIcon =
+                  device.device_type === 'smartwatch' || device.device_type === 'wearable' ? Watch :
+                  device.device_type === 'smartphone' || device.device_type === 'mobile' ? Smartphone :
+                  device.device_type === 'environmental' || device.device_type === 'sensor' ? Home :
+                  Wifi;
+                const Icon = deviceIcon;
+
+                return (
+                  <div key={device.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                    <Icon className="h-5 w-5 text-primary" />
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{device.device_name || device.device_type}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {device.manufacturer} {device.model}
+                      </p>
+                    </div>
+                    <Badge variant="default" className="text-xs">Active</Badge>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground mt-3">
+              {devices.length} device{devices.length !== 1 ? 's' : ''} actively monitoring health and environment
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Key Highlights and Concerns */}
       {(highlights.length > 0 || concerns.length > 0) && (
@@ -355,9 +452,77 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                 <p className="text-xs text-muted-foreground">{tempData.length} readings</p>
               </div>
             )}
+
+            {avgSystolic !== null && avgDiastolic !== null && (
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Heart className="h-5 w-5 text-pink-500" />
+                  <span className="font-medium">Blood Pressure</span>
+                </div>
+                <div className="text-2xl font-bold">{avgSystolic}/{avgDiastolic}</div>
+                <p className="text-xs text-muted-foreground">mmHg • {bpData.length} readings</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
+
+      {/* Environmental Conditions */}
+      {(avgAirQuality !== null || avgHumidity !== null || avgEnvTemp !== null) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Home className="h-5 w-5" />
+              Environmental Conditions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-3">
+              {avgEnvTemp !== null && (
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Thermometer className="h-5 w-5 text-orange-500" />
+                    <span className="font-medium">Room Temp</span>
+                  </div>
+                  <div className="text-2xl font-bold">{avgEnvTemp}°F</div>
+                  <p className="text-xs text-muted-foreground">{envTempData.length} readings</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {avgEnvTemp >= 68 && avgEnvTemp <= 76 ? '✓ Comfortable' : '⚠ Outside comfort zone'}
+                  </p>
+                </div>
+              )}
+
+              {avgHumidity !== null && (
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Droplets className="h-5 w-5 text-blue-500" />
+                    <span className="font-medium">Humidity</span>
+                  </div>
+                  <div className="text-2xl font-bold">{avgHumidity}%</div>
+                  <p className="text-xs text-muted-foreground">{humidityData.length} readings</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {avgHumidity >= 30 && avgHumidity <= 60 ? '✓ Optimal' : '⚠ Adjust needed'}
+                  </p>
+                </div>
+              )}
+
+              {avgAirQuality !== null && (
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Wind className="h-5 w-5 text-green-500" />
+                    <span className="font-medium">Air Quality</span>
+                  </div>
+                  <div className="text-2xl font-bold">{avgAirQuality}</div>
+                  <p className="text-xs text-muted-foreground">AQI • {airQualityData.length} readings</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {avgAirQuality <= 50 ? '✓ Good' : avgAirQuality <= 100 ? 'Moderate' : '⚠ Poor'}
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Activity & Sleep */}
       <div className="grid gap-4 md:grid-cols-2">
@@ -381,18 +546,40 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
           </CardContent>
         </Card>
 
-        {avgSleep !== null && (
+        {(avgSleep !== null || sleepHours !== null) && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Moon className="h-5 w-5" />
-                Sleep Quality
+                Sleep Analysis
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{avgSleep}%</div>
-              <p className="text-sm text-muted-foreground mb-3">quality score</p>
-              <Progress value={avgSleep} className="h-2" />
+              {sleepHours !== null && (
+                <>
+                  <div className="text-3xl font-bold mb-1">
+                    {sleepHours}h {sleepMinutes}m
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">total sleep duration</p>
+                </>
+              )}
+              {avgSleep !== null && (
+                <>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium">Sleep Quality</span>
+                    <span className="text-sm font-bold">{avgSleep}%</span>
+                  </div>
+                  <Progress value={avgSleep} className="h-2 mb-2" />
+                </>
+              )}
+              <p className="text-xs text-muted-foreground mt-2">
+                {sleepData.length + sleepDurationData.length} sleep data points
+              </p>
+              {sleepHours !== null && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {sleepHours >= 7 && sleepHours <= 9 ? '✓ Recommended sleep duration' : '⚠ Outside recommended range (7-9h)'}
+                </p>
+              )}
             </CardContent>
           </Card>
         )}
@@ -481,6 +668,85 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
           </CardContent>
         </Card>
       )}
+
+      {/* Daily Timeline */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Daily Activity Timeline
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {/* Combine all events and sort by time */}
+            {(() => {
+              const timelineEvents = [];
+
+              // Add medication events
+              medications.slice(0, 5).forEach((med: any) => {
+                timelineEvents.push({
+                  time: new Date(med.scheduled_time),
+                  type: 'medication',
+                  status: med.status,
+                  description: `${med.status === 'taken' ? 'Took' : med.status === 'missed' ? 'Missed' : 'Scheduled'} ${med.medications?.name || 'medication'}`,
+                  icon: Pill,
+                  color: med.status === 'taken' ? 'text-success' : med.status === 'missed' ? 'text-destructive' : 'text-muted-foreground'
+                });
+              });
+
+              // Add alert events
+              alerts.slice(0, 3).forEach((alert: any) => {
+                timelineEvents.push({
+                  time: new Date(alert.created_at),
+                  type: 'alert',
+                  severity: alert.severity,
+                  description: alert.message,
+                  icon: AlertCircle,
+                  color: alert.severity === 'critical' ? 'text-destructive' : alert.severity === 'high' ? 'text-warning' : 'text-info'
+                });
+              });
+
+              // Add activity milestones
+              if (totalSteps >= 5000) {
+                timelineEvents.push({
+                  time: reportDate,
+                  type: 'milestone',
+                  description: `Achieved daily step goal (${totalSteps.toLocaleString()} steps)`,
+                  icon: Activity,
+                  color: 'text-success'
+                });
+              }
+
+              // Sort by time descending
+              timelineEvents.sort((a, b) => b.time.getTime() - a.time.getTime());
+
+              if (timelineEvents.length === 0) {
+                return (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No timeline events recorded for this day
+                  </p>
+                );
+              }
+
+              return timelineEvents.slice(0, 8).map((event, index) => {
+                const Icon = event.icon;
+                return (
+                  <div key={index} className="flex items-start gap-3 pb-3 border-b last:border-0">
+                    <Icon className={`h-4 w-4 mt-0.5 ${event.color}`} />
+                    <div className="flex-1">
+                      <p className="text-sm">{event.description}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {format(event.time, 'h:mm a')}
+                      </p>
+                    </div>
+                  </div>
+                );
+              });
+            })()}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Report Footer */}
       <Card className="border-info">
