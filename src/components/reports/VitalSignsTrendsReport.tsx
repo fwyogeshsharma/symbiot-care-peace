@@ -35,9 +35,9 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
     },
   });
 
-  // Process data for charts
+  // Process data for charts - group by day and average values
   const chartData = vitalData.reduce((acc: any[], item) => {
-    const date = format(new Date(item.recorded_at), 'MMM dd HH:mm');
+    const date = format(new Date(item.recorded_at), 'dMMM'); // Format as "2Dec"
     const existingEntry = acc.find(entry => entry.date === date);
 
     let value = item.value;
@@ -47,21 +47,35 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
     }
 
     if (existingEntry) {
-      if (item.data_type === 'heart_rate') existingEntry.heartRate = Number(value);
+      if (item.data_type === 'heart_rate') {
+        if (!existingEntry.heartRateValues) existingEntry.heartRateValues = [];
+        existingEntry.heartRateValues.push(Number(value));
+      }
       if (item.data_type === 'oxygen_saturation' || item.data_type === 'spo2') {
-        existingEntry.oxygen = Number(value);
+        if (!existingEntry.oxygenValues) existingEntry.oxygenValues = [];
+        existingEntry.oxygenValues.push(Number(value));
       }
     } else {
       const entry: any = { date };
-      if (item.data_type === 'heart_rate') entry.heartRate = Number(value);
+      if (item.data_type === 'heart_rate') {
+        entry.heartRateValues = [Number(value)];
+      }
       if (item.data_type === 'oxygen_saturation' || item.data_type === 'spo2') {
-        entry.oxygen = Number(value);
+        entry.oxygenValues = [Number(value)];
       }
       acc.push(entry);
     }
 
     return acc;
-  }, []);
+  }, []).map(entry => ({
+    date: entry.date,
+    heartRate: entry.heartRateValues
+      ? Math.round(entry.heartRateValues.reduce((a: number, b: number) => a + b, 0) / entry.heartRateValues.length)
+      : undefined,
+    oxygen: entry.oxygenValues
+      ? Math.round(entry.oxygenValues.reduce((a: number, b: number) => a + b, 0) / entry.oxygenValues.length)
+      : undefined,
+  }));
 
   // Calculate statistics
   const heartRateData = vitalData.filter(v => v.data_type === 'heart_rate');
@@ -168,9 +182,10 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
-                angle={-45}
+                angle={-30}
                 textAnchor="end"
-                height={80}
+                height={60}
+                interval="preserveStartEnd"
               />
               <YAxis yAxisId="left" />
               <YAxis yAxisId="right" orientation="right" />
