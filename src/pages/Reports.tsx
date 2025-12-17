@@ -384,7 +384,9 @@ const Reports = () => {
         </Card>
 
         {/* Email Subscription for Daily Reports */}
-        <ReportSubscriptionManager selectedPerson={selectedPerson} />
+        <div className="max-w-3xl">
+          <ReportSubscriptionManager selectedPerson={selectedPerson} />
+        </div>
 
         {/* Report Categories */}
         <Tabs defaultValue="daily" className="space-y-6">
