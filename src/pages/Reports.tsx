@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -56,6 +56,25 @@ const Reports = () => {
     },
     enabled: !!user?.id,
   });
+
+  // Auto-select person when data loads
+  useEffect(() => {
+    if (elderlyPersons.length > 0 && selectedPerson === 'all') {
+      // Check if logged-in user is in the list
+      const loggedInPerson = elderlyPersons.find((person: any) => person.id === user?.id);
+
+      if (loggedInPerson) {
+        // Select the logged-in user if they're in the list
+        setSelectedPerson(loggedInPerson.id);
+      } else if (elderlyPersons.length === 1) {
+        // If only one person, select them
+        setSelectedPerson(elderlyPersons[0].id);
+      } else {
+        // Otherwise select the first person in the list
+        setSelectedPerson(elderlyPersons[0].id);
+      }
+    }
+  }, [elderlyPersons, user?.id]);
 
   const reportCategories = [
     {
@@ -369,7 +388,7 @@ const Reports = () => {
 
         {/* Report Categories */}
         <Tabs defaultValue="daily" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 xl:grid-cols-9">
+          <TabsList className="grid grid-cols-5 grid-rows-2 w-full h-auto gap-2 p-2">
             {reportCategories.map((category) => {
               const Icon = category.icon;
               return (
