@@ -2,6 +2,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -168,12 +174,27 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
               className="min-w-0 p-0 hover:bg-transparent"
             >
               <div className="min-w-0">
-                <h1 className="text-base sm:text-xl font-bold text-foreground truncate">
+                <h1 className="text-sm sm:text-base font-bold text-foreground truncate">
                   {title || t('common.symbiot')}
                 </h1>
-                <p className="text-xs text-muted-foreground hidden sm:block truncate">
-                  {subtitle || t('index.tagline')}
-                </p>
+                {subtitle ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block truncate cursor-help">
+                          {subtitle.split(' ').slice(0, 3).join(' ') + '...'}
+                        </p>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{subtitle}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block truncate">
+                    {t('index.tagline')}
+                  </p>
+                )}
               </div>
             </Button>
           </div>
