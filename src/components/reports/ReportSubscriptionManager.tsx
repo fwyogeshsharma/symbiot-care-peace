@@ -5,8 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Bell, Clock, Mail, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +19,7 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
   const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [scheduleTime, setScheduleTime] = useState('21:00');
+  const [scheduleTime, setScheduleTime] = useState('14:34');
 
   // Fetch existing subscription
   const { data: subscription, isLoading } = useQuery({
@@ -140,17 +140,6 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
     );
   }
 
-  const timeOptions = [];
-  for (let hour = 0; hour < 24; hour++) {
-    const time = `${hour.toString().padStart(2, '0')}:00`;
-    const label = new Date(`2000-01-01T${time}`).toLocaleTimeString([], { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
-    });
-    timeOptions.push({ value: time, label });
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -184,25 +173,16 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
                 <Clock className="w-4 h-4" />
                 {t('reports.subscription.scheduleTime', { defaultValue: 'Daily report time' })}
               </Label>
-              <Select
+              <Input
+                type="time"
                 value={subscription.schedule_time?.slice(0, 5) || scheduleTime}
-                onValueChange={handleTimeChange}
+                onChange={(e) => handleTimeChange(e.target.value)}
                 disabled={upsertMutation.isPending}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                className="w-full"
+              />
               <p className="text-xs text-muted-foreground">
-                {t('reports.subscription.timezoneNote', { 
-                  defaultValue: 'Times are shown in your local timezone' 
+                {t('reports.subscription.timezoneNote', {
+                  defaultValue: 'Times are shown in your local timezone'
                 })}
               </p>
             </div>
@@ -227,18 +207,12 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
                 <Clock className="w-4 h-4" />
                 {t('reports.subscription.selectTime', { defaultValue: 'Select delivery time' })}
               </Label>
-              <Select value={scheduleTime} onValueChange={setScheduleTime}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                type="time"
+                value={scheduleTime}
+                onChange={(e) => setScheduleTime(e.target.value)}
+                className="w-full"
+              />
             </div>
 
             <Button
