@@ -181,9 +181,32 @@ const Alerts = () => {
       }, 0) / acknowledgedAlerts.length
     : 0;
 
+  // Normalize alert type function
+  const normalizeAlertType = (type: string): string => {
+    const normalized = type.toLowerCase().trim();
+    // Consolidate singular and plural forms
+    if (normalized === 'vital_sign' || normalized === 'vital_signs' || normalized === 'vital sign' || normalized === 'vital signs') {
+      return 'vital_signs';
+    }
+    if (normalized === 'panic_sos' || normalized === 'panic' || normalized === 'sos') {
+      return 'panic_sos';
+    }
+    if (normalized === 'device_offline' || normalized === 'device offline') {
+      return 'device_offline';
+    }
+    if (normalized === 'geofence' || normalized === 'geofence_breach') {
+      return 'geofence';
+    }
+    if (normalized === 'inactivity' || normalized === 'inactive') {
+      return 'inactivity';
+    }
+    return normalized.replace(/\s+/g, '_');
+  };
+
   // Alert type breakdown for pie chart
   const typeBreakdown = filteredAlerts.reduce((acc, alert) => {
-    acc[alert.alert_type] = (acc[alert.alert_type] || 0) + 1;
+    const normalizedType = normalizeAlertType(alert.alert_type);
+    acc[normalizedType] = (acc[normalizedType] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
   const pieData = Object.entries(typeBreakdown).map(([name, value]) => ({ name, value }));
