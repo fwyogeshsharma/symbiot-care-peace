@@ -133,7 +133,7 @@ export default function MovementDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
-      <Header showBackButton title={t('movement.title')} subtitle={t('movement.subtitle')} />
+      <Header title={t('movement.title')} subtitle={t('movement.subtitle')} />
       <main className="container mx-auto p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>

@@ -44,7 +44,7 @@ const DeviceStatusPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
-      <Header showBackButton title={t('devices.title')} subtitle={t('devices.subtitle')} />
+      <Header title={t('devices.title')} subtitle={t('devices.subtitle')} />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">

@@ -318,7 +318,7 @@ export default function Tracking() {
   if (isCriticalLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header showBackButton title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
+        <Header title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
         <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
           <div className="space-y-6">
             <Skeleton className="h-12 w-64" />
@@ -338,7 +338,7 @@ export default function Tracking() {
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
-      <Header showBackButton title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
+      <Header title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
