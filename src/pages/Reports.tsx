@@ -383,11 +383,6 @@ const Reports = () => {
           </CardContent>
         </Card>
 
-        {/* Email Subscription for Daily Reports */}
-        <div className="max-w-3xl">
-          <ReportSubscriptionManager selectedPerson={selectedPerson} />
-        </div>
-
         {/* Report Categories */}
         <Tabs defaultValue="daily" className="space-y-6">
           <TabsList className="grid grid-cols-5 grid-rows-2 w-full h-auto gap-2 p-2">
@@ -466,6 +461,11 @@ const Reports = () => {
             </TabsContent>
           ))}
         </Tabs>
+
+        {/* Email Subscription for Daily Reports */}
+        <div className="max-w-3xl mt-6">
+          <ReportSubscriptionManager selectedPerson={selectedPerson} />
+        </div>
       </main>
       <Footer />
     </div>
