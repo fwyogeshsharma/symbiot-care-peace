@@ -170,15 +170,23 @@ const Dashboard = () => {
               .single();
 
             if (device?.device_type === 'emergency_button') {
-              const elderlyPerson = device.elderly_persons as any;
-              // Show toast notification for panic SOS
-              toast.error(t('panicSos.notifications.emergencyAlert'), {
-                description: `${t('panicSos.notifications.sosActivated')} ${elderlyPerson?.full_name || t('panicSos.unknown')}`,
-                duration: 10000,
-              });
+              // Check if user has access to this elderly person
+              const { data: accessiblePersons } = await supabase
+                .rpc('get_accessible_elderly_persons', { _user_id: user.id });
 
-              // Refetch panic events
-              queryClient.invalidateQueries({ queryKey: ['panic-sos-events'] });
+              const hasAccess = accessiblePersons?.some((p: any) => p.id === device.elderly_person_id);
+
+              if (hasAccess) {
+                const elderlyPerson = device.elderly_persons as any;
+                // Show toast notification for panic SOS
+                toast.error(t('panicSos.notifications.emergencyAlert'), {
+                  description: `${t('panicSos.notifications.sosActivated')} ${elderlyPerson?.full_name || t('panicSos.unknown')}`,
+                  duration: 10000,
+                });
+
+                // Refetch panic events
+                queryClient.invalidateQueries({ queryKey: ['panic-sos-events'] });
+              }
             }
           }
         }
