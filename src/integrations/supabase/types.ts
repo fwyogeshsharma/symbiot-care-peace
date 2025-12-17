@@ -1429,6 +1429,50 @@ export type Database = {
           },
         ]
       }
+      report_subscriptions: {
+        Row: {
+          created_at: string
+          elderly_person_id: string
+          id: string
+          is_active: boolean
+          report_type: string
+          schedule_time: string
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          elderly_person_id: string
+          id?: string
+          is_active?: boolean
+          report_type?: string
+          schedule_time?: string
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          elderly_person_id?: string
+          id?: string
+          is_active?: boolean
+          report_type?: string
+          schedule_time?: string
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_subscriptions_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_logs: {
         Row: {
           created_at: string
