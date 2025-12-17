@@ -30,6 +30,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { ReportViewer } from '@/components/reports/ReportViewer';
+import { ReportSubscriptionManager } from '@/components/reports/ReportSubscriptionManager';
+import { Footer } from '@/components/Footer';
 
 const Reports = () => {
   const { t } = useTranslation();
@@ -362,6 +364,9 @@ const Reports = () => {
           </CardContent>
         </Card>
 
+        {/* Email Subscription for Daily Reports */}
+        <ReportSubscriptionManager selectedPerson={selectedPerson} />
+
         {/* Report Categories */}
         <Tabs defaultValue="daily" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 xl:grid-cols-9">
@@ -441,6 +446,7 @@ const Reports = () => {
           ))}
         </Tabs>
       </main>
+      <Footer />
     </div>
   );
 };
