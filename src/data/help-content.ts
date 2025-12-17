@@ -145,6 +145,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.tracking'),
     keywords: ['indoor', 'floor plan', 'zone', 'location', 'position'],
     relatedPages: ['/tracking', '/indoor-tracking'],
+    youtubeUrl: 'https://youtu.be/w-J2MHGQXS0',
   },
   {
     id: 'outdoor-tracking',
@@ -366,6 +367,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Tracking',
     keywords: ['indoor', 'floor plan', 'zone', 'location', 'position'],
     relatedPages: ['/tracking', '/indoor-tracking'],
+    youtubeUrl: 'https://youtu.be/w-J2MHGQXS0',
   },
   {
     id: 'outdoor-tracking',
