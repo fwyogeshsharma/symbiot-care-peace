@@ -1900,7 +1900,8 @@
     "liabilityDisclaimer": "दायित्व अस्वीकरण",
     "cookiePolicy": "कुकी नीति",
     "followUs": "हमें फॉलो करें",
-    "allRightsReserved": "सर्वाधिकार सुरक्षित"
+    "allRightsReserved": "सर्वाधिकार सुरक्षित।",
+    "version": "संस्करण: 1.0.11"
   },
   "privacyPolicy": {
     "lastUpdated": "अंतिम अद्यतन",

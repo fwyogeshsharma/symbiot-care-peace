@@ -272,13 +272,17 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <Card className="w-full max-w-md p-8 shadow-healthcare">
-        <div className="flex items-center justify-center mb-8">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center justify-center mb-8 w-full hover:opacity-80 transition-opacity cursor-pointer"
+          type="button"
+        >
           <Activity className="w-8 h-8 text-primary" />
           <div className="ml-3">
             <h1 className="text-2xl font-bold text-foreground">{t('common.symbiot')}</h1>
             <p className="text-xs text-muted-foreground">{t('index.tagline')}</p>
           </div>
-        </div>
+        </button>
 
         <h2 className="text-xl font-semibold mb-6 text-center">
           {isResetPassword ? t('auth.newPassword') : isForgotPassword ? t('auth.resetPassword') : isLogin ? t('auth.welcome') : t('auth.welcomeNew')}

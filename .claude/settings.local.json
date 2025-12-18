@@ -18,7 +18,9 @@
       "Bash(done)",
       "Bash(for file in FloorPlanManagement.tsx FloorPlanEditor.tsx PlatformMetrics.tsx DataSharingPage.tsx)",
       "Bash(do grep -n \"^import.*useTranslation\\|^import.*from ''react''\" \"E:\\Projects\\symbiot-care-peace\\src\\pages$file\")",
-      "Bash(ls -la \"E:\\Projects\\symbiot-care-peace\\src\\components\\reports\"\" | grep -i \"report \")"
+      "Bash(ls -la \"E:\\Projects\\symbiot-care-peace\\src\\components\\reports\"\" | grep -i \"report \")",
+      "mcp__ide__getDiagnostics",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

@@ -2143,7 +2143,8 @@
     "liabilityDisclaimer": "Liability Disclaimer",
     "cookiePolicy": "Cookie Policy",
     "followUs": "Follow Us",
-    "allRightsReserved": "All rights reserved"
+    "allRightsReserved": "All rights reserved.",
+    "version": "Version: 1.0.11"
   },
   "privacyPolicy": {
     "lastUpdated": "Last Updated",

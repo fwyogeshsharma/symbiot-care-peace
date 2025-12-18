@@ -94,6 +94,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.alerts'),
     keywords: ['alert', 'notification', 'warning', 'emergency'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/u4jtgPbpp1k',
   },
   {
     id: 'alert-severity',
@@ -314,6 +315,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['alert', 'notification', 'warning', 'emergency'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/u4jtgPbpp1k',
   },
   {
     id: 'alert-severity',

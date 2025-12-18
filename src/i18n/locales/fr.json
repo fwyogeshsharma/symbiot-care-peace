@@ -2074,7 +2074,8 @@
     "liabilityDisclaimer": "Avertissement de Responsabilité",
     "cookiePolicy": "Politique des Cookies",
     "followUs": "Suivez-Nous",
-    "allRightsReserved": "Tous droits réservés"
+    "allRightsReserved": "Tous droits réservés.",
+    "version": "Version : 1.0.11"
   },
   "privacyPolicy": {
     "lastUpdated": "Dernière Mise à Jour",

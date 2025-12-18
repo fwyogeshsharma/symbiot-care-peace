@@ -128,11 +128,8 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
           <p>
-            © {currentYear} {t('common.symbiot')}. {t('footer.allRightsReserved')}
+            © {currentYear} {t('common.symbiot')}. {t('footer.allRightsReserved')} {t('footer.version')}
           </p>
-          {/*<p className="mt-2">*/}
-          {/*  {t('common.copyright')}*/}
-          {/*</p>*/}
         </div>
       </div>
     </footer>

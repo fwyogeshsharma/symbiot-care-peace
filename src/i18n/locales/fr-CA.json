@@ -1798,6 +1798,7 @@
     "liabilityDisclaimer": "Avis de Non-Responsabilité",
     "cookiePolicy": "Politique des Témoins",
     "followUs": "Suivez-Nous",
-    "allRightsReserved": "Tous droits réservés"
+    "allRightsReserved": "Tous droits réservés.",
+    "version": "Version : 1.0.11"
   }
 }
