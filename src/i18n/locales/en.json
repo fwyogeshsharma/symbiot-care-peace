@@ -2393,5 +2393,202 @@
       "content": "If you have questions about our use of cookies, please contact us:",
       "email": "Email"
     }
+  },
+  "liabilityDisclaimer": {
+    "title": "Liability Disclaimer",
+    "acknowledgment": "BY USING THE SYMBIOT PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THIS LIABILITY DISCLAIMER.",
+    "generalDisclaimer": {
+      "title": "1. General Disclaimer",
+      "notSubstitute": {
+        "title": "1.1 Not a Substitute for Professional Care",
+        "intro": "SymBIoT is a monitoring and tracking platform designed to assist caregivers and family members. It is NOT a replacement for:",
+        "items": {
+          "medical": "Professional medical care or supervision",
+          "caregiving": "In-person caregiving",
+          "emergency": "Emergency medical services",
+          "advice": "Professional medical advice, diagnosis, or treatment",
+          "healthcare": "Licensed healthcare providers"
+        }
+      },
+      "supplementary": {
+        "title": "1.2 Supplementary Tool",
+        "content": "This platform should be used as a supplementary monitoring tool only. Users must continue to provide appropriate levels of direct care, supervision, and professional medical oversight as required by the individual's condition."
+      }
+    },
+    "medicalDisclaimer": {
+      "title": "2. Medical Disclaimer",
+      "notMedicalDevice": {
+        "title": "2.1 Not a Medical Device",
+        "content": "SymBIoT and its associated devices are NOT medical-grade equipment and have not been evaluated or approved by regulatory bodies (FDA, CE, etc.) for medical diagnosis or treatment purposes."
+      },
+      "vitalSignsLimitations": {
+        "title": "2.2 Vital Signs Monitoring Limitations",
+        "intro": "Vital signs data (heart rate, blood pressure, oxygen saturation, temperature, glucose levels, etc.) displayed on the platform:",
+        "items": {
+          "accuracy": "May not be medically accurate",
+          "decisions": "Should not be used for medical decision-making without professional verification",
+          "informational": "Are for informational and monitoring purposes only",
+          "variance": "May vary significantly from medical-grade equipment readings",
+          "confirmation": "Should be confirmed by medical-grade equipment before any medical action is taken"
+        }
+      },
+      "seekAdvice": {
+        "title": "2.3 Seek Professional Medical Advice",
+        "intro": "Users must:",
+        "items": {
+          "consult": "Consult with qualified healthcare providers for all medical decisions",
+          "emergency": "Seek immediate emergency medical attention (call 911 or local emergency services) in case of any medical emergency",
+          "noDelay": "Not delay seeking medical care based on information from this platform"
+        }
+      }
+    },
+    "deviceLimitations": {
+      "title": "3. Device and Equipment Limitations",
+      "intro": "Connected devices (wearables, sensors, trackers, panic buttons, etc.) may:",
+      "items": {
+        "hardware": "Fail to capture data due to hardware malfunctions",
+        "stopFunctioning": "Stop functioning without warning",
+        "inaccurate": "Provide inaccurate readings due to calibration issues",
+        "battery": "Lose power due to battery depletion",
+        "disconnect": "Disconnect from the network unexpectedly",
+        "damage": "Experience physical damage affecting functionality"
+      },
+      "liability": "The Company is NOT liable for any consequences resulting from device failures, malfunctions, or inaccurate readings."
+    },
+    "dataAccuracy": {
+      "title": "4. Data Accuracy and Reliability",
+      "intro": "The Company makes NO WARRANTIES OR GUARANTEES regarding:",
+      "items": {
+        "accuracy": "Accuracy of any data displayed on the platform",
+        "completeness": "Completeness of data collection",
+        "timeliness": "Timeliness of data transmission",
+        "reliability": "Reliability of data storage"
+      }
+    },
+    "alertSystems": {
+      "title": "5. Alert and Notification Systems",
+      "intro": "The alert system may:",
+      "items": {
+        "failToTrigger": "Fail to trigger when conditions warrant an alert",
+        "falsePositive": "Generate false positive alerts (alerts when no actual issue exists)",
+        "falseNegative": "Generate false negative alerts (fail to alert when issues exist)",
+        "delayed": "Be delayed in notification delivery",
+        "failToDeliver": "Fail to deliver notifications due to device settings, network issues, or app permissions"
+      },
+      "noGuarantee": "The Company does NOT guarantee any specific response time for alerts, real-time delivery, or that alerts will reach all designated recipients."
+    },
+    "networkConnectivity": {
+      "title": "6. Network and Connectivity",
+      "intro": "The platform requires active internet connection and stable network connectivity. Data transmission and platform functionality may be interrupted by:",
+      "items": {
+        "isp": "Internet service provider (ISP) outages",
+        "wifi": "Wi-Fi router failures or configuration issues",
+        "cellular": "Cellular network outages or poor signal strength",
+        "cloud": "Cloud service outages or maintenance downtime",
+        "server": "Server failures or network congestion"
+      },
+      "responsibility": "Users are responsible for maintaining reliable internet connectivity and ensuring devices remain connected."
+    },
+    "locationTracking": {
+      "title": "7. Location Tracking Services",
+      "intro": "GPS tracking may be:",
+      "items": {
+        "inaccurate": "Inaccurate by several meters to hundreds of meters",
+        "affected": "Affected by atmospheric conditions, building structures, or tree cover",
+        "unavailable": "Unavailable in indoor environments",
+        "satellite": "Subject to satellite availability and signal quality"
+      },
+      "liability": "The Company is NOT liable for inaccurate location information or failure to detect geofence violations."
+    },
+    "emergencyResponse": {
+      "title": "8. Emergency Response",
+      "notEmergencyService": {
+        "title": "Not an Emergency Response Service",
+        "intro": "SymBIoT is NOT an emergency response system. The platform:",
+        "items": {
+          "noContact": "Does NOT automatically contact emergency services (911, police, ambulance)",
+          "noDispatch": "Does NOT provide emergency dispatch services",
+          "noGuarantee": "Does NOT guarantee that emergency situations will be detected",
+          "noReplace": "Does NOT replace the need to call emergency services directly"
+        }
+      },
+      "protocol": {
+        "title": "Emergency Protocol:",
+        "step1": "CALL 911 OR LOCAL EMERGENCY SERVICES IMMEDIATELY",
+        "step2": "Do not rely solely on the SymBIoT platform for emergency response",
+        "step3": "Alert notifications are for informational purposes only"
+      }
+    },
+    "userResponsibilities": {
+      "title": "9. User Responsibilities",
+      "intro": "Users are responsible for:",
+      "items": {
+        "setup": "Properly setting up and configuring devices",
+        "placement": "Ensuring devices are worn or placed correctly",
+        "charging": "Charging devices regularly and monitoring battery levels",
+        "alertSettings": "Regularly reviewing and updating alert settings",
+        "testing": "Testing the system regularly to ensure it is functioning",
+        "directCare": "Providing appropriate levels of direct care and supervision",
+        "responding": "Responding appropriately to alerts and unusual data patterns",
+        "security": "Maintaining account security with strong passwords"
+      },
+      "failure": "Failure to fulfill these responsibilities may result in system malfunction, inaccurate data, or missed alerts."
+    },
+    "limitationOfLiability": {
+      "title": "10. Limitation of Liability",
+      "maxLiability": {
+        "title": "Maximum Liability",
+        "content": "To the fullest extent permitted by law, the Company's total liability for any claims arising from or related to the use of the SymBIoT platform shall not exceed the total amount paid by the user for the service in the twelve (12) months preceding the claim."
+      },
+      "exclusionDamages": {
+        "title": "Exclusion of Consequential Damages",
+        "intro": "The Company shall NOT be liable for:",
+        "items": {
+          "indirect": "Indirect, incidental, special, or consequential damages",
+          "profits": "Loss of profits or revenue",
+          "data": "Loss of data or information",
+          "business": "Business interruption",
+          "injury": "Personal injury or death",
+          "emotional": "Emotional distress"
+        }
+      },
+      "noWarranty": {
+        "title": "No Warranty",
+        "intro": "THE PLATFORM IS PROVIDED \"AS IS\" AND \"AS AVAILABLE\" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:",
+        "items": {
+          "merchantability": "Warranties of merchantability",
+          "fitness": "Fitness for a particular purpose",
+          "nonInfringement": "Non-infringement",
+          "accuracy": "Accuracy or reliability",
+          "continuous": "Continuous, uninterrupted, or secure access"
+        }
+      },
+      "assumptionOfRisk": {
+        "title": "User Assumption of Risk",
+        "intro": "By using the SymBIoT platform, users ACKNOWLEDGE AND ASSUME ALL RISKS associated with:",
+        "items": {
+          "limitations": "Remote monitoring technology limitations",
+          "deviceFailure": "Potential for device failure or inaccurate data",
+          "alerts": "Delayed or missed alerts",
+          "outages": "System outages or downtime",
+          "security": "Data security and privacy risks"
+        }
+      }
+    },
+    "importantNotice": {
+      "title": "Important Notice",
+      "intro": "You understand that:",
+      "items": {
+        "notMedical": "This is NOT a medical device or emergency response system",
+        "limitations": "The platform has significant limitations that may result in missed emergencies, inaccurate data, or system failures",
+        "directCare": "You must continue to provide appropriate direct care and medical oversight",
+        "call911": "You should call emergency services (911) immediately in any emergency situation"
+      }
+    },
+    "contactInfo": {
+      "title": "Contact Information",
+      "intro": "If you have questions about this liability disclaimer, please contact us:",
+      "email": "Email"
+    }
   }
 }

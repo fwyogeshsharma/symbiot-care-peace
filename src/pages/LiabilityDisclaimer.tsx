@@ -23,7 +23,7 @@ const LiabilityDisclaimer = () => {
               {t('common.back')}
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold">Liability Disclaimer</h1>
+          <h1 className="text-2xl font-bold">{t('liabilityDisclaimer.title')}</h1>
         </div>
       </header>
 
@@ -32,276 +32,276 @@ const LiabilityDisclaimer = () => {
           <Alert className="mb-8 border-yellow-500">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription className="font-semibold">
-              BY USING THE SYMBIOT PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THIS LIABILITY DISCLAIMER.
+              {t('liabilityDisclaimer.acknowledgment')}
             </AlertDescription>
           </Alert>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">1. General Disclaimer</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.generalDisclaimer.title')}</h2>
             <div className="space-y-4">
               <div>
-                <h3 className="text-xl font-semibold mb-2">1.1 Not a Substitute for Professional Care</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('liabilityDisclaimer.generalDisclaimer.notSubstitute.title')}</h3>
                 <p className="text-muted-foreground mb-2">
-                  SymBIoT is a monitoring and tracking platform designed to assist caregivers and family members. It is NOT a replacement for:
+                  {t('liabilityDisclaimer.generalDisclaimer.notSubstitute.intro')}
                 </p>
                 <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                  <li>Professional medical care or supervision</li>
-                  <li>In-person caregiving</li>
-                  <li>Emergency medical services</li>
-                  <li>Professional medical advice, diagnosis, or treatment</li>
-                  <li>Licensed healthcare providers</li>
+                  <li>{t('liabilityDisclaimer.generalDisclaimer.notSubstitute.items.medical')}</li>
+                  <li>{t('liabilityDisclaimer.generalDisclaimer.notSubstitute.items.caregiving')}</li>
+                  <li>{t('liabilityDisclaimer.generalDisclaimer.notSubstitute.items.emergency')}</li>
+                  <li>{t('liabilityDisclaimer.generalDisclaimer.notSubstitute.items.advice')}</li>
+                  <li>{t('liabilityDisclaimer.generalDisclaimer.notSubstitute.items.healthcare')}</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-xl font-semibold mb-2">1.2 Supplementary Tool</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('liabilityDisclaimer.generalDisclaimer.supplementary.title')}</h3>
                 <p className="text-muted-foreground">
-                  This platform should be used as a supplementary monitoring tool only. Users must continue to provide appropriate levels of direct care, supervision, and professional medical oversight as required by the individual's condition.
+                  {t('liabilityDisclaimer.generalDisclaimer.supplementary.content')}
                 </p>
               </div>
             </div>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">2. Medical Disclaimer</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.medicalDisclaimer.title')}</h2>
             <div className="space-y-4">
               <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4">
-                <h3 className="text-xl font-semibold mb-2 text-red-800 dark:text-red-200">2.1 Not a Medical Device</h3>
+                <h3 className="text-xl font-semibold mb-2 text-red-800 dark:text-red-200">{t('liabilityDisclaimer.medicalDisclaimer.notMedicalDevice.title')}</h3>
                 <p className="text-red-700 dark:text-red-300">
-                  SymBIoT and its associated devices are NOT medical-grade equipment and have not been evaluated or approved by regulatory bodies (FDA, CE, etc.) for medical diagnosis or treatment purposes.
+                  {t('liabilityDisclaimer.medicalDisclaimer.notMedicalDevice.content')}
                 </p>
               </div>
 
               <div>
-                <h3 className="text-xl font-semibold mb-2">2.2 Vital Signs Monitoring Limitations</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('liabilityDisclaimer.medicalDisclaimer.vitalSignsLimitations.title')}</h3>
                 <p className="text-muted-foreground mb-2">
-                  Vital signs data (heart rate, blood pressure, oxygen saturation, temperature, glucose levels, etc.) displayed on the platform:
+                  {t('liabilityDisclaimer.medicalDisclaimer.vitalSignsLimitations.intro')}
                 </p>
                 <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                  <li>May not be medically accurate</li>
-                  <li>Should not be used for medical decision-making without professional verification</li>
-                  <li>Are for informational and monitoring purposes only</li>
-                  <li>May vary significantly from medical-grade equipment readings</li>
-                  <li>Should be confirmed by medical-grade equipment before any medical action is taken</li>
+                  <li>{t('liabilityDisclaimer.medicalDisclaimer.vitalSignsLimitations.items.accuracy')}</li>
+                  <li>{t('liabilityDisclaimer.medicalDisclaimer.vitalSignsLimitations.items.decisions')}</li>
+                  <li>{t('liabilityDisclaimer.medicalDisclaimer.vitalSignsLimitations.items.informational')}</li>
+                  <li>{t('liabilityDisclaimer.medicalDisclaimer.vitalSignsLimitations.items.variance')}</li>
+                  <li>{t('liabilityDisclaimer.medicalDisclaimer.vitalSignsLimitations.items.confirmation')}</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-xl font-semibold mb-2">2.3 Seek Professional Medical Advice</h3>
-                <p className="text-muted-foreground mb-2">Users must:</p>
+                <h3 className="text-xl font-semibold mb-2">{t('liabilityDisclaimer.medicalDisclaimer.seekAdvice.title')}</h3>
+                <p className="text-muted-foreground mb-2">{t('liabilityDisclaimer.medicalDisclaimer.seekAdvice.intro')}</p>
                 <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                  <li>Consult with qualified healthcare providers for all medical decisions</li>
-                  <li>Seek immediate emergency medical attention (call 911 or local emergency services) in case of any medical emergency</li>
-                  <li>Not delay seeking medical care based on information from this platform</li>
+                  <li>{t('liabilityDisclaimer.medicalDisclaimer.seekAdvice.items.consult')}</li>
+                  <li>{t('liabilityDisclaimer.medicalDisclaimer.seekAdvice.items.emergency')}</li>
+                  <li>{t('liabilityDisclaimer.medicalDisclaimer.seekAdvice.items.noDelay')}</li>
                 </ul>
               </div>
             </div>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">3. Device and Equipment Limitations</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.deviceLimitations.title')}</h2>
             <p className="text-muted-foreground mb-4">
-              Connected devices (wearables, sensors, trackers, panic buttons, etc.) may:
+              {t('liabilityDisclaimer.deviceLimitations.intro')}
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-1 mb-4">
-              <li>Fail to capture data due to hardware malfunctions</li>
-              <li>Stop functioning without warning</li>
-              <li>Provide inaccurate readings due to calibration issues</li>
-              <li>Lose power due to battery depletion</li>
-              <li>Disconnect from the network unexpectedly</li>
-              <li>Experience physical damage affecting functionality</li>
+              <li>{t('liabilityDisclaimer.deviceLimitations.items.hardware')}</li>
+              <li>{t('liabilityDisclaimer.deviceLimitations.items.stopFunctioning')}</li>
+              <li>{t('liabilityDisclaimer.deviceLimitations.items.inaccurate')}</li>
+              <li>{t('liabilityDisclaimer.deviceLimitations.items.battery')}</li>
+              <li>{t('liabilityDisclaimer.deviceLimitations.items.disconnect')}</li>
+              <li>{t('liabilityDisclaimer.deviceLimitations.items.damage')}</li>
             </ul>
             <p className="font-semibold text-muted-foreground">
-              The Company is NOT liable for any consequences resulting from device failures, malfunctions, or inaccurate readings.
+              {t('liabilityDisclaimer.deviceLimitations.liability')}
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">4. Data Accuracy and Reliability</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.dataAccuracy.title')}</h2>
             <div className="space-y-4">
               <p className="text-muted-foreground">
-                The Company makes NO WARRANTIES OR GUARANTEES regarding:
+                {t('liabilityDisclaimer.dataAccuracy.intro')}
               </p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                <li>Accuracy of any data displayed on the platform</li>
-                <li>Completeness of data collection</li>
-                <li>Timeliness of data transmission</li>
-                <li>Reliability of data storage</li>
+                <li>{t('liabilityDisclaimer.dataAccuracy.items.accuracy')}</li>
+                <li>{t('liabilityDisclaimer.dataAccuracy.items.completeness')}</li>
+                <li>{t('liabilityDisclaimer.dataAccuracy.items.timeliness')}</li>
+                <li>{t('liabilityDisclaimer.dataAccuracy.items.reliability')}</li>
               </ul>
             </div>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">5. Alert and Notification Systems</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.alertSystems.title')}</h2>
             <div className="space-y-4">
-              <p className="text-muted-foreground mb-2">The alert system may:</p>
+              <p className="text-muted-foreground mb-2">{t('liabilityDisclaimer.alertSystems.intro')}</p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                <li>Fail to trigger when conditions warrant an alert</li>
-                <li>Generate false positive alerts (alerts when no actual issue exists)</li>
-                <li>Generate false negative alerts (fail to alert when issues exist)</li>
-                <li>Be delayed in notification delivery</li>
-                <li>Fail to deliver notifications due to device settings, network issues, or app permissions</li>
+                <li>{t('liabilityDisclaimer.alertSystems.items.failToTrigger')}</li>
+                <li>{t('liabilityDisclaimer.alertSystems.items.falsePositive')}</li>
+                <li>{t('liabilityDisclaimer.alertSystems.items.falseNegative')}</li>
+                <li>{t('liabilityDisclaimer.alertSystems.items.delayed')}</li>
+                <li>{t('liabilityDisclaimer.alertSystems.items.failToDeliver')}</li>
               </ul>
 
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 mt-4">
                 <p className="font-semibold text-yellow-800 dark:text-yellow-200">
-                  The Company does NOT guarantee any specific response time for alerts, real-time delivery, or that alerts will reach all designated recipients.
+                  {t('liabilityDisclaimer.alertSystems.noGuarantee')}
                 </p>
               </div>
             </div>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">6. Network and Connectivity</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.networkConnectivity.title')}</h2>
             <p className="text-muted-foreground mb-4">
-              The platform requires active internet connection and stable network connectivity. Data transmission and platform functionality may be interrupted by:
+              {t('liabilityDisclaimer.networkConnectivity.intro')}
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-              <li>Internet service provider (ISP) outages</li>
-              <li>Wi-Fi router failures or configuration issues</li>
-              <li>Cellular network outages or poor signal strength</li>
-              <li>Cloud service outages or maintenance downtime</li>
-              <li>Server failures or network congestion</li>
+              <li>{t('liabilityDisclaimer.networkConnectivity.items.isp')}</li>
+              <li>{t('liabilityDisclaimer.networkConnectivity.items.wifi')}</li>
+              <li>{t('liabilityDisclaimer.networkConnectivity.items.cellular')}</li>
+              <li>{t('liabilityDisclaimer.networkConnectivity.items.cloud')}</li>
+              <li>{t('liabilityDisclaimer.networkConnectivity.items.server')}</li>
             </ul>
             <p className="font-semibold text-muted-foreground mt-4">
-              Users are responsible for maintaining reliable internet connectivity and ensuring devices remain connected.
+              {t('liabilityDisclaimer.networkConnectivity.responsibility')}
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">7. Location Tracking Services</h2>
-            <p className="text-muted-foreground mb-4">GPS tracking may be:</p>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.locationTracking.title')}</h2>
+            <p className="text-muted-foreground mb-4">{t('liabilityDisclaimer.locationTracking.intro')}</p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-              <li>Inaccurate by several meters to hundreds of meters</li>
-              <li>Affected by atmospheric conditions, building structures, or tree cover</li>
-              <li>Unavailable in indoor environments</li>
-              <li>Subject to satellite availability and signal quality</li>
+              <li>{t('liabilityDisclaimer.locationTracking.items.inaccurate')}</li>
+              <li>{t('liabilityDisclaimer.locationTracking.items.affected')}</li>
+              <li>{t('liabilityDisclaimer.locationTracking.items.unavailable')}</li>
+              <li>{t('liabilityDisclaimer.locationTracking.items.satellite')}</li>
             </ul>
             <p className="font-semibold text-muted-foreground mt-4">
-              The Company is NOT liable for inaccurate location information or failure to detect geofence violations.
+              {t('liabilityDisclaimer.locationTracking.liability')}
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">8. Emergency Response</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.emergencyResponse.title')}</h2>
             <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-4">
-              <h3 className="text-xl font-semibold mb-2 text-red-800 dark:text-red-200">Not an Emergency Response Service</h3>
+              <h3 className="text-xl font-semibold mb-2 text-red-800 dark:text-red-200">{t('liabilityDisclaimer.emergencyResponse.notEmergencyService.title')}</h3>
               <p className="text-red-700 dark:text-red-300 mb-2">
-                SymBIoT is NOT an emergency response system. The platform:
+                {t('liabilityDisclaimer.emergencyResponse.notEmergencyService.intro')}
               </p>
               <ul className="list-disc pl-6 text-red-700 dark:text-red-300 space-y-1">
-                <li>Does NOT automatically contact emergency services (911, police, ambulance)</li>
-                <li>Does NOT provide emergency dispatch services</li>
-                <li>Does NOT guarantee that emergency situations will be detected</li>
-                <li>Does NOT replace the need to call emergency services directly</li>
+                <li>{t('liabilityDisclaimer.emergencyResponse.notEmergencyService.items.noContact')}</li>
+                <li>{t('liabilityDisclaimer.emergencyResponse.notEmergencyService.items.noDispatch')}</li>
+                <li>{t('liabilityDisclaimer.emergencyResponse.notEmergencyService.items.noGuarantee')}</li>
+                <li>{t('liabilityDisclaimer.emergencyResponse.notEmergencyService.items.noReplace')}</li>
               </ul>
             </div>
 
             <div className="bg-red-100 dark:bg-red-900/30 p-4 rounded-lg">
-              <h4 className="font-bold text-red-900 dark:text-red-100 mb-2">Emergency Protocol:</h4>
+              <h4 className="font-bold text-red-900 dark:text-red-100 mb-2">{t('liabilityDisclaimer.emergencyResponse.protocol.title')}</h4>
               <ol className="list-decimal pl-6 text-red-800 dark:text-red-200 space-y-1">
-                <li className="font-semibold">CALL 911 OR LOCAL EMERGENCY SERVICES IMMEDIATELY</li>
-                <li>Do not rely solely on the SymBIoT platform for emergency response</li>
-                <li>Alert notifications are for informational purposes only</li>
+                <li className="font-semibold">{t('liabilityDisclaimer.emergencyResponse.protocol.step1')}</li>
+                <li>{t('liabilityDisclaimer.emergencyResponse.protocol.step2')}</li>
+                <li>{t('liabilityDisclaimer.emergencyResponse.protocol.step3')}</li>
               </ol>
             </div>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">9. User Responsibilities</h2>
-            <p className="text-muted-foreground mb-4">Users are responsible for:</p>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.userResponsibilities.title')}</h2>
+            <p className="text-muted-foreground mb-4">{t('liabilityDisclaimer.userResponsibilities.intro')}</p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-              <li>Properly setting up and configuring devices</li>
-              <li>Ensuring devices are worn or placed correctly</li>
-              <li>Charging devices regularly and monitoring battery levels</li>
-              <li>Regularly reviewing and updating alert settings</li>
-              <li>Testing the system regularly to ensure it is functioning</li>
-              <li>Providing appropriate levels of direct care and supervision</li>
-              <li>Responding appropriately to alerts and unusual data patterns</li>
-              <li>Maintaining account security with strong passwords</li>
+              <li>{t('liabilityDisclaimer.userResponsibilities.items.setup')}</li>
+              <li>{t('liabilityDisclaimer.userResponsibilities.items.placement')}</li>
+              <li>{t('liabilityDisclaimer.userResponsibilities.items.charging')}</li>
+              <li>{t('liabilityDisclaimer.userResponsibilities.items.alertSettings')}</li>
+              <li>{t('liabilityDisclaimer.userResponsibilities.items.testing')}</li>
+              <li>{t('liabilityDisclaimer.userResponsibilities.items.directCare')}</li>
+              <li>{t('liabilityDisclaimer.userResponsibilities.items.responding')}</li>
+              <li>{t('liabilityDisclaimer.userResponsibilities.items.security')}</li>
             </ul>
             <p className="font-semibold text-muted-foreground mt-4">
-              Failure to fulfill these responsibilities may result in system malfunction, inaccurate data, or missed alerts.
+              {t('liabilityDisclaimer.userResponsibilities.failure')}
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">10. Limitation of Liability</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.limitationOfLiability.title')}</h2>
             <div className="space-y-4">
               <div>
-                <h3 className="text-xl font-semibold mb-2">Maximum Liability</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('liabilityDisclaimer.limitationOfLiability.maxLiability.title')}</h3>
                 <p className="text-muted-foreground">
-                  To the fullest extent permitted by law, the Company's total liability for any claims arising from or related to the use of the SymBIoT platform shall not exceed the total amount paid by the user for the service in the twelve (12) months preceding the claim.
+                  {t('liabilityDisclaimer.limitationOfLiability.maxLiability.content')}
                 </p>
               </div>
 
               <div>
-                <h3 className="text-xl font-semibold mb-2">Exclusion of Consequential Damages</h3>
-                <p className="text-muted-foreground mb-2">The Company shall NOT be liable for:</p>
+                <h3 className="text-xl font-semibold mb-2">{t('liabilityDisclaimer.limitationOfLiability.exclusionDamages.title')}</h3>
+                <p className="text-muted-foreground mb-2">{t('liabilityDisclaimer.limitationOfLiability.exclusionDamages.intro')}</p>
                 <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                  <li>Indirect, incidental, special, or consequential damages</li>
-                  <li>Loss of profits or revenue</li>
-                  <li>Loss of data or information</li>
-                  <li>Business interruption</li>
-                  <li>Personal injury or death</li>
-                  <li>Emotional distress</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.exclusionDamages.items.indirect')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.exclusionDamages.items.profits')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.exclusionDamages.items.data')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.exclusionDamages.items.business')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.exclusionDamages.items.injury')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.exclusionDamages.items.emotional')}</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-xl font-semibold mb-2">No Warranty</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('liabilityDisclaimer.limitationOfLiability.noWarranty.title')}</h3>
                 <p className="text-muted-foreground mb-2">
-                  THE PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
+                  {t('liabilityDisclaimer.limitationOfLiability.noWarranty.intro')}
                 </p>
                 <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                  <li>Warranties of merchantability</li>
-                  <li>Fitness for a particular purpose</li>
-                  <li>Non-infringement</li>
-                  <li>Accuracy or reliability</li>
-                  <li>Continuous, uninterrupted, or secure access</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.noWarranty.items.merchantability')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.noWarranty.items.fitness')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.noWarranty.items.nonInfringement')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.noWarranty.items.accuracy')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.noWarranty.items.continuous')}</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-xl font-semibold mb-2">User Assumption of Risk</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('liabilityDisclaimer.limitationOfLiability.assumptionOfRisk.title')}</h3>
                 <p className="text-muted-foreground">
-                  By using the SymBIoT platform, users ACKNOWLEDGE AND ASSUME ALL RISKS associated with:
+                  {t('liabilityDisclaimer.limitationOfLiability.assumptionOfRisk.intro')}
                 </p>
                 <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-                  <li>Remote monitoring technology limitations</li>
-                  <li>Potential for device failure or inaccurate data</li>
-                  <li>Delayed or missed alerts</li>
-                  <li>System outages or downtime</li>
-                  <li>Data security and privacy risks</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.assumptionOfRisk.items.limitations')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.assumptionOfRisk.items.deviceFailure')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.assumptionOfRisk.items.alerts')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.assumptionOfRisk.items.outages')}</li>
+                  <li>{t('liabilityDisclaimer.limitationOfLiability.assumptionOfRisk.items.security')}</li>
                 </ul>
               </div>
             </div>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">Important Notice</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.importantNotice.title')}</h2>
             <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4">
               <p className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                You understand that:
+                {t('liabilityDisclaimer.importantNotice.intro')}
               </p>
               <ul className="list-disc pl-6 text-blue-800 dark:text-blue-200 space-y-1">
-                <li>This is NOT a medical device or emergency response system</li>
-                <li>The platform has significant limitations that may result in missed emergencies, inaccurate data, or system failures</li>
-                <li>You must continue to provide appropriate direct care and medical oversight</li>
-                <li>You should call emergency services (911) immediately in any emergency situation</li>
+                <li>{t('liabilityDisclaimer.importantNotice.items.notMedical')}</li>
+                <li>{t('liabilityDisclaimer.importantNotice.items.limitations')}</li>
+                <li>{t('liabilityDisclaimer.importantNotice.items.directCare')}</li>
+                <li>{t('liabilityDisclaimer.importantNotice.items.call911')}</li>
               </ul>
             </div>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-3xl font-bold mb-4 text-primary">Contact Information</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{t('liabilityDisclaimer.contactInfo.title')}</h2>
             <p className="text-muted-foreground mb-2">
-              If you have questions about this liability disclaimer, please contact us:
+              {t('liabilityDisclaimer.contactInfo.intro')}
             </p>
             <div className="bg-muted p-4 rounded-lg">
               <p className="font-semibold">{t('common.symbiot')}</p>
               <p className="text-muted-foreground">
-                Email: <a href="mailto:symbiot.doc@gmail.com" className="text-primary hover:underline">symbiot.doc@gmail.com</a>
+                {t('liabilityDisclaimer.contactInfo.email')}: <a href="mailto:symbiot.doc@gmail.com" className="text-primary hover:underline">symbiot.doc@gmail.com</a>
               </p>
             </div>
           </section>

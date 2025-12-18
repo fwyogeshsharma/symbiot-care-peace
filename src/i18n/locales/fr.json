@@ -2075,5 +2075,378 @@
     "cookiePolicy": "Politique des Cookies",
     "followUs": "Suivez-Nous",
     "allRightsReserved": "Tous droits réservés"
+  },
+  "privacyPolicy": {
+    "lastUpdated": "Dernière Mise à Jour",
+    "introduction": {
+      "title": "Introduction",
+      "content": "SymBIoT (\"nous\", \"notre\" ou \"nos\") s'engage à protéger votre vie privée. Cette Politique de Confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous utilisez notre plateforme de surveillance des soins aux personnes âgées. En utilisant SymBIoT, vous acceptez la collecte et l'utilisation des informations conformément à cette politique."
+    },
+    "informationWeCollect": {
+      "title": "Informations que Nous Collectons",
+      "personalInfo": {
+        "title": "Informations Personnelles",
+        "items": {
+          "name": "Nom et coordonnées",
+          "email": "Adresse e-mail",
+          "phone": "Numéro de téléphone",
+          "address": "Adresse postale",
+          "birthYear": "Année de naissance"
+        }
+      },
+      "healthData": {
+        "title": "Données de Santé et de Surveillance",
+        "items": {
+          "vitals": "Signes vitaux (fréquence cardiaque, tension artérielle, température, niveaux d'oxygène)",
+          "activity": "Modèles d'activité et de mouvement",
+          "location": "Données de localisation (suivi intérieur et extérieur)",
+          "environmental": "Données des capteurs environnementaux (température, humidité, qualité de l'air)",
+          "medication": "Informations sur l'observance des médicaments"
+        }
+      },
+      "deviceData": {
+        "title": "Informations sur l'Appareil et Techniques",
+        "items": {
+          "deviceInfo": "Identifiants d'appareil et spécifications techniques",
+          "ipAddress": "Adresse IP et données de géolocalisation",
+          "browserType": "Type de navigateur et système d'exploitation"
+        }
+      }
+    },
+    "howWeUseInfo": {
+      "title": "Comment Nous Utilisons Vos Informations",
+      "items": {
+        "provideServices": "Fournir et maintenir nos services de surveillance",
+        "monitoring": "Surveiller les paramètres de santé et les modèles d'activité",
+        "alerts": "Envoyer des alertes et notifications aux soignants",
+        "analytics": "Générer des analyses et des rapports",
+        "communication": "Communiquer avec vous au sujet de votre compte et de vos services",
+        "improvement": "Améliorer nos services et développer de nouvelles fonctionnalités"
+      }
+    },
+    "dataSharing": {
+      "title": "Partage et Divulgation des Données",
+      "intro": "Nous ne vendons pas vos informations personnelles. Nous pouvons partager vos données dans les circonstances suivantes :",
+      "items": {
+        "authorizedUsers": "Avec les membres de la famille et les soignants que vous avez autorisés",
+        "serviceProviders": "Avec les fournisseurs de services qui aident à exploiter notre plateforme",
+        "healthcare": "Avec les prestataires de soins de santé selon votre autorisation",
+        "legal": "Lorsque requis par la loi ou pour protéger nos droits légaux",
+        "emergency": "Dans les situations d'urgence pour protéger la santé et la sécurité"
+      }
+    },
+    "dataSecurity": {
+      "title": "Sécurité des Données",
+      "content": "Nous mettons en œuvre des mesures de sécurité conformes aux normes de l'industrie pour protéger vos informations :",
+      "items": {
+        "encryption": "Chiffrement de bout en bout pour la transmission des données",
+        "accessControls": "Contrôles d'accès basés sur les rôles",
+        "regularAudits": "Audits de sécurité et surveillance réguliers",
+        "hipaaCompliance": "Stockage et traitement des données conformes à la HIPAA"
+      }
+    },
+    "yourRights": {
+      "title": "Vos Droits",
+      "items": {
+        "access": "Accéder à vos informations personnelles",
+        "correction": "Demander la correction de données inexactes",
+        "deletion": "Demander la suppression de vos données",
+        "portability": "Exporter vos données dans un format portable",
+        "optOut": "Refuser la collecte de données non essentielles"
+      }
+    },
+    "dataRetention": {
+      "title": "Conservation des Données",
+      "content": "Nous conservons vos informations aussi longtemps que votre compte est actif ou selon les besoins pour fournir des services. Les données de santé peuvent être conservées plus longtemps selon les exigences légales ou à des fins commerciales légitimes."
+    },
+    "childrenPrivacy": {
+      "title": "Confidentialité des Enfants",
+      "content": "Notre service n'est pas destiné aux personnes de moins de 18 ans. Nous ne collectons pas sciemment d'informations personnelles auprès d'enfants."
+    },
+    "changes": {
+      "title": "Modifications de Cette Politique",
+      "content": "Nous pouvons mettre à jour cette Politique de Confidentialité de temps à autre. Nous vous informerons de tout changement en publiant la nouvelle politique sur cette page et en mettant à jour la date de \"Dernière Mise à Jour\"."
+    },
+    "contact": {
+      "title": "Nous Contacter",
+      "content": "Si vous avez des questions concernant cette Politique de Confidentialité, veuillez nous contacter :",
+      "email": "E-mail"
+    }
+  },
+  "termsOfService": {
+    "lastUpdated": "Dernière Mise à Jour",
+    "acceptance": {
+      "title": "Acceptation des Conditions",
+      "content": "En accédant et en utilisant les services de SymBIoT, vous acceptez et convenez d'être lié par ces Conditions d'Utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser nos services."
+    },
+    "description": {
+      "title": "Description du Service",
+      "content": "SymBIoT fournit une plateforme de surveillance de la santé basée sur l'IoT pour les soins aux personnes âgées. Nos services comprennent la surveillance de la santé en temps réel, le suivi des activités, le suivi de la localisation, les systèmes d'alerte et l'analyse pour les soignants et les membres de la famille."
+    },
+    "userAccounts": {
+      "title": "Comptes Utilisateur",
+      "items": {
+        "accurate": "Fournir des informations exactes et complètes lors de la création de votre compte",
+        "confidential": "Garder vos identifiants de compte confidentiels",
+        "responsible": "Être responsable de toutes les activités sous votre compte",
+        "notify": "Nous informer immédiatement de tout accès non autorisé"
+      }
+    },
+    "acceptableUse": {
+      "title": "Utilisation Acceptable",
+      "intro": "Vous acceptez de ne pas :",
+      "items": {
+        "lawful": "Utiliser le service à des fins illégales",
+        "authorized": "Accéder ou surveiller les données de personnes sans autorisation appropriée",
+        "noInterference": "Interférer avec ou perturber le service",
+        "noHarm": "Transmettre un code malveillant ou un logiciel malveillant",
+        "noImpersonation": "Usurper l'identité d'une personne ou d'une entité",
+        "noUnauthorizedAccess": "Tenter d'obtenir un accès non autorisé à des systèmes ou des données"
+      }
+    },
+    "medicalDisclaimer": {
+      "title": "Avertissement Médical",
+      "warning": "AVERTISSEMENT MÉDICAL IMPORTANT",
+      "content": "SymBIoT est un outil de surveillance et ne fournit pas de conseils médicaux, de diagnostic ou de traitement. Les informations fournies ne doivent pas remplacer les soins médicaux professionnels. Consultez toujours des professionnels de la santé qualifiés pour les décisions médicales. En cas d'urgence, appelez immédiatement les services d'urgence."
+    },
+    "dataAccuracy": {
+      "title": "Exactitude des Données",
+      "content": "Bien que nous nous efforcions d'être précis, nous ne pouvons pas garantir que toutes les données collectées par les appareils sont totalement exactes. Les lectures des capteurs peuvent être affectées par le placement de l'appareil, les interférences ou les problèmes techniques. Vous ne devez pas vous fier uniquement à notre plateforme pour des décisions de santé critiques."
+    },
+    "intellectualProperty": {
+      "title": "Propriété Intellectuelle",
+      "content": "Tout le contenu, les fonctionnalités et les fonctionnalités de SymBIoT sont notre propriété et sont protégés par les lois sur la propriété intellectuelle. Vous ne pouvez pas copier, modifier, distribuer ou effectuer de rétro-ingénierie sur aucune partie de notre service sans autorisation écrite."
+    },
+    "payment": {
+      "title": "Paiement et Abonnements",
+      "items": {
+        "fees": "Les frais d'abonnement sont facturés à l'avance en fonction du plan que vous avez sélectionné",
+        "billing": "Vous nous autorisez à débiter automatiquement votre moyen de paiement",
+        "refunds": "Les remboursements sont accordés conformément à notre politique de remboursement",
+        "cancellation": "Vous pouvez annuler votre abonnement à tout moment"
+      }
+    },
+    "termination": {
+      "title": "Résiliation",
+      "content": "Nous nous réservons le droit de suspendre ou de résilier votre compte si vous violez ces conditions ou si vous participez à des activités frauduleuses ou nuisibles. En cas de résiliation, votre droit d'utiliser le service cessera immédiatement."
+    },
+    "limitation": {
+      "title": "Limitation de Responsabilité",
+      "content": "Dans toute la mesure permise par la loi, SymBIoT ne sera pas responsable des dommages indirects, accessoires, spéciaux, consécutifs ou punitifs découlant de votre utilisation du service. Notre responsabilité totale ne dépassera pas le montant que vous avez payé pour le service au cours des 12 derniers mois."
+    },
+    "indemnification": {
+      "title": "Indemnisation",
+      "content": "Vous acceptez d'indemniser et de dégager SymBIoT de toute réclamation, dommage ou dépense découlant de votre utilisation du service ou de la violation de ces conditions."
+    },
+    "changes": {
+      "title": "Modifications des Conditions",
+      "content": "Nous pouvons modifier ces conditions à tout moment. L'utilisation continue du service après les modifications constitue l'acceptation des nouvelles conditions."
+    },
+    "governingLaw": {
+      "title": "Loi Applicable",
+      "content": "Ces conditions sont régies par les lois de la juridiction dans laquelle SymBIoT opère, sans égard aux principes de conflit de lois."
+    },
+    "contact": {
+      "title": "Informations de Contact",
+      "content": "Pour toute question concernant ces Conditions d'Utilisation, veuillez nous contacter :",
+      "email": "E-mail"
+    }
+  },
+  "liabilityDisclaimer": {
+    "title": "Clause de Non-Responsabilité",
+    "acknowledgment": "EN UTILISANT LA PLATEFORME SYMBIOT, VOUS RECONNAISSEZ QUE VOUS AVEZ LU, COMPRIS ET ACCEPTÉ D'ÊTRE LIÉ PAR CETTE CLAUSE DE NON-RESPONSABILITÉ.",
+    "generalDisclaimer": {
+      "title": "1. Clause de Non-Responsabilité Générale",
+      "notSubstitute": {
+        "title": "1.1 Pas un Substitut aux Soins Professionnels",
+        "intro": "SymBIoT est une plateforme de surveillance et de suivi conçue pour assister les prestataires de soins et les membres de la famille. Elle N'EST PAS un remplacement pour :",
+        "items": {
+          "medical": "Les soins médicaux professionnels ou la supervision",
+          "caregiving": "Les soins à domicile en personne",
+          "emergency": "Les services médicaux d'urgence",
+          "advice": "Les conseils médicaux professionnels, le diagnostic ou le traitement",
+          "healthcare": "Les prestataires de soins de santé autorisés"
+        }
+      },
+      "supplementary": {
+        "title": "1.2 Outil Supplémentaire",
+        "content": "Cette plateforme ne doit être utilisée que comme outil de surveillance supplémentaire. Les utilisateurs doivent continuer à fournir les niveaux appropriés de soins directs, de supervision et de surveillance médicale professionnelle requis par l'état de santé de la personne."
+      }
+    },
+    "medicalDisclaimer": {
+      "title": "2. Clause de Non-Responsabilité Médicale",
+      "notMedicalDevice": {
+        "title": "2.1 N'est Pas un Dispositif Médical",
+        "content": "SymBIoT et ses appareils associés NE SONT PAS des équipements de qualité médicale et n'ont pas été évalués ou approuvés par les organismes de réglementation (FDA, CE, etc.) à des fins de diagnostic ou de traitement médical."
+      },
+      "vitalSignsLimitations": {
+        "title": "2.2 Limitations de la Surveillance des Signes Vitaux",
+        "intro": "Les données de signes vitaux (fréquence cardiaque, tension artérielle, saturation en oxygène, température, niveaux de glucose, etc.) affichées sur la plateforme :",
+        "items": {
+          "accuracy": "Peuvent ne pas être médicalement précises",
+          "decisions": "Ne doivent pas être utilisées pour la prise de décisions médicales sans vérification professionnelle",
+          "informational": "Sont à titre informatif et de surveillance uniquement",
+          "variance": "Peuvent varier considérablement des lectures des équipements de qualité médicale",
+          "confirmation": "Doivent être confirmées par des équipements de qualité médicale avant toute action médicale"
+        }
+      },
+      "seekAdvice": {
+        "title": "2.3 Consulter un Professionnel Médical",
+        "intro": "Les utilisateurs doivent :",
+        "items": {
+          "consult": "Consulter des prestataires de soins de santé qualifiés pour toutes les décisions médicales",
+          "emergency": "Chercher immédiatement une aide médicale d'urgence (appeler le 15, le 112 ou les services d'urgence locaux) en cas d'urgence médicale",
+          "noDelay": "Ne pas retarder la consultation médicale en fonction des informations de cette plateforme"
+        }
+      }
+    },
+    "deviceLimitations": {
+      "title": "3. Limitations des Appareils et Équipements",
+      "intro": "Les appareils connectés (appareils portables, capteurs, traceurs, boutons de panique, etc.) peuvent :",
+      "items": {
+        "hardware": "Échouer à capturer les données en raison de dysfonctionnements matériels",
+        "stopFunctioning": "Cesser de fonctionner sans avertissement",
+        "inaccurate": "Fournir des lectures inexactes en raison de problèmes d'étalonnage",
+        "battery": "Perdre de l'énergie en raison de l'épuisement de la batterie",
+        "disconnect": "Se déconnecter du réseau de manière inattendue",
+        "damage": "Subir des dommages physiques affectant les fonctionnalités"
+      },
+      "liability": "La Société N'EST PAS responsable des conséquences résultant de défaillances d'appareils, de dysfonctionnements ou de lectures inexactes."
+    },
+    "dataAccuracy": {
+      "title": "4. Précision et Fiabilité des Données",
+      "intro": "La Société ne donne AUCUNE GARANTIE concernant :",
+      "items": {
+        "accuracy": "La précision de toute donnée affichée sur la plateforme",
+        "completeness": "L'exhaustivité de la collecte de données",
+        "timeliness": "La rapidité de transmission des données",
+        "reliability": "La fiabilité du stockage des données"
+      }
+    },
+    "alertSystems": {
+      "title": "5. Systèmes d'Alerte et de Notification",
+      "intro": "Le système d'alerte peut :",
+      "items": {
+        "failToTrigger": "Ne pas se déclencher quand des conditions le justifieraient",
+        "falsePositive": "Générer des fausses alertes positives (alertes alors qu'aucun problème n'existe)",
+        "falseNegative": "Générer des fausses alertes négatives (ne pas alerter quand des problèmes existent)",
+        "delayed": "Être retardé dans la livraison des notifications",
+        "failToDeliver": "Ne pas livrer les notifications en raison des paramètres d'appareil, des problèmes réseau ou des autorisations d'application"
+      },
+      "noGuarantee": "La Société NE GARANTIT PAS un délai de réponse spécifique pour les alertes, la livraison en temps réel ou que les alertes atteindront tous les destinataires désignés."
+    },
+    "networkConnectivity": {
+      "title": "6. Réseau et Connectivité",
+      "intro": "La plateforme nécessite une connexion Internet active et une connectivité réseau stable. La transmission des données et les fonctionnalités de la plateforme peuvent être interrompues par :",
+      "items": {
+        "isp": "Les pannes du fournisseur d'accès à Internet (FAI)",
+        "wifi": "Les défaillances du routeur Wi-Fi ou les problèmes de configuration",
+        "cellular": "Les pannes du réseau cellulaire ou une mauvaise force du signal",
+        "cloud": "Les pannes de service cloud ou l'arrêt de maintenance",
+        "server": "Les défaillances de serveur ou la congestion du réseau"
+      },
+      "responsibility": "Les utilisateurs sont responsables du maintien d'une connectivité Internet fiable et de veiller à ce que les appareils restent connectés."
+    },
+    "locationTracking": {
+      "title": "7. Services de Suivi de Localisation",
+      "intro": "Le suivi GPS peut être :",
+      "items": {
+        "inaccurate": "Inexact de plusieurs mètres à des centaines de mètres",
+        "affected": "Affecté par les conditions atmosphériques, les structures de bâtiment ou la couverture d'arbres",
+        "unavailable": "Indisponible dans les environnements intérieurs",
+        "satellite": "Assujetti à la disponibilité des satellites et à la qualité du signal"
+      },
+      "liability": "La Société N'EST PAS responsable des informations de localisation inexactes ou de l'impossibilité de détecter les violations de géofence."
+    },
+    "emergencyResponse": {
+      "title": "8. Intervention d'Urgence",
+      "notEmergencyService": {
+        "title": "Pas un Service de Réponse aux Urgences",
+        "intro": "SymBIoT N'EST PAS un système de réponse aux urgences. La plateforme :",
+        "items": {
+          "noContact": "N'APPELLE PAS automatiquement les services d'urgence (15, 112, ambulance)",
+          "noDispatch": "Ne fournit PAS les services de dépêche d'urgence",
+          "noGuarantee": "Ne GARANTIT PAS que les situations d'urgence seront détectées",
+          "noReplace": "NE remplace PAS la nécessité d'appeler directement les services d'urgence"
+        }
+      },
+      "protocol": {
+        "title": "Protocole d'Urgence :",
+        "step1": "APPELER LE 15, LE 112 OU LES SERVICES D'URGENCE LOCAUX IMMÉDIATEMENT",
+        "step2": "Ne vous fiez pas uniquement à la plateforme SymBIoT pour les interventions d'urgence",
+        "step3": "Les notifications d'alerte sont à titre informatif uniquement"
+      }
+    },
+    "userResponsibilities": {
+      "title": "9. Responsabilités de l'Utilisateur",
+      "intro": "Les utilisateurs sont responsables de :",
+      "items": {
+        "setup": "La configuration appropriée et la configuration des appareils",
+        "placement": "Le port ou le placement correct des appareils",
+        "charging": "La charge régulière des appareils et la surveillance des niveaux de batterie",
+        "alertSettings": "L'examen régulier et la mise à jour des paramètres d'alerte",
+        "testing": "Le test régulier du système pour assurer son bon fonctionnement",
+        "directCare": "La fourniture de niveaux appropriés de soins directs et de supervision",
+        "responding": "La réponse appropriée aux alertes et aux modèles de données inhabituels",
+        "security": "Le maintien de la sécurité du compte avec des mots de passe forts"
+      },
+      "failure": "Le non-respect de ces responsabilités peut entraîner un dysfonctionnement du système, des données inexactes ou des alertes manquées."
+    },
+    "limitationOfLiability": {
+      "title": "10. Limitation de Responsabilité",
+      "maxLiability": {
+        "title": "Responsabilité Maximale",
+        "content": "Dans la mesure maximale permise par la loi, la responsabilité totale de la Société pour toute réclamation découlant de ou liée à l'utilisation de la plateforme SymBIoT ne dépassera pas le montant total payé par l'utilisateur pour le service au cours des douze (12) mois précédant la réclamation."
+      },
+      "exclusionDamages": {
+        "title": "Exclusion des Dommages Consécutifs",
+        "intro": "La Société NE sera PAS responsable de :",
+        "items": {
+          "indirect": "Les dommages indirects, accessoires, spéciaux ou consécutifs",
+          "profits": "La perte de bénéfices ou de revenus",
+          "data": "La perte de données ou d'informations",
+          "business": "L'interruption d'activité",
+          "injury": "Les blessures corporelles ou la mort",
+          "emotional": "La détresse émotionnelle"
+        }
+      },
+      "noWarranty": {
+        "title": "Aucune Garantie",
+        "intro": "LA PLATEFORME EST FOURNIE « TEL QUEL » ET « TEL QUE DISPONIBLE » SANS GARANTIE D'AUCUNE SORTE, EXPRESSE OU IMPLICITE, Y COMPRIS MAIS NON LIMITÉ À :",
+        "items": {
+          "merchantability": "Les garanties de qualité marchande",
+          "fitness": "L'adéquation à un usage particulier",
+          "nonInfringement": "La non-contrefaçon",
+          "accuracy": "La précision ou la fiabilité",
+          "continuous": "L'accès continu, ininterrompu ou sécurisé"
+        }
+      },
+      "assumptionOfRisk": {
+        "title": "Acceptation du Risque par l'Utilisateur",
+        "intro": "En utilisant la plateforme SymBIoT, les utilisateurs RECONNAISSENT ET ACCEPTENT TOUS LES RISQUES associés à :",
+        "items": {
+          "limitations": "Les limitations de la technologie de surveillance à distance",
+          "deviceFailure": "La possibilité de défaillance d'appareil ou de données inexactes",
+          "alerts": "Les alertes retardées ou manquées",
+          "outages": "Les pannes du système ou l'arrêt du service",
+          "security": "Les risques de sécurité et de confidentialité des données"
+        }
+      }
+    },
+    "importantNotice": {
+      "title": "Avis Important",
+      "intro": "Vous comprenez que :",
+      "items": {
+        "notMedical": "Ceci N'EST PAS un dispositif médical ou un système de réponse aux urgences",
+        "limitations": "La plateforme a des limitations importantes qui peuvent entraîner des urgences manquées, des données inexactes ou des défaillances du système",
+        "directCare": "Vous devez continuer à fournir les soins directs et la surveillance médicale appropriés",
+        "call911": "Vous devez appeler les services d'urgence (15 ou 112) immédiatement en cas d'urgence"
+      }
+    },
+    "contactInfo": {
+      "title": "Informations de Contact",
+      "intro": "Si vous avez des questions concernant cette clause de non-responsabilité, veuillez nous contacter :",
+      "email": "E-mail"
+    }
   }
 }

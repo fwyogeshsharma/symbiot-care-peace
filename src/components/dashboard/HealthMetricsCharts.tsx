@@ -121,7 +121,8 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
       return true;
     });
 
-    return filtered.map((item: any) => {
+    // Group by day and calculate average
+    const groupedByDay = filtered.reduce((acc: any, item: any) => {
       let value = item.value;
 
       // Extract numeric value from different formats
@@ -146,12 +147,32 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
         numericValue = celsiusToFahrenheit(numericValue);
       }
 
-      return {
-        timestamp: format(new Date(item.recorded_at), 'MMM dd HH:mm', { locale: dateLocale }),
-        value: numericValue,
-        fullDate: new Date(item.recorded_at),
-      };
-    });
+      const dayKey = format(new Date(item.recorded_at), 'yyyy-MM-dd');
+
+      if (!acc[dayKey]) {
+        acc[dayKey] = {
+          values: [],
+          date: new Date(item.recorded_at),
+        };
+      }
+
+      acc[dayKey].values.push(numericValue);
+
+      return acc;
+    }, {});
+
+    // Calculate average for each day and format
+    return Object.entries(groupedByDay)
+      .map(([dayKey, data]: [string, any]) => {
+        const avgValue = data.values.reduce((sum: number, val: number) => sum + val, 0) / data.values.length;
+        return {
+          timestamp: format(data.date, 'dMMM', { locale: dateLocale }),
+          value: Math.round(avgValue * 10) / 10, // Round to 1 decimal
+          fullDate: data.date,
+          sortKey: dayKey,
+        };
+      })
+      .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
   };
 
   const processBloodPressureData = () => {
@@ -159,15 +180,39 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
 
     const filtered = historicalData.filter((item: any) => item.data_type === 'blood_pressure');
 
-    return filtered.map((item: any) => {
+    // Group by day and calculate average
+    const groupedByDay = filtered.reduce((acc: any, item: any) => {
       const value = item.value as any;
-      return {
-        timestamp: format(new Date(item.recorded_at), 'MMM dd HH:mm', { locale: dateLocale }),
-        systolic: value?.systolic || value?.value?.systolic || 0,
-        diastolic: value?.diastolic || value?.value?.diastolic || 0,
-        fullDate: new Date(item.recorded_at),
-      };
-    });
+      const dayKey = format(new Date(item.recorded_at), 'yyyy-MM-dd');
+
+      if (!acc[dayKey]) {
+        acc[dayKey] = {
+          systolicValues: [],
+          diastolicValues: [],
+          date: new Date(item.recorded_at),
+        };
+      }
+
+      acc[dayKey].systolicValues.push(value?.systolic || value?.value?.systolic || 0);
+      acc[dayKey].diastolicValues.push(value?.diastolic || value?.value?.diastolic || 0);
+
+      return acc;
+    }, {});
+
+    // Calculate average for each day and format
+    return Object.entries(groupedByDay)
+      .map(([dayKey, data]: [string, any]) => {
+        const avgSystolic = data.systolicValues.reduce((sum: number, val: number) => sum + val, 0) / data.systolicValues.length;
+        const avgDiastolic = data.diastolicValues.reduce((sum: number, val: number) => sum + val, 0) / data.diastolicValues.length;
+        return {
+          timestamp: format(data.date, 'dMMM', { locale: dateLocale }),
+          systolic: Math.round(avgSystolic),
+          diastolic: Math.round(avgDiastolic),
+          fullDate: data.date,
+          sortKey: dayKey,
+        };
+      })
+      .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
   };
 
   const processPanicSosData = () => {
@@ -180,17 +225,18 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
 
     // Group by date
     const grouped = filtered.reduce((acc: any, item: any) => {
-      const date = format(new Date(item.recorded_at), 'MMM dd', { locale: dateLocale });
-      if (!acc[date]) {
-        acc[date] = { date, total: 0 };
+      const dayKey = format(new Date(item.recorded_at), 'yyyy-MM-dd');
+      const date = format(new Date(item.recorded_at), 'dMMM', { locale: dateLocale });
+      if (!acc[dayKey]) {
+        acc[dayKey] = { date, total: 0, sortKey: dayKey };
       }
-      
-      acc[date].total += 1;
-      
+
+      acc[dayKey].total += 1;
+
       return acc;
     }, {});
 
-    return Object.values(grouped);
+    return Object.values(grouped).sort((a: any, b: any) => a.sortKey.localeCompare(b.sortKey));
   };
 
   const renderChart = (dataType: string, label: string, color: string, unit?: string) => {
@@ -208,31 +254,36 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="timestamp" 
+          <XAxis
+            dataKey="timestamp"
             stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
+            fontSize={11}
+            angle={-15}
+            textAnchor="end"
+            height={50}
+            interval={data.length > 8 ? Math.floor(data.length / 8) : 0}
           />
-          <YAxis 
+          <YAxis
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             label={{ value: unit, angle: -90, position: 'insideLeft' }}
           />
-          <Tooltip 
-            contentStyle={{ 
+          <Tooltip
+            contentStyle={{
               backgroundColor: 'hsl(var(--popover))',
               border: '1px solid hsl(var(--border))',
               borderRadius: '6px',
             }}
           />
           <Legend />
-          <Line 
-            type="monotone" 
-            dataKey="value" 
-            stroke={color} 
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={color}
             strokeWidth={2}
             name={label}
-            dot={{ fill: color }}
+            dot={{ fill: color, r: 3 }}
+            activeDot={{ r: 5 }}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -254,39 +305,45 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="timestamp" 
+          <XAxis
+            dataKey="timestamp"
             stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
+            fontSize={11}
+            angle={-15}
+            textAnchor="end"
+            height={50}
+            interval={data.length > 8 ? Math.floor(data.length / 8) : 0}
           />
-          <YAxis 
+          <YAxis
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             label={{ value: 'mmHg', angle: -90, position: 'insideLeft' }}
           />
-          <Tooltip 
-            contentStyle={{ 
+          <Tooltip
+            contentStyle={{
               backgroundColor: 'hsl(var(--popover))',
               border: '1px solid hsl(var(--border))',
               borderRadius: '6px',
             }}
           />
           <Legend />
-          <Line 
-            type="monotone" 
-            dataKey="systolic" 
-            stroke="hsl(var(--destructive))" 
+          <Line
+            type="monotone"
+            dataKey="systolic"
+            stroke="hsl(var(--destructive))"
             strokeWidth={2}
             name={t('healthMetrics.charts.systolic')}
-            dot={{ fill: 'hsl(var(--destructive))' }}
+            dot={{ fill: 'hsl(var(--destructive))', r: 3 }}
+            activeDot={{ r: 5 }}
           />
-          <Line 
-            type="monotone" 
-            dataKey="diastolic" 
-            stroke="hsl(var(--primary))" 
+          <Line
+            type="monotone"
+            dataKey="diastolic"
+            stroke="hsl(var(--primary))"
             strokeWidth={2}
             name={t('healthMetrics.charts.diastolic')}
-            dot={{ fill: 'hsl(var(--primary))' }}
+            dot={{ fill: 'hsl(var(--primary))', r: 3 }}
+            activeDot={{ r: 5 }}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -308,18 +365,22 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="date" 
+          <XAxis
+            dataKey="date"
             stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
+            fontSize={11}
+            angle={-15}
+            textAnchor="end"
+            height={50}
+            interval={data.length > 8 ? Math.floor(data.length / 8) : 0}
           />
-          <YAxis 
+          <YAxis
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             label={{ value: t('healthMetrics.charts.buttonPresses'), angle: -90, position: 'insideLeft' }}
           />
-          <Tooltip 
-            contentStyle={{ 
+          <Tooltip
+            contentStyle={{
               backgroundColor: 'hsl(var(--popover))',
               border: '1px solid hsl(var(--border))',
               borderRadius: '6px',
