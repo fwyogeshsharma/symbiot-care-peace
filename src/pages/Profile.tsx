@@ -92,6 +92,35 @@ const Profile = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate required fields
+    if (!formData.full_name || formData.full_name.trim().length < 2) {
+      toast({
+        title: t('profile.updateFailed'),
+        description: t('profile.fullNameRequired') || 'Full name is required (minimum 2 characters)',
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.phone || formData.phone.trim().length < 10) {
+      toast({
+        title: t('profile.updateFailed'),
+        description: t('profile.phoneRequired') || 'Phone number is required (minimum 10 digits)',
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.postal_address || formData.postal_address.trim().length < 5) {
+      toast({
+        title: t('profile.updateFailed'),
+        description: t('profile.postalAddressRequired') || 'Postal address is required (minimum 5 characters)',
+        variant: "destructive",
+      });
+      return;
+    }
+
     updateProfileMutation.mutate(formData);
   };
 
@@ -218,6 +247,7 @@ const Profile = () => {
                     <Label htmlFor="full_name" className="flex items-center gap-2">
                       <User className="w-4 h-4" />
                       {t('auth.fullName')}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="full_name"
@@ -226,6 +256,7 @@ const Profile = () => {
                       onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                       disabled={!isEditing}
                       placeholder={t('profile.enterFullName')}
+                      required
                     />
                   </div>
 
@@ -233,6 +264,7 @@ const Profile = () => {
                     <Label htmlFor="phone" className="flex items-center gap-2">
                       <Phone className="w-4 h-4" />
                       {t('auth.phone')}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="phone"
@@ -241,6 +273,7 @@ const Profile = () => {
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       disabled={!isEditing}
                       placeholder={t('profile.enterPhone')}
+                      required
                     />
                   </div>
 
@@ -269,6 +302,7 @@ const Profile = () => {
                     <Label htmlFor="postal_address" className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
                       {t('profile.postalAddress') || 'Postal Address'}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="postal_address"
@@ -278,6 +312,7 @@ const Profile = () => {
                       disabled={!isEditing}
                       placeholder={t('profile.enterPostalAddress') || 'Enter your postal address'}
                       className={!isEditing ? 'bg-muted' : ''}
+                      required
                     />
                   </div>
                 </div>

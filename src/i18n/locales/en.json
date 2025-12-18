@@ -1375,7 +1375,10 @@
     "userManagement": "User Management",
     "profileUpdated": "Profile updated",
     "profileUpdatedDesc": "Your profile has been updated successfully.",
-    "updateFailed": "Failed to update profile"
+    "updateFailed": "Failed to update profile",
+    "fullNameRequired": "Full name is required (minimum 2 characters)",
+    "phoneRequired": "Phone number is required (minimum 10 digits)",
+    "postalAddressRequired": "Postal address is required (minimum 5 characters)"
   },
   "movement": {
     "title": "Activity Dashboard",
