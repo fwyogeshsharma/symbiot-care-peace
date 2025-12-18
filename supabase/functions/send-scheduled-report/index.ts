@@ -155,48 +155,6 @@ function generateReportHTML(data: ReportData): string {
   `;
 }
 
-// Convert local time to UTC based on timezone
-function getUTCTimeFromLocal(localHour: number, localMinute: number, timezone: string): { hour: number; minute: number } {
-  // Create a date object in the user's timezone
-  const now = new Date();
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone,
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: false,
-  });
-  
-  // Get current local time in that timezone
-  const parts = formatter.formatToParts(now);
-  const currentLocalHour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
-  const currentLocalMinute = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
-  
-  // Calculate the offset
-  const currentUTCHour = now.getUTCHours();
-  const currentUTCMinute = now.getUTCMinutes();
-  
-  // Calculate offset in minutes
-  const localTotalMinutes = currentLocalHour * 60 + currentLocalMinute;
-  const utcTotalMinutes = currentUTCHour * 60 + currentUTCMinute;
-  let offsetMinutes = localTotalMinutes - utcTotalMinutes;
-  
-  // Handle day boundary
-  if (offsetMinutes > 720) offsetMinutes -= 1440;
-  if (offsetMinutes < -720) offsetMinutes += 1440;
-  
-  // Convert schedule time from local to UTC
-  let scheduleTotalMinutes = localHour * 60 + localMinute - offsetMinutes;
-  
-  // Normalize to 0-1439 range
-  if (scheduleTotalMinutes < 0) scheduleTotalMinutes += 1440;
-  if (scheduleTotalMinutes >= 1440) scheduleTotalMinutes -= 1440;
-  
-  return {
-    hour: Math.floor(scheduleTotalMinutes / 60),
-    minute: scheduleTotalMinutes % 60,
-  };
-}
-
 async function sendReportForSubscription(supabase: any, subscription: any, forceTest: boolean = false): Promise<any> {
   const now = new Date();
   const elderlyPersonId = subscription.elderly_person_id;
@@ -279,8 +237,8 @@ async function sendReportForSubscription(supabase: any, subscription: any, force
 
   // Send email using Resend
   try {
-    // IMPORTANT: Use onboarding@resend.dev for testing, or configure a verified domain
-    const fromEmail = "SymBIoT Health <onboarding@resend.dev>";
+    // IMPORTANT: Use apancholi@faberworksolutions.com for testing, or configure a verified domain
+    const fromEmail = "SymBIoT Health <apancholi@faberworksolutions.com>";
 
     console.log(`Sending email from ${fromEmail} to ${userEmail}`);
 
@@ -378,27 +336,23 @@ const handler = async (req: Request): Promise<Response> => {
     const results: any[] = [];
 
     for (const subscription of subscriptions || []) {
-      // Parse the schedule time (HH:MM:SS format)
+      // Parse the schedule time (HH:MM:SS format) - now stored in UTC
       const [scheduleHour, scheduleMinute] = subscription.schedule_time.split(':').map(Number);
-      const timezone = subscription.timezone || 'UTC';
+      const timezone = subscription.timezone || 'UTC'; // For display/reference only
 
-      console.log(`Subscription ${subscription.id}: scheduled for ${scheduleHour}:${String(scheduleMinute).padStart(2, '0')} ${timezone}`);
+      console.log(`Subscription ${subscription.id}: scheduled for ${scheduleHour}:${String(scheduleMinute).padStart(2, '0')} UTC (user timezone: ${timezone})`);
 
       // Skip time check if this is a test
       if (!isTest) {
-        // Convert user's local schedule time to UTC
-        const scheduleUTC = getUTCTimeFromLocal(scheduleHour, scheduleMinute, timezone);
-        
-        console.log(`Converted to UTC: ${scheduleUTC.hour}:${String(scheduleUTC.minute).padStart(2, '0')}`);
-
-        // Check if we're within 30 minutes of the scheduled time (to account for cron running hourly)
-        const scheduleTotalMinutes = scheduleUTC.hour * 60 + scheduleUTC.minute;
+        // Compare directly with UTC time (schedule_time is already in UTC)
+        const scheduleTotalMinutes = scheduleHour * 60 + scheduleMinute;
         const currentTotalMinutes = currentUTCHour * 60 + currentUTCMinute;
         let minuteDiff = Math.abs(currentTotalMinutes - scheduleTotalMinutes);
-        
-        // Handle day boundary
+
+        // Handle day boundary (if time wraps around midnight)
         if (minuteDiff > 720) minuteDiff = 1440 - minuteDiff;
 
+        // Check if we're within 30 minutes of the scheduled time (to account for cron running every 5 minutes)
         if (minuteDiff > 30) {
           console.log(`Skipping subscription ${subscription.id}: not within time window (diff: ${minuteDiff} minutes)`);
           continue;

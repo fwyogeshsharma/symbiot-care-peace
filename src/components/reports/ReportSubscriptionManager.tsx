@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,6 +11,55 @@ import { Bell, Clock, Mail, Loader2, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
+// Helper function to convert local time to UTC
+const convertLocalTimeToUTC = (localTime: string, timezone: string): string => {
+  try {
+    // Create a date object for today with the local time
+    const today = new Date();
+    const [hours, minutes] = localTime.split(':').map(Number);
+
+    // Create a date string in the format that respects the timezone
+    const dateStr = today.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+    const localDateTime = new Date(`${dateStr}T${localTime}:00`);
+
+    // Get the timezone offset for the user's timezone
+    const localDateTimeStr = localDateTime.toLocaleString('en-US', { timeZone: timezone });
+    const localDateObj = new Date(localDateTimeStr);
+    const utcDateObj = new Date(localDateTime.getTime() - (localDateObj.getTime() - localDateTime.getTime()));
+
+    // Convert to UTC
+    const utcHours = utcDateObj.getUTCHours().toString().padStart(2, '0');
+    const utcMinutes = utcDateObj.getUTCMinutes().toString().padStart(2, '0');
+    const utcSeconds = utcDateObj.getUTCSeconds().toString().padStart(2, '0');
+
+    return `${utcHours}:${utcMinutes}:${utcSeconds}`;
+  } catch (error) {
+    console.error('Error converting local time to UTC:', error);
+    // Fallback: return the original time with seconds
+    return `${localTime}:00`;
+  }
+};
+
+// Helper function to convert UTC time to local time
+const convertUTCToLocalTime = (utcTime: string, timezone: string): string => {
+  try {
+    // Create a UTC date with the time
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+    const utcDateTime = new Date(`${dateStr}T${utcTime}Z`); // Z indicates UTC
+
+    // Convert to user's local timezone
+    const localHours = utcDateTime.getHours().toString().padStart(2, '0');
+    const localMinutes = utcDateTime.getMinutes().toString().padStart(2, '0');
+
+    return `${localHours}:${localMinutes}`;
+  } catch (error) {
+    console.error('Error converting UTC to local time:', error);
+    // Fallback: return the time without seconds
+    return utcTime.slice(0, 5);
+  }
+};
+
 interface ReportSubscriptionManagerProps {
   selectedPerson: string;
 }
@@ -21,13 +70,14 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
   const queryClient = useQueryClient();
   const [scheduleTime, setScheduleTime] = useState('21:00');
   const [isSendingTest, setIsSendingTest] = useState(false);
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Fetch existing subscription
   const { data: subscription, isLoading } = useQuery({
     queryKey: ['report-subscription', user?.id, selectedPerson],
     queryFn: async () => {
       if (!user?.id || selectedPerson === 'all') return null;
-      
+
       const { data, error } = await supabase
         .from('report_subscriptions')
         .select('*')
@@ -42,26 +92,38 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
     enabled: !!user?.id && selectedPerson !== 'all',
   });
 
+  // Convert UTC time from subscription to local time for display
+  useEffect(() => {
+    if (subscription?.schedule_time) {
+      const localTime = convertUTCToLocalTime(subscription.schedule_time, userTimezone);
+      setScheduleTime(localTime);
+    }
+  }, [subscription, userTimezone]);
+
   // Create or update subscription
   const upsertMutation = useMutation({
     mutationFn: async ({ isActive, time }: { isActive: boolean; time: string }) => {
       if (!user?.id || selectedPerson === 'all') throw new Error('Invalid selection');
 
+      // Convert local time to UTC for storage
+      const utcTime = convertLocalTimeToUTC(time, userTimezone);
+
       const subscriptionData = {
         user_id: user.id,
         elderly_person_id: selectedPerson,
         report_type: 'daily_summary',
-        schedule_time: time + ':00',
+        schedule_time: utcTime,
         is_active: isActive,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timezone: userTimezone, // Still store timezone for display purposes
       };
 
       if (subscription?.id) {
         const { error } = await supabase
           .from('report_subscriptions')
           .update({
-            schedule_time: time + ':00',
+            schedule_time: utcTime,
             is_active: isActive,
+            timezone: userTimezone,
             updated_at: new Date().toISOString(),
           })
           .eq('id', subscription.id);
@@ -105,7 +167,7 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
   const handleToggle = (checked: boolean) => {
     upsertMutation.mutate({
       isActive: checked,
-      time: subscription?.schedule_time?.slice(0, 5) || scheduleTime,
+      time: scheduleTime, // Use the local time from state (already converted from UTC)
     });
   };
 
@@ -205,14 +267,14 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
               </Label>
               <Input
                 type="time"
-                value={subscription.schedule_time?.slice(0, 5) || scheduleTime}
+                value={scheduleTime}
                 onChange={(e) => handleTimeChange(e.target.value)}
                 disabled={upsertMutation.isPending}
                 className="w-full"
               />
               <p className="text-xs text-muted-foreground">
                 {t('reports.subscription.timezoneNote', {
-                  defaultValue: 'Times are shown in your local timezone'
+                  defaultValue: 'Times are shown in your local timezone (stored as UTC)'
                 })}
               </p>
             </div>
