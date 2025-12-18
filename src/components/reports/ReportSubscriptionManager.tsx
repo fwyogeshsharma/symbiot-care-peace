@@ -12,26 +12,22 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
 // Helper function to convert local time to UTC
-const convertLocalTimeToUTC = (localTime: string, timezone: string): string => {
+const convertLocalTimeToUTC = (localTime: string): string => {
   try {
-    // Create a date object for today with the local time
+    // Create a date object for today with the local time in the user's timezone
     const today = new Date();
     const [hours, minutes] = localTime.split(':').map(Number);
 
-    // Create a date string in the format that respects the timezone
-    const dateStr = today.toLocaleDateString('en-CA'); // YYYY-MM-DD format
-    const localDateTime = new Date(`${dateStr}T${localTime}:00`);
+    // Set the local time
+    const localDateTime = new Date(today);
+    localDateTime.setHours(hours, minutes, 0, 0);
 
-    // Get the timezone offset for the user's timezone
-    const localDateTimeStr = localDateTime.toLocaleString('en-US', { timeZone: timezone });
-    const localDateObj = new Date(localDateTimeStr);
-    const utcDateObj = new Date(localDateTime.getTime() - (localDateObj.getTime() - localDateTime.getTime()));
+    // Get UTC hours and minutes
+    const utcHours = localDateTime.getUTCHours().toString().padStart(2, '0');
+    const utcMinutes = localDateTime.getUTCMinutes().toString().padStart(2, '0');
+    const utcSeconds = '00';
 
-    // Convert to UTC
-    const utcHours = utcDateObj.getUTCHours().toString().padStart(2, '0');
-    const utcMinutes = utcDateObj.getUTCMinutes().toString().padStart(2, '0');
-    const utcSeconds = utcDateObj.getUTCSeconds().toString().padStart(2, '0');
-
+    console.log(`Converting local time ${localTime} to UTC: ${utcHours}:${utcMinutes}:${utcSeconds}`);
     return `${utcHours}:${utcMinutes}:${utcSeconds}`;
   } catch (error) {
     console.error('Error converting local time to UTC:', error);
@@ -41,17 +37,21 @@ const convertLocalTimeToUTC = (localTime: string, timezone: string): string => {
 };
 
 // Helper function to convert UTC time to local time
-const convertUTCToLocalTime = (utcTime: string, timezone: string): string => {
+const convertUTCToLocalTime = (utcTime: string): string => {
   try {
-    // Create a UTC date with the time
+    // Create a date object for today
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
-    const utcDateTime = new Date(`${dateStr}T${utcTime}Z`); // Z indicates UTC
+    const [hours, minutes] = utcTime.split(':').map(Number);
 
-    // Convert to user's local timezone
+    // Set UTC time
+    const utcDateTime = new Date(today);
+    utcDateTime.setUTCHours(hours, minutes, 0, 0);
+
+    // Get local hours and minutes
     const localHours = utcDateTime.getHours().toString().padStart(2, '0');
     const localMinutes = utcDateTime.getMinutes().toString().padStart(2, '0');
 
+    console.log(`Converting UTC time ${utcTime} to local: ${localHours}:${localMinutes}`);
     return `${localHours}:${localMinutes}`;
   } catch (error) {
     console.error('Error converting UTC to local time:', error);
@@ -95,10 +95,10 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
   // Convert UTC time from subscription to local time for display
   useEffect(() => {
     if (subscription?.schedule_time) {
-      const localTime = convertUTCToLocalTime(subscription.schedule_time, userTimezone);
+      const localTime = convertUTCToLocalTime(subscription.schedule_time);
       setScheduleTime(localTime);
     }
-  }, [subscription, userTimezone]);
+  }, [subscription]);
 
   // Create or update subscription
   const upsertMutation = useMutation({
@@ -106,7 +106,9 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
       if (!user?.id || selectedPerson === 'all') throw new Error('Invalid selection');
 
       // Convert local time to UTC for storage
-      const utcTime = convertLocalTimeToUTC(time, userTimezone);
+      const utcTime = convertLocalTimeToUTC(time);
+
+      console.log(`Saving schedule: local time ${time} -> UTC ${utcTime}, timezone: ${userTimezone}`);
 
       const subscriptionData = {
         user_id: user.id,
@@ -114,7 +116,7 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
         report_type: 'daily_summary',
         schedule_time: utcTime,
         is_active: isActive,
-        timezone: userTimezone, // Still store timezone for display purposes
+        timezone: userTimezone, // Store timezone for reference
       };
 
       if (subscription?.id) {
