@@ -83,32 +83,32 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
 
   const avgHeartRate = heartRateData.length > 0
     ? Math.round(heartRateData.reduce((sum, v) => {
-        let val = v.value;
-        if (typeof val === 'object') val = val.bpm || val.value;
+        let val = v.value as any;
+        if (typeof val === 'object' && val !== null && !Array.isArray(val)) val = val.bpm || val.value;
         return sum + Number(val);
       }, 0) / heartRateData.length)
     : 0;
 
   const avgOxygen = oxygenData.length > 0
     ? Math.round(oxygenData.reduce((sum, v) => {
-        let val = v.value;
-        if (typeof val === 'object') val = val.value;
+        let val = v.value as any;
+        if (typeof val === 'object' && val !== null && !Array.isArray(val)) val = val.value;
         return sum + Number(val);
       }, 0) / oxygenData.length)
     : 0;
 
   const minHeartRate = heartRateData.length > 0
     ? Math.min(...heartRateData.map(v => {
-        let val = v.value;
-        if (typeof val === 'object') val = val.bpm || val.value;
+        let val = v.value as any;
+        if (typeof val === 'object' && val !== null && !Array.isArray(val)) val = val.bpm || val.value;
         return Number(val);
       }))
     : 0;
 
   const maxHeartRate = heartRateData.length > 0
     ? Math.max(...heartRateData.map(v => {
-        let val = v.value;
-        if (typeof val === 'object') val = val.bpm || val.value;
+        let val = v.value as any;
+        if (typeof val === 'object' && val !== null && !Array.isArray(val)) val = val.bpm || val.value;
         return Number(val);
       }))
     : 0;

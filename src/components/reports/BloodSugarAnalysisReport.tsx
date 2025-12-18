@@ -234,7 +234,7 @@ export const BloodSugarAnalysisReport = ({ selectedPerson, dateRange }: BloodSug
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Badge variant="warning">Elevated</Badge>
+                <Badge variant="secondary" className="bg-amber-100 text-amber-800">Elevated</Badge>
                 <span className="text-sm text-muted-foreground">141-199 mg/dL</span>
               </div>
               <div className="flex items-center gap-2">

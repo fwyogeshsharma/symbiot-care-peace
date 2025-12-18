@@ -43,14 +43,16 @@ export const AlertHistoryReport = ({ selectedPerson, dateRange }: AlertHistoryRe
 
   // Calculate average response time (for resolved/acknowledged alerts)
   const alertsWithResponse = alerts.filter(a =>
-    (a.status === 'acknowledged' || a.status === 'resolved') && a.updated_at
+    (a.status === 'acknowledged' || a.status === 'resolved') && (a.acknowledged_at || a.resolved_at)
   );
 
   const avgResponseTime = alertsWithResponse.length > 0
     ? Math.round(
         alertsWithResponse.reduce((sum, alert) => {
+          const responseDate = alert.resolved_at || alert.acknowledged_at;
+          if (!responseDate) return sum;
           const minutes = differenceInMinutes(
-            new Date(alert.updated_at),
+            new Date(responseDate),
             new Date(alert.created_at)
           );
           return sum + minutes;
@@ -82,21 +84,21 @@ export const AlertHistoryReport = ({ selectedPerson, dateRange }: AlertHistoryRe
     value,
   }));
 
-  const getSeverityColor = (severity: string) => {
+  const getSeverityColor = (severity: string): "default" | "destructive" | "outline" | "secondary" => {
     switch (severity) {
       case 'critical': return 'destructive';
       case 'high': return 'destructive';
-      case 'medium': return 'warning';
+      case 'medium': return 'secondary';
       case 'low': return 'secondary';
       default: return 'secondary';
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): "default" | "destructive" | "outline" | "secondary" => {
     switch (status) {
       case 'active': return 'destructive';
-      case 'acknowledged': return 'warning';
-      case 'resolved': return 'success';
+      case 'acknowledged': return 'secondary';
+      case 'resolved': return 'default';
       default: return 'secondary';
     }
   };

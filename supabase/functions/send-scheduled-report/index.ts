@@ -155,6 +155,168 @@ function generateReportHTML(data: ReportData): string {
   `;
 }
 
+// Convert local time to UTC based on timezone
+function getUTCTimeFromLocal(localHour: number, localMinute: number, timezone: string): { hour: number; minute: number } {
+  // Create a date object in the user's timezone
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+  });
+  
+  // Get current local time in that timezone
+  const parts = formatter.formatToParts(now);
+  const currentLocalHour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
+  const currentLocalMinute = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
+  
+  // Calculate the offset
+  const currentUTCHour = now.getUTCHours();
+  const currentUTCMinute = now.getUTCMinutes();
+  
+  // Calculate offset in minutes
+  const localTotalMinutes = currentLocalHour * 60 + currentLocalMinute;
+  const utcTotalMinutes = currentUTCHour * 60 + currentUTCMinute;
+  let offsetMinutes = localTotalMinutes - utcTotalMinutes;
+  
+  // Handle day boundary
+  if (offsetMinutes > 720) offsetMinutes -= 1440;
+  if (offsetMinutes < -720) offsetMinutes += 1440;
+  
+  // Convert schedule time from local to UTC
+  let scheduleTotalMinutes = localHour * 60 + localMinute - offsetMinutes;
+  
+  // Normalize to 0-1439 range
+  if (scheduleTotalMinutes < 0) scheduleTotalMinutes += 1440;
+  if (scheduleTotalMinutes >= 1440) scheduleTotalMinutes -= 1440;
+  
+  return {
+    hour: Math.floor(scheduleTotalMinutes / 60),
+    minute: scheduleTotalMinutes % 60,
+  };
+}
+
+async function sendReportForSubscription(supabase: any, subscription: any, forceTest: boolean = false): Promise<any> {
+  const now = new Date();
+  const elderlyPersonId = subscription.elderly_person_id;
+  const userEmail = subscription.profiles?.email;
+
+  if (!userEmail) {
+    console.error(`No email found for subscription ${subscription.id}`);
+    return { subscriptionId: subscription.id, success: false, error: 'No email found' };
+  }
+
+  console.log(`Processing report for ${userEmail}, elderly person: ${subscription.elderly_persons?.full_name}`);
+
+  // Get today's date range
+  const startOfDay = new Date(now);
+  startOfDay.setUTCHours(0, 0, 0, 0);
+  const endOfDay = new Date(now);
+  endOfDay.setUTCHours(23, 59, 59, 999);
+
+  // Fetch device data for today
+  const { data: deviceData, error: deviceError } = await supabase
+    .from('device_data')
+    .select('*')
+    .eq('elderly_person_id', elderlyPersonId)
+    .gte('recorded_at', startOfDay.toISOString())
+    .lte('recorded_at', endOfDay.toISOString())
+    .order('recorded_at', { ascending: false });
+
+  if (deviceError) {
+    console.error("Error fetching device data:", deviceError);
+  }
+
+  // Fetch alerts for today
+  const { data: alerts, error: alertsError } = await supabase
+    .from('alerts')
+    .select('*')
+    .eq('elderly_person_id', elderlyPersonId)
+    .gte('created_at', startOfDay.toISOString())
+    .lte('created_at', endOfDay.toISOString())
+    .order('created_at', { ascending: false });
+
+  if (alertsError) {
+    console.error("Error fetching alerts:", alertsError);
+  }
+
+  // Fetch latest ILQ score
+  const { data: ilqScores, error: ilqError } = await supabase
+    .from('ilq_scores')
+    .select('*')
+    .eq('elderly_person_id', elderlyPersonId)
+    .order('computation_timestamp', { ascending: false })
+    .limit(1);
+
+  if (ilqError) {
+    console.error("Error fetching ILQ scores:", ilqError);
+  }
+
+  // Fetch medication logs for today
+  const { data: medicationLogs, error: medError } = await supabase
+    .from('medication_adherence_logs')
+    .select('*')
+    .eq('elderly_person_id', elderlyPersonId)
+    .gte('timestamp', startOfDay.toISOString())
+    .lte('timestamp', endOfDay.toISOString());
+
+  if (medError) {
+    console.error("Error fetching medication logs:", medError);
+  }
+
+  // Generate HTML report
+  const reportData: ReportData = {
+    elderlyPerson: subscription.elderly_persons,
+    userEmail,
+    deviceData: deviceData || [],
+    alerts: alerts || [],
+    ilqScore: ilqScores?.[0] || null,
+    medicationLogs: medicationLogs || [],
+  };
+
+  const html = generateReportHTML(reportData);
+
+  // Send email using Resend
+  try {
+    // IMPORTANT: Use onboarding@resend.dev for testing, or configure a verified domain
+    const fromEmail = "SymBIoT Health <onboarding@resend.dev>";
+
+    console.log(`Sending email from ${fromEmail} to ${userEmail}`);
+
+    const { data: emailData, error: emailError } = await resend.emails.send({
+      from: fromEmail,
+      to: [userEmail],
+      subject: `Daily Health Report - ${subscription.elderly_persons.full_name} - ${now.toLocaleDateString()}`,
+      html,
+    });
+
+    if (emailError) {
+      console.error(`Failed to send email to ${userEmail}:`, emailError);
+      return {
+        subscriptionId: subscription.id,
+        success: false,
+        error: emailError.message || JSON.stringify(emailError),
+      };
+    } else {
+      console.log(`Successfully sent report to ${userEmail}`, emailData);
+      return {
+        subscriptionId: subscription.id,
+        success: true,
+        email: userEmail,
+        emailId: emailData?.id,
+      };
+    }
+  } catch (sendError: any) {
+    console.error(`Email send error:`, sendError);
+    return {
+      subscriptionId: subscription.id,
+      success: false,
+      error: sendError.message,
+    };
+  }
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -165,18 +327,29 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    console.log("Starting scheduled report processing...");
+    // Check if this is a test/manual trigger
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
 
-    // Get current hour in UTC
+    const isTest = body.test === true;
+    const testSubscriptionId = body.subscriptionId;
+    const testUserId = body.userId;
+
+    console.log("Starting scheduled report processing...", { isTest, testSubscriptionId, testUserId });
+
+    // Get current time
     const now = new Date();
-    const currentHour = now.getUTCHours();
-    const currentMinute = now.getUTCMinutes();
+    const currentUTCHour = now.getUTCHours();
+    const currentUTCMinute = now.getUTCMinutes();
     
-    console.log(`Current UTC time: ${currentHour}:${currentMinute}`);
+    console.log(`Current UTC time: ${currentUTCHour}:${String(currentUTCMinute).padStart(2, '0')}`);
 
-    // Fetch all active subscriptions that match the current hour
-    // We check for subscriptions where schedule_time hour matches current hour
-    const { data: subscriptions, error: subError } = await supabase
+    // Build query for subscriptions
+    let query = supabase
       .from('report_subscriptions')
       .select(`
         *,
@@ -185,6 +358,15 @@ const handler = async (req: Request): Promise<Response> => {
       `)
       .eq('is_active', true)
       .eq('report_type', 'daily_summary');
+
+    // If testing specific subscription or user
+    if (testSubscriptionId) {
+      query = query.eq('id', testSubscriptionId);
+    } else if (testUserId) {
+      query = query.eq('user_id', testUserId);
+    }
+
+    const { data: subscriptions, error: subError } = await query;
 
     if (subError) {
       console.error("Error fetching subscriptions:", subError);
@@ -198,132 +380,37 @@ const handler = async (req: Request): Promise<Response> => {
     for (const subscription of subscriptions || []) {
       // Parse the schedule time (HH:MM:SS format)
       const [scheduleHour, scheduleMinute] = subscription.schedule_time.split(':').map(Number);
+      const timezone = subscription.timezone || 'UTC';
 
-      // Convert user's local time to UTC for comparison
-      // The schedule_time is stored in user's local time, we need to check if it's time to send
-      // For now, we'll check if we're within the same hour and within 5 minutes of the scheduled time
-      const minuteDiff = Math.abs(currentMinute - scheduleMinute);
+      console.log(`Subscription ${subscription.id}: scheduled for ${scheduleHour}:${String(scheduleMinute).padStart(2, '0')} ${timezone}`);
 
-      if (scheduleHour !== currentHour || minuteDiff > 5) {
-        console.log(`Skipping subscription ${subscription.id}: scheduled for ${scheduleHour}:${scheduleMinute}, current time is ${currentHour}:${currentMinute} UTC`);
-        continue;
-      }
+      // Skip time check if this is a test
+      if (!isTest) {
+        // Convert user's local schedule time to UTC
+        const scheduleUTC = getUTCTimeFromLocal(scheduleHour, scheduleMinute, timezone);
+        
+        console.log(`Converted to UTC: ${scheduleUTC.hour}:${String(scheduleUTC.minute).padStart(2, '0')}`);
 
-      console.log(`Time match for subscription ${subscription.id}: scheduled ${scheduleHour}:${scheduleMinute}, current ${currentHour}:${currentMinute} UTC`);
+        // Check if we're within 30 minutes of the scheduled time (to account for cron running hourly)
+        const scheduleTotalMinutes = scheduleUTC.hour * 60 + scheduleUTC.minute;
+        const currentTotalMinutes = currentUTCHour * 60 + currentUTCMinute;
+        let minuteDiff = Math.abs(currentTotalMinutes - scheduleTotalMinutes);
+        
+        // Handle day boundary
+        if (minuteDiff > 720) minuteDiff = 1440 - minuteDiff;
 
-      console.log(`Processing report for subscription ${subscription.id}`);
-
-      const elderlyPersonId = subscription.elderly_person_id;
-      const userEmail = subscription.profiles?.email;
-
-      if (!userEmail) {
-        console.error(`No email found for subscription ${subscription.id}`);
-        continue;
-      }
-
-      // Get today's date range
-      const startOfDay = new Date(now);
-      startOfDay.setUTCHours(0, 0, 0, 0);
-      const endOfDay = new Date(now);
-      endOfDay.setUTCHours(23, 59, 59, 999);
-
-      // Fetch device data for today
-      const { data: deviceData, error: deviceError } = await supabase
-        .from('device_data')
-        .select('*')
-        .eq('elderly_person_id', elderlyPersonId)
-        .gte('recorded_at', startOfDay.toISOString())
-        .lte('recorded_at', endOfDay.toISOString())
-        .order('recorded_at', { ascending: false });
-
-      if (deviceError) {
-        console.error("Error fetching device data:", deviceError);
-      }
-
-      // Fetch alerts for today
-      const { data: alerts, error: alertsError } = await supabase
-        .from('alerts')
-        .select('*')
-        .eq('elderly_person_id', elderlyPersonId)
-        .gte('created_at', startOfDay.toISOString())
-        .lte('created_at', endOfDay.toISOString())
-        .order('created_at', { ascending: false });
-
-      if (alertsError) {
-        console.error("Error fetching alerts:", alertsError);
-      }
-
-      // Fetch latest ILQ score
-      const { data: ilqScores, error: ilqError } = await supabase
-        .from('ilq_scores')
-        .select('*')
-        .eq('elderly_person_id', elderlyPersonId)
-        .order('computation_timestamp', { ascending: false })
-        .limit(1);
-
-      if (ilqError) {
-        console.error("Error fetching ILQ scores:", ilqError);
-      }
-
-      // Fetch medication logs for today
-      const { data: medicationLogs, error: medError } = await supabase
-        .from('medication_adherence_logs')
-        .select('*')
-        .eq('elderly_person_id', elderlyPersonId)
-        .gte('timestamp', startOfDay.toISOString())
-        .lte('timestamp', endOfDay.toISOString());
-
-      if (medError) {
-        console.error("Error fetching medication logs:", medError);
-      }
-
-      // Generate HTML report
-      const reportData: ReportData = {
-        elderlyPerson: subscription.elderly_persons,
-        userEmail,
-        deviceData: deviceData || [],
-        alerts: alerts || [],
-        ilqScore: ilqScores?.[0] || null,
-        medicationLogs: medicationLogs || [],
-      };
-
-      const html = generateReportHTML(reportData);
-
-      // Send email
-      try {
-        // Use configured sender email or fall back to default
-        const fromEmail = Deno.env.get("SENDER_EMAIL") || "SymBIoT Health <noreply@yourdomain.com>";
-
-        const { error: emailError } = await resend.emails.send({
-          from: fromEmail,
-          to: [userEmail],
-          subject: `Daily Health Report - ${subscription.elderly_persons.full_name} - ${now.toLocaleDateString()}`,
-          html,
-        });
-
-        if (emailError) {
-          console.error(`Failed to send email to ${userEmail}:`, emailError);
-          results.push({
-            subscriptionId: subscription.id,
-            success: false,
-            error: emailError.message,
-          });
-        } else {
-          console.log(`Successfully sent report to ${userEmail}`);
-          results.push({
-            subscriptionId: subscription.id,
-            success: true,
-            email: userEmail,
-          });
+        if (minuteDiff > 30) {
+          console.log(`Skipping subscription ${subscription.id}: not within time window (diff: ${minuteDiff} minutes)`);
+          continue;
         }
-      } catch (sendError: any) {
-        console.error(`Email send error:`, sendError);
-        results.push({
-          subscriptionId: subscription.id,
-          success: false,
-          error: sendError.message,
-        });
+
+        console.log(`Time match for subscription ${subscription.id} (diff: ${minuteDiff} minutes)`);
+      } else {
+        console.log(`Test mode: skipping time check for subscription ${subscription.id}`);
       }
+
+      const result = await sendReportForSubscription(supabase, subscription, isTest);
+      results.push(result);
     }
 
     return new Response(
@@ -331,6 +418,7 @@ const handler = async (req: Request): Promise<Response> => {
         success: true,
         processed: results.length,
         results,
+        timestamp: now.toISOString(),
       }),
       {
         status: 200,

@@ -38,8 +38,8 @@ export const MedicationAdherenceReport = ({ selectedPerson, dateRange }: Medicat
 
   // Calculate adherence statistics
   const taken = medicationData.filter(m => {
-    let val = m.value;
-    if (typeof val === 'object' && val !== null) {
+    let val = m.value as any;
+    if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
       val = val.taken ?? val.value;
     }
     return val === true || val === 'true' || val === 1 || val === '1';
@@ -58,8 +58,8 @@ export const MedicationAdherenceReport = ({ selectedPerson, dateRange }: Medicat
   // Group by day
   const dailyAdherence = medicationData.reduce((acc: any[], item) => {
     const date = format(new Date(item.recorded_at), 'dMMM');
-    let val = item.value;
-    if (typeof val === 'object' && val !== null) {
+    let val = item.value as any;
+    if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
       val = val.taken ?? val.value;
     }
     const taken = val === true || val === 'true' || val === 1 || val === '1';

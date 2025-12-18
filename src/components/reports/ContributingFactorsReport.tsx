@@ -231,7 +231,7 @@ export const ContributingFactorsReport = ({ selectedPerson, dateRange }: Contrib
               </p>
             </div>
             <div className="text-right">
-              <Badge variant={overallScore >= 75 ? 'default' : overallScore >= 50 ? 'warning' : 'destructive'}>
+              <Badge variant={overallScore >= 75 ? 'default' : overallScore >= 50 ? 'secondary' : 'destructive'} className={overallScore >= 50 && overallScore < 75 ? 'bg-amber-100 text-amber-800' : ''}>
                 {overallScore >= 75 ? 'Good' : overallScore >= 50 ? 'Fair' : 'Needs Attention'}
               </Badge>
               <p className="text-xs text-muted-foreground mt-2">
@@ -283,7 +283,7 @@ export const ContributingFactorsReport = ({ selectedPerson, dateRange }: Contrib
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-semibold">{factor.name}</h4>
-                        <Badge variant={factor.score >= 75 ? 'default' : factor.score >= 50 ? 'warning' : 'destructive'}>
+                        <Badge variant={factor.score >= 75 ? 'default' : factor.score >= 50 ? 'secondary' : 'destructive'} className={factor.score >= 50 && factor.score < 75 ? 'bg-amber-100 text-amber-800' : ''}>
                           {factor.status}
                         </Badge>
                       </div>
