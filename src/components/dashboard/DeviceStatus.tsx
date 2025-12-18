@@ -538,32 +538,6 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-semibold mb-2 text-sm sm:text-base">{t('devices.apiDetails.exampleRequest')}</h4>
-                <div className="bg-muted p-3 rounded-md overflow-x-auto">
-                  <pre className="text-xs overflow-x-auto">
-{`POST /device-ingest
-Headers:
-  Content-Type: application/json
-  Authorization: Bearer ${selectedDevice.api_key}
-
-Body:
-{
-  "device_id": "${selectedDevice.device_id}",
-  "data_type": "heart_rate",
-  "value": { "bpm": 72 },
-  "unit": "bpm"
-}`}
-                  </pre>
-                </div>
-              </div>
-
-              <div className="bg-info/10 border border-info/20 p-3 rounded-md">
-                <p className="text-xs text-muted-foreground">
-                  <strong>{t('devices.apiDetails.availableDataTypes')}:</strong> {t('devices.apiDetails.dataTypesList')}
-                </p>
-              </div>
-
               <Button
                 variant="outline"
                 className="w-full"

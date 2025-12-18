@@ -609,24 +609,6 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
               </code>
             </div>
 
-            <div className="space-y-2 text-sm">
-              <p className="font-medium">{t('devices.register.exampleRequest')}</p>
-              <pre className="p-2 bg-muted rounded text-xs overflow-x-auto">
-{`POST /device-ingest
-Headers:
-  Content-Type: application/json
-  Authorization: Bearer ${apiKey}
-
-Body:
-{
-  "device_id": "${deviceId}",
-  "data_type": "heart_rate",
-  "value": { "bpm": 72 },
-  "unit": "bpm"
-}`}
-              </pre>
-            </div>
-
             <Button onClick={resetForm} className="w-full">
               {t('devices.register.registerAnother')}
             </Button>
