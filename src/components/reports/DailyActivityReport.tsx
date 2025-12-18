@@ -91,7 +91,7 @@ export const DailyActivityReport = ({ selectedPerson, dateRange }: DailyActivity
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Steps</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.totalSteps')}</CardTitle>
             <Footprints className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -104,26 +104,26 @@ export const DailyActivityReport = ({ selectedPerson, dateRange }: DailyActivity
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Average Daily Steps</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.avgDailySteps')}</CardTitle>
             <ActivityIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgStepsPerDay.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              Target: 8,000 steps/day
+              {t('reports.content.targetSteps')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Most Active Day</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.mostActiveDay')}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mostActiveDay?.date || 'N/A'}</div>
+            <div className="text-2xl font-bold">{mostActiveDay?.date || t('reports.content.notAvailable')}</div>
             <p className="text-xs text-muted-foreground">
-              {mostActiveDay?.steps.toLocaleString() || 0} steps
+              {mostActiveDay?.steps.toLocaleString() || 0} {t('reports.content.steps')}
             </p>
           </CardContent>
         </Card>
@@ -132,7 +132,7 @@ export const DailyActivityReport = ({ selectedPerson, dateRange }: DailyActivity
       {/* Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Daily Step Count</CardTitle>
+          <CardTitle>{t('reports.content.dailyStepCount')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
@@ -142,7 +142,7 @@ export const DailyActivityReport = ({ selectedPerson, dateRange }: DailyActivity
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="steps" fill="#10b981" name="Steps" />
+              <Bar dataKey="steps" fill="#10b981" name={t('reports.content.totalSteps')} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -151,18 +151,19 @@ export const DailyActivityReport = ({ selectedPerson, dateRange }: DailyActivity
       {/* Activity Level Analysis */}
       <Card>
         <CardHeader>
-          <CardTitle>Activity Level Analysis</CardTitle>
+          <CardTitle>{t('reports.content.activityLevelAnalysis')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {dailyData.map((day, index) => {
-              const level = day.steps >= 8000 ? 'Good' : day.steps >= 4000 ? 'Fair' : 'Low';
-              const color = level === 'Good' ? 'text-success' : level === 'Fair' ? 'text-warning' : 'text-destructive';
+              const level = day.steps >= 8000 ? t('reports.content.good') : day.steps >= 4000 ? t('reports.content.fair') : t('reports.content.low');
+              const levelKey = day.steps >= 8000 ? 'good' : day.steps >= 4000 ? 'fair' : 'low';
+              const color = levelKey === 'good' ? 'text-success' : levelKey === 'fair' ? 'text-warning' : 'text-destructive';
               return (
                 <div key={index} className="flex items-center justify-between">
                   <span className="text-sm">{day.date}</span>
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium">{day.steps.toLocaleString()} steps</span>
+                    <span className="text-sm font-medium">{day.steps.toLocaleString()} {t('reports.content.steps')}</span>
                     <span className={`text-sm font-semibold ${color}`}>{level}</span>
                   </div>
                 </div>

@@ -161,7 +161,7 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Deep Sleep</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.deepSleep')}</CardTitle>
             <Moon className="h-4 w-4 text-indigo-500" />
           </CardHeader>
           <CardContent>
@@ -174,7 +174,7 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">REM Sleep</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.remSleep')}</CardTitle>
             <Brain className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>

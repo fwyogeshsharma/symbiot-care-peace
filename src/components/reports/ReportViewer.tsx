@@ -143,7 +143,7 @@ export const ReportViewer = ({
         return (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              This report is under development. Please check back later.
+              {t('reports.underDevelopment', { defaultValue: 'This report is under development. Please check back later.' })}
             </p>
           </div>
         );
@@ -166,7 +166,7 @@ export const ReportViewer = ({
                 variant="outline"
                 size="sm"
                 onClick={handlePrint}
-                title="Print Report"
+                title={t('reports.printReport', { defaultValue: 'Print Report' })}
               >
                 <Printer className="w-4 h-4" />
               </Button>
@@ -174,7 +174,7 @@ export const ReportViewer = ({
                 variant="outline"
                 size="sm"
                 onClick={handleExport}
-                title="Export to PDF"
+                title={t('reports.exportToPDF', { defaultValue: 'Export to PDF' })}
               >
                 <Download className="w-4 h-4" />
               </Button>

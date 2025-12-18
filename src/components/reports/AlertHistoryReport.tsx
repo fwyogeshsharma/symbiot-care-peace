@@ -123,7 +123,7 @@ export const AlertHistoryReport = ({ selectedPerson, dateRange }: AlertHistoryRe
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.totalAlerts')}</CardTitle>
             <Bell className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -136,39 +136,39 @@ export const AlertHistoryReport = ({ selectedPerson, dateRange }: AlertHistoryRe
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Active</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.active')}</CardTitle>
             <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-destructive">{activeAlerts}</div>
             <p className="text-xs text-muted-foreground">
-              Require attention
+              {t('reports.content.requireAttention')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Resolved</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.resolved')}</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">{resolvedAlerts}</div>
             <p className="text-xs text-muted-foreground">
-              Successfully handled
+              {t('reports.content.successfullyHandled')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.avgResponseTime')}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgResponseTime}m</div>
             <p className="text-xs text-muted-foreground">
-              Minutes to acknowledge
+              {t('reports.content.minutesToAcknowledge')}
             </p>
           </CardContent>
         </Card>
@@ -178,7 +178,7 @@ export const AlertHistoryReport = ({ selectedPerson, dateRange }: AlertHistoryRe
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Alerts by Severity</CardTitle>
+            <CardTitle>{t('reports.content.alertsBySeverity')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -195,7 +195,7 @@ export const AlertHistoryReport = ({ selectedPerson, dateRange }: AlertHistoryRe
 
         <Card>
           <CardHeader>
-            <CardTitle>Alerts by Type</CardTitle>
+            <CardTitle>{t('reports.content.alertsByType')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -214,7 +214,7 @@ export const AlertHistoryReport = ({ selectedPerson, dateRange }: AlertHistoryRe
       {/* Alert List */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Alerts</CardTitle>
+          <CardTitle>{t('reports.content.recentAlerts')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -234,7 +234,7 @@ export const AlertHistoryReport = ({ selectedPerson, dateRange }: AlertHistoryRe
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {alert.title || 'No title'}
+                    {alert.title || t('reports.content.noTitle')}
                   </p>
                   {alert.description && (
                     <p className="text-sm text-muted-foreground">

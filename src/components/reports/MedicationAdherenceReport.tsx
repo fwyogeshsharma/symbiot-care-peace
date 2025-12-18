@@ -102,7 +102,7 @@ export const MedicationAdherenceReport = ({ selectedPerson, dateRange }: Medicat
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Adherence Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.adherenceRate')}</CardTitle>
             <Pill className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -113,7 +113,7 @@ export const MedicationAdherenceReport = ({ selectedPerson, dateRange }: Medicat
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Doses Taken</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.dosesTaken')}</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
@@ -126,7 +126,7 @@ export const MedicationAdherenceReport = ({ selectedPerson, dateRange }: Medicat
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Doses Missed</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.missedDoses')}</CardTitle>
             <XCircle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>

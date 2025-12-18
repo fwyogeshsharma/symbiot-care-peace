@@ -274,7 +274,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl mb-2">End of Day Summary</CardTitle>
+              <CardTitle className="text-2xl mb-2">{t('reports.content.endOfDaySummary')}</CardTitle>
               <p className="text-muted-foreground">{format(reportDate, 'EEEE, MMMM d, yyyy')}</p>
             </div>
             <div className="text-right">
@@ -287,7 +287,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                 </>
               ) : (
                 <Badge variant="secondary" className="text-lg px-4 py-1">
-                  No Data
+                  {t('reports.content.noData')}
                 </Badge>
               )}
             </div>
@@ -298,7 +298,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
             <Progress value={dailyScore} className="h-3 mb-2" />
           )}
           <p className="text-sm text-muted-foreground">
-            {healthData.length} health readings recorded today
+            {healthData.length} {t('reports.content.readings')} recorded today
           </p>
         </CardContent>
       </Card>
@@ -309,7 +309,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Wifi className="h-5 w-5" />
-              Connected Devices
+              {t('reports.content.connectedDevices')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -331,7 +331,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                         {device.manufacturer} {device.model}
                       </p>
                     </div>
-                    <Badge variant="default" className="text-xs">Active</Badge>
+                    <Badge variant="default" className="text-xs">{t('reports.content.active')}</Badge>
                   </div>
                 );
               })}
@@ -395,7 +395,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
       {/* Vital Signs Summary */}
       <Card>
         <CardHeader>
-          <CardTitle>Vital Signs Summary</CardTitle>
+          <CardTitle>{t('reports.content.vitalSignsSummary')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -408,10 +408,10 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                 <>
                   <div className="text-2xl font-bold">{latestHeartRate} BPM</div>
                   <p className="text-xs text-muted-foreground">Avg: {avgHeartRate} BPM</p>
-                  <p className="text-xs text-muted-foreground">{heartRateData.length} readings</p>
+                  <p className="text-xs text-muted-foreground">{heartRateData.length} {t('reports.content.readings')}</p>
                 </>
               ) : (
-                <p className="text-sm text-muted-foreground">No data</p>
+                <p className="text-sm text-muted-foreground">{t('reports.content.noData')}</p>
               )}
             </div>
 
@@ -424,10 +424,10 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                 <>
                   <div className="text-2xl font-bold">{latestO2}%</div>
                   <p className="text-xs text-muted-foreground">Avg: {avgO2}%</p>
-                  <p className="text-xs text-muted-foreground">{o2Data.length} readings</p>
+                  <p className="text-xs text-muted-foreground">{o2Data.length} {t('reports.content.readings')}</p>
                 </>
               ) : (
-                <p className="text-sm text-muted-foreground">No data</p>
+                <p className="text-sm text-muted-foreground">{t('reports.content.noData')}</p>
               )}
             </div>
 
@@ -438,7 +438,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                   <span className="font-medium">Blood Sugar</span>
                 </div>
                 <div className="text-2xl font-bold">{avgGlucose} mg/dL</div>
-                <p className="text-xs text-muted-foreground">{glucoseData.length} readings</p>
+                <p className="text-xs text-muted-foreground">{glucoseData.length} {t('reports.content.readings')}</p>
               </div>
             )}
 
@@ -449,7 +449,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                   <span className="font-medium">Temperature</span>
                 </div>
                 <div className="text-2xl font-bold">{avgTemp}°F</div>
-                <p className="text-xs text-muted-foreground">{tempData.length} readings</p>
+                <p className="text-xs text-muted-foreground">{tempData.length} {t('reports.content.readings')}</p>
               </div>
             )}
 
@@ -460,7 +460,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                   <span className="font-medium">Blood Pressure</span>
                 </div>
                 <div className="text-2xl font-bold">{avgSystolic}/{avgDiastolic}</div>
-                <p className="text-xs text-muted-foreground">mmHg • {bpData.length} readings</p>
+                <p className="text-xs text-muted-foreground">mmHg • {bpData.length} {t('reports.content.readings')}</p>
               </div>
             )}
           </div>
@@ -473,7 +473,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Home className="h-5 w-5" />
-              Environmental Conditions
+              {t('reports.content.environmentalConditions')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -485,9 +485,9 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                     <span className="font-medium">Room Temp</span>
                   </div>
                   <div className="text-2xl font-bold">{avgEnvTemp}°F</div>
-                  <p className="text-xs text-muted-foreground">{envTempData.length} readings</p>
+                  <p className="text-xs text-muted-foreground">{envTempData.length} {t('reports.content.readings')}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {avgEnvTemp >= 68 && avgEnvTemp <= 76 ? '✓ Comfortable' : '⚠ Outside comfort zone'}
+                    {avgEnvTemp >= 68 && avgEnvTemp <= 76 ? `✓ ${t('reports.content.comfortable')}` : '⚠ Outside comfort zone'}
                   </p>
                 </div>
               )}
@@ -499,9 +499,9 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                     <span className="font-medium">Humidity</span>
                   </div>
                   <div className="text-2xl font-bold">{avgHumidity}%</div>
-                  <p className="text-xs text-muted-foreground">{humidityData.length} readings</p>
+                  <p className="text-xs text-muted-foreground">{humidityData.length} {t('reports.content.readings')}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {avgHumidity >= 30 && avgHumidity <= 60 ? '✓ Optimal' : '⚠ Adjust needed'}
+                    {avgHumidity >= 30 && avgHumidity <= 60 ? `✓ ${t('reports.content.optimal')}` : '⚠ Adjust needed'}
                   </p>
                 </div>
               )}
@@ -513,7 +513,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                     <span className="font-medium">Air Quality</span>
                   </div>
                   <div className="text-2xl font-bold">{avgAirQuality}</div>
-                  <p className="text-xs text-muted-foreground">AQI • {airQualityData.length} readings</p>
+                  <p className="text-xs text-muted-foreground">AQI • {airQualityData.length} {t('reports.content.readings')}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {avgAirQuality <= 50 ? '✓ Good' : avgAirQuality <= 100 ? 'Moderate' : '⚠ Poor'}
                   </p>
@@ -535,7 +535,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold mb-2">{totalSteps.toLocaleString()}</div>
-            <p className="text-sm text-muted-foreground mb-3">steps today</p>
+            <p className="text-sm text-muted-foreground mb-3">{t('reports.content.steps')} today</p>
             <Progress
               value={Math.min(100, (totalSteps / 5000) * 100)}
               className="h-2 mb-1"

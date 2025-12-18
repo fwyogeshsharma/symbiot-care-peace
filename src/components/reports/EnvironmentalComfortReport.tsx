@@ -215,7 +215,7 @@ export const EnvironmentalComfortReport = ({ selectedPerson, dateRange }: Enviro
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Temperature</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.temperature')}</CardTitle>
             <Thermometer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -231,7 +231,7 @@ export const EnvironmentalComfortReport = ({ selectedPerson, dateRange }: Enviro
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Humidity</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.humidity')}</CardTitle>
             <Droplets className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>

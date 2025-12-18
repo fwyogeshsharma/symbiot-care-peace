@@ -120,12 +120,12 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
           <div className="flex flex-col items-center gap-4">
             <Wind className="w-16 h-16 text-muted-foreground" />
             <div>
-              <h3 className="text-lg font-semibold mb-2">No Environmental Data</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('reports.content.noEnvironmentalData')}</h3>
               <p className="text-muted-foreground">
-                No environmental sensor data available for the selected period.
+                {t('reports.content.noEnvironmentalDataAvailable')}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Ensure environmental sensors are properly configured and connected.
+                {t('reports.content.ensureSensorsConfigured')}
               </p>
             </div>
           </div>
@@ -146,7 +146,7 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
               ) : (
                 <AlertTriangle className="h-6 w-6 text-warning" />
               )}
-              Air Quality Status
+              {t('reports.content.airQualityStatus')}
             </CardTitle>
             <Badge variant={airQualityStatus.color as any} className="text-lg px-4 py-2">
               {airQualityStatus.status}
@@ -156,7 +156,7 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
         <CardContent>
           {airQualityStatus.issues.length > 0 ? (
             <div className="space-y-2">
-              <p className="font-medium">Issues Detected:</p>
+              <p className="font-medium">{t('reports.content.issuesDetected')}</p>
               <ul className="list-disc list-inside space-y-1">
                 {airQualityStatus.issues.map((issue, index) => (
                   <li key={index} className="text-sm text-muted-foreground">{issue}</li>
@@ -164,7 +164,7 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
               </ul>
             </div>
           ) : (
-            <p className="text-success">All environmental parameters are within optimal ranges.</p>
+            <p className="text-success">{t('reports.content.allParametersOptimal')}</p>
           )}
         </CardContent>
       </Card>
@@ -173,67 +173,67 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Temperature</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.temperature')}</CardTitle>
             <Thermometer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgTemp}°F</div>
-            <p className="text-xs text-muted-foreground">Optimal: 68-78°F</p>
+            <p className="text-xs text-muted-foreground">{t('reports.content.optimal6878F')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Humidity</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.humidity')}</CardTitle>
             <Droplets className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgHumidity}%</div>
-            <p className="text-xs text-muted-foreground">Optimal: 30-60%</p>
+            <p className="text-xs text-muted-foreground">{t('reports.content.optimal3060')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">CO₂</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.co2')}</CardTitle>
             <Wind className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgCO2}</div>
-            <p className="text-xs text-muted-foreground">ppm (Good: &lt;800)</p>
+            <p className="text-xs text-muted-foreground">{t('reports.content.ppmGood800')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">VOC</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.voc')}</CardTitle>
             <Wind className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgVOC}</div>
-            <p className="text-xs text-muted-foreground">ppb (Good: &lt;500)</p>
+            <p className="text-xs text-muted-foreground">{t('reports.content.ppbGood500')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">PM2.5</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.pm25')}</CardTitle>
             <Wind className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgPM25}</div>
-            <p className="text-xs text-muted-foreground">µg/m³ (Good: &lt;12)</p>
+            <p className="text-xs text-muted-foreground">{t('reports.content.ugm3Good12')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">AQI</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.aqi')}</CardTitle>
             <Wind className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgAQI}</div>
-            <p className="text-xs text-muted-foreground">Good: 0-50</p>
+            <p className="text-xs text-muted-foreground">{t('reports.content.good050')}</p>
           </CardContent>
         </Card>
       </div>
@@ -242,7 +242,7 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
       {combinedChartData.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Temperature & Humidity Trends</CardTitle>
+            <CardTitle>{t('reports.content.temperatureHumidityTrends')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={400}>
@@ -267,7 +267,7 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
       {co2Data.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>CO₂ Levels</CardTitle>
+            <CardTitle>{t('reports.content.co2Levels')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -289,7 +289,7 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
       {/* Recommendations */}
       <Card className="border-info">
         <CardHeader>
-          <CardTitle>Recommendations</CardTitle>
+          <CardTitle>{t('reports.content.recommendations')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="list-disc list-inside space-y-2 text-sm">

@@ -116,46 +116,46 @@ export const BloodSugarAnalysisReport = ({ selectedPerson, dateRange }: BloodSug
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Average Level</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.averageLevel')}</CardTitle>
             <Droplets className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgGlucose} mg/dL</div>
             <p className="text-xs text-muted-foreground">
-              Range: {minGlucose} - {maxGlucose}
+              {t('reports.content.range')}: {minGlucose} - {maxGlucose}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Variability</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.variability')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">±{stdDev.toFixed(1)}</div>
             <p className="text-xs text-muted-foreground">
-              Standard Deviation
+              {t('reports.content.standardDeviation')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Normal Readings</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.normalReadings')}</CardTitle>
             <Droplets className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">{normal}</div>
             <p className="text-xs text-muted-foreground">
-              70-140 mg/dL
+              {t('reports.content.normalRange70140')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Readings</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.totalReadings')}</CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -170,7 +170,7 @@ export const BloodSugarAnalysisReport = ({ selectedPerson, dateRange }: BloodSug
       {/* Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Blood Sugar Trends</CardTitle>
+          <CardTitle>{t('reports.content.bloodSugarTrends')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
@@ -202,7 +202,7 @@ export const BloodSugarAnalysisReport = ({ selectedPerson, dateRange }: BloodSug
       {/* Range Distribution */}
       <Card>
         <CardHeader>
-          <CardTitle>Reading Distribution</CardTitle>
+          <CardTitle>{t('reports.content.readingDistribution')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -264,7 +264,7 @@ export const BloodSugarAnalysisReport = ({ selectedPerson, dateRange }: BloodSug
       {/* Time of Day Patterns */}
       <Card>
         <CardHeader>
-          <CardTitle>Patterns by Time of Day</CardTitle>
+          <CardTitle>{t('reports.content.patternsByTimeOfDay')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-4">

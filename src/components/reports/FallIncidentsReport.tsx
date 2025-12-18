@@ -89,7 +89,7 @@ export const FallIncidentsReport = ({ selectedPerson, dateRange }: FallIncidents
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Falls</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.totalFalls')}</CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -128,7 +128,7 @@ export const FallIncidentsReport = ({ selectedPerson, dateRange }: FallIncidents
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.avgResponseTime')}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>

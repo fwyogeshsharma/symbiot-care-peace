@@ -300,7 +300,7 @@ export const MonthOverMonthReport = ({ selectedPerson, dateRange }: MonthOverMon
       {/* Monthly Statistics Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Monthly Summary Statistics</CardTitle>
+          <CardTitle>{t('reports.content.monthlyComparison')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">

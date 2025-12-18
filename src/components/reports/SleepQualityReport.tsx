@@ -108,7 +108,7 @@ export const SleepQualityReport = ({ selectedPerson, dateRange }: SleepQualityRe
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Avg Sleep Quality</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.sleepQuality')}</CardTitle>
             <Moon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -122,7 +122,7 @@ export const SleepQualityReport = ({ selectedPerson, dateRange }: SleepQualityRe
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Avg Duration</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.sleepDuration')}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -136,7 +136,7 @@ export const SleepQualityReport = ({ selectedPerson, dateRange }: SleepQualityRe
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Sleep Efficiency</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.sleepEfficiency')}</CardTitle>
             <Zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -230,7 +230,7 @@ export const SleepQualityReport = ({ selectedPerson, dateRange }: SleepQualityRe
       {/* Quality Trend Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Sleep Quality Trend</CardTitle>
+          <CardTitle>{t('reports.content.sleepTrends')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>

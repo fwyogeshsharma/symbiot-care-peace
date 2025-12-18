@@ -80,7 +80,7 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
       toast.success(t('reports.subscription.saved', { defaultValue: 'Subscription settings saved!' }));
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to save subscription');
+      toast.error(error.message || t('reports.subscription.saveFailed', { defaultValue: 'Failed to save subscription' }));
     },
   });
 

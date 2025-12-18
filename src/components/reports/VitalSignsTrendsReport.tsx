@@ -133,33 +133,33 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Average Heart Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.avgHeartRate')}</CardTitle>
             <Heart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgHeartRate} BPM</div>
             <p className="text-xs text-muted-foreground">
-              Range: {minHeartRate} - {maxHeartRate} BPM
+              {t('reports.content.range')}: {minHeartRate} - {maxHeartRate} BPM
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Average Oxygen</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.avgOxygen')}</CardTitle>
             <Wind className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgOxygen}%</div>
             <p className="text-xs text-muted-foreground">
-              Normal range: 95-100%
+              {t('reports.content.normalRange')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Readings</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.totalReadings')}</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -174,7 +174,7 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
       {/* Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Vital Signs Over Time</CardTitle>
+          <CardTitle>{t('reports.content.vitalSignsOverTime')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
@@ -196,7 +196,7 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
                 type="monotone"
                 dataKey="heartRate"
                 stroke="#ef4444"
-                name="Heart Rate (BPM)"
+                name={t('reports.content.heartRateBPM')}
                 strokeWidth={2}
               />
               <Line
@@ -204,7 +204,7 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
                 type="monotone"
                 dataKey="oxygen"
                 stroke="#3b82f6"
-                name="Oxygen (%)"
+                name={t('reports.content.oxygenPercent')}
                 strokeWidth={2}
               />
             </LineChart>

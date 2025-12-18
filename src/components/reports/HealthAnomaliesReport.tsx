@@ -138,7 +138,7 @@ export const HealthAnomaliesReport = ({ selectedPerson, dateRange }: HealthAnoma
         <CardHeader>
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-warning" />
-            <CardTitle>Anomalies Detected</CardTitle>
+            <CardTitle>{t('reports.content.anomaliesDetected')}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>

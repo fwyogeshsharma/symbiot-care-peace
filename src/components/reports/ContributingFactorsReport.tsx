@@ -245,7 +245,7 @@ export const ContributingFactorsReport = ({ selectedPerson, dateRange }: Contrib
       {/* Factor Scores Radar Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Health Factor Analysis</CardTitle>
+          <CardTitle>{t('reports.content.healthFactorAnalysis')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>

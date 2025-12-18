@@ -146,7 +146,7 @@ export const MedicationTimingAnalysisReport = ({ selectedPerson, dateRange }: Me
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">On-Time Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.onTime')}</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -187,7 +187,7 @@ export const MedicationTimingAnalysisReport = ({ selectedPerson, dateRange }: Me
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Schedule Consistency</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.scheduleCompliance')}</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
