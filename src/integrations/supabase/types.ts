@@ -1595,6 +1595,7 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       lookup_user_by_email: { Args: { _email: string }; Returns: string }
+      trigger_scheduled_reports: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "elderly" | "caregiver" | "relative" | "admin" | "super_admin"

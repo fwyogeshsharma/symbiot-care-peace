@@ -652,8 +652,8 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                     <div className="flex items-center gap-2">
                       <Badge variant={
                         alert.severity === 'critical' ? 'destructive' :
-                        alert.severity === 'high' ? 'warning' : 'default'
-                      }>
+                        alert.severity === 'high' ? 'secondary' : 'default'
+                      } className={alert.severity === 'high' ? 'bg-amber-100 text-amber-800' : ''}>
                         {alert.severity}
                       </Badge>
                       <span>{alert.title}</span>

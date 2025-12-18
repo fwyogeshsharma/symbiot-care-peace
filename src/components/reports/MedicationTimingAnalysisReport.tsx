@@ -35,27 +35,27 @@ export const MedicationTimingAnalysisReport = ({ selectedPerson, dateRange }: Me
     },
   });
 
-  // Calculate timing statistics
+  // Calculate timing statistics - use 'timestamp' field instead of 'taken_at'
   const takenOnTime = medicationLogs.filter(log => {
-    if (log.status !== 'taken' || !log.taken_at) return false;
+    if (log.status !== 'taken' || !log.timestamp) return false;
     const scheduledTime = new Date(log.scheduled_time);
-    const takenTime = new Date(log.taken_at);
+    const takenTime = new Date(log.timestamp);
     const diffMinutes = Math.abs(differenceInMinutes(takenTime, scheduledTime));
     return diffMinutes <= 30; // Within 30 minutes
   }).length;
 
   const takenLate = medicationLogs.filter(log => {
-    if (log.status !== 'taken' || !log.taken_at) return false;
+    if (log.status !== 'taken' || !log.timestamp) return false;
     const scheduledTime = new Date(log.scheduled_time);
-    const takenTime = new Date(log.taken_at);
+    const takenTime = new Date(log.timestamp);
     const diffMinutes = differenceInMinutes(takenTime, scheduledTime);
     return diffMinutes > 30;
   }).length;
 
   const takenEarly = medicationLogs.filter(log => {
-    if (log.status !== 'taken' || !log.taken_at) return false;
+    if (log.status !== 'taken' || !log.timestamp) return false;
     const scheduledTime = new Date(log.scheduled_time);
-    const takenTime = new Date(log.taken_at);
+    const takenTime = new Date(log.timestamp);
     const diffMinutes = differenceInMinutes(takenTime, scheduledTime);
     return diffMinutes < -30;
   }).length;
@@ -90,16 +90,16 @@ export const MedicationTimingAnalysisReport = ({ selectedPerson, dateRange }: Me
 
   // Calculate average delay for taken medications
   const delaysData = medicationLogs
-    .filter(log => log.status === 'taken' && log.taken_at)
+    .filter(log => log.status === 'taken' && log.timestamp)
     .map(log => {
       const scheduledTime = new Date(log.scheduled_time);
-      const takenTime = new Date(log.taken_at);
+      const takenTime = new Date(log.timestamp);
       const delayMinutes = differenceInMinutes(takenTime, scheduledTime);
       return {
         date: format(scheduledTime, 'dMMM'),
         hour: scheduledTime.getHours(),
         delay: delayMinutes,
-        medicationName: log.medications?.name || 'Unknown',
+        medicationName: 'Medication',
       };
     });
 
@@ -262,7 +262,7 @@ export const MedicationTimingAnalysisReport = ({ selectedPerson, dateRange }: Me
                   <Clock className="h-5 w-5 text-warning" />
                   <span className="font-medium">Taken Late</span>
                 </div>
-                <Badge variant="warning">{takenLate} doses</Badge>
+                <Badge variant="secondary" className="bg-amber-100 text-amber-800">{takenLate} doses</Badge>
               </div>
 
               <div className="flex items-center justify-between p-3 border rounded-lg bg-info/10">

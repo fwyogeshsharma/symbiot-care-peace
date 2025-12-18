@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Bell, Clock, Mail, Loader2 } from 'lucide-react';
+import { Bell, Clock, Mail, Loader2, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
@@ -19,7 +19,8 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
   const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [scheduleTime, setScheduleTime] = useState('14:34');
+  const [scheduleTime, setScheduleTime] = useState('21:00');
+  const [isSendingTest, setIsSendingTest] = useState(false);
 
   // Fetch existing subscription
   const { data: subscription, isLoading } = useQuery({
@@ -119,6 +120,35 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
     upsertMutation.mutate({ isActive: true, time: scheduleTime });
   };
 
+  const handleSendTestReport = async () => {
+    if (!user?.id) return;
+    
+    setIsSendingTest(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-scheduled-report', {
+        body: { test: true, userId: user.id },
+      });
+
+      if (error) throw error;
+
+      if (data?.results?.length > 0) {
+        const result = data.results[0];
+        if (result.success) {
+          toast.success(`Test report sent to ${result.email}!`);
+        } else {
+          toast.error(`Failed to send: ${result.error}`);
+        }
+      } else {
+        toast.info('No subscriptions found to send reports for.');
+      }
+    } catch (error: any) {
+      console.error('Error sending test report:', error);
+      toast.error(error.message || 'Failed to send test report');
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
+
   if (selectedPerson === 'all') {
     return (
       <Card>
@@ -187,18 +217,34 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
               </p>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => deleteMutation.mutate()}
-              disabled={deleteMutation.isPending}
-              className="w-full"
-            >
-              {deleteMutation.isPending ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : null}
-              {t('reports.subscription.unsubscribe', { defaultValue: 'Unsubscribe' })}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSendTestReport}
+                disabled={isSendingTest}
+                className="flex-1"
+              >
+                {isSendingTest ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4 mr-2" />
+                )}
+                {t('reports.subscription.sendTest', { defaultValue: 'Send Test Now' })}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending}
+                className="flex-1"
+              >
+                {deleteMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : null}
+                {t('reports.subscription.unsubscribe', { defaultValue: 'Unsubscribe' })}
+              </Button>
+            </div>
           </>
         ) : (
           <div className="space-y-4">

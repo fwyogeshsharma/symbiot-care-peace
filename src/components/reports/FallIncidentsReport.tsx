@@ -203,9 +203,10 @@ export const FallIncidentsReport = ({ selectedPerson, dateRange }: FallIncidents
                           alert.severity === 'critical'
                             ? 'destructive'
                             : alert.severity === 'high'
-                            ? 'warning'
+                            ? 'secondary'
                             : 'default'
                         }
+                        className={alert.severity === 'high' ? 'bg-amber-100 text-amber-800' : ''}
                       >
                         {alert.severity}
                       </Badge>
