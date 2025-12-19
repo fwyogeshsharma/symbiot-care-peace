@@ -42,6 +42,7 @@ export default function Tracking() {
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
   const [selectedPreset, setSelectedPreset] = useState<string>('today');
   const [activeTab, setActiveTab] = useState<'indoor' | 'outdoor' | 'camera'>('indoor');
+  const [selectedFloorPlanId, setSelectedFloorPlanId] = useState<string | null>(null);
 
   // Fetch current user
   const { data: user } = useQuery({
@@ -76,36 +77,51 @@ export default function Tracking() {
     }
   }, [elderlyPersons, selectedPersonId]);
 
-  // Fetch floor plan for indoor tracking
-  const { data: floorPlan, isLoading: floorPlanLoading } = useQuery({
-    queryKey: ['floor-plan', selectedPersonId],
+  // Reset selected floor plan when person changes
+  useEffect(() => {
+    setSelectedFloorPlanId(null);
+  }, [selectedPersonId]);
+
+  // Fetch all floor plans for indoor tracking
+  const { data: floorPlans = [], isLoading: floorPlanLoading } = useQuery({
+    queryKey: ['floor-plans', selectedPersonId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('floor_plans')
         .select('id, elderly_person_id, name, image_url, width, height, furniture, zones, grid_size, created_at, updated_at')
         .eq('elderly_person_id', selectedPersonId)
-        .maybeSingle();
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
-      if (!data) return null;
+      if (!data) return [];
 
-      return {
-        id: data.id,
-        elderly_person_id: data.elderly_person_id,
-        name: data.name,
-        image_url: data.image_url || undefined,
-        width: data.width,
-        height: data.height,
-        grid_size: data.grid_size || 20,
-        furniture: (data.furniture as any) || [],
-        zones: (data.zones as any) || [],
-        created_at: data.created_at || '',
-        updated_at: data.updated_at || ''
-      };
+      return data.map(item => ({
+        id: item.id,
+        elderly_person_id: item.elderly_person_id,
+        name: item.name,
+        image_url: item.image_url || undefined,
+        width: item.width,
+        height: item.height,
+        grid_size: item.grid_size || 20,
+        furniture: (item.furniture as any) || [],
+        zones: (item.zones as any) || [],
+        created_at: item.created_at || '',
+        updated_at: item.updated_at || ''
+      }));
     },
     enabled: !!selectedPersonId && activeTab === 'indoor',
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
+
+  // Auto-select first floor plan if none selected
+  useEffect(() => {
+    if (floorPlans.length > 0 && !selectedFloorPlanId) {
+      setSelectedFloorPlanId(floorPlans[0].id);
+    }
+  }, [floorPlans, selectedFloorPlanId]);
+
+  // Get the currently selected floor plan
+  const selectedFloorPlan = floorPlans.find(fp => fp.id === selectedFloorPlanId) || null;
 
   // Fetch position data for indoor tracking
   const { data: positionData = [], isLoading: positionLoading } = useQuery({
@@ -406,7 +422,7 @@ export default function Tracking() {
                   <Skeleton className="h-96 w-full" />
                   <Skeleton className="h-48 w-full" />
                 </div>
-              ) : !floorPlan ? (
+              ) : floorPlans.length === 0 ? (
                 <div className="text-center py-12">
                   <h2 className="text-2xl font-bold mb-4">{t('tracking.noFloorPlan.title')}</h2>
                   <p className="text-muted-foreground">
@@ -417,20 +433,48 @@ export default function Tracking() {
                 <>
                   <div className="grid gap-6 lg:grid-cols-3">
                     <div className="lg:col-span-2" data-tour="tracking-floor-plan">
-                      <FloorPlanGrid
-                        floorPlan={floorPlan}
-                        currentPosition={currentPosition}
-                        trail={trail}
-                        showGrid={true}
-                      />
+                      {selectedFloorPlan && (
+                        <FloorPlanGrid
+                          floorPlan={selectedFloorPlan}
+                          currentPosition={currentPosition}
+                          trail={trail}
+                          showGrid={true}
+                        />
+                      )}
                     </div>
 
-                    <div data-tour="tracking-playback">
-                      <MovementPlayback
-                        positions={positionEvents}
-                        onPositionChange={setCurrentPositionIndex}
-                        currentIndex={currentPositionIndex}
-                      />
+                    <div className="space-y-4">
+                      {/* Floor Plan Selector */}
+                      <div className="bg-card rounded-lg border p-4">
+                        <h3 className="text-sm font-semibold mb-3">{t('tracking.selectFloorPlan', 'Select Floor Plan')}</h3>
+                        <div className="space-y-2">
+                          {floorPlans.map((floorPlan) => (
+                            <button
+                              key={floorPlan.id}
+                              onClick={() => setSelectedFloorPlanId(floorPlan.id)}
+                              className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
+                                selectedFloorPlanId === floorPlan.id
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'bg-muted hover:bg-muted/80'
+                              }`}
+                            >
+                              <div className="font-medium text-sm">{floorPlan.name}</div>
+                              <div className="text-xs opacity-80">
+                                {floorPlan.width}m × {floorPlan.height}m
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Movement Playback */}
+                      <div data-tour="tracking-playback">
+                        <MovementPlayback
+                          positions={positionEvents}
+                          onPositionChange={setCurrentPositionIndex}
+                          currentIndex={currentPositionIndex}
+                        />
+                      </div>
                     </div>
                   </div>
 
