@@ -252,14 +252,14 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
   const highlights = [];
   const concerns = [];
 
-  if (adherenceRate !== null && adherenceRate >= 90) highlights.push('Excellent medication adherence');
-  if (adherenceRate !== null && adherenceRate < 80) concerns.push('Low medication adherence - follow up needed');
-  if (totalSteps >= 5000) highlights.push('Activity goal achieved');
-  if (totalSteps < 1000) concerns.push('Low activity level today');
-  if (criticalAlerts > 0) concerns.push(`${criticalAlerts} critical alert${criticalAlerts > 1 ? 's' : ''} triggered`);
-  if (avgHeartRate && (avgHeartRate < 50 || avgHeartRate > 110)) concerns.push('Heart rate outside normal range');
-  if (avgO2 && avgO2 < 90) concerns.push('Low oxygen saturation detected');
-  if (alerts.length === 0 && healthData.length > 0) highlights.push('No alerts today');
+  if (adherenceRate !== null && adherenceRate >= 90) highlights.push(t('reports.content.excellentMedicationAdherence'));
+  if (adherenceRate !== null && adherenceRate < 80) concerns.push(t('reports.content.lowMedicationAdherence'));
+  if (totalSteps >= 5000) highlights.push(t('reports.content.activityGoalAchieved'));
+  if (totalSteps < 1000) concerns.push(t('reports.content.lowActivityLevel'));
+  if (criticalAlerts > 0) concerns.push(t('reports.content.criticalAlertsTriggered', { count: criticalAlerts, plural: criticalAlerts > 1 ? 's' : '' }));
+  if (avgHeartRate && (avgHeartRate < 50 || avgHeartRate > 110)) concerns.push(t('reports.content.heartRateOutsideRange'));
+  if (avgO2 && avgO2 < 90) concerns.push(t('reports.content.lowOxygenSaturation'));
+  if (alerts.length === 0 && healthData.length > 0) highlights.push(t('reports.content.noAlertsToday'));
 
   const isLoading = loadingHealth || loadingAlerts || loadingMeds || loadingDevices;
 
@@ -337,7 +337,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
               })}
             </div>
             <p className="text-xs text-muted-foreground mt-3">
-              {devices.length} device{devices.length !== 1 ? 's' : ''} actively monitoring health and environment
+              {t('reports.content.devicesMonitoring', { count: devices.length, plural: devices.length !== 1 ? 's' : '' })}
             </p>
           </CardContent>
         </Card>
@@ -352,7 +352,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-success">
                   <CheckCircle2 className="h-5 w-5" />
-                  Today's Highlights
+                  {t('reports.content.todaysHighlights')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -374,7 +374,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-warning">
                   <AlertCircle className="h-5 w-5" />
-                  Areas of Concern
+                  {t('reports.content.areasOfConcern')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -402,12 +402,12 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
             <div className="p-4 border rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Heart className="h-5 w-5 text-red-500" />
-                <span className="font-medium">Heart Rate</span>
+                <span className="font-medium">{t('reports.content.heartRate')}</span>
               </div>
               {avgHeartRate !== null ? (
                 <>
                   <div className="text-2xl font-bold">{latestHeartRate} BPM</div>
-                  <p className="text-xs text-muted-foreground">Avg: {avgHeartRate} BPM</p>
+                  <p className="text-xs text-muted-foreground">{t('reports.content.avgReading')}: {avgHeartRate} BPM</p>
                   <p className="text-xs text-muted-foreground">{heartRateData.length} {t('reports.content.readings')}</p>
                 </>
               ) : (
@@ -418,12 +418,12 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
             <div className="p-4 border rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Heart className="h-5 w-5 text-blue-500" />
-                <span className="font-medium">Oxygen Sat</span>
+                <span className="font-medium">{t('reports.content.oxygenSat')}</span>
               </div>
               {avgO2 !== null ? (
                 <>
                   <div className="text-2xl font-bold">{latestO2}%</div>
-                  <p className="text-xs text-muted-foreground">Avg: {avgO2}%</p>
+                  <p className="text-xs text-muted-foreground">{t('reports.content.avgReading')}: {avgO2}%</p>
                   <p className="text-xs text-muted-foreground">{o2Data.length} {t('reports.content.readings')}</p>
                 </>
               ) : (
@@ -435,7 +435,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
               <div className="p-4 border rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Droplets className="h-5 w-5 text-purple-500" />
-                  <span className="font-medium">Blood Sugar</span>
+                  <span className="font-medium">{t('reports.content.bloodSugar')}</span>
                 </div>
                 <div className="text-2xl font-bold">{avgGlucose} mg/dL</div>
                 <p className="text-xs text-muted-foreground">{glucoseData.length} {t('reports.content.readings')}</p>
@@ -446,7 +446,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
               <div className="p-4 border rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Thermometer className="h-5 w-5 text-orange-500" />
-                  <span className="font-medium">Temperature</span>
+                  <span className="font-medium">{t('dataTypes.temperature')}</span>
                 </div>
                 <div className="text-2xl font-bold">{avgTemp}°F</div>
                 <p className="text-xs text-muted-foreground">{tempData.length} {t('reports.content.readings')}</p>
@@ -457,10 +457,10 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
               <div className="p-4 border rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Heart className="h-5 w-5 text-pink-500" />
-                  <span className="font-medium">Blood Pressure</span>
+                  <span className="font-medium">{t('reports.content.bloodPressure')}</span>
                 </div>
                 <div className="text-2xl font-bold">{avgSystolic}/{avgDiastolic}</div>
-                <p className="text-xs text-muted-foreground">mmHg • {bpData.length} {t('reports.content.readings')}</p>
+                <p className="text-xs text-muted-foreground">{t('reports.content.mmHg')} • {bpData.length} {t('reports.content.readings')}</p>
               </div>
             )}
           </div>
@@ -482,12 +482,12 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <Thermometer className="h-5 w-5 text-orange-500" />
-                    <span className="font-medium">Room Temp</span>
+                    <span className="font-medium">{t('reports.content.roomTemp')}</span>
                   </div>
                   <div className="text-2xl font-bold">{avgEnvTemp}°F</div>
                   <p className="text-xs text-muted-foreground">{envTempData.length} {t('reports.content.readings')}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {avgEnvTemp >= 68 && avgEnvTemp <= 76 ? `✓ ${t('reports.content.comfortable')}` : '⚠ Outside comfort zone'}
+                    {avgEnvTemp >= 68 && avgEnvTemp <= 76 ? `✓ ${t('reports.content.comfortable')}` : `⚠ ${t('reports.content.outsideComfortZone')}`}
                   </p>
                 </div>
               )}
@@ -496,12 +496,12 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <Droplets className="h-5 w-5 text-blue-500" />
-                    <span className="font-medium">Humidity</span>
+                    <span className="font-medium">{t('dataTypes.humidity')}</span>
                   </div>
                   <div className="text-2xl font-bold">{avgHumidity}%</div>
                   <p className="text-xs text-muted-foreground">{humidityData.length} {t('reports.content.readings')}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {avgHumidity >= 30 && avgHumidity <= 60 ? `✓ ${t('reports.content.optimal')}` : '⚠ Adjust needed'}
+                    {avgHumidity >= 30 && avgHumidity <= 60 ? `✓ ${t('reports.content.optimal')}` : `⚠ ${t('reports.content.adjustNeeded')}`}
                   </p>
                 </div>
               )}
@@ -510,12 +510,12 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <Wind className="h-5 w-5 text-green-500" />
-                    <span className="font-medium">Air Quality</span>
+                    <span className="font-medium">{t('reports.content.airQuality')}</span>
                   </div>
                   <div className="text-2xl font-bold">{avgAirQuality}</div>
                   <p className="text-xs text-muted-foreground">AQI • {airQualityData.length} {t('reports.content.readings')}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {avgAirQuality <= 50 ? '✓ Good' : avgAirQuality <= 100 ? 'Moderate' : '⚠ Poor'}
+                    {avgAirQuality <= 50 ? `✓ ${t('reports.content.good')}` : avgAirQuality <= 100 ? t('reports.content.moderate') : `⚠ ${t('reports.content.poor')}`}
                   </p>
                 </div>
               )}
@@ -530,18 +530,18 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5" />
-              Physical Activity
+              {t('reports.content.physicalActivity')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold mb-2">{totalSteps.toLocaleString()}</div>
-            <p className="text-sm text-muted-foreground mb-3">{t('reports.content.steps')} today</p>
+            <p className="text-sm text-muted-foreground mb-3">{t('reports.content.stepsToday')}</p>
             <Progress
               value={Math.min(100, (totalSteps / 5000) * 100)}
               className="h-2 mb-1"
             />
             <p className="text-xs text-muted-foreground">
-              Goal: 5,000 steps ({Math.min(100, Math.round((totalSteps / 5000) * 100))}%)
+              {t('reports.content.goalSteps', { percent: Math.min(100, Math.round((totalSteps / 5000) * 100)) })}
             </p>
           </CardContent>
         </Card>
@@ -551,7 +551,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Moon className="h-5 w-5" />
-                Sleep Analysis
+                {t('reports.content.sleepAnalysis')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -560,24 +560,24 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                   <div className="text-3xl font-bold mb-1">
                     {sleepHours}h {sleepMinutes}m
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">total sleep duration</p>
+                  <p className="text-sm text-muted-foreground mb-3">{t('reports.content.totalSleepDuration')}</p>
                 </>
               )}
               {avgSleep !== null && (
                 <>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium">Sleep Quality</span>
+                    <span className="text-sm font-medium">{t('reports.content.sleepQuality')}</span>
                     <span className="text-sm font-bold">{avgSleep}%</span>
                   </div>
                   <Progress value={avgSleep} className="h-2 mb-2" />
                 </>
               )}
               <p className="text-xs text-muted-foreground mt-2">
-                {sleepData.length + sleepDurationData.length} sleep data points
+                {sleepData.length + sleepDurationData.length} {t('reports.content.sleepDataPoints')}
               </p>
               {sleepHours !== null && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  {sleepHours >= 7 && sleepHours <= 9 ? '✓ Recommended sleep duration' : '⚠ Outside recommended range (7-9h)'}
+                  {sleepHours >= 7 && sleepHours <= 9 ? `✓ ${t('reports.content.recommendedSleepDuration')}` : `⚠ ${t('reports.content.outsideRecommendedRange')}`}
                 </p>
               )}
             </CardContent>
@@ -591,27 +591,27 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Pill className="h-5 w-5" />
-              Medication Adherence
+              {t('reports.content.medicationAdherence')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3 mb-4">
               <div className="text-center p-4 border rounded-lg">
                 <div className="text-2xl font-bold text-success">{takenMeds}</div>
-                <p className="text-sm text-muted-foreground">Taken</p>
+                <p className="text-sm text-muted-foreground">{t('reports.content.taken')}</p>
               </div>
               <div className="text-center p-4 border rounded-lg">
                 <div className="text-2xl font-bold text-destructive">{missedMeds}</div>
-                <p className="text-sm text-muted-foreground">Missed</p>
+                <p className="text-sm text-muted-foreground">{t('reports.content.missed')}</p>
               </div>
               <div className="text-center p-4 border rounded-lg">
                 <div className="text-2xl font-bold">{totalMeds}</div>
-                <p className="text-sm text-muted-foreground">Total</p>
+                <p className="text-sm text-muted-foreground">{t('reports.content.total')}</p>
               </div>
             </div>
             <div className="mb-2">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium">Adherence Rate</span>
+                <span className="text-sm font-medium">{t('reports.content.adherenceRate')}</span>
                 <span className="text-sm font-bold">{adherenceRate}%</span>
               </div>
               <Progress value={adherenceRate || 0} className="h-3" />
@@ -626,27 +626,27 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5" />
-              Alerts & Incidents
+              {t('reports.content.alertsIncidents')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3 mb-4">
               <div className="text-center p-4 border border-destructive rounded-lg">
                 <div className="text-2xl font-bold text-destructive">{criticalAlerts}</div>
-                <p className="text-sm text-muted-foreground">Critical</p>
+                <p className="text-sm text-muted-foreground">{t('reports.content.critical')}</p>
               </div>
               <div className="text-center p-4 border border-warning rounded-lg">
                 <div className="text-2xl font-bold text-warning">{highAlerts}</div>
-                <p className="text-sm text-muted-foreground">High Priority</p>
+                <p className="text-sm text-muted-foreground">{t('reports.content.highPriority')}</p>
               </div>
               <div className="text-center p-4 border border-success rounded-lg">
                 <div className="text-2xl font-bold text-success">{resolvedAlerts}</div>
-                <p className="text-sm text-muted-foreground">Resolved</p>
+                <p className="text-sm text-muted-foreground">{t('reports.content.resolved')}</p>
               </div>
             </div>
             {alerts.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm font-medium mb-2">Recent Alerts:</p>
+                <p className="text-sm font-medium mb-2">{t('reports.content.recentAlerts')}:</p>
                 {alerts.slice(0, 5).map((alert: any, index: number) => (
                   <div key={index} className="flex items-center justify-between p-2 border rounded text-sm">
                     <div className="flex items-center gap-2">
@@ -674,7 +674,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            Daily Activity Timeline
+            {t('reports.content.dailyActivityTimeline')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -689,7 +689,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                   time: new Date(med.scheduled_time),
                   type: 'medication',
                   status: med.status,
-                  description: `${med.status === 'taken' ? 'Took' : med.status === 'missed' ? 'Missed' : 'Scheduled'} ${med.medications?.name || 'medication'}`,
+                  description: `${med.status === 'taken' ? t('reports.content.took') : med.status === 'missed' ? t('reports.content.missed') : t('reports.content.scheduled')} ${med.medications?.name || 'medication'}`,
                   icon: Pill,
                   color: med.status === 'taken' ? 'text-success' : med.status === 'missed' ? 'text-destructive' : 'text-muted-foreground'
                 });
@@ -712,7 +712,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                 timelineEvents.push({
                   time: reportDate,
                   type: 'milestone',
-                  description: `Achieved daily step goal (${totalSteps.toLocaleString()} steps)`,
+                  description: t('reports.content.achievedStepGoal', { steps: totalSteps.toLocaleString() }),
                   icon: Activity,
                   color: 'text-success'
                 });
@@ -724,7 +724,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
               if (timelineEvents.length === 0) {
                 return (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    No timeline events recorded for this day
+                    {t('reports.content.noTimelineEvents')}
                   </p>
                 );
               }
@@ -754,11 +754,9 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
           <div className="flex items-start gap-3">
             <Clock className="h-5 w-5 text-info mt-0.5" />
             <div>
-              <p className="text-sm font-medium mb-1">About This Report</p>
+              <p className="text-sm font-medium mb-1">{t('reports.content.aboutThisReport')}</p>
               <p className="text-xs text-muted-foreground">
-                This End of Day summary provides a comprehensive overview of health metrics, activities,
-                and incidents for {format(reportDate, 'MMMM d, yyyy')}. Family members can optionally
-                receive this report via email each evening to stay informed about their loved one's daily well-being.
+                {t('reports.content.eodSummaryDescription', { date: format(reportDate, 'MMMM d, yyyy') })}
               </p>
             </div>
           </div>
