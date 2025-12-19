@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Upload, X } from "lucide-react";
 
 const floorPlanSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
@@ -36,16 +37,31 @@ interface FloorPlanFormProps {
 
 export function FloorPlanForm({ open, onOpenChange, elderlyPersonId, floorPlan, onSuccess }: FloorPlanFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const form = useForm<FloorPlanFormData>({
     resolver: zodResolver(floorPlanSchema),
     defaultValues: {
-      name: floorPlan?.name || "",
-      width: floorPlan?.width || 10,
-      height: floorPlan?.height || 10,
-      grid_size: floorPlan?.grid_size || 1.0,
+      name: "",
+      width: 10,
+      height: 10,
+      grid_size: 1.0,
     },
   });
+
+  // Reset form when dialog opens or floorPlan changes
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        name: floorPlan?.name || "",
+        width: floorPlan?.width || 10,
+        height: floorPlan?.height || 10,
+        grid_size: floorPlan?.grid_size || 1.0,
+      });
+      setSelectedFileName(null);
+    }
+  }, [open, floorPlan, form]);
 
   const onSubmit = async (data: FloorPlanFormData) => {
     setIsSubmitting(true);
@@ -195,15 +211,92 @@ export function FloorPlanForm({ open, onOpenChange, elderlyPersonId, floorPlan, 
               render={({ field: { value, onChange, ...field } }) => (
                 <FormItem>
                   <FormLabel>Background Image (Optional)</FormLabel>
+
+                  {/* Show current image if editing */}
+                  {floorPlan?.image_url && (
+                    <div className="mb-3 p-3 bg-muted rounded-md">
+                      <p className="text-sm font-medium mb-2">Current Image:</p>
+                      <div className="flex items-start gap-3">
+                        {/* Image preview */}
+                        <img
+                          src={floorPlan.image_url}
+                          alt="Floor plan preview"
+                          className="w-20 h-20 object-cover rounded border"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground break-all">
+                            {floorPlan.image_url.split('/').pop()?.split('?')[0] || 'Image file'}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Click Upload Photo below to replace this image
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <FormControl>
-                    <Input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={(e) => onChange(e.target.files)}
-                      {...field}
-                    />
+                    <div className="space-y-2">
+                      {/* Hidden file input */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const files = e.target.files;
+                          if (files && files.length > 0) {
+                            setSelectedFileName(files[0].name);
+                            onChange(files);
+                          }
+                        }}
+                        {...field}
+                      />
+
+                      {/* Upload Photo Button */}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Photo
+                      </Button>
+
+                      {/* Show selected file name */}
+                      {selectedFileName && (
+                        <div className="flex items-center justify-between p-2 bg-muted rounded-md">
+                          <p className="text-sm text-muted-foreground truncate">
+                            {selectedFileName}
+                          </p>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedFileName(null);
+                              if (fileInputRef.current) {
+                                fileInputRef.current.value = '';
+                              }
+                              onChange(null);
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </FormControl>
                   <FormMessage />
+                  {!floorPlan?.image_url && !selectedFileName && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Upload an image to use as background for the floor plan
+                    </p>
+                  )}
                 </FormItem>
               )}
             />

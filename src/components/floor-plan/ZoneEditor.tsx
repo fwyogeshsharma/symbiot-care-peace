@@ -4,6 +4,9 @@ import { ZoneDrawingTools, DrawingTool } from "./ZoneDrawingTools";
 import { ZonePropertiesPanel } from "./ZonePropertiesPanel";
 import { FurniturePalette } from "./FurniturePalette";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Upload, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface Zone {
   id: string;
@@ -30,6 +33,9 @@ interface ZoneEditorProps {
   initialZones?: Zone[];
   initialFurniture?: FurnitureItem[];
   onSave: (zones: Zone[], furniture: FurnitureItem[]) => Promise<void>;
+  onUploadImage?: (file: File) => Promise<void>;
+  onRemoveImage?: () => Promise<void>;
+  isUploadingImage?: boolean;
 }
 
 export function ZoneEditor({
@@ -40,8 +46,12 @@ export function ZoneEditor({
   initialZones = [],
   initialFurniture = [],
   onSave,
+  onUploadImage,
+  onRemoveImage,
+  isUploadingImage = false,
 }: ZoneEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
   const [activeTool, setActiveTool] = useState<DrawingTool>("select");
   const [zones, setZones] = useState<Zone[]>(initialZones);
@@ -620,6 +630,28 @@ export function ZoneEditor({
     }
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onUploadImage) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error("Please select a valid image file");
+        return;
+      }
+      onUploadImage(file);
+    }
+    // Reset input so the same file can be selected again if needed
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveClick = () => {
+    if (onRemoveImage && confirm("Are you sure you want to remove the background image?")) {
+      onRemoveImage();
+    }
+  };
+
   return (
     <div className="flex flex-col h-full">
       <ZoneDrawingTools
@@ -645,8 +677,46 @@ export function ZoneEditor({
         />
 
         <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
-          <div className="border rounded-lg shadow-lg overflow-hidden">
-            <canvas ref={canvasRef} />
+          <div className="relative">
+            <div className="border rounded-lg shadow-lg overflow-hidden">
+              <canvas ref={canvasRef} />
+            </div>
+
+            {/* Image controls */}
+            <div className="absolute top-4 right-4 flex gap-2">
+              {imageUrl ? (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={handleRemoveClick}
+                  disabled={isUploadingImage}
+                  title="Remove background image"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Remove Image
+                </Button>
+              ) : (
+                <>
+                  <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingImage}
+                    title="Add background image"
+                  >
+                    <Upload className="h-4 w-4 mr-1" />
+                    {isUploadingImage ? "Uploading..." : "Add Image"}
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
