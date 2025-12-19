@@ -17,9 +17,11 @@
       "Bash(git checkout:*)",
       "Bash(done)",
       "mcp__ide__getDiagnostics",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm i:*)",
+      "Bash(npm run dev:*)",
+      "WebFetch(domain:codepen.io)"
     ],
-
     "deny": [],
     "ask": []
   }

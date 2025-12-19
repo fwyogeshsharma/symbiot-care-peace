@@ -7,6 +7,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Footer } from "@/components/Footer";
+import Snowfall from "react-snowfall";
+import { ChristmasTree } from "@/components/ChristmasTree";
+
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -60,17 +63,22 @@ const Index = () => {
       }} />
 
         <div className="relative z-10 container mx-auto px-4 py-12 sm:py-20 lg:py-32">
-          <div className="max-w-3xl">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
-              {t('index.hero.title')}
-            </h1>
-            <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 leading-relaxed">
-              {t('index.hero.subtitle')}
-            </p>
-            <div className="flex flex-wrap gap-3 sm:gap-4">
-              <Button size="default" className="shadow-lg bg-secondary text-white hover:bg-secondary/90" onClick={handleKnowMore}>
-                {t('index.hero.knowMore')}
-              </Button>
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            <div className="max-w-3xl">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
+                {t('index.hero.title')}
+              </h1>
+              <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 leading-relaxed">
+                {t('index.hero.subtitle')}
+              </p>
+              <div className="flex flex-wrap gap-3 sm:gap-4">
+                <Button size="default" className="shadow-lg bg-secondary text-white hover:bg-secondary/90" onClick={handleKnowMore}>
+                  {t('index.hero.knowMore')}
+                </Button>
+              </div>
+            </div>
+            <div className="flex justify-center items-center">
+              <ChristmasTree />
             </div>
           </div>
         </div>
@@ -165,6 +173,18 @@ const Index = () => {
 
       {/* Footer */}
       <Footer />
+
+      {/* Christmas Snowfall Effect */}
+      <Snowfall
+        color="white"
+        snowflakeCount={200}
+        style={{
+          position: 'fixed',
+          width: '100vw',
+          height: '100vh',
+          zIndex: 99
+        }}
+      />
     </div>;
 };
 export default Index;
