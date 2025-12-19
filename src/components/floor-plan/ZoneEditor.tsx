@@ -67,9 +67,14 @@ export function ZoneEditor({
   const isModifyingRef = useRef(false);
   const backgroundImageRef = useRef<FabricImage | null>(null);
 
-  const CANVAS_WIDTH = 800;
-  const CANVAS_HEIGHT = 600;
-  const SCALE = Math.min(CANVAS_WIDTH / floorPlanWidth, CANVAS_HEIGHT / floorPlanHeight);
+  // Calculate canvas size based on floor plan dimensions and grid
+  // Each grid cell = 60 pixels (square)
+  const PIXELS_PER_CELL = 60;
+  const gridCellsWidth = floorPlanWidth / gridSize;
+  const gridCellsHeight = floorPlanHeight / gridSize;
+  const CANVAS_WIDTH = gridCellsWidth * PIXELS_PER_CELL;
+  const CANVAS_HEIGHT = gridCellsHeight * PIXELS_PER_CELL;
+  const SCALE = PIXELS_PER_CELL / gridSize; // pixels per meter
 
   // Sync state with initialZones/initialFurniture when they change (e.g., after save/reload)
   useEffect(() => {
@@ -122,25 +127,32 @@ export function ZoneEditor({
       .then((img) => {
         if (!fabricCanvas || !img) return;
 
-        // Calculate scale to fit image within canvas while maintaining aspect ratio
+        // Scale image to cover the entire canvas (fill) while maintaining aspect ratio
         const imgAspectRatio = (img.width || 1) / (img.height || 1);
         const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
 
-        let scale;
+        let imgScale;
+        let left = 0;
+        let top = 0;
+
         if (imgAspectRatio > canvasAspectRatio) {
-          // Image is wider than canvas
-          scale = CANVAS_WIDTH / (img.width || 1);
+          // Image is wider than canvas - scale to canvas width and center vertically
+          imgScale = CANVAS_WIDTH / (img.width || 1);
+          const scaledHeight = (img.height || 1) * imgScale;
+          top = (CANVAS_HEIGHT - scaledHeight) / 2;
         } else {
-          // Image is taller than canvas
-          scale = CANVAS_HEIGHT / (img.height || 1);
+          // Image is taller than canvas - scale to canvas height and center horizontally
+          imgScale = CANVAS_HEIGHT / (img.height || 1);
+          const scaledWidth = (img.width || 1) * imgScale;
+          left = (CANVAS_WIDTH - scaledWidth) / 2;
         }
 
         // Set image properties
         img.set({
-          scaleX: scale,
-          scaleY: scale,
-          left: 0,
-          top: 0,
+          scaleX: imgScale,
+          scaleY: imgScale,
+          left: left,
+          top: top,
           selectable: false,
           evented: false,
           opacity: 0.7,
@@ -677,9 +689,9 @@ export function ZoneEditor({
         />
 
         <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
-          <div className="relative">
-            <div className="border rounded-lg shadow-lg overflow-hidden">
-              <canvas ref={canvasRef} />
+          <div className="relative max-w-full">
+            <div className="border rounded-lg shadow-lg overflow-hidden" style={{ maxWidth: '100%', maxHeight: '70vh' }}>
+              <canvas ref={canvasRef} style={{ maxWidth: '100%', maxHeight: '70vh', width: 'auto', height: 'auto', display: 'block' }} />
             </div>
 
             {/* Image controls */}

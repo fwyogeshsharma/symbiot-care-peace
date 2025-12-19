@@ -20,12 +20,14 @@ export const FloorPlanGrid = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
 
-  // Use full card width with square grid cells
-  const CANVAS_WIDTH = 900;
-  const CANVAS_HEIGHT = 900;
-
-  // Use same scale for both dimensions to maintain square grid cells
-  const scale = Math.min(CANVAS_WIDTH / floorPlan.width, CANVAS_HEIGHT / floorPlan.height);
+  // Calculate canvas size based on floor plan dimensions and grid
+  // Each grid cell = 60 pixels (square) - matches ZoneEditor
+  const PIXELS_PER_CELL = 60;
+  const gridCellsWidth = floorPlan.width / floorPlan.grid_size;
+  const gridCellsHeight = floorPlan.height / floorPlan.grid_size;
+  const CANVAS_WIDTH = gridCellsWidth * PIXELS_PER_CELL;
+  const CANVAS_HEIGHT = gridCellsHeight * PIXELS_PER_CELL;
+  const scale = PIXELS_PER_CELL / floorPlan.grid_size; // pixels per meter
   const scaleX = scale;
   const scaleY = scale;
 
@@ -77,18 +79,27 @@ export const FloorPlanGrid = ({
       const imgAspectRatio = backgroundImage.width / backgroundImage.height;
       const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
 
-      let scale;
+      let imgScale;
+      let left = 0;
+      let top = 0;
+
       if (imgAspectRatio > canvasAspectRatio) {
-        scale = CANVAS_WIDTH / backgroundImage.width;
+        // Image is wider than canvas - scale to canvas width and center vertically
+        imgScale = CANVAS_WIDTH / backgroundImage.width;
+        const scaledHeight = backgroundImage.height * imgScale;
+        top = (CANVAS_HEIGHT - scaledHeight) / 2;
       } else {
-        scale = CANVAS_HEIGHT / backgroundImage.height;
+        // Image is taller than canvas - scale to canvas height and center horizontally
+        imgScale = CANVAS_HEIGHT / backgroundImage.height;
+        const scaledWidth = backgroundImage.width * imgScale;
+        left = (CANVAS_WIDTH - scaledWidth) / 2;
       }
 
-      const scaledWidth = backgroundImage.width * scale;
-      const scaledHeight = backgroundImage.height * scale;
+      const scaledWidth = backgroundImage.width * imgScale;
+      const scaledHeight = backgroundImage.height * imgScale;
 
       ctx.globalAlpha = 0.7;
-      ctx.drawImage(backgroundImage, 0, 0, scaledWidth, scaledHeight);
+      ctx.drawImage(backgroundImage, left, top, scaledWidth, scaledHeight);
       ctx.globalAlpha = 1.0;
     }
 
@@ -456,11 +467,11 @@ export const FloorPlanGrid = ({
           </div>
         </div>
         
-        <div className="overflow-auto border rounded-lg bg-background">
+        <div className="overflow-auto border rounded-lg bg-background flex items-center justify-center">
           <canvas
             ref={canvasRef}
-            className="max-w-full"
-            style={{ imageRendering: 'crisp-edges' }}
+            className="mx-auto"
+            style={{ maxWidth: '100%', maxHeight: '70vh', width: 'auto', height: 'auto', display: 'block', imageRendering: 'crisp-edges' }}
           />
         </div>
 
