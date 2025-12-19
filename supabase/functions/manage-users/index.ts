@@ -6,8 +6,9 @@ const corsHeaders = {
 };
 
 interface ManageUserRequest {
-  action: 'block' | 'unblock' | 'delete';
+  action: 'block' | 'unblock' | 'delete' | 'reset-password';
   userId: string;
+  password?: string;
 }
 
 Deno.serve(async (req) => {
@@ -58,7 +59,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { action, userId }: ManageUserRequest = await req.json();
+    const { action, userId, password }: ManageUserRequest = await req.json();
     console.log(`Super admin ${user.email} performing action: ${action} on user: ${userId}`);
 
     if (action === 'block') {
@@ -137,6 +138,32 @@ Deno.serve(async (req) => {
       console.log(`User ${userId} deleted successfully`);
       return new Response(
         JSON.stringify({ success: true, message: 'User and all associated data deleted successfully' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+
+    } else if (action === 'reset-password') {
+      // Validate password is provided
+      if (!password) {
+        return new Response(
+          JSON.stringify({ error: 'Password is required for reset-password action' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        );
+      }
+
+      // Update user password using admin API
+      const { error: resetError } = await supabaseAdmin.auth.admin.updateUserById(
+        userId,
+        { password: password }
+      );
+
+      if (resetError) {
+        console.error('Error resetting password:', resetError);
+        throw resetError;
+      }
+
+      console.log(`Password reset successfully for user ${userId}`);
+      return new Response(
+        JSON.stringify({ success: true, message: 'Password reset successfully' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
 
