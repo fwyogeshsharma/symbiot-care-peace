@@ -6,6 +6,8 @@ import { DailyActivityReport } from './DailyActivityReport';
 import { MedicationAdherenceReport } from './MedicationAdherenceReport';
 import { MedicationTimingAnalysisReport } from './MedicationTimingAnalysisReport';
 import { AlertHistoryReport } from './AlertHistoryReport';
+import { EmergencyEventsReport } from './EmergencyEventsReport';
+import { ResponseTimeAnalysisReport } from './ResponseTimeAnalysisReport';
 import { HealthAnomaliesReport } from './HealthAnomaliesReport';
 import { BloodSugarAnalysisReport } from './BloodSugarAnalysisReport';
 import { SleepQualityReport } from './SleepQualityReport';
@@ -106,11 +108,11 @@ export const ReportViewer = ({
 
       case 'Emergency Events':
       case t('reports.alerts.emergency'):
-        return <AlertHistoryReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+        return <EmergencyEventsReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       case 'Response Time Analysis':
       case t('reports.alerts.responseTime'):
-        return <AlertHistoryReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+        return <ResponseTimeAnalysisReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Environmental Safety Reports
       case 'Air Quality Report':
