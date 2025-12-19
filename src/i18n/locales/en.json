@@ -121,6 +121,8 @@
       "last24Hours": "Last 24 Hours",
       "last7Days": "Last 7 Days",
       "last30Days": "Last 30 Days",
+      "allAvailableData": "All Available Data",
+      "monthlyAverages": "Showing monthly averages",
       "heartRate": "Heart Rate",
       "bloodPressure": "Blood Pressure",
       "oxygen": "Oxygen",
@@ -1901,7 +1903,9 @@
         "anomalies": "Health Anomalies",
         "anomaliesDesc": "Out-of-range readings and concerning patterns",
         "bloodSugar": "Blood Sugar Analysis",
-        "bloodSugarDesc": "Glucose levels and patterns"
+        "bloodSugarDesc": "Glucose levels and patterns",
+        "dataPoints": "data points",
+        "loadingHistoricalData": "Loading historical data..."
       },
       "activity": {
         "dailyActivity": "Daily Activity Summary",

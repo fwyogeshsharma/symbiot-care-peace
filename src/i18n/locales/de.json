@@ -1832,7 +1832,9 @@
       "anomalies": "Gesundheitsanomalien",
       "anomaliesDesc": "Messwerte außerhalb des Normalbereichs und besorgniserregende Muster",
       "bloodSugar": "Blutzuckeranalyse",
-      "bloodSugarDesc": "Glukosewerte und -muster"
+      "bloodSugarDesc": "Glukosewerte und -muster",
+      "dataPoints": "Datenpunkte",
+      "loadingHistoricalData": "Lade historische Daten..."
     },
     "activity": {
       "dailyActivity": "Tagesaktivitäts-Zusammenfassung",

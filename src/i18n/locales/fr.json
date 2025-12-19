@@ -1832,7 +1832,9 @@
       "anomalies": "Anomalies de Santé",
       "anomaliesDesc": "Lectures hors normes et modèles préoccupants",
       "bloodSugar": "Analyse de la Glycémie",
-      "bloodSugarDesc": "Niveaux et modèles de glucose"
+      "bloodSugarDesc": "Niveaux et modèles de glucose",
+      "dataPoints": "points de données",
+      "loadingHistoricalData": "Chargement des données historiques..."
     },
     "activity": {
       "dailyActivity": "Résumé d'Activité Quotidienne",

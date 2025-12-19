@@ -1658,7 +1658,9 @@
       "anomalies": "स्वास्थ्य विसंगतियां",
       "anomaliesDesc": "सीमा से बाहर रीडिंग और चिंताजनक पैटर्न",
       "bloodSugar": "रक्त शर्करा विश्लेषण",
-      "bloodSugarDesc": "ग्लूकोज स्तर और पैटर्न"
+      "bloodSugarDesc": "ग्लूकोज स्तर और पैटर्न",
+      "dataPoints": "डेटा बिंदु",
+      "loadingHistoricalData": "ऐतिहासिक डेटा लोड हो रहा है..."
     },
     "activity": {
       "dailyActivity": "दैनिक गतिविधि सारांश",

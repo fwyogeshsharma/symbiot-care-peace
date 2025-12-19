@@ -1832,7 +1832,9 @@
       "anomalies": "Anomalías de Salud",
       "anomaliesDesc": "Lecturas fuera de rango y patrones preocupantes",
       "bloodSugar": "Análisis de Azúcar en Sangre",
-      "bloodSugarDesc": "Niveles y patrones de glucosa"
+      "bloodSugarDesc": "Niveles y patrones de glucosa",
+      "dataPoints": "puntos de datos",
+      "loadingHistoricalData": "Cargando datos históricos..."
     },
     "activity": {
       "dailyActivity": "Resumen de Actividad Diaria",
