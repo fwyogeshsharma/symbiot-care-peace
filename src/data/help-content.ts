@@ -103,6 +103,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.alerts'),
     keywords: ['severity', 'critical', 'high', 'medium', 'low', 'priority'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/fx7g0E0xM1U',
   },
   {
     id: 'alert-types',
@@ -111,6 +112,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.alerts'),
     keywords: ['type', 'vital signs', 'panic', 'sos', 'geofence', 'device', 'inactivity'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/ideFkK_MaPQ',
   },
   {
     id: 'acknowledging-alerts',
@@ -324,6 +326,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['severity', 'critical', 'high', 'medium', 'low', 'priority'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/fx7g0E0xM1U',
   },
   {
     id: 'alert-types',
@@ -332,6 +335,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['type', 'vital signs', 'panic', 'sos', 'geofence', 'device', 'inactivity'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/ideFkK_MaPQ',
   },
   {
     id: 'acknowledging-alerts',
