@@ -20,11 +20,11 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
     queryFn: async () => {
       let query = supabase
         .from('device_data')
-        .select('*')
+        .select('*, devices(device_name, device_type)')
         .in('data_type', [
           'temperature', 'humidity', 'co2', 'carbon_dioxide',
-          'voc', 'volatile_organic_compounds', 'pm2_5', 'pm25',
-          'aqi', 'air_quality_index', 'pm1', 'pm10'
+          'voc', 'volatile_organic_compounds', 'tvoc', 'pm1', 'pm2_5', 'pm25', 'pm10',
+          'aqi', 'air_quality_index', 'eco2', 'air_quality'
         ])
         .gte('recorded_at', dateRange.from.toISOString())
         .lte('recorded_at', dateRange.to.toISOString())
@@ -36,7 +36,28 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
 
       const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+
+      // If we have air_quality data type, extract sub-values
+      const processedData = data || [];
+      const expandedData: any[] = [];
+
+      processedData.forEach(item => {
+        if (item.data_type === 'air_quality' && typeof item.value === 'object') {
+          // Expand air_quality object into separate data points
+          const aqValue = item.value as any;
+          if (aqValue.co2) expandedData.push({ ...item, data_type: 'co2', value: aqValue.co2 });
+          if (aqValue.voc || aqValue.tvoc) expandedData.push({ ...item, data_type: 'voc', value: aqValue.voc || aqValue.tvoc });
+          if (aqValue.pm25 || aqValue.pm2_5) expandedData.push({ ...item, data_type: 'pm2_5', value: aqValue.pm25 || aqValue.pm2_5 });
+          if (aqValue.pm10) expandedData.push({ ...item, data_type: 'pm10', value: aqValue.pm10 });
+          if (aqValue.aqi) expandedData.push({ ...item, data_type: 'aqi', value: aqValue.aqi });
+          if (aqValue.temperature) expandedData.push({ ...item, data_type: 'temperature', value: aqValue.temperature });
+          if (aqValue.humidity) expandedData.push({ ...item, data_type: 'humidity', value: aqValue.humidity });
+        } else {
+          expandedData.push(item);
+        }
+      });
+
+      return expandedData;
     },
   });
 
@@ -69,9 +90,11 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
 
   const temperatureData = dataByType.temperature || [];
   const humidityData = dataByType.humidity || [];
-  const co2Data = dataByType.co2 || dataByType.carbon_dioxide || [];
-  const vocData = dataByType.voc || dataByType.volatile_organic_compounds || [];
+  const co2Data = dataByType.co2 || dataByType.carbon_dioxide || dataByType.eco2 || [];
+  const vocData = dataByType.voc || dataByType.volatile_organic_compounds || dataByType.tvoc || [];
   const pm25Data = dataByType.pm2_5 || dataByType.pm25 || [];
+  const pm10Data = dataByType.pm10 || [];
+  const pm1Data = dataByType.pm1 || [];
   const aqiData = dataByType.aqi || dataByType.air_quality_index || [];
 
   const avgTemp = calculateAverage(temperatureData);
@@ -79,28 +102,47 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
   const avgCO2 = calculateAverage(co2Data);
   const avgVOC = calculateAverage(vocData);
   const avgPM25 = calculateAverage(pm25Data);
+  const avgPM10 = calculateAverage(pm10Data);
+  const avgPM1 = calculateAverage(pm1Data);
   const avgAQI = calculateAverage(aqiData);
+
+  // Get unique devices providing environmental data
+  const environmentalDevices = Array.from(
+    new Set(environmentalData.map(item => (item as any).devices?.device_name).filter(Boolean))
+  );
 
   // Quality assessment
   const getAirQualityStatus = () => {
     let issues = [];
 
-    if (avgCO2 > 1000) issues.push('High CO2 levels');
-    if (avgVOC > 500) issues.push('High VOC levels');
-    if (avgPM25 > 35) issues.push('High particulate matter');
-    if (avgHumidity < 30 || avgHumidity > 60) issues.push('Humidity out of optimal range');
-    if (avgTemp < 68 || avgTemp > 78) issues.push('Temperature out of comfort range');
+    if (avgCO2 > 1000) issues.push(t('reports.airQuality.highCO2'));
+    if (avgVOC > 500) issues.push(t('reports.airQuality.highVOC'));
+    if (avgPM25 > 35) issues.push(t('reports.airQuality.highPM25'));
+    if (avgPM10 > 50) issues.push(t('reports.airQuality.highPM10'));
+    if (avgHumidity < 30 || avgHumidity > 60) issues.push(t('reports.airQuality.humidityOutOfRange'));
+    if (avgTemp < 68 || avgTemp > 78) issues.push(t('reports.airQuality.temperatureOutOfRange'));
+    if (avgAQI > 100) issues.push(t('reports.airQuality.unhealthyAQI'));
 
     if (issues.length === 0) {
-      return { status: 'Good', color: 'success', issues: [] };
+      return { status: t('reports.airQuality.good'), color: 'success', issues: [] };
     } else if (issues.length <= 2) {
-      return { status: 'Fair', color: 'warning', issues };
+      return { status: t('reports.airQuality.fair'), color: 'warning', issues };
     } else {
-      return { status: 'Poor', color: 'destructive', issues };
+      return { status: t('reports.airQuality.poor'), color: 'destructive', issues };
     }
   };
 
   const airQualityStatus = getAirQualityStatus();
+
+  // Data availability flags
+  const hasTemperature = temperatureData.length > 0;
+  const hasHumidity = humidityData.length > 0;
+  const hasCO2 = co2Data.length > 0;
+  const hasVOC = vocData.length > 0;
+  const hasPM25 = pm25Data.length > 0;
+  const hasPM10 = pm10Data.length > 0;
+  const hasPM1 = pm1Data.length > 0;
+  const hasAQI = aqiData.length > 0;
 
   // Combine data for multi-line chart
   const combinedChartData = temperatureData.map((item, index) => ({
@@ -169,73 +211,135 @@ export const AirQualityReport = ({ selectedPerson, dateRange }: AirQualityReport
         </CardContent>
       </Card>
 
+      {/* Connected Devices */}
+      {environmentalDevices.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Wind className="h-5 w-5" />
+              {t('reports.airQuality.connectedSensors')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {environmentalDevices.map((device, index) => (
+                <Badge key={index} variant="outline" className="px-3 py-1">
+                  {device}
+                </Badge>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {t('reports.airQuality.sensorsActive', { count: environmentalDevices.length })}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('reports.content.temperature')}</CardTitle>
-            <Thermometer className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgTemp}°F</div>
-            <p className="text-xs text-muted-foreground">{t('reports.content.optimal6878F')}</p>
-          </CardContent>
-        </Card>
+        {hasTemperature && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{t('reports.content.temperature')}</CardTitle>
+              <Thermometer className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{avgTemp}°F</div>
+              <p className="text-xs text-muted-foreground">{t('reports.content.optimal6878F')}</p>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('reports.content.humidity')}</CardTitle>
-            <Droplets className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgHumidity}%</div>
-            <p className="text-xs text-muted-foreground">{t('reports.content.optimal3060')}</p>
-          </CardContent>
-        </Card>
+        {hasHumidity && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{t('reports.content.humidity')}</CardTitle>
+              <Droplets className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{avgHumidity}%</div>
+              <p className="text-xs text-muted-foreground">{t('reports.content.optimal3060')}</p>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('reports.content.co2')}</CardTitle>
-            <Wind className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgCO2}</div>
-            <p className="text-xs text-muted-foreground">{t('reports.content.ppmGood800')}</p>
-          </CardContent>
-        </Card>
+        {hasCO2 && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{t('reports.content.co2')}</CardTitle>
+              <Wind className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{avgCO2}</div>
+              <p className="text-xs text-muted-foreground">{t('reports.content.ppmGood800')}</p>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('reports.content.voc')}</CardTitle>
-            <Wind className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgVOC}</div>
-            <p className="text-xs text-muted-foreground">{t('reports.content.ppbGood500')}</p>
-          </CardContent>
-        </Card>
+        {hasVOC && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{t('reports.content.voc')}</CardTitle>
+              <Wind className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{avgVOC}</div>
+              <p className="text-xs text-muted-foreground">{t('reports.content.ppbGood500')}</p>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('reports.content.pm25')}</CardTitle>
-            <Wind className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgPM25}</div>
-            <p className="text-xs text-muted-foreground">{t('reports.content.ugm3Good12')}</p>
-          </CardContent>
-        </Card>
+        {hasPM25 && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{t('reports.content.pm25')}</CardTitle>
+              <Wind className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{avgPM25}</div>
+              <p className="text-xs text-muted-foreground">{t('reports.content.ugm3Good12')}</p>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t('reports.content.aqi')}</CardTitle>
-            <Wind className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgAQI}</div>
-            <p className="text-xs text-muted-foreground">{t('reports.content.good050')}</p>
-          </CardContent>
-        </Card>
+        {hasPM10 && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">PM10</CardTitle>
+              <Wind className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{avgPM10}</div>
+              <p className="text-xs text-muted-foreground">{t('reports.airQuality.pm10Good')}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {hasPM1 && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">PM1</CardTitle>
+              <Wind className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{avgPM1}</div>
+              <p className="text-xs text-muted-foreground">{t('reports.airQuality.pm1Good')}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {hasAQI && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{t('reports.content.aqi')}</CardTitle>
+              <Wind className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{avgAQI}</div>
+              <p className="text-xs text-muted-foreground">{t('reports.content.good050')}</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Temperature & Humidity Chart */}
