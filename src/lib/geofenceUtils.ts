@@ -163,7 +163,12 @@ export function getPlaceTypeOptions(): Array<{ value: string; label: string }> {
  * @param placeType Type of place
  * @returns Formatted label with proper capitalization
  */
-export function getPlaceTypeLabel(placeType: string): string {
+export function getPlaceTypeLabel(placeType: string | null | undefined): string {
+  // Handle null or undefined values
+  if (!placeType) {
+    return 'Unknown';
+  }
+
   const option = getPlaceTypeOptions().find(opt => opt.value === placeType);
   return option ? option.label : placeType.charAt(0).toUpperCase() + placeType.slice(1);
 }
