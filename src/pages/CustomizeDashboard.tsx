@@ -17,7 +17,16 @@ import {
   Users,
   Plus,
   X,
-  Eye
+  Eye,
+  BarChart3,
+  Wifi,
+  Share2,
+  Map,
+  Camera,
+  Smartphone,
+  Home,
+  Clock,
+  MapPin
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -46,11 +55,27 @@ const CustomizeDashboard = () => {
   // Default available dashboard components
   const availableComponents: DashboardComponent[] = [
     {
+      id: 'elderly-list',
+      name: t('dashboard.elderlyList', { defaultValue: 'Monitored Individuals' }),
+      description: t('dashboard.elderlyListDesc', { defaultValue: 'List of people you are monitoring' }),
+      icon: Users,
+      enabled: true,
+      category: 'people'
+    },
+    {
       id: 'vital-metrics',
       name: t('dashboard.vitalMetrics', { defaultValue: 'Vital Metrics' }),
       description: t('dashboard.vitalMetricsDesc', { defaultValue: 'Heart rate, blood pressure, oxygen levels' }),
       icon: HeartPulse,
       enabled: true,
+      category: 'health'
+    },
+    {
+      id: 'health-charts',
+      name: t('dashboard.healthCharts', { defaultValue: 'Health Metrics Charts' }),
+      description: t('dashboard.healthChartsDesc', { defaultValue: 'Detailed health trend charts and history' }),
+      icon: BarChart3,
+      enabled: false,
       category: 'health'
     },
     {
@@ -94,12 +119,68 @@ const CustomizeDashboard = () => {
       category: 'analytics'
     },
     {
-      id: 'elderly-list',
-      name: t('dashboard.elderlyList', { defaultValue: 'Monitored Individuals' }),
-      description: t('dashboard.elderlyListDesc', { defaultValue: 'List of people you are monitoring' }),
-      icon: Users,
-      enabled: true,
-      category: 'people'
+      id: 'movement-summary',
+      name: t('dashboard.movementSummary', { defaultValue: 'Movement Summary' }),
+      description: t('dashboard.movementSummaryDesc', { defaultValue: 'Activity patterns and movement statistics' }),
+      icon: Activity,
+      enabled: false,
+      category: 'activity'
+    },
+    {
+      id: 'movement-timeline',
+      name: t('dashboard.movementTimeline', { defaultValue: 'Movement Timeline' }),
+      description: t('dashboard.movementTimelineDesc', { defaultValue: 'Daily activity timeline and patterns' }),
+      icon: Clock,
+      enabled: false,
+      category: 'activity'
+    },
+    {
+      id: 'movement-heatmap',
+      name: t('dashboard.movementHeatmap', { defaultValue: 'Movement Heatmap' }),
+      description: t('dashboard.movementHeatmapDesc', { defaultValue: 'Visual heatmap of activity by location' }),
+      icon: Map,
+      enabled: false,
+      category: 'activity'
+    },
+    {
+      id: 'dwell-time',
+      name: t('dashboard.dwellTime', { defaultValue: 'Dwell Time Analysis' }),
+      description: t('dashboard.dwellTimeDesc', { defaultValue: 'Time spent in different locations' }),
+      icon: MapPin,
+      enabled: false,
+      category: 'activity'
+    },
+    {
+      id: 'device-status',
+      name: t('dashboard.deviceStatus', { defaultValue: 'Device Status' }),
+      description: t('dashboard.deviceStatusDesc', { defaultValue: 'Connected devices and battery levels' }),
+      icon: Wifi,
+      enabled: false,
+      category: 'devices'
+    },
+    {
+      id: 'home-hub',
+      name: t('dashboard.homeHub', { defaultValue: 'Home Hub' }),
+      description: t('dashboard.homeHubDesc', { defaultValue: 'Home hub device status and info' }),
+      icon: Home,
+      enabled: false,
+      category: 'devices'
+    },
+    {
+      id: 'smartphone',
+      name: t('dashboard.smartphone', { defaultValue: 'Smartphone' }),
+      description: t('dashboard.smartphoneDesc', { defaultValue: 'Mobile device status and location' }),
+      icon: Smartphone,
+      enabled: false,
+      category: 'devices'
+    },
+    {
+      id: 'cameras',
+      name: t('dashboard.cameras', { defaultValue: 'Security Cameras' }),
+      description: t('dashboard.camerasDesc', { defaultValue: 'Live camera feeds and recordings' }),
+      icon: Camera,
+      enabled: false,
+      category: 'security'
     }
   ];
 

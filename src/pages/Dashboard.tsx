@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import VitalMetrics from '@/components/dashboard/VitalMetrics';
 import AlertsList from '@/components/dashboard/AlertsList';
 import ElderlyList from '@/components/dashboard/ElderlyList';
@@ -10,18 +10,29 @@ import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
 import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
+import HealthMetricsCharts from '@/components/dashboard/HealthMetricsCharts';
+import { MovementSummary } from '@/components/dashboard/MovementSummary';
+import { MovementTimeline } from '@/components/dashboard/MovementTimeline';
+import { MovementHeatmap } from '@/components/dashboard/MovementHeatmap';
+import { DwellTimeAnalysis } from '@/components/dashboard/DwellTimeAnalysis';
+import DeviceStatus from '@/components/dashboard/DeviceStatus';
+import HomeHubCard from '@/components/dashboard/HomeHubCard';
+import SmartPhoneCard from '@/components/dashboard/SmartPhoneCard';
+import CameraStream from '@/components/dashboard/CameraStream';
 import Header from '@/components/layout/Header';
 import { useTranslation } from 'react-i18next';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { processMovementData, getDateRangePreset } from '@/lib/movementUtils';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const [dateRange] = useState(getDateRangePreset('today'));
 
   // Fetch elderly persons based on role
   const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
@@ -73,14 +84,58 @@ const Dashboard = () => {
     enabled: !!user?.id,
   });
 
+  // Fetch movement data for activity components
+  const { data: rawMovementData = [] } = useQuery({
+    queryKey: ['movement-data', selectedPersonId, dateRange],
+    queryFn: async () => {
+      if (!selectedPersonId) return [];
+
+      const { data, error } = await supabase
+        .from('device_data')
+        .select(`
+          *,
+          devices!inner(location, device_name, device_type, device_types!inner(category))
+        `)
+        .eq('elderly_person_id', selectedPersonId)
+        .gte('recorded_at', dateRange.start)
+        .lte('recorded_at', dateRange.end)
+        .order('recorded_at', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!selectedPersonId,
+  });
+
+  const processedMovementData = processMovementData(rawMovementData || []);
+
   // Check if a component is enabled
   const isComponentEnabled = (componentId: string) => {
-    if (!dashboardLayout?.layout_config) return true; // Default to showing all if no custom layout
+    if (!dashboardLayout?.layout_config) {
+      // No custom layout saved - show default components
+      const defaultEnabled = ['elderly-list', 'vital-metrics', 'alerts', 'panic-sos', 'environmental', 'medication', 'ilq-score'];
+      console.log('No dashboard layout, using defaults for:', componentId, defaultEnabled.includes(componentId));
+      return defaultEnabled.includes(componentId);
+    }
 
     const components = dashboardLayout.layout_config as any[];
     const component = components.find((c: any) => c.id === componentId);
-    return component ? component.enabled : true;
+
+    console.log('Checking component:', componentId, 'Found:', !!component, 'Enabled:', component?.enabled);
+
+    // If component not found in saved config (new component added later), don't show it by default
+    if (!component) return false;
+
+    return component.enabled;
   };
+
+  // Debug: Log the dashboard layout when it changes
+  useEffect(() => {
+    if (dashboardLayout?.layout_config) {
+      console.log('Dashboard layout loaded:', dashboardLayout.layout_config);
+      console.log('Enabled components:', (dashboardLayout.layout_config as any[]).filter(c => c.enabled).map(c => c.id));
+    }
+  }, [dashboardLayout]);
 
   if (elderlyLoading) {
     return (
@@ -117,39 +172,78 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Left Column - Elderly Persons & Vital Metrics */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            {isComponentEnabled('elderly-list') && (
-              <ElderlyList
-                elderlyPersons={elderlyPersons || []}
-                selectedPersonId={selectedPersonId}
-                onSelectPerson={setSelectedPersonId}
-              />
+        <div className="space-y-4 sm:space-y-6">
+          {/* Elderly List */}
+          {isComponentEnabled('elderly-list') && (
+            <ElderlyList
+              elderlyPersons={elderlyPersons || []}
+              selectedPersonId={selectedPersonId}
+              onSelectPerson={setSelectedPersonId}
+            />
+          )}
+
+          {/* Grid Layout for Side-by-Side Components */}
+          <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+            {/* Left Column - Health & Monitoring */}
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+              {isComponentEnabled('vital-metrics') && (
+                <VitalMetrics selectedPersonId={selectedPersonId} />
+              )}
+              {isComponentEnabled('health-charts') && (
+                <HealthMetricsCharts selectedPersonId={selectedPersonId} />
+              )}
+              {isComponentEnabled('movement-summary') && (
+                <MovementSummary data={processedMovementData} />
+              )}
+              {isComponentEnabled('movement-timeline') && (
+                <MovementTimeline events={processedMovementData.events} />
+              )}
+              {isComponentEnabled('movement-heatmap') && (
+                <MovementHeatmap data={processedMovementData} />
+              )}
+              {isComponentEnabled('dwell-time') && (
+                <DwellTimeAnalysis data={processedMovementData} idealProfile={null} />
+              )}
+            </div>
+
+            {/* Right Column - Widgets & Quick Info */}
+            <div className="space-y-4 sm:space-y-6">
+              {isComponentEnabled('ilq-score') && (
+                <ILQWidget elderlyPersonId={selectedPersonId || ''} />
+              )}
+              {isComponentEnabled('medication') && (
+                <MedicationManagement selectedPersonId={selectedPersonId} />
+              )}
+              {isComponentEnabled('environmental') && (
+                <EnvironmentalSensors selectedPersonId={selectedPersonId} />
+              )}
+              {isComponentEnabled('panic-sos') && (
+                <PanicSosEvents selectedPersonId={selectedPersonId} />
+              )}
+              {isComponentEnabled('alerts') && (
+                <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
+              )}
+            </div>
+          </div>
+
+          {/* Full Width Components */}
+          {isComponentEnabled('device-status') && (
+            <DeviceStatus selectedPersonId={selectedPersonId} />
+          )}
+
+          {/* Device Cards - Side by Side */}
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+            {isComponentEnabled('home-hub') && (
+              <HomeHubCard selectedPersonId={selectedPersonId} />
             )}
-            {isComponentEnabled('vital-metrics') && (
-              <VitalMetrics selectedPersonId={selectedPersonId} />
+            {isComponentEnabled('smartphone') && (
+              <SmartPhoneCard selectedPersonId={selectedPersonId} />
             )}
           </div>
 
-          {/* Right Column - Other Components */}
-          <div className="space-y-4 sm:space-y-6">
-            {isComponentEnabled('ilq-score') && selectedPersonId && (
-              <ILQWidget elderlyPersonId={selectedPersonId} />
-            )}
-            {isComponentEnabled('medication') && (
-              <MedicationManagement selectedPersonId={selectedPersonId} />
-            )}
-            {isComponentEnabled('environmental') && (
-              <EnvironmentalSensors selectedPersonId={selectedPersonId} />
-            )}
-            {isComponentEnabled('panic-sos') && (
-              <PanicSosEvents selectedPersonId={selectedPersonId} />
-            )}
-            {isComponentEnabled('alerts') && (
-              <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
-            )}
-          </div>
+          {isComponentEnabled('cameras') && (
+            <CameraStream />
+          )}
         </div>
 
         {/* Empty State */}
