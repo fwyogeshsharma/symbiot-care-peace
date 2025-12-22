@@ -20,7 +20,8 @@
       "Bash(rm:*)",
       "Bash(npm i:*)",
       "Bash(npm run dev:*)",
-      "WebFetch(domain:codepen.io)"
+      "WebFetch(domain:codepen.io)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []

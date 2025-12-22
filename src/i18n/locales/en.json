@@ -2257,9 +2257,200 @@
     "termsOfService": "Terms of Service",
     "liabilityDisclaimer": "Liability Disclaimer",
     "cookiePolicy": "Cookie Policy",
+    "faq": "FAQ",
     "followUs": "Follow Us",
     "allRightsReserved": "All rights reserved.",
     "version": "Version: 1.0.11"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions about using Symbiot. If you can't find what you're looking for, please contact our support team at",
+    "stillHaveQuestions": "Still have questions?",
+    "contactMessage": "Our support team is here to help. Reach out to us and we'll get back to you as soon as possible.",
+    "contactSupport": "Contact Support",
+    "goToDashboard": "Go to Dashboard",
+    "categories": {
+      "gettingStarted": {
+        "title": "Getting Started",
+        "questionKeys": ["createAccount", "compatibleDevices", "addSensor"],
+        "questions": {
+          "createAccount": {
+            "question": "How do I create an account?",
+            "answer": "To create an account, click on the 'Sign Up' button on the homepage. Fill in your email, create a password, and complete your profile information. You will receive a verification email to activate your account."
+          },
+          "compatibleDevices": {
+            "question": "What devices are compatible with Symbiot?",
+            "answer": "Symbiot supports a wide range of devices including smartwatches, heart rate monitors, blood pressure monitors, GPS trackers, environmental sensors, fall detection sensors, emergency buttons, and medication dispensers. Check our supported devices list in the Devices section."
+          },
+          "addSensor": {
+            "question": "How do I add a new sensor or device?",
+            "answer": "Navigate to the Dashboard and click on 'Device Management' or go to the Devices page. Click 'Add Device' button, select your device type from the list, and follow the on-screen pairing instructions. Make sure your device is in pairing mode and within range."
+          }
+        }
+      },
+      "ilqScore": {
+        "title": "ILQ Score",
+        "questionKeys": ["whatIsIlq", "viewIlq", "devicesNeeded", "lowScore"],
+        "questions": {
+          "whatIsIlq": {
+            "question": "What is the ILQ Score?",
+            "answer": "ILQ (Independent Living Quality) Score is a comprehensive metric that evaluates overall wellbeing and independence. It combines data from health vitals (30%), physical activity (25%), cognitive function (15%), environmental safety (15%), emergency response (10%), and social engagement (5%)."
+          },
+          "viewIlq": {
+            "question": "How can I view my ILQ Score?",
+            "answer": "Your ILQ Score is displayed on the main Dashboard. For detailed analytics, navigate to 'ILQ Analytics' from the sidebar menu where you can view historical trends, component breakdowns, and insights into what affects your score."
+          },
+          "devicesNeeded": {
+            "question": "What devices do I need to get an ILQ Score?",
+            "answer": "For a complete ILQ score, you need: (1) Heart rate monitor or smartwatch, (2) Blood pressure monitor, (3) Pulse oximeter, (4) Environmental sensor for temperature and humidity, (5) GPS tracker, (6) Fall detection sensor, (7) Emergency button, and (8) Medication dispenser. However, you can get a partial score with fewer devices."
+          },
+          "lowScore": {
+            "question": "Why is my ILQ Score low?",
+            "answer": "A low ILQ score indicates areas needing attention. Check the component breakdown in ILQ Analytics to identify which areas (health vitals, activity, cognitive function, etc.) are affecting your score. The system will provide recommendations for improvement."
+          }
+        }
+      },
+      "healthMonitoring": {
+        "title": "Health Monitoring",
+        "questionKeys": ["viewMetrics", "dataUpdate", "exportData"],
+        "questions": {
+          "viewMetrics": {
+            "question": "How do I view my health metrics?",
+            "answer": "Health metrics are displayed on the Dashboard in the 'Health Metrics' card. Click 'View Charts' to see detailed historical trends for heart rate, blood pressure, oxygen levels, temperature, sleep quality, and humidity over customizable time periods."
+          },
+          "dataUpdate": {
+            "question": "How often is health data updated?",
+            "answer": "Health data is updated in real-time as your connected devices send information. Most metrics refresh every 10 seconds. You can see the last update time displayed with each metric."
+          },
+          "exportData": {
+            "question": "Can I export my health data?",
+            "answer": "Yes! Go to the Reports page, select the desired date range and person, then generate the report you need. Click the 'Export' button to download your data in PDF or CSV format."
+          }
+        }
+      },
+      "dataSharing": {
+        "title": "Data Sharing",
+        "questionKeys": ["shareWithLovedOnes", "whatToShare", "stopSharing"],
+        "questions": {
+          "shareWithLovedOnes": {
+            "question": "How can I share my data with loved ones?",
+            "answer": "Navigate to 'Data Sharing' from the sidebar menu. Click 'Add Access', enter the email address of the person you want to share with, select their relationship (family, caregiver, etc.), and choose what data they can access. They will receive an invitation email to create an account and view your shared data."
+          },
+          "whatToShare": {
+            "question": "What information can I share?",
+            "answer": "You have granular control over what data to share. You can choose to share health metrics, location tracking, alerts, activity data, medication adherence, environmental data, or all of the above. You can also set different permissions for different people."
+          },
+          "stopSharing": {
+            "question": "How do I stop sharing data with someone?",
+            "answer": "Go to 'Data Sharing', find the person in your shared access list, and click 'Revoke Access' or 'Remove'. Their access will be immediately terminated, and they will no longer be able to view your data."
+          }
+        }
+      },
+      "alertsNotifications": {
+        "title": "Alerts & Notifications",
+        "questionKeys": ["setupAlerts", "alertTypes", "acknowledgeAlert"],
+        "questions": {
+          "setupAlerts": {
+            "question": "How do I set up alerts?",
+            "answer": "Alerts are automatically configured based on your health thresholds and safety settings. You can customize alert preferences in your Profile settings under 'Alert Preferences'. Here you can set notification methods (email, SMS, in-app) and alert priorities."
+          },
+          "alertTypes": {
+            "question": "What types of alerts will I receive?",
+            "answer": "You will receive alerts for: abnormal health readings (heart rate, blood pressure, etc.), fall detection, emergency button presses, medication reminders, low ILQ scores, environmental safety concerns (temperature, humidity), and device disconnections."
+          },
+          "acknowledgeAlert": {
+            "question": "How do I acknowledge or dismiss an alert?",
+            "answer": "Go to the Alerts page from the sidebar. Click on any active alert to view details, then use the 'Acknowledge' button to mark it as seen or 'Resolve' to close it. You can also add notes about actions taken."
+          }
+        }
+      },
+      "locationTracking": {
+        "title": "Location & Tracking",
+        "questionKeys": ["indoorTracking", "setupFloorPlan", "outdoorTracking"],
+        "questions": {
+          "indoorTracking": {
+            "question": "How does indoor tracking work?",
+            "answer": "Indoor tracking uses floor plans that you configure in 'Floor Plan Management'. Upload or create a floor plan of your home, place positioning sensors or beacons, and the system will track movement between rooms. This helps monitor activity patterns and detect unusual behavior."
+          },
+          "setupFloorPlan": {
+            "question": "How do I set up a floor plan?",
+            "answer": "Navigate to 'Floor Plan Management' from the sidebar. Click 'Add Floor Plan', upload an image of your floor layout or draw one using our editor. Then mark rooms, doors, and sensor positions. Save the configuration and assign it to the monitored individual."
+          },
+          "outdoorTracking": {
+            "question": "Can I track outdoor location?",
+            "answer": "Yes, if you have a GPS tracker device connected. Go to the 'Tracking' page to view real-time outdoor location on a map, see movement history, and set up geofencing alerts for when the person enters or exits designated areas."
+          }
+        }
+      },
+      "medicationManagement": {
+        "title": "Medication Management",
+        "questionKeys": ["setupReminders", "trackAdherence"],
+        "questions": {
+          "setupReminders": {
+            "question": "How do I set up medication reminders?",
+            "answer": "Navigate to 'Medication' from the sidebar. Click 'Add Medication', enter the medication name, dosage, frequency, and times. The system will send reminders at scheduled times and track adherence automatically if you have a connected medication dispenser."
+          },
+          "trackAdherence": {
+            "question": "How is medication adherence tracked?",
+            "answer": "If you have a smart medication dispenser connected, adherence is tracked automatically. Otherwise, you can manually log doses as taken, missed, or late through the Medication page. This data contributes to your Cognitive Function score in the ILQ calculation."
+          }
+        }
+      },
+      "reports": {
+        "title": "Reports",
+        "questionKeys": ["reportTypes", "scheduleReports", "customizeDateRange"],
+        "questions": {
+          "reportTypes": {
+            "question": "What types of reports can I generate?",
+            "answer": "You can generate various reports including: Daily Summary, Vital Signs Trends, Health Anomalies, Activity Summary, Sleep Analysis, Medication Adherence, Alert History, Environmental Safety, ILQ Score Trends, and Comparative Analysis (week-over-week, month-over-month)."
+          },
+          "scheduleReports": {
+            "question": "How do I schedule automatic reports?",
+            "answer": "On the Reports page, scroll down to the 'Email Report Subscriptions' section. Click 'Subscribe to Report', select the report type, frequency (daily, weekly, monthly), time, and recipients. Reports will be automatically generated and emailed on schedule."
+          },
+          "customizeDateRange": {
+            "question": "Can I customize report date ranges?",
+            "answer": "Yes! Use the date range filter at the top of the Reports page. You can select custom dates using the calendar picker or use quick select options like 'Last 7 Days', 'Last 30 Days', or 'Last 3 Months'."
+          }
+        }
+      },
+      "accountSettings": {
+        "title": "Account & Settings",
+        "questionKeys": ["changeProfile", "changeLanguage", "dataSecure"],
+        "questions": {
+          "changeProfile": {
+            "question": "How do I change my profile information?",
+            "answer": "Click on your profile icon in the top-right corner and select 'Profile'. Here you can update your name, email, phone number, emergency contacts, medical conditions, profile picture, and other personal information."
+          },
+          "changeLanguage": {
+            "question": "How do I change the language?",
+            "answer": "Click on the language selector (globe icon) in the top-right corner of the page. Select your preferred language from the dropdown menu. The interface will immediately update to display in the selected language."
+          },
+          "dataSecure": {
+            "question": "Is my data secure?",
+            "answer": "Yes, we take security seriously. All data is encrypted in transit (HTTPS) and at rest. We comply with HIPAA regulations and follow industry best practices for data protection. You have full control over who can access your data through our sharing permissions system."
+          }
+        }
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting",
+        "questionKeys": ["deviceNotConnecting", "noAlerts", "incorrectData"],
+        "questions": {
+          "deviceNotConnecting": {
+            "question": "My device is not connecting. What should I do?",
+            "answer": "First, ensure the device is powered on and in pairing mode. Check that Bluetooth is enabled on your phone/hub. Try removing the device from Device Management and re-adding it. Make sure the device firmware is up to date. If issues persist, contact support."
+          },
+          "noAlerts": {
+            "question": "Why am I not receiving alerts?",
+            "answer": "Check your notification settings in Profile > Alert Preferences. Ensure you have enabled notifications for the alert types you want to receive. Verify your email address is confirmed and check your spam folder. For in-app notifications, ensure browser notifications are allowed."
+          },
+          "incorrectData": {
+            "question": "My health data looks incorrect. What should I do?",
+            "answer": "First, check that your devices are properly calibrated and positioned correctly. Verify the device settings and ensure they match your profile (e.g., height, weight for accurate calculations). If data continues to look wrong, try re-syncing the device or contact support for device-specific troubleshooting."
+          }
+        }
+      }
+    }
   },
   "privacyPolicy": {
     "lastUpdated": "Last Updated",

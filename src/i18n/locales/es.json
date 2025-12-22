@@ -2166,9 +2166,200 @@
     "termsOfService": "Términos de Servicio",
     "liabilityDisclaimer": "Descargo de Responsabilidad",
     "cookiePolicy": "Política de Cookies",
+    "faq": "Preguntas Frecuentes",
     "followUs": "Síguenos",
     "allRightsReserved": "Todos los derechos reservados.",
     "version": "Versión: 1.0.11"
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "subtitle": "Encuentre respuestas a preguntas comunes sobre el uso de Symbiot. Si no encuentra lo que busca, contacte a nuestro equipo de soporte en",
+    "stillHaveQuestions": "¿Aún tiene preguntas?",
+    "contactMessage": "Nuestro equipo de soporte está aquí para ayudar. Contáctenos y le responderemos lo antes posible.",
+    "contactSupport": "Contactar Soporte",
+    "goToDashboard": "Ir al Panel",
+    "categories": {
+      "gettingStarted": {
+        "title": "Primeros Pasos",
+        "questionKeys": ["createAccount", "compatibleDevices", "addSensor"],
+        "questions": {
+          "createAccount": {
+            "question": "¿Cómo creo una cuenta?",
+            "answer": "Para crear una cuenta, haga clic en el botón 'Registrarse' en la página de inicio. Complete su correo electrónico, cree una contraseña y complete su información de perfil. Recibirá un correo de verificación para activar su cuenta."
+          },
+          "compatibleDevices": {
+            "question": "¿Qué dispositivos son compatibles con Symbiot?",
+            "answer": "Symbiot soporta una amplia gama de dispositivos incluyendo relojes inteligentes, monitores de frecuencia cardíaca, monitores de presión arterial, rastreadores GPS, sensores ambientales, sensores de caídas, botones de emergencia y dispensadores de medicamentos. Consulte nuestra lista de dispositivos compatibles en la sección Dispositivos."
+          },
+          "addSensor": {
+            "question": "¿Cómo agrego un nuevo sensor o dispositivo?",
+            "answer": "Navegue al Panel y haga clic en 'Gestión de Dispositivos' o vaya a la página de Dispositivos. Haga clic en 'Agregar Dispositivo', seleccione su tipo de dispositivo de la lista y siga las instrucciones en pantalla. Asegúrese de que su dispositivo esté en modo de emparejamiento y dentro del rango."
+          }
+        }
+      },
+      "ilqScore": {
+        "title": "Puntuación ILQ",
+        "questionKeys": ["whatIsIlq", "viewIlq", "devicesNeeded", "lowScore"],
+        "questions": {
+          "whatIsIlq": {
+            "question": "¿Qué es la Puntuación ILQ?",
+            "answer": "La Puntuación ILQ (Calidad de Vida Independiente) es una métrica integral que evalúa el bienestar general y la independencia. Combina datos de signos vitales de salud (30%), actividad física (25%), función cognitiva (15%), seguridad ambiental (15%), respuesta de emergencia (10%) y compromiso social (5%)."
+          },
+          "viewIlq": {
+            "question": "¿Cómo puedo ver mi Puntuación ILQ?",
+            "answer": "Su Puntuación ILQ se muestra en el Panel principal. Para análisis detallados, navegue a 'Analíticas ILQ' desde el menú lateral donde puede ver tendencias históricas, desgloses de componentes e información sobre lo que afecta su puntuación."
+          },
+          "devicesNeeded": {
+            "question": "¿Qué dispositivos necesito para obtener una Puntuación ILQ?",
+            "answer": "Para una puntuación ILQ completa, necesita: (1) Monitor de frecuencia cardíaca o reloj inteligente, (2) Monitor de presión arterial, (3) Oxímetro de pulso, (4) Sensor ambiental para temperatura y humedad, (5) Rastreador GPS, (6) Sensor de detección de caídas, (7) Botón de emergencia y (8) Dispensador de medicamentos. Sin embargo, puede obtener una puntuación parcial con menos dispositivos."
+          },
+          "lowScore": {
+            "question": "¿Por qué mi Puntuación ILQ es baja?",
+            "answer": "Una puntuación ILQ baja indica áreas que necesitan atención. Consulte el desglose de componentes en Analíticas ILQ para identificar qué áreas (signos vitales de salud, actividad, función cognitiva, etc.) están afectando su puntuación. El sistema proporcionará recomendaciones para mejorar."
+          }
+        }
+      },
+      "healthMonitoring": {
+        "title": "Monitoreo de Salud",
+        "questionKeys": ["viewMetrics", "dataUpdate", "exportData"],
+        "questions": {
+          "viewMetrics": {
+            "question": "¿Cómo veo mis métricas de salud?",
+            "answer": "Las métricas de salud se muestran en el Panel en la tarjeta 'Métricas de Salud'. Haga clic en 'Ver Gráficos' para ver tendencias históricas detalladas de frecuencia cardíaca, presión arterial, niveles de oxígeno, temperatura, calidad del sueño y humedad durante períodos de tiempo personalizables."
+          },
+          "dataUpdate": {
+            "question": "¿Con qué frecuencia se actualizan los datos de salud?",
+            "answer": "Los datos de salud se actualizan en tiempo real a medida que sus dispositivos conectados envían información. La mayoría de las métricas se actualizan cada 10 segundos. Puede ver la hora de la última actualización mostrada con cada métrica."
+          },
+          "exportData": {
+            "question": "¿Puedo exportar mis datos de salud?",
+            "answer": "¡Sí! Vaya a la página de Informes, seleccione el rango de fechas y la persona deseados, luego genere el informe que necesita. Haga clic en el botón 'Exportar' para descargar sus datos en formato PDF o CSV."
+          }
+        }
+      },
+      "dataSharing": {
+        "title": "Compartir Datos",
+        "questionKeys": ["shareWithLovedOnes", "whatToShare", "stopSharing"],
+        "questions": {
+          "shareWithLovedOnes": {
+            "question": "¿Cómo puedo compartir mis datos con seres queridos?",
+            "answer": "Navegue a 'Compartir Datos' desde el menú lateral. Haga clic en 'Agregar Acceso', ingrese la dirección de correo electrónico de la persona con la que desea compartir, seleccione su relación (familia, cuidador, etc.) y elija a qué datos pueden acceder. Recibirán un correo de invitación para crear una cuenta y ver sus datos compartidos."
+          },
+          "whatToShare": {
+            "question": "¿Qué información puedo compartir?",
+            "answer": "Tiene control granular sobre qué datos compartir. Puede elegir compartir métricas de salud, seguimiento de ubicación, alertas, datos de actividad, adherencia a medicamentos, datos ambientales o todo lo anterior. También puede establecer diferentes permisos para diferentes personas."
+          },
+          "stopSharing": {
+            "question": "¿Cómo dejo de compartir datos con alguien?",
+            "answer": "Vaya a 'Compartir Datos', encuentre a la persona en su lista de acceso compartido y haga clic en 'Revocar Acceso' o 'Eliminar'. Su acceso se terminará inmediatamente y ya no podrán ver sus datos."
+          }
+        }
+      },
+      "alertsNotifications": {
+        "title": "Alertas y Notificaciones",
+        "questionKeys": ["setupAlerts", "alertTypes", "acknowledgeAlert"],
+        "questions": {
+          "setupAlerts": {
+            "question": "¿Cómo configuro alertas?",
+            "answer": "Las alertas se configuran automáticamente según sus umbrales de salud y configuraciones de seguridad. Puede personalizar las preferencias de alerta en la configuración de su Perfil en 'Preferencias de Alerta'. Aquí puede establecer métodos de notificación (correo electrónico, SMS, en la aplicación) y prioridades de alerta."
+          },
+          "alertTypes": {
+            "question": "¿Qué tipos de alertas recibiré?",
+            "answer": "Recibirá alertas por: lecturas de salud anormales (frecuencia cardíaca, presión arterial, etc.), detección de caídas, pulsaciones del botón de emergencia, recordatorios de medicamentos, puntuaciones ILQ bajas, preocupaciones de seguridad ambiental (temperatura, humedad) y desconexiones de dispositivos."
+          },
+          "acknowledgeAlert": {
+            "question": "¿Cómo reconozco o descarto una alerta?",
+            "answer": "Vaya a la página de Alertas desde la barra lateral. Haga clic en cualquier alerta activa para ver los detalles, luego use el botón 'Reconocer' para marcarla como vista o 'Resolver' para cerrarla. También puede agregar notas sobre las acciones tomadas."
+          }
+        }
+      },
+      "locationTracking": {
+        "title": "Ubicación y Seguimiento",
+        "questionKeys": ["indoorTracking", "setupFloorPlan", "outdoorTracking"],
+        "questions": {
+          "indoorTracking": {
+            "question": "¿Cómo funciona el seguimiento en interiores?",
+            "answer": "El seguimiento en interiores utiliza planos de planta que configura en 'Gestión de Planos de Planta'. Cargue o cree un plano de planta de su hogar, coloque sensores de posicionamiento o balizas, y el sistema rastreará el movimiento entre habitaciones. Esto ayuda a monitorear patrones de actividad y detectar comportamientos inusuales."
+          },
+          "setupFloorPlan": {
+            "question": "¿Cómo configuro un plano de planta?",
+            "answer": "Navegue a 'Gestión de Planos de Planta' desde la barra lateral. Haga clic en 'Agregar Plano de Planta', cargue una imagen de su diseño de piso o dibuje uno usando nuestro editor. Luego marque habitaciones, puertas y posiciones de sensores. Guarde la configuración y asígnela al individuo monitoreado."
+          },
+          "outdoorTracking": {
+            "question": "¿Puedo rastrear la ubicación al aire libre?",
+            "answer": "Sí, si tiene un dispositivo rastreador GPS conectado. Vaya a la página de 'Seguimiento' para ver la ubicación al aire libre en tiempo real en un mapa, ver el historial de movimiento y configurar alertas de geocercas para cuando la persona entre o salga de áreas designadas."
+          }
+        }
+      },
+      "medicationManagement": {
+        "title": "Gestión de Medicamentos",
+        "questionKeys": ["setupReminders", "trackAdherence"],
+        "questions": {
+          "setupReminders": {
+            "question": "¿Cómo configuro recordatorios de medicamentos?",
+            "answer": "Navegue a 'Medicamentos' desde la barra lateral. Haga clic en 'Agregar Medicamento', ingrese el nombre del medicamento, dosis, frecuencia y horarios. El sistema enviará recordatorios en los horarios programados y rastreará la adherencia automáticamente si tiene un dispensador de medicamentos conectado."
+          },
+          "trackAdherence": {
+            "question": "¿Cómo se rastrea la adherencia a los medicamentos?",
+            "answer": "Si tiene un dispensador de medicamentos inteligente conectado, la adherencia se rastrea automáticamente. De lo contrario, puede registrar manualmente las dosis como tomadas, perdidas o tardías a través de la página de Medicamentos. Estos datos contribuyen a su puntuación de Función Cognitiva en el cálculo de ILQ."
+          }
+        }
+      },
+      "reports": {
+        "title": "Informes",
+        "questionKeys": ["reportTypes", "scheduleReports", "customizeDateRange"],
+        "questions": {
+          "reportTypes": {
+            "question": "¿Qué tipos de informes puedo generar?",
+            "answer": "Puede generar varios informes que incluyen: Resumen Diario, Tendencias de Signos Vitales, Anomalías de Salud, Resumen de Actividad, Análisis de Sueño, Adherencia a Medicamentos, Historial de Alertas, Seguridad Ambiental, Tendencias de Puntuación ILQ y Análisis Comparativo (semana a semana, mes a mes)."
+          },
+          "scheduleReports": {
+            "question": "¿Cómo programo informes automáticos?",
+            "answer": "En la página de Informes, desplácese hacia abajo a la sección 'Suscripciones de Informes por Correo Electrónico'. Haga clic en 'Suscribirse a Informe', seleccione el tipo de informe, frecuencia (diaria, semanal, mensual), hora y destinatarios. Los informes se generarán y enviarán automáticamente por correo electrónico según el programa."
+          },
+          "customizeDateRange": {
+            "question": "¿Puedo personalizar los rangos de fechas de los informes?",
+            "answer": "¡Sí! Use el filtro de rango de fechas en la parte superior de la página de Informes. Puede seleccionar fechas personalizadas usando el selector de calendario o usar opciones de selección rápida como 'Últimos 7 Días', 'Últimos 30 Días' o 'Últimos 3 Meses'."
+          }
+        }
+      },
+      "accountSettings": {
+        "title": "Cuenta y Configuración",
+        "questionKeys": ["changeProfile", "changeLanguage", "dataSecure"],
+        "questions": {
+          "changeProfile": {
+            "question": "¿Cómo cambio mi información de perfil?",
+            "answer": "Haga clic en su icono de perfil en la esquina superior derecha y seleccione 'Perfil'. Aquí puede actualizar su nombre, correo electrónico, número de teléfono, contactos de emergencia, condiciones médicas, foto de perfil y otra información personal."
+          },
+          "changeLanguage": {
+            "question": "¿Cómo cambio el idioma?",
+            "answer": "Haga clic en el selector de idioma (icono de globo) en la esquina superior derecha de la página. Seleccione su idioma preferido del menú desplegable. La interfaz se actualizará inmediatamente para mostrar en el idioma seleccionado."
+          },
+          "dataSecure": {
+            "question": "¿Mis datos están seguros?",
+            "answer": "Sí, nos tomamos la seguridad en serio. Todos los datos están encriptados en tránsito (HTTPS) y en reposo. Cumplimos con las regulaciones HIPAA y seguimos las mejores prácticas de la industria para la protección de datos. Tiene control total sobre quién puede acceder a sus datos a través de nuestro sistema de permisos de compartir."
+          }
+        }
+      },
+      "troubleshooting": {
+        "title": "Solución de Problemas",
+        "questionKeys": ["deviceNotConnecting", "noAlerts", "incorrectData"],
+        "questions": {
+          "deviceNotConnecting": {
+            "question": "Mi dispositivo no se conecta. ¿Qué debo hacer?",
+            "answer": "Primero, asegúrese de que el dispositivo esté encendido y en modo de emparejamiento. Verifique que Bluetooth esté habilitado en su teléfono/hub. Intente eliminar el dispositivo de la Gestión de Dispositivos y vuelva a agregarlo. Asegúrese de que el firmware del dispositivo esté actualizado. Si los problemas persisten, contacte al soporte."
+          },
+          "noAlerts": {
+            "question": "¿Por qué no estoy recibiendo alertas?",
+            "answer": "Verifique su configuración de notificaciones en Perfil > Preferencias de Alerta. Asegúrese de haber habilitado las notificaciones para los tipos de alerta que desea recibir. Verifique que su dirección de correo electrónico esté confirmada y revise su carpeta de spam. Para notificaciones en la aplicación, asegúrese de que las notificaciones del navegador estén permitidas."
+          },
+          "incorrectData": {
+            "question": "Mis datos de salud parecen incorrectos. ¿Qué debo hacer?",
+            "answer": "Primero, verifique que sus dispositivos estén calibrados correctamente y posicionados correctamente. Verifique la configuración del dispositivo y asegúrese de que coincida con su perfil (por ejemplo, altura, peso para cálculos precisos). Si los datos continúan viéndose incorrectos, intente volver a sincronizar el dispositivo o contacte al soporte para solucionar problemas específicos del dispositivo."
+          }
+        }
+      }
+    }
   },
   "privacyPolicy": {
     "lastUpdated": "Última Actualización",

@@ -46,6 +46,11 @@ export const Footer = () => {
                   {t('nav.investorInfo')}
                 </Link>
               </li>
+              <li>
+                <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors">
+                  {t('footer.faq', { defaultValue: 'FAQ' })}
+                </Link>
+              </li>
               {/*<li>*/}
               {/*  <Link to="/dashboard" className="text-muted-foreground hover:text-primary transition-colors">*/}
               {/*    {t('nav.dashboard')}*/}
