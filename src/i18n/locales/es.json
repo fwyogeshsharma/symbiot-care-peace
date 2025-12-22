@@ -440,6 +440,11 @@
       "tagline": "Uniendo familias y tecnología para un mejor cuidado."
     }
   },
+  "health": {
+    "title": "Panel de Salud",
+    "subtitle": "Monitoreo de signos vitales y métricas de salud",
+    "description": "Monitoreo integral de salud y seguimiento de signos vitales"
+  },
   "movement": {
     "title": "Panel de Actividad",
     "subtitle": "Seguimiento de patrones de actividad a lo largo del tiempo",
