@@ -3,7 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText, LayoutDashboard } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText, LayoutDashboard, ChevronDown, Database, Package, FileBarChart } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -97,6 +103,18 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const isDataMenuActive = () => {
+    return isActive('/health') || isActive('/movement-dashboard') || isActive('/tracking');
+  };
+
+  const isAssetsMenuActive = () => {
+    return isActive('/device-status');
+  };
+
+  const isReportsMenuActive = () => {
+    return isActive('/reports') || isActive('/alerts');
+  };
+
   const NavButtons = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
       <Button
@@ -109,66 +127,178 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         <LayoutDashboard className="w-4 h-4 mr-2" />
         {t('nav.dashboard')}
       </Button>
-      <Button
-        data-tour="nav-health"
-        variant={isActive('/health') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/health')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <HeartPulse className="w-4 h-4 mr-2" />
-        {t('nav.health')}
-      </Button>
-      <Button
-        data-tour="nav-activity"
-        variant={isActive('/movement-dashboard') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/movement-dashboard')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <Activity className="w-4 h-4 mr-2" />
-        {t('nav.movement')}
-      </Button>
-      <Button
-        data-tour="nav-tracking"
-        variant={isActive('/tracking') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/tracking')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <MapPin className="w-4 h-4 mr-2" />
-        {t('nav.tracking')}
-      </Button>
-      <Button
-        data-tour="nav-devices"
-        variant={isActive('/device-status') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/device-status')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <Wifi className="w-4 h-4 mr-2" />
-        {t('nav.devices')}
-      </Button>
-      <Button
-        data-tour="nav-reports"
-        variant={isActive('/reports') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/reports')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <FileText className="w-4 h-4 mr-2" />
-        {t('nav.reports')}
-      </Button>
-      <Button
-        data-tour="nav-alerts"
-        variant={isActive('/alerts') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/alerts')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <AlertTriangle className="w-4 h-4 mr-2" />
-        {t('nav.alerts')}
-      </Button>
+
+      {/* Data Dropdown - Desktop Only */}
+      {!isMobile ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              data-tour="nav-data"
+              variant={isDataMenuActive() ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-1"
+            >
+              <Database className="w-4 h-4 mr-2" />
+              {t('nav.data', { defaultValue: 'Data' })}
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem
+              onClick={() => navigate('/health')}
+              className="cursor-pointer"
+            >
+              <HeartPulse className="w-4 h-4 mr-2" />
+              {t('nav.health')}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => navigate('/movement-dashboard')}
+              className="cursor-pointer"
+            >
+              <Activity className="w-4 h-4 mr-2" />
+              {t('nav.movement')}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => navigate('/tracking')}
+              className="cursor-pointer"
+            >
+              <MapPin className="w-4 h-4 mr-2" />
+              {t('nav.tracking')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        /* Mobile - Show items separately */
+        <>
+          <Button
+            data-tour="nav-health"
+            variant={isActive('/health') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/health')}
+            className="w-full justify-start"
+          >
+            <HeartPulse className="w-4 h-4 mr-2" />
+            {t('nav.health')}
+          </Button>
+          <Button
+            data-tour="nav-activity"
+            variant={isActive('/movement-dashboard') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/movement-dashboard')}
+            className="w-full justify-start"
+          >
+            <Activity className="w-4 h-4 mr-2" />
+            {t('nav.movement')}
+          </Button>
+          <Button
+            data-tour="nav-tracking"
+            variant={isActive('/tracking') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/tracking')}
+            className="w-full justify-start"
+          >
+            <MapPin className="w-4 h-4 mr-2" />
+            {t('nav.tracking')}
+          </Button>
+        </>
+      )}
+
+      {/* Assets Dropdown - Desktop Only */}
+      {!isMobile ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              data-tour="nav-assets"
+              variant={isAssetsMenuActive() ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-1"
+            >
+              <Package className="w-4 h-4 mr-2" />
+              {t('nav.assets', { defaultValue: 'Assets' })}
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem
+              onClick={() => navigate('/device-status')}
+              className="cursor-pointer"
+            >
+              <Wifi className="w-4 h-4 mr-2" />
+              {t('nav.devices')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        /* Mobile - Show items separately */
+        <Button
+          data-tour="nav-devices"
+          variant={isActive('/device-status') ? 'default' : 'ghost'}
+          size="default"
+          onClick={() => navigate('/device-status')}
+          className="w-full justify-start"
+        >
+          <Wifi className="w-4 h-4 mr-2" />
+          {t('nav.devices')}
+        </Button>
+      )}
+
+      {/* Reports Dropdown - Desktop Only */}
+      {!isMobile ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              data-tour="nav-reports-menu"
+              variant={isReportsMenuActive() ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-1"
+            >
+              <FileBarChart className="w-4 h-4 mr-2" />
+              {t('nav.reportsMenu', { defaultValue: 'Reports' })}
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem
+              onClick={() => navigate('/reports')}
+              className="cursor-pointer"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              {t('nav.reports')}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => navigate('/alerts')}
+              className="cursor-pointer"
+            >
+              <AlertTriangle className="w-4 h-4 mr-2" />
+              {t('nav.alerts')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        /* Mobile - Show items separately */
+        <>
+          <Button
+            data-tour="nav-reports"
+            variant={isActive('/reports') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/reports')}
+            className="w-full justify-start"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            {t('nav.reports')}
+          </Button>
+          <Button
+            data-tour="nav-alerts"
+            variant={isActive('/alerts') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/alerts')}
+            className="w-full justify-start"
+          >
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            {t('nav.alerts')}
+          </Button>
+        </>
+      )}
       <Button
         variant="ghost"
         size={isMobile ? 'default' : 'sm'}

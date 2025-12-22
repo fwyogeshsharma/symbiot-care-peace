@@ -370,7 +370,10 @@
   "nav": {
     "home": "Inicio",
     "dashboard": "Panel",
+    "data": "Datos",
     "health": "Salud",
+    "assets": "Activos",
+    "reportsMenu": "Reportes",
     "profile": "Perfil",
     "alerts": "Alertas",
     "reports": "Reportes",
