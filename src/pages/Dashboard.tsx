@@ -10,7 +10,6 @@ import ElderlyList from '@/components/dashboard/ElderlyList';
 import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
 import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
-import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import Header from '@/components/layout/Header';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
@@ -27,33 +26,6 @@ const Dashboard = () => {
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [newAlert, setNewAlert] = useState<any>(null);
   const shouldShowTour = useShouldShowTour();
-
-  // Fetch user's dashboard layout
-  const { data: dashboardLayout } = useQuery({
-    queryKey: ['dashboard-layout', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-
-      const { data, error } = await supabase
-        .from('dashboard_layouts')
-        .select('layout_config')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  // Check if a component is enabled
-  const isComponentEnabled = (componentId: string) => {
-    if (!dashboardLayout?.layout_config) return true; // Default to showing all if no custom layout
-
-    const components = dashboardLayout.layout_config as any[];
-    const component = components.find((c: any) => c.id === componentId);
-    return component ? component.enabled : true;
-  };
 
   // Fetch elderly persons based on role
   const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
@@ -384,41 +356,26 @@ const Dashboard = () => {
         <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column - Elderly Persons & Devices */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            {isComponentEnabled('elderly-list') && (
-              <div data-tour="elderly-list">
-                <ElderlyList
-                  elderlyPersons={elderlyPersons || []}
-                  selectedPersonId={selectedPersonId}
-                  onSelectPerson={setSelectedPersonId}
-                />
-              </div>
-            )}
-            {isComponentEnabled('vital-metrics') && (
-              <div data-tour="vital-metrics">
-                <VitalMetrics selectedPersonId={selectedPersonId} />
-              </div>
-            )}
+            <div data-tour="elderly-list">
+              <ElderlyList 
+                elderlyPersons={elderlyPersons || []} 
+                selectedPersonId={selectedPersonId}
+                onSelectPerson={setSelectedPersonId}
+              />
+            </div>
+            <div data-tour="vital-metrics">
+              <VitalMetrics selectedPersonId={selectedPersonId} />
+            </div>
           </div>
 
-          {/* Right Column - Medication, Environmental, ILQ Score, Emergency Events & Alerts */}
+          {/* Right Column - Medication, Environmental, Emergency Events & Alerts */}
           <div className="space-y-4 sm:space-y-6">
-            {isComponentEnabled('ilq-score') && selectedPersonId && (
-              <ILQWidget elderlyPersonId={selectedPersonId} />
-            )}
-            {isComponentEnabled('medication') && (
-              <MedicationManagement selectedPersonId={selectedPersonId} />
-            )}
-            {isComponentEnabled('environmental') && (
-              <EnvironmentalSensors selectedPersonId={selectedPersonId} />
-            )}
-            {isComponentEnabled('panic-sos') && (
-              <PanicSosEvents selectedPersonId={selectedPersonId} />
-            )}
-            {isComponentEnabled('alerts') && (
-              <div data-tour="alerts-list">
-                <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
-              </div>
-            )}
+            <MedicationManagement selectedPersonId={selectedPersonId} />
+            <EnvironmentalSensors selectedPersonId={selectedPersonId} />
+            <PanicSosEvents selectedPersonId={selectedPersonId} />
+            <div data-tour="alerts-list">
+              <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
+            </div>
           </div>
         </div>
       </main>
