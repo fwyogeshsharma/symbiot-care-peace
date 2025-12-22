@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Globe, Share2, MapPin, Calendar } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Globe, Share2, MapPin, Calendar, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -367,6 +367,15 @@ const Profile = () => {
                 >
                   <HelpCircle className="w-4 h-4 mr-2" />
                   {t('profile.restartTour')}
+                </Button>
+                <Separator />
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => navigate('/customize-dashboard')}
+                >
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  {t('profile.customizeDashboard', { defaultValue: 'Customize Dashboard' })}
                 </Button>
                 <Separator />
                 {userRole === 'super_admin' && (

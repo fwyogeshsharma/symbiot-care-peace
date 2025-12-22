@@ -36,6 +36,7 @@ import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
 import LiabilityDisclaimer from "./pages/LiabilityDisclaimer";
 import FAQ from "./pages/FAQ";
+import CustomizeDashboard from "./pages/CustomizeDashboard";
 
 const queryClient = new QueryClient();
 
@@ -194,6 +195,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Reports />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customize-dashboard"
+              element={
+                <ProtectedRoute>
+                  <CustomizeDashboard />
                 </ProtectedRoute>
               }
             />
