@@ -149,6 +149,20 @@ const Dashboard = () => {
       <Header />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
+        {/* Page Heading */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title', { defaultValue: 'Dashboard' })}</h1>
+            <p className="text-muted-foreground mt-1">
+              {t('dashboard.subtitle', { defaultValue: 'Monitor and manage elderly care' })}
+            </p>
+          </div>
+          <Button onClick={() => navigate('/customize-dashboard')} variant="outline">
+            <LayoutDashboard className="w-4 h-4 mr-2" />
+            {t('profile.customizeDashboard', { defaultValue: 'Customize Dashboard' })}
+          </Button>
+        </div>
+
         {/* Main Content Grid */}
         <div className="space-y-4 sm:space-y-6">
           {/* Elderly List */}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,6 +57,14 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const playLogoSound = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reset to start
+      audioRef.current.play().catch(err => console.log('Audio play failed:', err));
+    }
+  };
 
   useEffect(() => {
     // Check if this is a password reset flow
@@ -274,6 +282,7 @@ const Auth = () => {
       <Card className="w-full max-w-md p-8 shadow-healthcare">
         <button
           onClick={() => navigate('/')}
+          onMouseEnter={playLogoSound}
           className="flex items-center justify-center mb-8 w-full hover:opacity-80 transition-opacity cursor-pointer"
           type="button"
         >
@@ -283,6 +292,8 @@ const Auth = () => {
             <p className="text-xs text-muted-foreground">{t('index.tagline')}</p>
           </div>
         </button>
+
+        <audio ref={audioRef} src="/symbiotVoice.mp3" preload="auto" />
 
         <h2 className="text-xl font-semibold mb-6 text-center">
           {isResetPassword ? t('auth.newPassword') : isForgotPassword ? t('auth.resetPassword') : isLogin ? t('auth.welcome') : t('auth.welcomeNew')}

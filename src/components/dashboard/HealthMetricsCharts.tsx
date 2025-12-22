@@ -64,23 +64,11 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
     enabled: !!selectedPersonId && open,
   });
 
-  // Default to showing all available data (or last 6 months if no earliest point)
-  const defaultFromDate = earliestDataPoint || subDays(new Date(), 180);
-
+  // Default to showing last 7 days
   const [dateRange, setDateRange] = useState({
-    from: defaultFromDate,
+    from: subDays(new Date(), 7),
     to: new Date(),
   });
-
-  // Update dateRange when earliestDataPoint is loaded
-  React.useEffect(() => {
-    if (earliestDataPoint && open) {
-      setDateRange({
-        from: earliestDataPoint,
-        to: new Date(),
-      });
-    }
-  }, [earliestDataPoint, open]);
 
   // Calculate if we should use monthly aggregation based on date range
   const daysDifference = Math.floor(
@@ -581,7 +569,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
                   {format(dateRange.from, 'MMM dd yyyy', { locale: dateLocale })} - {format(dateRange.to, 'MMM dd yyyy', { locale: dateLocale })}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
+              <PopoverContent className="w-48 p-0" align="end">
                 <div className="p-3 space-y-2">
                   <Button
                     variant="outline"
