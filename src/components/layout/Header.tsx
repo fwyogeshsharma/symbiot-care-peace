@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -8,6 +9,8 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { HelpPanel } from '@/components/help/HelpPanel';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -16,11 +19,39 @@ interface HeaderProps {
 }
 
 const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
-  const { userRole, signOut } = useAuth();
+  const { user, userRole, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [helpPanelOpen, setHelpPanelOpen] = useState(false);
   const { t } = useTranslation();
+
+  // Fetch user profile data
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   // Keyboard shortcut to open help panel (F1)
   useEffect(() => {
@@ -129,14 +160,37 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         {t('nav.alerts')}
       </Button>
       <Button
+        variant="ghost"
+        size={isMobile ? 'default' : 'sm'}
+        onClick={() => setHelpPanelOpen(true)}
+        className={cn(isMobile ? 'w-full justify-start' : 'gap-2')}
+        title="Help & Support (F1)"
+      >
+        <HelpCircle className="w-4 h-4 mr-2" />
+        {isMobile ? (
+          <span>{t('nav.help')}</span>
+        ) : (
+          <span className="hidden xl:inline">{t('nav.help')}</span>
+        )}
+      </Button>
+      <Button
         data-tour="user-menu"
         variant={isActive('/profile') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/profile')}
-        className={cn(isMobile && 'w-full justify-start')}
+        className={cn(isMobile ? 'w-full justify-start' : 'gap-2')}
       >
-        <User className="w-4 h-4 mr-2" />
-        {t('nav.profile')}
+        <Avatar className={cn("w-6 h-6", isMobile && "mr-2")}>
+          <AvatarImage src={userProfile?.avatar_url || undefined} alt={userProfile?.full_name || 'User'} />
+          <AvatarFallback className="bg-primary/10 text-primary text-xs">
+            {getInitials(userProfile?.full_name)}
+          </AvatarFallback>
+        </Avatar>
+        {isMobile ? (
+          <span>{userProfile?.full_name || t('nav.profile')}</span>
+        ) : (
+          <span className="hidden xl:inline">{userProfile?.full_name || t('nav.profile')}</span>
+        )}
       </Button>
     </>
   );
@@ -186,16 +240,6 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
               </Badge>
             )}
             <NavButtons />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setHelpPanelOpen(true)}
-              className="gap-2"
-              title="Help & Support (F1)"
-            >
-              <HelpCircle className="w-4 h-4" />
-              <span className="hidden xl:inline">{t('nav.help')}</span>
-            </Button>
           </div>
 
           {/* Right side - Mobile/Tablet */}
@@ -205,14 +249,6 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
                 {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
               </Badge>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setHelpPanelOpen(true)}
-              title="Help & Support"
-            >
-              <HelpCircle className="w-5 h-5" />
-            </Button>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm">
