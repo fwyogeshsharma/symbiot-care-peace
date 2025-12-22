@@ -11,6 +11,7 @@ import "./i18n/config";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Health from "./pages/Health";
 import Profile from "./pages/Profile";
 import DeviceStatusPage from "./pages/DeviceStatusPage";
 import DataSharingPage from "./pages/DataSharingPage";
@@ -36,6 +37,7 @@ import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
 import LiabilityDisclaimer from "./pages/LiabilityDisclaimer";
 import FAQ from "./pages/FAQ";
+import CustomizeDashboard from "./pages/CustomizeDashboard";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +58,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/health"
+              element={
+                <ProtectedRoute>
+                  <Health />
                 </ProtectedRoute>
               }
             />
@@ -194,6 +204,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Reports />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customize-dashboard"
+              element={
+                <ProtectedRoute>
+                  <CustomizeDashboard />
                 </ProtectedRoute>
               }
             />

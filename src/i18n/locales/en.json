@@ -1386,6 +1386,11 @@
     "phoneRequired": "Phone number is required (minimum 10 digits)",
     "postalAddressRequired": "Postal address is required (minimum 5 characters)"
   },
+  "health": {
+    "title": "Health Dashboard",
+    "subtitle": "Monitor vital signs and health metrics",
+    "description": "Comprehensive health monitoring and vital signs tracking"
+  },
   "movement": {
     "title": "Activity Dashboard",
     "subtitle": "Track activity patterns over time",

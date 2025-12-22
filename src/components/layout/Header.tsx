@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText, LayoutDashboard } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -100,10 +100,20 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
   const NavButtons = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
       <Button
-        data-tour="nav-health"
+        data-tour="nav-dashboard"
         variant={isActive('/dashboard') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/dashboard')}
+        className={cn(isMobile && 'w-full justify-start')}
+      >
+        <LayoutDashboard className="w-4 h-4 mr-2" />
+        {t('nav.dashboard')}
+      </Button>
+      <Button
+        data-tour="nav-health"
+        variant={isActive('/health') ? 'default' : 'ghost'}
+        size={isMobile ? 'default' : 'sm'}
+        onClick={() => navigate('/health')}
         className={cn(isMobile && 'w-full justify-start')}
       >
         <HeartPulse className="w-4 h-4 mr-2" />
