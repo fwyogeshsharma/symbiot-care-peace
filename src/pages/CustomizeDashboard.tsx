@@ -19,12 +19,7 @@ import {
   X,
   Eye,
   BarChart3,
-  Wifi,
-  Share2,
   Map,
-  Camera,
-  Smartphone,
-  Home,
   Clock,
   MapPin
 } from 'lucide-react';
@@ -75,7 +70,7 @@ const CustomizeDashboard = () => {
       name: t('dashboard.healthCharts', { defaultValue: 'Health Metrics Charts' }),
       description: t('dashboard.healthChartsDesc', { defaultValue: 'Detailed health trend charts and history' }),
       icon: BarChart3,
-      enabled: false,
+      enabled: true,
       category: 'health'
     },
     {
@@ -83,7 +78,7 @@ const CustomizeDashboard = () => {
       name: t('dashboard.alerts', { defaultValue: 'Active Alerts' }),
       description: t('dashboard.alertsDesc', { defaultValue: 'Current alerts and notifications' }),
       icon: AlertTriangle,
-      enabled: true,
+      enabled: false,
       category: 'monitoring'
     },
     {
@@ -91,7 +86,7 @@ const CustomizeDashboard = () => {
       name: t('dashboard.panicSos', { defaultValue: 'Panic/SOS Events' }),
       description: t('dashboard.panicSosDesc', { defaultValue: 'Emergency button activity' }),
       icon: AlertTriangle,
-      enabled: true,
+      enabled: false,
       category: 'monitoring'
     },
     {
@@ -107,7 +102,7 @@ const CustomizeDashboard = () => {
       name: t('dashboard.medication', { defaultValue: 'Medication Management' }),
       description: t('dashboard.medicationDesc', { defaultValue: 'Medication schedule and adherence' }),
       icon: Pill,
-      enabled: true,
+      enabled: false,
       category: 'health'
     },
     {
@@ -115,7 +110,7 @@ const CustomizeDashboard = () => {
       name: t('dashboard.ilqScore', { defaultValue: 'ILQ Score' }),
       description: t('dashboard.ilqScoreDesc', { defaultValue: 'Independent Living Quality metrics' }),
       icon: TrendingUp,
-      enabled: true,
+      enabled: false,
       category: 'analytics'
     },
     {
@@ -149,38 +144,6 @@ const CustomizeDashboard = () => {
       icon: MapPin,
       enabled: false,
       category: 'activity'
-    },
-    {
-      id: 'device-status',
-      name: t('dashboard.deviceStatus', { defaultValue: 'Device Status' }),
-      description: t('dashboard.deviceStatusDesc', { defaultValue: 'Connected devices and battery levels' }),
-      icon: Wifi,
-      enabled: false,
-      category: 'devices'
-    },
-    {
-      id: 'home-hub',
-      name: t('dashboard.homeHub', { defaultValue: 'Home Hub' }),
-      description: t('dashboard.homeHubDesc', { defaultValue: 'Home hub device status and info' }),
-      icon: Home,
-      enabled: false,
-      category: 'devices'
-    },
-    {
-      id: 'smartphone',
-      name: t('dashboard.smartphone', { defaultValue: 'Smartphone' }),
-      description: t('dashboard.smartphoneDesc', { defaultValue: 'Mobile device status and location' }),
-      icon: Smartphone,
-      enabled: false,
-      category: 'devices'
-    },
-    {
-      id: 'cameras',
-      name: t('dashboard.cameras', { defaultValue: 'Security Cameras' }),
-      description: t('dashboard.camerasDesc', { defaultValue: 'Live camera feeds and recordings' }),
-      icon: Camera,
-      enabled: false,
-      category: 'security'
     }
   ];
 

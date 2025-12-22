@@ -15,10 +15,6 @@ import { MovementSummary } from '@/components/dashboard/MovementSummary';
 import { MovementTimeline } from '@/components/dashboard/MovementTimeline';
 import { MovementHeatmap } from '@/components/dashboard/MovementHeatmap';
 import { DwellTimeAnalysis } from '@/components/dashboard/DwellTimeAnalysis';
-import DeviceStatus from '@/components/dashboard/DeviceStatus';
-import HomeHubCard from '@/components/dashboard/HomeHubCard';
-import SmartPhoneCard from '@/components/dashboard/SmartPhoneCard';
-import CameraStream from '@/components/dashboard/CameraStream';
 import Header from '@/components/layout/Header';
 import { useTranslation } from 'react-i18next';
 import { Footer } from '@/components/Footer';
@@ -113,7 +109,7 @@ const Dashboard = () => {
   const isComponentEnabled = (componentId: string) => {
     if (!dashboardLayout?.layout_config) {
       // No custom layout saved - show default components
-      const defaultEnabled = ['elderly-list', 'vital-metrics', 'alerts', 'panic-sos', 'environmental', 'medication', 'ilq-score'];
+      const defaultEnabled = ['elderly-list', 'vital-metrics', 'health-charts', 'environmental'];
       console.log('No dashboard layout, using defaults for:', componentId, defaultEnabled.includes(componentId));
       return defaultEnabled.includes(componentId);
     }
@@ -153,24 +149,6 @@ const Dashboard = () => {
       <Header />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
-        {/* Header with Customize Button */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">{t('nav.dashboard', { defaultValue: 'Dashboard' })}</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('dashboard.welcome', { defaultValue: 'Welcome to your personalized dashboard' })}
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => navigate('/customize-dashboard')}
-            className="flex items-center gap-2"
-          >
-            <LayoutDashboard className="w-4 h-4" />
-            <span className="hidden sm:inline">{t('profile.customizeDashboard', { defaultValue: 'Customize' })}</span>
-          </Button>
-        </div>
-
         {/* Main Content Grid */}
         <div className="space-y-4 sm:space-y-6">
           {/* Elderly List */}
@@ -226,24 +204,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Full Width Components */}
-          {isComponentEnabled('device-status') && (
-            <DeviceStatus selectedPersonId={selectedPersonId} />
-          )}
-
-          {/* Device Cards - Side by Side */}
-          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-            {isComponentEnabled('home-hub') && (
-              <HomeHubCard selectedPersonId={selectedPersonId} />
-            )}
-            {isComponentEnabled('smartphone') && (
-              <SmartPhoneCard selectedPersonId={selectedPersonId} />
-            )}
-          </div>
-
-          {isComponentEnabled('cameras') && (
-            <CameraStream />
-          )}
         </div>
 
         {/* Empty State */}
