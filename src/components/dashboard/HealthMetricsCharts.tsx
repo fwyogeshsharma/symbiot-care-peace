@@ -108,6 +108,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           'oxygen_saturation',
           'temperature',
           'sleep_quality',
+          'humidity',
           'button_pressed'
         ])
         .gte('recorded_at', dateRange.from.toISOString())
@@ -646,12 +647,13 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           </div>
         ) : (
           <Tabs defaultValue="heart_rate" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7">
               <TabsTrigger value="heart_rate">{t('healthMetrics.charts.heartRate')}</TabsTrigger>
               <TabsTrigger value="blood_pressure">{t('healthMetrics.charts.bloodPressure')}</TabsTrigger>
               <TabsTrigger value="oxygen">{t('healthMetrics.charts.oxygen')}</TabsTrigger>
               <TabsTrigger value="temperature">{t('healthMetrics.charts.temperature')}</TabsTrigger>
               <TabsTrigger value="sleep_quality">{t('healthMetrics.charts.sleep')}</TabsTrigger>
+              <TabsTrigger value="humidity">{t('healthMetrics.charts.humidity')}</TabsTrigger>
               <TabsTrigger value="panic_sos">{t('healthMetrics.charts.panicSos')}</TabsTrigger>
             </TabsList>
 
@@ -687,6 +689,13 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
               <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-4">{t('healthMetrics.charts.sleepOverTime')}</h3>
                 {renderChart('sleep_quality', t('healthMetrics.charts.sleepQuality'), 'hsl(var(--info))', '%')}
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="humidity" className="mt-4">
+              <Card className="p-4">
+                <h3 className="text-lg font-semibold mb-4">{t('healthMetrics.charts.humidityOverTime')}</h3>
+                {renderChart('humidity', t('healthMetrics.charts.humidity'), 'hsl(var(--info))', '%')}
               </Card>
             </TabsContent>
 
