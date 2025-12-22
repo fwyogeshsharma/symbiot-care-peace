@@ -241,6 +241,24 @@ const Reports = () => {
     setReportViewerOpen(true);
   };
 
+  // Helper function to check if current date range matches a preset
+  const isDateRangeActive = (days: number) => {
+    const now = new Date();
+    const expectedFrom = new Date();
+    if (days === 90) {
+      // For 3 months, use setMonth
+      expectedFrom.setMonth(now.getMonth() - 3);
+    } else {
+      expectedFrom.setDate(now.getDate() - days);
+    }
+
+    // Compare dates (ignoring time)
+    const fromMatch = dateRange.from.toDateString() === expectedFrom.toDateString();
+    const toMatch = dateRange.to.toDateString() === now.toDateString();
+
+    return fromMatch && toMatch;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -348,7 +366,7 @@ const Reports = () => {
                 </label>
                 <div className="flex flex-wrap gap-2">
                   <Button
-                    variant="outline"
+                    variant={isDateRangeActive(7) ? "default" : "outline"}
                     size="sm"
                     onClick={() => setDateRange({
                       from: new Date(new Date().setDate(new Date().getDate() - 7)),
@@ -358,7 +376,7 @@ const Reports = () => {
                     {t('reports.last7Days', { defaultValue: 'Last 7 Days' })}
                   </Button>
                   <Button
-                    variant="outline"
+                    variant={isDateRangeActive(30) ? "default" : "outline"}
                     size="sm"
                     onClick={() => setDateRange({
                       from: new Date(new Date().setDate(new Date().getDate() - 30)),
@@ -368,7 +386,7 @@ const Reports = () => {
                     {t('reports.last30Days', { defaultValue: 'Last 30 Days' })}
                   </Button>
                   <Button
-                    variant="outline"
+                    variant={isDateRangeActive(90) ? "default" : "outline"}
                     size="sm"
                     onClick={() => setDateRange({
                       from: new Date(new Date().setMonth(new Date().getMonth() - 3)),
