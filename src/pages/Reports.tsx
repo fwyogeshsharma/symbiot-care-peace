@@ -17,9 +17,6 @@ import {
   Download,
   FileText,
   BarChart3,
-  Droplets,
-  Wind,
-  Home,
   Clock,
   Target
 } from 'lucide-react';
@@ -178,22 +175,6 @@ const Reports = () => {
         {
           name: t('reports.alerts.responseTime', { defaultValue: 'Response Time Analysis' }),
           description: t('reports.alerts.responseTimeDesc', { defaultValue: 'Average time to acknowledge and resolve' })
-        },
-      ]
-    },
-    {
-      id: 'environment',
-      title: t('reports.categories.environment', { defaultValue: 'Environmental Safety' }),
-      icon: Home,
-      description: t('reports.categories.environmentDesc', { defaultValue: 'Home environment conditions' }),
-      reports: [
-        {
-          name: t('reports.environment.airQuality', { defaultValue: 'Air Quality Report' }),
-          description: t('reports.environment.airQualityDesc', { defaultValue: 'Temperature, humidity, and air quality trends' })
-        },
-        {
-          name: t('reports.environment.comfort', { defaultValue: 'Comfort Analysis' }),
-          description: t('reports.environment.comfortDesc', { defaultValue: 'Optimal vs actual environmental conditions' })
         },
       ]
     },
@@ -403,7 +384,7 @@ const Reports = () => {
 
         {/* Report Categories */}
         <Tabs defaultValue="daily" className="space-y-6">
-          <TabsList className="grid grid-cols-5 grid-rows-2 w-full h-auto gap-2 p-2">
+          <TabsList className="grid grid-cols-4 grid-rows-2 w-full h-auto gap-2 p-2">
             {reportCategories.map((category) => {
               const Icon = category.icon;
               return (

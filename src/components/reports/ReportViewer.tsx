@@ -20,6 +20,7 @@ import { WeekOverWeekReport } from './WeekOverWeekReport';
 import { MonthOverMonthReport } from './MonthOverMonthReport';
 import { EndOfDayReport } from './EndOfDayReport';
 import { FallIncidentsReport } from './FallIncidentsReport';
+import { EnvironmentalSafetyReport } from './EnvironmentalSafetyReport';
 import { useTranslation } from 'react-i18next';
 
 interface ReportViewerProps {
@@ -115,6 +116,10 @@ export const ReportViewer = ({
         return <ResponseTimeAnalysisReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Environmental Safety Reports
+      case 'Environmental Safety Assessment':
+      case t('reports.environment.safetyAssessment'):
+        return <EnvironmentalSafetyReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+
       case 'Air Quality Report':
       case t('reports.environment.airQuality'):
         return <AirQualityReport selectedPerson={selectedPerson} dateRange={dateRange} />;
