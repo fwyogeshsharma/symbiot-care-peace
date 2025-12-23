@@ -23,7 +23,8 @@
       "WebFetch(domain:codepen.io)",
       "Bash(wc:*)",
       "Bash(dir:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

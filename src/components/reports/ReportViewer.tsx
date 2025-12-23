@@ -22,6 +22,9 @@ import { EndOfDayReport } from './EndOfDayReport';
 import { FallIncidentsReport } from './FallIncidentsReport';
 import { EnvironmentalSafetyReport } from './EnvironmentalSafetyReport';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
+import { exportReportById } from '@/lib/reportExport';
+import { toast } from 'sonner';
 
 interface ReportViewerProps {
   open: boolean;
@@ -39,10 +42,28 @@ export const ReportViewer = ({
   dateRange,
 }: ReportViewerProps) => {
   const { t } = useTranslation();
+  const [isExporting, setIsExporting] = useState(false);
 
-  const handleExport = () => {
-    // TODO: Implement PDF export
-    console.log('Exporting report:', reportName);
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      toast.info(t('reports.preparingExport', { defaultValue: 'Preparing report for export...' }));
+
+      console.log('ReportViewer: Starting export for', reportName);
+
+      // Wait for report to be fully rendered with data
+      await exportReportById('report-content', reportName, 'pdf', 1500);
+
+      console.log('ReportViewer: Export completed');
+
+      toast.success(t('reports.exportSuccess', { defaultValue: 'Report exported successfully!' }));
+    } catch (error) {
+      console.error('ReportViewer: Export error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(t('reports.exportError', { defaultValue: 'Failed to export report. Please try again.' }) + ` (${errorMessage})`);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handlePrint = () => {
@@ -181,15 +202,17 @@ export const ReportViewer = ({
                 variant="outline"
                 size="sm"
                 onClick={handleExport}
+                disabled={isExporting}
                 title={t('reports.exportToPDF', { defaultValue: 'Export to PDF' })}
               >
                 <Download className="w-4 h-4" />
+                {isExporting && <span className="ml-2">{t('common.loading', { defaultValue: 'Loading...' })}</span>}
               </Button>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="mt-6">
+        <div id="report-content" className="mt-6">
           {renderReport()}
         </div>
       </DialogContent>

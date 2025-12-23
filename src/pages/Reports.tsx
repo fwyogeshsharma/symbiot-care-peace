@@ -29,6 +29,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ReportViewer } from '@/components/reports/ReportViewer';
 import { ReportSubscriptionManager } from '@/components/reports/ReportSubscriptionManager';
 import { Footer } from '@/components/Footer';
+import { toast } from 'sonner';
 
 const Reports = () => {
   const { t } = useTranslation();
@@ -40,6 +41,7 @@ const Reports = () => {
   const [selectedPerson, setSelectedPerson] = useState<string>('all');
   const [currentReport, setCurrentReport] = useState<string | null>(null);
   const [reportViewerOpen, setReportViewerOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Fetch elderly persons
   const { data: elderlyPersons = [] } = useQuery({
@@ -212,9 +214,100 @@ const Reports = () => {
     },
   ];
 
-  const handleExport = (reportType: string) => {
-    // TODO: Implement export functionality
-    console.log('Exporting report:', reportType);
+  const handleExport = async (reportName: string) => {
+    setIsExporting(true);
+    try {
+      // Show loading message
+      toast.info(t('reports.preparingExport', { defaultValue: 'Preparing report for export...' }));
+
+      // Open the report viewer temporarily to render the report
+      setCurrentReport(reportName);
+      setReportViewerOpen(true);
+
+      // Wait for the report to render completely with data
+      // This gives time for database queries to complete and charts to render
+      await new Promise(resolve => setTimeout(resolve, 2500));
+
+      // Import the export function dynamically
+      const { exportReportById } = await import('@/lib/reportExport');
+
+      console.log('Starting export for:', reportName);
+
+      // Export with additional wait time for charts/async content
+      await exportReportById('report-content', reportName, 'pdf', 1500);
+
+      console.log('Export completed for:', reportName);
+
+      toast.success(t('reports.exportSuccess', { defaultValue: 'Report exported successfully!' }));
+
+      // Close the viewer after export completes
+      setTimeout(() => setReportViewerOpen(false), 1000);
+    } catch (error) {
+      console.error('Export error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(t('reports.exportError', { defaultValue: 'Failed to export report. Please try again.' }) + ` (${errorMessage})`);
+      // Close viewer on error too
+      setReportViewerOpen(false);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportAll = async (categoryId: string) => {
+    const category = reportCategories.find(cat => cat.id === categoryId);
+    if (!category) return;
+
+    setIsExporting(true);
+    let exportedCount = 0;
+
+    try {
+      toast.info(t('reports.exportingAll', {
+        defaultValue: `Exporting ${category.reports.length} reports...`,
+        count: category.reports.length
+      }));
+
+      for (let i = 0; i < category.reports.length; i++) {
+        const report = category.reports[i];
+
+        toast.info(t('reports.exportingReport', {
+          defaultValue: `Exporting ${i + 1} of ${category.reports.length}: ${report.name}`,
+          current: i + 1,
+          total: category.reports.length,
+          name: report.name
+        }));
+
+        try {
+          await handleExport(report.name);
+          exportedCount++;
+          // Longer delay between exports to ensure proper cleanup
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error(`Failed to export ${report.name}:`, error);
+          toast.error(t('reports.exportSingleFailed', {
+            defaultValue: `Failed to export ${report.name}`,
+            name: report.name
+          }));
+        }
+      }
+
+      if (exportedCount === category.reports.length) {
+        toast.success(t('reports.exportAllSuccess', {
+          defaultValue: 'All reports exported successfully!',
+          count: category.reports.length
+        }));
+      } else {
+        toast.warning(t('reports.exportAllPartial', {
+          defaultValue: `Exported ${exportedCount} of ${category.reports.length} reports`,
+          exported: exportedCount,
+          total: category.reports.length
+        }));
+      }
+    } catch (error) {
+      console.error('Export all error:', error);
+      toast.error(t('reports.exportAllError', { defaultValue: 'Failed to export all reports.' }));
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleGenerate = (reportName: string) => {
@@ -413,7 +506,8 @@ const Reports = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleExport(category.id)}
+                      onClick={() => handleExportAll(category.id)}
+                      disabled={isExporting}
                     >
                       <Download className="w-4 h-4 mr-2" />
                       {t('reports.exportAll', { defaultValue: 'Export All' })}
@@ -447,6 +541,8 @@ const Reports = () => {
                               size="sm"
                               variant="outline"
                               onClick={() => handleExport(report.name)}
+                              disabled={isExporting}
+                              title={t('reports.exportToPDF', { defaultValue: 'Export to PDF' })}
                             >
                               <Download className="w-4 h-4" />
                             </Button>
