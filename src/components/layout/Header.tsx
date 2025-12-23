@@ -353,7 +353,13 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
                 <span className="hidden sm:inline ml-2">{t('profile.back')}</span>
               </Button>
             )}
-            <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
+            <Activity
+              className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0 cursor-pointer"
+              onMouseEnter={() => {
+                const audio = new Audio('/symbiotVoice.mp3');
+                audio.play().catch(err => console.log('Audio play failed:', err));
+              }}
+            />
             <Button
               data-tour="nav-dashboard"
               variant="ghost"

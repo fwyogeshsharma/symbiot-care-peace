@@ -33,7 +33,13 @@ const Index = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div
+              className="flex items-center gap-2 sm:gap-3 cursor-pointer"
+              onMouseEnter={() => {
+                const audio = new Audio('/symbiotVoice.mp3');
+                audio.play().catch(err => console.log('Audio play failed:', err));
+              }}
+            >
               <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               <div>
                 <h1 className="text-base sm:text-xl font-bold text-foreground">{t('common.symbiot')}</h1>
