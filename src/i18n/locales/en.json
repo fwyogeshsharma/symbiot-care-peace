@@ -346,8 +346,10 @@
   "nav": {
     "home": "Home",
     "dashboard": "Dashboard",
+    "vital": "Vital",
     "data": "Data",
     "health": "Health",
+    "insights": "Insights",
     "assets": "Assets",
     "reportsMenu": "Results",
     "profile": "Profile",

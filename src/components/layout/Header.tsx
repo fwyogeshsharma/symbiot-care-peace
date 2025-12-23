@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText, LayoutDashboard, ChevronDown, Database, Package, FileBarChart } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText, LayoutDashboard, ChevronDown, FileBarChart } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -103,15 +103,11 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const isDataMenuActive = () => {
-    return isActive('/health') || isActive('/movement-dashboard') || isActive('/tracking');
+  const isVitalMenuActive = () => {
+    return isActive('/health') || isActive('/movement-dashboard');
   };
 
-  const isAssetsMenuActive = () => {
-    return isActive('/device-status');
-  };
-
-  const isReportsMenuActive = () => {
+  const isInsightsMenuActive = () => {
     return isActive('/reports') || isActive('/alerts');
   };
 
@@ -128,18 +124,18 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         {t('nav.dashboard')}
       </Button>
 
-      {/* Data Dropdown - Desktop Only */}
+      {/* Vital Dropdown - Desktop Only */}
       {!isMobile ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              data-tour="nav-data"
-              variant={isDataMenuActive() ? 'default' : 'ghost'}
+              data-tour="nav-vital"
+              variant={isVitalMenuActive() ? 'default' : 'ghost'}
               size="sm"
               className="flex items-center gap-1"
             >
-              <Database className="w-4 h-4 mr-2" />
-              {t('nav.data', { defaultValue: 'Data' })}
+              <HeartPulse className="w-4 h-4 mr-2" />
+              {t('nav.vital', { defaultValue: 'Vital' })}
               <ChevronDown className="w-3 h-3 ml-1" />
             </Button>
           </DropdownMenuTrigger>
@@ -157,13 +153,6 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
             >
               <Activity className="w-4 h-4 mr-2" />
               {t('nav.movement')}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => navigate('/tracking')}
-              className="cursor-pointer"
-            >
-              <MapPin className="w-4 h-4 mr-2" />
-              {t('nav.tracking')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -190,70 +179,45 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
             <Activity className="w-4 h-4 mr-2" />
             {t('nav.movement')}
           </Button>
-          <Button
-            data-tour="nav-tracking"
-            variant={isActive('/tracking') ? 'default' : 'ghost'}
-            size="default"
-            onClick={() => navigate('/tracking')}
-            className="w-full justify-start"
-          >
-            <MapPin className="w-4 h-4 mr-2" />
-            {t('nav.tracking')}
-          </Button>
         </>
       )}
 
-      {/* Assets Dropdown - Desktop Only */}
-      {!isMobile ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              data-tour="nav-assets"
-              variant={isAssetsMenuActive() ? 'default' : 'ghost'}
-              size="sm"
-              className="flex items-center gap-1"
-            >
-              <Package className="w-4 h-4 mr-2" />
-              {t('nav.assets', { defaultValue: 'Assets' })}
-              <ChevronDown className="w-3 h-3 ml-1" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem
-              onClick={() => navigate('/device-status')}
-              className="cursor-pointer"
-            >
-              <Wifi className="w-4 h-4 mr-2" />
-              {t('nav.devices')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ) : (
-        /* Mobile - Show items separately */
-        <Button
-          data-tour="nav-devices"
-          variant={isActive('/device-status') ? 'default' : 'ghost'}
-          size="default"
-          onClick={() => navigate('/device-status')}
-          className="w-full justify-start"
-        >
-          <Wifi className="w-4 h-4 mr-2" />
-          {t('nav.devices')}
-        </Button>
-      )}
+      {/* Tracking Button */}
+      <Button
+        data-tour="nav-tracking"
+        variant={isActive('/tracking') ? 'default' : 'ghost'}
+        size={isMobile ? 'default' : 'sm'}
+        onClick={() => navigate('/tracking')}
+        className={cn(isMobile && 'w-full justify-start')}
+      >
+        <MapPin className="w-4 h-4 mr-2" />
+        {t('nav.tracking')}
+      </Button>
 
-      {/* Reports Dropdown - Desktop Only */}
+      {/* Devices Button */}
+      <Button
+        data-tour="nav-devices"
+        variant={isActive('/device-status') ? 'default' : 'ghost'}
+        size={isMobile ? 'default' : 'sm'}
+        onClick={() => navigate('/device-status')}
+        className={cn(isMobile && 'w-full justify-start')}
+      >
+        <Wifi className="w-4 h-4 mr-2" />
+        {t('nav.devices')}
+      </Button>
+
+      {/* Insights Dropdown - Desktop Only */}
       {!isMobile ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              data-tour="nav-reports-menu"
-              variant={isReportsMenuActive() ? 'default' : 'ghost'}
+              data-tour="nav-insights"
+              variant={isInsightsMenuActive() ? 'default' : 'ghost'}
               size="sm"
               className="flex items-center gap-1"
             >
               <FileBarChart className="w-4 h-4 mr-2" />
-              {t('nav.reportsMenu', { defaultValue: 'Reports' })}
+              {t('nav.insights', { defaultValue: 'Insights' })}
               <ChevronDown className="w-3 h-3 ml-1" />
             </Button>
           </DropdownMenuTrigger>
