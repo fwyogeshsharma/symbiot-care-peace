@@ -376,8 +376,10 @@
   "nav": {
     "home": "Inicio",
     "dashboard": "Panel",
+    "vital": "Vital",
     "data": "Datos",
     "health": "Salud",
+    "insights": "Información",
     "assets": "Activos",
     "reportsMenu": "Resultados",
     "profile": "Perfil",

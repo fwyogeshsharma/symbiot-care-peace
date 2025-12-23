@@ -376,7 +376,9 @@
   "nav": {
     "home": "Startseite",
     "dashboard": "Dashboard",
+    "vital": "Vital",
     "health": "Gesundheit",
+    "insights": "Einblicke",
     "profile": "Profil",
     "alerts": "Warnungen",
     "reports": "Berichte",
