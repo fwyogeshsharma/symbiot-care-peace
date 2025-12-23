@@ -1986,6 +1986,24 @@
         "fallIncidents": "Fall Incidents",
         "fallIncidentsDesc": "Fall detection events and risk analysis"
       },
+      "movementPatterns": {
+        "noData": "No movement data available for the selected period.",
+        "noDataDesc": "Ensure location tracking devices are properly configured.",
+        "totalMovements": "Total Movements",
+        "recordedEvents": "Recorded events",
+        "locationsVisited": "Locations Visited",
+        "uniqueLocations": "Unique locations",
+        "roomTransitions": "Room Transitions",
+        "locationChanges": "Location changes",
+        "mostVisited": "Most Visited",
+        "hourlyMovement": "Movement Frequency by Hour",
+        "movements": "Movements",
+        "timeDistribution": "Activity by Time of Day",
+        "dwellTime": "Time Spent by Location",
+        "topTransitions": "Top Location Transitions",
+        "transitions": "transitions",
+        "detailedDwellTime": "Detailed Dwell Time Analysis"
+      },
       "sleep": {
         "quality": "Sleep Quality Report",
         "qualityDesc": "Duration, quality scores, and disturbances",

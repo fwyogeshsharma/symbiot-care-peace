@@ -1791,6 +1791,24 @@
       "reviewMedications": "चक्कर या संतुलन को प्रभावित करने वाली दवाओं की नियमित समीक्षा।",
       "physicalTherapy": "शक्ति और स्थिरता में सुधार के लिए फिजियोथेरेपी या संतुलन व्यायाम पर विचार करें।"
     },
+    "movementPatterns": {
+      "noData": "चयनित अवधि के लिए कोई गतिविधि डेटा उपलब्ध नहीं है।",
+      "noDataDesc": "सुनिश्चित करें कि स्थान ट्रैकिंग उपकरण ठीक से कॉन्फ़िगर किए गए हैं।",
+      "totalMovements": "कुल गतिविधियां",
+      "recordedEvents": "रिकॉर्ड की गई घटनाएं",
+      "locationsVisited": "देखे गए स्थान",
+      "uniqueLocations": "अद्वितीय स्थान",
+      "roomTransitions": "कमरे के बीच संक्रमण",
+      "locationChanges": "स्थान परिवर्तन",
+      "mostVisited": "सबसे अधिक देखा गया",
+      "hourlyMovement": "प्रति घंटे गतिविधि आवृत्ति",
+      "movements": "गतिविधियां",
+      "timeDistribution": "दिन के समय के अनुसार गतिविधि",
+      "dwellTime": "स्थान के अनुसार बिताया गया समय",
+      "topTransitions": "शीर्ष स्थान संक्रमण",
+      "transitions": "संक्रमण",
+      "detailedDwellTime": "विस्तृत ठहराव समय विश्लेषण"
+    },
     "healthAnomalies": {
       "allReadingsNormal": "सभी रीडिंग सामान्य",
       "noAnomaliesDetected": "चयनित अवधि में कोई स्वास्थ्य विसंगति का पता नहीं चला",

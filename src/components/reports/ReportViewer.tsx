@@ -21,6 +21,7 @@ import { MonthOverMonthReport } from './MonthOverMonthReport';
 import { EndOfDayReport } from './EndOfDayReport';
 import { FallIncidentsReport } from './FallIncidentsReport';
 import { EnvironmentalSafetyReport } from './EnvironmentalSafetyReport';
+import { MovementPatternsReport } from './MovementPatternsReport';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { exportReportById } from '@/lib/reportExport';
@@ -99,7 +100,7 @@ export const ReportViewer = ({
 
       case 'Movement Patterns':
       case t('reports.activity.movementPatterns'):
-        return <DailyActivityReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+        return <MovementPatternsReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       case 'Fall Incidents':
       case t('reports.activity.fallIncidents'):

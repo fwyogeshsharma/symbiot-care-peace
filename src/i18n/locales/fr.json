@@ -1965,6 +1965,24 @@
       "reviewMedications": "Révision régulière des médicaments pouvant causer des étourdissements ou affecter l'équilibre.",
       "physicalTherapy": "Envisager la physiothérapie ou des exercices d'équilibre pour améliorer la force et la stabilité."
     },
+    "movementPatterns": {
+      "noData": "Aucune donnée de mouvement disponible pour la période sélectionnée.",
+      "noDataDesc": "Assurez-vous que les dispositifs de suivi de localisation sont correctement configurés.",
+      "totalMovements": "Mouvements Totaux",
+      "recordedEvents": "Événements enregistrés",
+      "locationsVisited": "Lieux Visités",
+      "uniqueLocations": "Lieux uniques",
+      "roomTransitions": "Transitions de Pièce",
+      "locationChanges": "Changements de lieu",
+      "mostVisited": "Le Plus Visité",
+      "hourlyMovement": "Fréquence de Mouvement par Heure",
+      "movements": "Mouvements",
+      "timeDistribution": "Activité par Moment de la Journée",
+      "dwellTime": "Temps Passé par Lieu",
+      "topTransitions": "Principales Transitions de Lieu",
+      "transitions": "transitions",
+      "detailedDwellTime": "Analyse Détaillée du Temps de Séjour"
+    },
     "healthAnomalies": {
       "allReadingsNormal": "Toutes les Lectures Normales",
       "noAnomaliesDetected": "Aucune anomalie de santé détectée dans la période sélectionnée",

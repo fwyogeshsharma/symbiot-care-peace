@@ -1973,6 +1973,24 @@
       "reviewMedications": "Revisión regular de medicamentos que puedan causar mareos o afectar el equilibrio.",
       "physicalTherapy": "Considere terapia física o ejercicios de equilibrio para mejorar la fuerza y estabilidad."
     },
+    "movementPatterns": {
+      "noData": "No hay datos de movimiento disponibles para el período seleccionado.",
+      "noDataDesc": "Asegúrese de que los dispositivos de seguimiento de ubicación estén configurados correctamente.",
+      "totalMovements": "Movimientos Totales",
+      "recordedEvents": "Eventos registrados",
+      "locationsVisited": "Ubicaciones Visitadas",
+      "uniqueLocations": "Ubicaciones únicas",
+      "roomTransitions": "Transiciones de Habitación",
+      "locationChanges": "Cambios de ubicación",
+      "mostVisited": "Más Visitada",
+      "hourlyMovement": "Frecuencia de Movimiento por Hora",
+      "movements": "Movimientos",
+      "timeDistribution": "Actividad por Hora del Día",
+      "dwellTime": "Tiempo Pasado por Ubicación",
+      "topTransitions": "Principales Transiciones de Ubicación",
+      "transitions": "transiciones",
+      "detailedDwellTime": "Análisis Detallado de Tiempo de Permanencia"
+    },
     "healthAnomalies": {
       "allReadingsNormal": "Todas las Lecturas Normales",
       "noAnomaliesDetected": "No se detectaron anomalías de salud en el período seleccionado",

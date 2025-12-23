@@ -1965,6 +1965,24 @@
       "reviewMedications": "Regelmäßige Überprüfung von Medikamenten, die Schwindel verursachen oder das Gleichgewicht beeinträchtigen können.",
       "physicalTherapy": "Erwägen Sie Physiotherapie oder Gleichgewichtsübungen zur Verbesserung von Kraft und Stabilität."
     },
+    "movementPatterns": {
+      "noData": "Für den ausgewählten Zeitraum sind keine Bewegungsdaten verfügbar.",
+      "noDataDesc": "Stellen Sie sicher, dass die Standortverfolgungsgeräte ordnungsgemäß konfiguriert sind.",
+      "totalMovements": "Gesamtbewegungen",
+      "recordedEvents": "Aufgezeichnete Ereignisse",
+      "locationsVisited": "Besuchte Orte",
+      "uniqueLocations": "Einzigartige Orte",
+      "roomTransitions": "Raumübergänge",
+      "locationChanges": "Standortwechsel",
+      "mostVisited": "Am Meisten Besucht",
+      "hourlyMovement": "Bewegungshäufigkeit nach Stunde",
+      "movements": "Bewegungen",
+      "timeDistribution": "Aktivität nach Tageszeit",
+      "dwellTime": "Nach Standort verbrachte Zeit",
+      "topTransitions": "Häufigste Standortübergänge",
+      "transitions": "Übergänge",
+      "detailedDwellTime": "Detaillierte Verweilzeitanalyse"
+    },
     "healthAnomalies": {
       "allReadingsNormal": "Alle Messwerte Normal",
       "noAnomaliesDetected": "Im ausgewählten Zeitraum wurden keine Gesundheitsanomalien festgestellt",
