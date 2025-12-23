@@ -9,6 +9,7 @@ import ElderlyList from '@/components/dashboard/ElderlyList';
 import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
 import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
+import CriticalAlertsOverlay from '@/components/dashboard/CriticalAlertsOverlay';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import HealthMetricsCharts from '@/components/dashboard/HealthMetricsCharts';
 import { MovementSummary } from '@/components/dashboard/MovementSummary';
@@ -108,16 +109,21 @@ const Dashboard = () => {
   // Check if a component is enabled
   const isComponentEnabled = (componentId: string) => {
     if (!dashboardLayout?.layout_config) {
-      // No custom layout saved - show default components
-      const defaultEnabled = ['elderly-list', 'vital-metrics', 'health-charts', 'environmental'];
-      console.log('No dashboard layout, using defaults for:', componentId, defaultEnabled.includes(componentId));
+      // No custom layout saved - show MEDICAL-GRADE default components
+      // Priority: Emergency-first, then monitoring, then routine
+      const defaultEnabled = [
+        'elderly-list',        // Monitored Individuals (with status indicators)
+        'alerts',              // Active Alerts (with urgency grouping)
+        'panic-sos',           // Emergency SOS Events
+        'vital-metrics',       // Health Metrics
+        'medication',          // Medication Management
+        'environmental'        // Environmental Sensors
+      ];
       return defaultEnabled.includes(componentId);
     }
 
     const components = dashboardLayout.layout_config as any[];
     const component = components.find((c: any) => c.id === componentId);
-
-    console.log('Checking component:', componentId, 'Found:', !!component, 'Enabled:', component?.enabled);
 
     // If component not found in saved config (new component added later), don't show it by default
     if (!component) return false;
@@ -152,9 +158,9 @@ const Dashboard = () => {
         {/* Page Heading */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title', { defaultValue: 'Dashboard' })}</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
             <p className="text-muted-foreground mt-1">
-              {t('dashboard.subtitle', { defaultValue: 'Monitor and manage elderly care' })}
+              Healthcare Monitoring Dashboard
             </p>
           </div>
           <Button onClick={() => navigate('/customize-dashboard')} variant="outline">
@@ -163,9 +169,12 @@ const Dashboard = () => {
           </Button>
         </div>
 
+        {/* 🚨 CRITICAL ALERTS OVERLAY - Emergency First Design */}
+        <CriticalAlertsOverlay alerts={alerts || []} />
+
         {/* Main Content Grid */}
         <div className="space-y-4 sm:space-y-6">
-          {/* Elderly List */}
+          {/* Monitored Individuals - With Live Status Indicators */}
           {isComponentEnabled('elderly-list') && (
             <ElderlyList
               elderlyPersons={elderlyPersons || []}
@@ -198,22 +207,33 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Right Column - Widgets & Quick Info */}
+            {/* Right Column - URGENCY-GROUPED LAYOUT */}
             <div className="space-y-4 sm:space-y-6">
-              {isComponentEnabled('ilq-score') && (
-                <ILQWidget elderlyPersonId={selectedPersonId || ''} />
+              {/* ⚠️ URGENT ATTENTION Group */}
+              {(isComponentEnabled('panic-sos') || isComponentEnabled('alerts')) && (
+                <div className="space-y-4">
+                  {isComponentEnabled('panic-sos') && (
+                    <PanicSosEvents selectedPersonId={selectedPersonId} />
+                  )}
+                  {isComponentEnabled('alerts') && (
+                    <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
+                  )}
+                </div>
               )}
-              {isComponentEnabled('medication') && (
-                <MedicationManagement selectedPersonId={selectedPersonId} />
-              )}
-              {isComponentEnabled('environmental') && (
-                <EnvironmentalSensors selectedPersonId={selectedPersonId} />
-              )}
-              {isComponentEnabled('panic-sos') && (
-                <PanicSosEvents selectedPersonId={selectedPersonId} />
-              )}
-              {isComponentEnabled('alerts') && (
-                <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
+
+              {/* 📋 ROUTINE MONITORING Group */}
+              {(isComponentEnabled('medication') || isComponentEnabled('environmental') || isComponentEnabled('ilq-score')) && (
+                <div className="space-y-4">
+                  {isComponentEnabled('medication') && (
+                    <MedicationManagement selectedPersonId={selectedPersonId} />
+                  )}
+                  {isComponentEnabled('environmental') && (
+                    <EnvironmentalSensors selectedPersonId={selectedPersonId} />
+                  )}
+                  {isComponentEnabled('ilq-score') && (
+                    <ILQWidget elderlyPersonId={selectedPersonId || ''} />
+                  )}
+                </div>
               )}
             </div>
           </div>

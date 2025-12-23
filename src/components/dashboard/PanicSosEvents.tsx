@@ -103,14 +103,14 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
 
   if (isLoading) {
     return (
-      <Card className="p-6 overflow-hidden">
-        <div className="flex items-center justify-between gap-2 mb-4 flex-wrap">
-          <h3 className="text-lg font-semibold flex items-center gap-2 min-w-0">
-            <AlertCircle className="w-5 h-5 text-destructive shrink-0" />
+      <Card className="p-4 overflow-hidden">
+        <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
+          <h3 className="text-sm font-semibold flex items-center gap-2 min-w-0">
+            <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
             <span className="truncate">{t('panicSos.title')}</span>
           </h3>
         </div>
-        <div className="text-center py-8 text-muted-foreground">
+        <div className="py-4 text-muted-foreground text-sm">
           {t('panicSos.loading')}
         </div>
       </Card>
@@ -119,10 +119,10 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
 
   return (
     <>
-      <Card className="p-6 overflow-hidden">
-        <div className="flex items-center justify-between gap-2 mb-4 flex-wrap">
-          <h3 className="text-lg font-semibold flex items-center gap-2 min-w-0">
-            <AlertCircle className="w-5 h-5 text-destructive shrink-0" />
+      <Card className="p-4 overflow-hidden">
+        <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
+          <h3 className="text-sm font-semibold flex items-center gap-2 min-w-0">
+            <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
             <span className="truncate">{t('panicSos.title')}</span>
           </h3>
           <div className="flex items-center gap-2 shrink-0">
@@ -132,13 +132,13 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowCharts(true)}
-                  className="gap-2"
+                  className="gap-1 h-7 text-xs"
                 >
-                  <TrendingUp className="h-4 w-4" />
+                  <TrendingUp className="h-3 w-3" />
                   <span className="hidden sm:inline">{t('panicSos.viewCharts')}</span>
                 </Button>
-                <Badge variant="outline" className="border-destructive text-destructive whitespace-nowrap">
-                  {panicEvents.length} {panicEvents.length === 1 ? t('panicSos.event') : t('panicSos.events')}
+                <Badge variant="outline" className="text-xs whitespace-nowrap">
+                  {panicEvents.length}
                 </Badge>
               </>
             )}
@@ -146,14 +146,16 @@ const PanicSosEvents = ({ selectedPersonId }: PanicSosEventsProps) => {
         </div>
 
       {!panicEvents || panicEvents.length === 0 ? (
-        <div className="text-center py-8">
-          <AlertCircle className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
-          <p className="text-muted-foreground text-sm">
-            {t('panicSos.noEvents')}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {t('panicSos.noEventsHint')}
-          </p>
+        <div className="flex items-center gap-3 py-4">
+          <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+          <div>
+            <p className="text-muted-foreground text-sm">
+              {t('panicSos.noEvents')}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {t('panicSos.noEventsHint')}
+            </p>
+          </div>
         </div>
       ) : (
         <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">

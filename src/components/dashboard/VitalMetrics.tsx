@@ -522,11 +522,11 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   if (!selectedPersonId || recentData.length === 0) {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>{t('healthMetrics.title')}</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">{t('healthMetrics.title')}</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-center py-8">
+        <CardContent className="pb-4">
+          <p className="text-muted-foreground text-sm">
             {t('healthMetrics.noData')}
           </p>
         </CardContent>

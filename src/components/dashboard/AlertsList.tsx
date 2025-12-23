@@ -79,6 +79,8 @@ const AlertsList = ({ alerts, selectedPersonId }: AlertsListProps) => {
     onSuccess: () => {
       // Invalidate and refetch alerts
       queryClient.invalidateQueries({ queryKey: ['alerts'] });
+      // Invalidate person health status to update their indicator (🔴→🟢)
+      queryClient.invalidateQueries({ queryKey: ['person-health-status'] });
       toast({
         title: t('alerts.toasts.alertAcknowledgedTitle'),
         description: t('alerts.toasts.alertAcknowledgedDesc'),
@@ -97,69 +99,128 @@ const AlertsList = ({ alerts, selectedPersonId }: AlertsListProps) => {
     acknowledgeMutation.mutate(alertId);
   };
 
+  // Separate alerts by urgency
+  const criticalAlerts = filteredAlerts.filter(a => a.severity === 'critical');
+  const highPriorityAlerts = filteredAlerts.filter(a => a.severity === 'high');
+  const otherAlerts = filteredAlerts.filter(a => !['critical', 'high'].includes(a.severity));
+
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">
-          {t('alerts.list.activeAlerts')} {selectedPersonId && t('alerts.list.filtered')}
-        </h3>
-        <Badge variant="outline" className="animate-pulse-soft">
-          {filteredAlerts.length} {t('alerts.list.active')}
-        </Badge>
-      </div>
+    <div className="space-y-3">
+      {/* URGENT ATTENTION Section - Toned down to avoid competing with critical alerts strip */}
+      {(criticalAlerts.length > 0 || highPriorityAlerts.length > 0) && (
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-foreground">
+              Urgent Attention
+            </h3>
+            <Badge variant="secondary" className="text-xs">
+              {criticalAlerts.length + highPriorityAlerts.length}
+            </Badge>
+          </div>
 
-      {filteredAlerts.length === 0 ? (
-        <div className="text-center py-8">
-          <CheckCircle className="w-12 h-12 text-success mx-auto mb-3" />
-          <p className="text-muted-foreground">{t('alerts.allClear')}</p>
-        </div>
-      ) : (
-        <div className="space-y-3 max-h-[600px] overflow-y-auto">
-          {filteredAlerts.map((alert) => (
-            <div
-              key={alert.id}
-              className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-warning" />
-                  <h4 className="font-semibold">{t(`alerts.messages.${alert.alert_type}.title`, { defaultValue: alert.title })}</h4>
+          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            {[...criticalAlerts, ...highPriorityAlerts].map((alert) => (
+              <div
+                key={alert.id}
+                className="border rounded p-3 hover:bg-accent/50 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-1">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <AlertTriangle className="w-4 h-4 text-warning flex-shrink-0" />
+                    <h4 className="font-medium text-sm truncate">{t(`alerts.messages.${alert.alert_type}.title`, { defaultValue: alert.title })}</h4>
+                  </div>
+                  <Badge variant="outline" className="text-xs ml-2 flex-shrink-0">
+                    {t(`alerts.${alert.severity}`, { defaultValue: alert.severity })}
+                  </Badge>
                 </div>
-                <Badge className={`${getSeverityColor(alert.severity)} capitalize text-xs`}>
-                  {t(`alerts.${alert.severity}`, { defaultValue: alert.severity })}
-                </Badge>
-              </div>
 
-              {alert.description && (
-                <p className="text-sm text-muted-foreground mb-2">{t(`alerts.messages.${alert.alert_type}.description`, { defaultValue: alert.description })}</p>
-              )}
-
-              <div className="flex items-center justify-between mt-3">
-                <div>
-                  <p className="text-xs text-muted-foreground">
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-muted-foreground truncate">
                     {alert.elderly_persons?.full_name || t('alerts.timeline.unknown')}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {format(new Date(alert.created_at), 'MMM d, yyyy HH:mm:ss', { locale: dateLocale })}
-                  </p>
+
+                  {alert.status === 'active' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-xs"
+                      onClick={() => handleAcknowledge(alert.id)}
+                      disabled={acknowledgeMutation.isPending}
+                    >
+                      {acknowledgeMutation.isPending ? 'Saving...' : 'Mark Handled'}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* ROUTINE MONITORING Section */}
+      {otherAlerts.length > 0 && (
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-muted-foreground">
+              Routine Monitoring
+            </h3>
+            <Badge variant="outline" className="text-xs">
+              {otherAlerts.length}
+            </Badge>
+          </div>
+
+          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            {otherAlerts.map((alert) => (
+              <div
+                key={alert.id}
+                className="border rounded p-3 hover:bg-accent/50 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-1">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <AlertTriangle className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <h4 className="font-medium text-sm truncate">{t(`alerts.messages.${alert.alert_type}.title`, { defaultValue: alert.title })}</h4>
+                  </div>
+                  <Badge variant="outline" className="text-xs ml-2 flex-shrink-0">
+                    {t(`alerts.${alert.severity}`, { defaultValue: alert.severity })}
+                  </Badge>
                 </div>
 
-                {alert.status === 'active' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleAcknowledge(alert.id)}
-                    disabled={acknowledgeMutation.isPending}
-                  >
-                    {acknowledgeMutation.isPending ? t('common.loading', { defaultValue: 'Loading...' }) : t('alerts.actions.acknowledge')}
-                  </Button>
-                )}
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-muted-foreground truncate">
+                    {alert.elderly_persons?.full_name || t('alerts.timeline.unknown')}
+                  </p>
+
+                  {alert.status === 'active' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-xs"
+                      onClick={() => handleAcknowledge(alert.id)}
+                      disabled={acknowledgeMutation.isPending}
+                    >
+                      {acknowledgeMutation.isPending ? 'Saving...' : 'Mark Handled'}
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </Card>
       )}
-    </Card>
+
+      {/* All Clear State - Compact */}
+      {filteredAlerts.length === 0 && (
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-success">All Clear</p>
+              <p className="text-xs text-muted-foreground">No active alerts</p>
+            </div>
+          </div>
+        </Card>
+      )}
+    </div>
   );
 };
 

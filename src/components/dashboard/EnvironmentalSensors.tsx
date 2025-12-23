@@ -141,14 +141,14 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
   if (!selectedPersonId) {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Thermometer className="w-5 h-5" />
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <Thermometer className="w-4 h-4" />
             {t('environmental.title')}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-8">
+        <CardContent className="pb-4">
+          <p className="text-sm text-muted-foreground">
             {t('environmental.selectPerson')}
           </p>
         </CardContent>
@@ -159,16 +159,16 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
   if (isLoading) {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Thermometer className="w-5 h-5" />
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <Thermometer className="w-4 h-4" />
             {t('environmental.title')}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
+        <CardContent className="space-y-3">
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
         </CardContent>
       </Card>
     );
@@ -178,16 +178,16 @@ const EnvironmentalSensors = ({ selectedPersonId }: EnvironmentalSensorsProps) =
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Thermometer className="w-5 h-5" />
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-sm">
+          <Thermometer className="w-4 h-4" />
           {t('environmental.title')}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {!hasData ? (
-          <div className="text-center py-8">
-            <AlertCircle className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+          <div className="flex items-center gap-3 py-4">
+            <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
             <p className="text-sm text-muted-foreground">
               {t('environmental.noData')}
             </p>
