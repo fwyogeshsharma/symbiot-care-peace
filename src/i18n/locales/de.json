@@ -365,6 +365,12 @@
       "nameMin": "Der Name muss mindestens 2 Zeichen haben",
       "phoneMin": "Die Telefonnummer muss mindestens 10 Ziffern haben",
       "phoneInvalid": "Ungültiges Telefonnummernformat"
+    },
+    "roleDialog": {
+      "title": "Selbstüberwachungsoption",
+      "message": "Durch die Auswahl von älterer Person/Familienmitglied können Sie sich auch selbst überwachen. Wenn Sie sich nicht selbst überwachen möchten, wählen Sie Pflegekraft.",
+      "selectCaregiver": "Pflegekraft Auswählen",
+      "continue": "Mit Auswahl Fortfahren"
     }
   },
   "nav": {

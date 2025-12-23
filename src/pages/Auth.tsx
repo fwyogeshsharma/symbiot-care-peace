@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Activity, Eye, EyeOff } from 'lucide-react';
+import { Activity, Eye, EyeOff, Info } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,7 +46,7 @@ const Auth = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<string>('relative');
+  const [role, setRole] = useState<string>('caregiver');
   const [yearOfBirth, setYearOfBirth] = useState<string>('');
   const [postalAddress, setPostalAddress] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -53,6 +54,8 @@ const Auth = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  const [showRoleDialog, setShowRoleDialog] = useState(false);
+  const [pendingRole, setPendingRole] = useState<string>('');
   const { signUp, signIn, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -64,6 +67,29 @@ const Auth = () => {
       audioRef.current.currentTime = 0; // Reset to start
       audioRef.current.play().catch(err => console.log('Audio play failed:', err));
     }
+  };
+
+  const handleRoleChange = (newRole: string) => {
+    // If user selects elderly or relative, show dialog
+    if (newRole === 'elderly' || newRole === 'relative') {
+      setPendingRole(newRole);
+      setShowRoleDialog(true);
+    } else {
+      // For caregiver, just set it directly
+      setRole(newRole);
+    }
+  };
+
+  const handleConfirmRoleChange = () => {
+    setRole(pendingRole);
+    setShowRoleDialog(false);
+  };
+
+  const handleCancelRoleChange = () => {
+    // Reset to caregiver role
+    setRole('caregiver');
+    setShowRoleDialog(false);
+    setPendingRole('');
   };
 
   useEffect(() => {
@@ -440,13 +466,13 @@ const Auth = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="role">{t('auth.selectRole')}</Label>
-                <Select value={role} onValueChange={setRole}>
+                <Select value={role} onValueChange={handleRoleChange}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="elderly">{t('auth.roles.elderly')}</SelectItem>
                     <SelectItem value="caregiver">{t('auth.roles.caregiver')}</SelectItem>
+                    <SelectItem value="elderly">{t('auth.roles.elderly')}</SelectItem>
                     <SelectItem value="relative">{t('auth.roles.relative')}</SelectItem>
                   </SelectContent>
                 </Select>
@@ -544,6 +570,38 @@ const Auth = () => {
           </div>
         )}
       </Card>
+
+      {/* Role Selection Dialog */}
+      <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-primary" />
+              {t('auth.roleDialog.title', { defaultValue: 'Self-Monitoring Option' })}
+            </DialogTitle>
+            <DialogDescription>
+              {t('auth.roleDialog.message', {
+                defaultValue: 'By selecting elderly/family member, you can monitor yourself too. If you don\'t want to monitor yourself, select caregiver.'
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={handleCancelRoleChange}
+              className="w-full sm:w-auto"
+            >
+              {t('auth.roleDialog.selectCaregiver', { defaultValue: 'Select Caregiver' })}
+            </Button>
+            <Button
+              onClick={handleConfirmRoleChange}
+              className="w-full sm:w-auto"
+            >
+              {t('auth.roleDialog.continue', { defaultValue: 'Continue with Selection' })}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

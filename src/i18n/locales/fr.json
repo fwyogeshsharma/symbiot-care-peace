@@ -365,6 +365,12 @@
       "nameMin": "Le nom doit contenir au moins 2 caractères",
       "phoneMin": "Le numéro de téléphone doit contenir au moins 10 chiffres",
       "phoneInvalid": "Format de numéro de téléphone invalide"
+    },
+    "roleDialog": {
+      "title": "Option d'Auto-Surveillance",
+      "message": "En sélectionnant personne âgée/membre de la famille, vous pouvez également vous surveiller vous-même. Si vous ne souhaitez pas vous surveiller vous-même, sélectionnez soignant.",
+      "selectCaregiver": "Sélectionner Soignant",
+      "continue": "Continuer avec la Sélection"
     }
   },
   "nav": {

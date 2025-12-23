@@ -365,6 +365,12 @@
       "nameMin": "El nombre debe tener al menos 2 caracteres",
       "phoneMin": "El número de teléfono debe tener al menos 10 dígitos",
       "phoneInvalid": "Formato de número de teléfono inválido"
+    },
+    "roleDialog": {
+      "title": "Opción de Automonitoreo",
+      "message": "Al seleccionar persona mayor/familiar, también puede monitorearse a sí mismo. Si no desea monitorearse a sí mismo, seleccione cuidador.",
+      "selectCaregiver": "Seleccionar Cuidador",
+      "continue": "Continuar con la Selección"
     }
   },
   "nav": {

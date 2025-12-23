@@ -416,6 +416,12 @@
       "passwordReset": "Password reset successfully",
       "loginSuccess": "Welcome back!",
       "signupSuccess": "Account created successfully!"
+    },
+    "roleDialog": {
+      "title": "Self-Monitoring Option",
+      "message": "By selecting elderly/family member, you can monitor yourself too. If you don't want to monitor yourself, select caregiver.",
+      "selectCaregiver": "Select Caregiver",
+      "continue": "Continue with Selection"
     }
   },
   "investorInfo": {
