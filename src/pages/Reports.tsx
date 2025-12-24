@@ -322,6 +322,9 @@ const Reports = () => {
     if (days === 90) {
       // For 3 months, use setMonth
       expectedFrom.setMonth(now.getMonth() - 3);
+    } else if (days === 180) {
+      // For 6 months, use setMonth
+      expectedFrom.setMonth(now.getMonth() - 6);
     } else {
       expectedFrom.setDate(now.getDate() - days);
     }
@@ -366,7 +369,7 @@ const Reports = () => {
           <CardContent>
             <div className="flex flex-col md:flex-row gap-4">
               {/* Person Selection */}
-              <div className="flex-1">
+              <div className="w-full md:w-1/4">
                 <label className="text-sm font-medium mb-2 block">
                   {t('reports.selectPerson', { defaultValue: 'Select Person' })}
                 </label>
@@ -388,7 +391,7 @@ const Reports = () => {
               </div>
 
               {/* Date Range */}
-              <div className="flex-1">
+              <div className="w-full md:w-1/4">
                 <label className="text-sm font-medium mb-2 block">
                   {t('reports.dateRange', { defaultValue: 'Date Range' })}
                 </label>
@@ -434,7 +437,7 @@ const Reports = () => {
               </div>
 
               {/* Quick Ranges */}
-              <div className="flex-1">
+              <div className="w-full md:w-1/2">
                 <label className="text-sm font-medium mb-2 block">
                   {t('reports.quickSelect', { defaultValue: 'Quick Select' })}
                 </label>
@@ -468,6 +471,16 @@ const Reports = () => {
                     })}
                   >
                     {t('reports.last3Months', { defaultValue: 'Last 3 Months' })}
+                  </Button>
+                  <Button
+                    variant={isDateRangeActive(180) ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDateRange({
+                      from: new Date(new Date().setMonth(new Date().getMonth() - 6)),
+                      to: new Date(),
+                    })}
+                  >
+                    {t('reports.last6Months', { defaultValue: 'Last 6 Months' })}
                   </Button>
                 </div>
               </div>
