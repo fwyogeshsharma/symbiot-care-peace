@@ -27,13 +27,19 @@ export default function ILQAnalytics() {
     queryFn: async () => {
       if (!selectedPersonId) return null;
 
-      const daysAgo = new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString();
-      const { data, error } = await supabase
+      let query = supabase
         .from('ilq_scores')
         .select('*')
         .eq('elderly_person_id', selectedPersonId)
-        .gte('computation_timestamp', daysAgo)
         .order('computation_timestamp', { ascending: true });
+
+      // Only apply date filter if not "All Time"
+      if (timeRange !== 'all') {
+        const daysAgo = new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString();
+        query = query.gte('computation_timestamp', daysAgo);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data;
@@ -188,6 +194,35 @@ export default function ILQAnalytics() {
     }
   };
 
+  const computeHistoricalILQ = async () => {
+    if (!selectedPersonId) return;
+
+    try {
+      toast.info(t('ilq.analytics.computingHistorical', { defaultValue: 'Calculating historical ILQ scores for all past data...' }));
+
+      const { data, error } = await supabase.functions.invoke('ilq-compute', {
+        body: {
+          elderly_person_id: selectedPersonId,
+          calculate_historical: true,
+          force_recompute: false,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success(
+        t('ilq.analytics.historicalSuccess', {
+          defaultValue: `Successfully calculated ${data.scores_inserted} historical scores!`,
+          count: data.scores_inserted
+        })
+      );
+      refetch();
+    } catch (error: any) {
+      console.error('Error computing historical ILQ:', error);
+      toast.error(error.message || t('ilq.analytics.historicalFailed', { defaultValue: 'Failed to calculate historical scores' }));
+    }
+  };
+
   const downloadReport = async () => {
     if (!selectedPersonId) return;
 
@@ -276,6 +311,11 @@ export default function ILQAnalytics() {
             <Button onClick={() => computeILQ(false)} disabled={!selectedPersonId}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isAutoRefreshing ? 'animate-spin' : ''}`} />
               {t('ilq.analytics.computeILQ')}
+            </Button>
+
+            <Button onClick={computeHistoricalILQ} disabled={!selectedPersonId} variant="secondary">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              {t('ilq.analytics.computeHistorical', { defaultValue: 'Calculate Historical' })}
             </Button>
 
             <Button
@@ -367,13 +407,14 @@ export default function ILQAnalytics() {
                     <CardDescription>{t('ilq.analytics.trackIndependence')}</CardDescription>
                   </div>
                   <Select value={timeRange} onValueChange={setTimeRange}>
-                    <SelectTrigger className="w-[150px]">
+                    <SelectTrigger className="w-[180px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="7">{t('ilq.analytics.last7Days')}</SelectItem>
                       <SelectItem value="30">{t('ilq.analytics.last30Days')}</SelectItem>
                       <SelectItem value="90">{t('ilq.analytics.last90Days')}</SelectItem>
+                      <SelectItem value="all">{t('ilq.analytics.allTime', { defaultValue: 'All Available Data' })}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

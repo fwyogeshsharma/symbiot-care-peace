@@ -1650,6 +1650,7 @@
       "last7Days": "Last 7 days",
       "last30Days": "Last 30 days",
       "last90Days": "Last 90 days",
+      "allTime": "All Available Data",
       "noHistoricalData": "No historical data available",
       "componentAnalysis": "Component Analysis",
       "componentAnalysisDesc": "Latest score breakdown across all dimensions",
@@ -1671,6 +1672,10 @@
       "computingScore": "Computing ILQ score...",
       "computedSuccess": "ILQ computed successfully: {{score}}",
       "computeFailed": "Failed to compute ILQ",
+      "computeHistorical": "Calculate Historical",
+      "computingHistorical": "Calculating historical ILQ scores for all past data...",
+      "historicalSuccess": "Successfully calculated {{count}} historical scores!",
+      "historicalFailed": "Failed to calculate historical scores",
       "generatingReport": "Generating PDF report...",
       "reportDownloaded": "Report downloaded successfully!",
       "reportFailed": "Failed to generate report"

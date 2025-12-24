@@ -1736,6 +1736,7 @@
       "last7Days": "Letzte 7 Tage",
       "last30Days": "Letzte 30 Tage",
       "last90Days": "Letzte 90 Tage",
+      "allTime": "Alle verfügbaren Daten",
       "noHistoricalData": "Keine historischen Daten verfügbar",
       "componentAnalysis": "Komponentenanalyse",
       "componentAnalysisDesc": "Punktzahlaufschlüsselung über alle Dimensionen",
@@ -1757,6 +1758,10 @@
       "computingScore": "ILQ-Punktzahl wird berechnet...",
       "computedSuccess": "ILQ erfolgreich berechnet: {{score}}",
       "computeFailed": "ILQ-Berechnung fehlgeschlagen",
+      "computeHistorical": "Historische Berechnen",
+      "computingHistorical": "Berechnung historischer ILQ-Werte für alle vergangenen Daten...",
+      "historicalSuccess": "{{count}} historische Werte erfolgreich berechnet!",
+      "historicalFailed": "Fehler bei der Berechnung historischer Werte",
       "generatingReport": "PDF-Bericht wird generiert...",
       "reportDownloaded": "Bericht erfolgreich heruntergeladen!",
       "reportFailed": "Berichterstellung fehlgeschlagen"

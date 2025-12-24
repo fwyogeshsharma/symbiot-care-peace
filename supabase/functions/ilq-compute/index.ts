@@ -9,6 +9,7 @@ interface ComputeRequest {
   elderly_person_id: string;
   time_window_hours?: number;
   force_recompute?: boolean;
+  calculate_historical?: boolean; // NEW: Calculate historical scores for all past data
   custom_weights?: {
     health_vitals?: number;
     physical_activity?: number;
@@ -30,9 +31,9 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { elderly_person_id, time_window_hours = 24, force_recompute = false, custom_weights }: ComputeRequest = await req.json();
+    const { elderly_person_id, time_window_hours = 24, force_recompute = false, calculate_historical = false, custom_weights }: ComputeRequest = await req.json();
 
-    console.log(`Computing ILQ for elderly person: ${elderly_person_id}, window: ${time_window_hours}h`);
+    console.log(`Computing ILQ for elderly person: ${elderly_person_id}, window: ${time_window_hours}h, historical: ${calculate_historical}`);
 
     // 1. Fetch configuration
     const { data: config } = await supabaseClient
@@ -59,6 +60,11 @@ Deno.serve(async (req) => {
       emergency_response: custom_weights?.emergency_response || parseFloat(config.emergency_response_weight),
       social_engagement: custom_weights?.social_engagement || parseFloat(config.social_engagement_weight),
     };
+
+    // HISTORICAL CALCULATION MODE
+    if (calculate_historical) {
+      return await calculateHistoricalScores(supabaseClient, elderly_person_id, config, weights, force_recompute);
+    }
 
     // 2. Fetch device data within time window
     const timeWindowStart = new Date(Date.now() - time_window_hours * 60 * 60 * 1000).toISOString();
@@ -495,4 +501,178 @@ async function checkAlerts(supabase: any, elderlyPersonId: string, currentScore:
   }
 
   return alerts;
+}
+
+async function calculateHistoricalScores(supabase: any, elderlyPersonId: string, config: any, weights: any, forceRecompute: boolean) {
+  console.log(`Starting historical ILQ calculation for ${elderlyPersonId}`);
+
+  // 1. Fetch ALL device data for this person
+  const { data: allDeviceData, error: deviceError } = await supabase
+    .from('device_data')
+    .select('*')
+    .eq('elderly_person_id', elderlyPersonId)
+    .order('recorded_at', { ascending: true });
+
+  if (deviceError) {
+    console.error('Error fetching device data:', deviceError);
+    throw deviceError;
+  }
+
+  if (!allDeviceData || allDeviceData.length === 0) {
+    return new Response(
+      JSON.stringify({
+        error: 'No historical data found',
+        message: 'No device data available to calculate historical scores'
+      }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  console.log(`Found ${allDeviceData.length} total data points`);
+
+  // 2. Get existing scores to avoid duplicates (unless force_recompute)
+  const { data: existingScores } = await supabase
+    .from('ilq_scores')
+    .select('computation_timestamp')
+    .eq('elderly_person_id', elderlyPersonId);
+
+  const existingDates = new Set(
+    (existingScores || []).map((s: any) => new Date(s.computation_timestamp).toISOString().split('T')[0])
+  );
+
+  console.log(`Found ${existingDates.size} existing score dates`);
+
+  // 3. Group data by day
+  const dataByDay: Record<string, any[]> = {};
+  const medicationByDay: Record<string, any[]> = {};
+
+  for (const dataPoint of allDeviceData) {
+    const date = new Date(dataPoint.recorded_at).toISOString().split('T')[0]; // YYYY-MM-DD
+
+    if (!dataByDay[date]) {
+      dataByDay[date] = [];
+    }
+    dataByDay[date].push(dataPoint);
+  }
+
+  // 4. Fetch medication logs and group by day
+  const { data: allMedicationLogs } = await supabase
+    .from('medication_adherence_logs')
+    .select('*')
+    .eq('elderly_person_id', elderlyPersonId);
+
+  if (allMedicationLogs) {
+    for (const log of allMedicationLogs) {
+      const date = new Date(log.timestamp).toISOString().split('T')[0];
+      if (!medicationByDay[date]) {
+        medicationByDay[date] = [];
+      }
+      medicationByDay[date].push(log);
+    }
+  }
+
+  console.log(`Grouped data into ${Object.keys(dataByDay).length} days`);
+
+  // 5. Calculate ILQ for each day
+  const scoresToInsert: any[] = [];
+  const days = Object.keys(dataByDay).sort();
+
+  for (const date of days) {
+    // Skip if already exists and not force recompute
+    if (!forceRecompute && existingDates.has(date)) {
+      console.log(`Skipping ${date} - score already exists`);
+      continue;
+    }
+
+    const dayData = dataByDay[date];
+    const dayMedication = medicationByDay[date] || [];
+
+    if (dayData.length === 0) {
+      console.log(`Skipping ${date} - no data`);
+      continue;
+    }
+
+    // Calculate component scores for this day
+    const componentScores = computeComponentScores(dayData, config, dayMedication);
+
+    // Calculate ILQ score
+    const ilqScore = (
+      componentScores.health_vitals * weights.health_vitals +
+      componentScores.physical_activity * weights.physical_activity +
+      componentScores.cognitive_function * weights.cognitive_function +
+      componentScores.environmental_safety * weights.environmental_safety +
+      componentScores.emergency_response * weights.emergency_response +
+      componentScores.social_engagement * weights.social_engagement
+    );
+
+    // Calculate confidence
+    const confidenceLevel = calculateConfidence(dayData.length, 24);
+
+    // Set computation timestamp to end of that day
+    const computationTimestamp = new Date(`${date}T23:59:59Z`).toISOString();
+
+    scoresToInsert.push({
+      elderly_person_id: elderlyPersonId,
+      score: Math.round(ilqScore * 100) / 100,
+      health_vitals_score: Math.round(componentScores.health_vitals * 100) / 100,
+      physical_activity_score: Math.round(componentScores.physical_activity * 100) / 100,
+      cognitive_function_score: Math.round(componentScores.cognitive_function * 100) / 100,
+      environmental_safety_score: Math.round(componentScores.environmental_safety * 100) / 100,
+      emergency_response_score: Math.round(componentScores.emergency_response * 100) / 100,
+      social_engagement_score: Math.round(componentScores.social_engagement * 100) / 100,
+      data_points_analyzed: dayData.length,
+      time_window_hours: 24,
+      confidence_level: Math.round(confidenceLevel * 100) / 100,
+      detailed_metrics: { data_types: groupDataByType(dayData) },
+      computation_timestamp: computationTimestamp,
+    });
+  }
+
+  console.log(`Prepared ${scoresToInsert.length} historical scores to insert`);
+
+  // 6. Insert all scores in batches (Supabase has a limit)
+  const batchSize = 100;
+  let insertedCount = 0;
+
+  for (let i = 0; i < scoresToInsert.length; i += batchSize) {
+    const batch = scoresToInsert.slice(i, i + batchSize);
+
+    if (forceRecompute) {
+      // Delete existing scores for these dates first
+      const batchDates = batch.map((s: any) => new Date(s.computation_timestamp).toISOString().split('T')[0]);
+      await supabase
+        .from('ilq_scores')
+        .delete()
+        .eq('elderly_person_id', elderlyPersonId)
+        .in('computation_timestamp', batchDates.map((d: string) => `${d}T23:59:59Z`));
+    }
+
+    const { error: insertError } = await supabase
+      .from('ilq_scores')
+      .insert(batch);
+
+    if (insertError) {
+      console.error('Error inserting batch:', insertError);
+      // Continue with next batch even if one fails
+    } else {
+      insertedCount += batch.length;
+    }
+  }
+
+  console.log(`Successfully inserted ${insertedCount} historical scores`);
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      message: 'Historical ILQ scores calculated',
+      scores_calculated: scoresToInsert.length,
+      scores_inserted: insertedCount,
+      date_range: {
+        from: days[0],
+        to: days[days.length - 1]
+      },
+      total_data_points: allDeviceData.length,
+    }),
+    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
 }
