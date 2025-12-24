@@ -126,16 +126,30 @@ const Auth = () => {
         return;
       }
 
-      const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+      const baseUrl = window.location.origin;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${baseUrl}/auth`,
       });
 
       if (error) {
+        console.error("Password reset error:", error);
+        let errorMessage = error.message;
+
+        // Handle specific error cases
+        if (error.message.includes("recovery email") ||
+            error.message.includes("sending email") ||
+            error.message.includes("unexpected_failure") ||
+            error.status === 500) {
+          errorMessage = "Email service is not configured. Please contact the administrator.\n\nTechnical details: SMTP settings need to be configured in Supabase Dashboard.\n\nFor immediate assistance, contact support@symbiot.faberwork.com";
+        } else if (error.message.includes("not found") || error.message.includes("User not found")) {
+          errorMessage = "No account found with this email address. Please check the email or sign up for a new account.";
+        }
+
         toast({
-          title: "Error",
-          description: error.message,
+          title: "Password Reset Failed",
+          description: errorMessage,
           variant: "destructive",
+          duration: 10000, // Show for 10 seconds
         });
       } else {
         toast({
