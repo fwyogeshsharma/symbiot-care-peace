@@ -98,19 +98,19 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
     : 0;
 
   const minHeartRate = heartRateData.length > 0
-    ? Math.min(...heartRateData.map(v => {
+    ? Math.round(Math.min(...heartRateData.map(v => {
         let val = v.value as any;
         if (typeof val === 'object' && val !== null && !Array.isArray(val)) val = val.bpm || val.value;
         return Number(val);
-      }))
+      })))
     : 0;
 
   const maxHeartRate = heartRateData.length > 0
-    ? Math.max(...heartRateData.map(v => {
+    ? Math.round(Math.max(...heartRateData.map(v => {
         let val = v.value as any;
         if (typeof val === 'object' && val !== null && !Array.isArray(val)) val = val.bpm || val.value;
         return Number(val);
-      }))
+      })))
     : 0;
 
   if (isLoading) {
@@ -139,7 +139,7 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
           <CardContent>
             <div className="text-2xl font-bold">{avgHeartRate} BPM</div>
             <p className="text-xs text-muted-foreground">
-              {t('reports.content.range')}: {minHeartRate} - {maxHeartRate} BPM
+              {t('reports.content.range')}: {minHeartRate.toFixed(1)} - {maxHeartRate.toFixed(1)} BPM
             </p>
           </CardContent>
         </Card>
