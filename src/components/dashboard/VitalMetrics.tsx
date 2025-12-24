@@ -306,7 +306,13 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
 
       case 'activity':
         const activity = extractStringValue(value, type);
-        return activity || 'N/A';
+        if (!activity) return 'N/A';
+        // Convert to title case (capitalize first letter of each word)
+        return String(activity)
+          .toLowerCase()
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
 
       case 'sleep_quality':
         const quality = extractNumericValue(value, type);
