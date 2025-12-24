@@ -114,7 +114,9 @@ const Dashboard = () => {
       return defaultEnabled.includes(componentId);
     }
 
-    const components = dashboardLayout.layout_config as any[];
+    // Handle both old format (array) and new format (object with components property)
+    const layoutConfig = dashboardLayout.layout_config as any;
+    const components = Array.isArray(layoutConfig) ? layoutConfig : (layoutConfig.components || []);
     const component = components.find((c: any) => c.id === componentId);
 
     console.log('Checking component:', componentId, 'Found:', !!component, 'Enabled:', component?.enabled);
@@ -129,7 +131,9 @@ const Dashboard = () => {
   useEffect(() => {
     if (dashboardLayout?.layout_config) {
       console.log('Dashboard layout loaded:', dashboardLayout.layout_config);
-      console.log('Enabled components:', (dashboardLayout.layout_config as any[]).filter(c => c.enabled).map(c => c.id));
+      const layoutConfig = dashboardLayout.layout_config as any;
+      const components = Array.isArray(layoutConfig) ? layoutConfig : (layoutConfig.components || []);
+      console.log('Enabled components:', components.filter((c: any) => c.enabled).map((c: any) => c.id));
     }
   }, [dashboardLayout]);
 
@@ -222,7 +226,11 @@ const Dashboard = () => {
 
         {/* Empty State */}
         {dashboardLayout?.layout_config &&
-         (dashboardLayout.layout_config as any[]).filter(c => c.enabled).length === 0 && (
+         (() => {
+           const layoutConfig = dashboardLayout.layout_config as any;
+           const components = Array.isArray(layoutConfig) ? layoutConfig : (layoutConfig.components || []);
+           return components.filter((c: any) => c.enabled).length === 0;
+         })() && (
           <Card className="p-12 text-center">
             <div className="max-w-md mx-auto">
               <LayoutDashboard className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
