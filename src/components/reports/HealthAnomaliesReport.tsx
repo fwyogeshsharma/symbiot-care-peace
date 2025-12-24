@@ -192,7 +192,7 @@ export const HealthAnomaliesReport = ({ selectedPerson, dateRange }: HealthAnoma
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-semibold text-lg">
-                            {value} {range.unit}
+                            {value.toFixed(1)} {range.unit}
                           </span>
                           <Badge variant={severity.color as any}>
                             {severity.level}
