@@ -2016,6 +2016,37 @@
         "patterns": "Sleep Patterns",
         "patternsDesc": "Sleep stages and cycle analysis"
       },
+      "sleepPatterns": {
+        "noData": "No Sleep Pattern Data Available",
+        "noDataDesc": "Sleep pattern analysis requires sleep quality data for the selected period.",
+        "noDataTip": "Tip: Try selecting a different date range or ensure sleep tracking devices are recording data.",
+        "percentOfSleep": "% of sleep",
+        "sleepCycles": "Sleep Cycles",
+        "minEach": "~90 min each",
+        "avgBedtime": "Avg Bedtime",
+        "typicalSleepTime": "Typical sleep time",
+        "stagesDistribution": "Sleep Stages Distribution",
+        "minutes": "Minutes",
+        "durationMin": "Duration (min)",
+        "averagePerNight": "Average per Night",
+        "min": "min",
+        "deepSleepOptimal": "Deep sleep duration is optimal (15-25% of total)",
+        "deepSleepImprove": "Deep sleep could be improved",
+        "remSleepHealthy": "REM sleep is in healthy range (20-25% of total)",
+        "remSleepConsider": "Consider factors affecting REM sleep",
+        "stagesTrends": "Sleep Stages Trends",
+        "insights": "Sleep Pattern Insights",
+        "cyclesLabel": "Cycles",
+        "cyclesDesc": "Completing {{count}} sleep cycles per night. Aim for 4-6 complete cycles (6-9 hours) for optimal rest.",
+        "consistencyLabel": "Consistency",
+        "consistencyGood": "Bedtime is consistent and within healthy range (10 PM - 11 PM).",
+        "consistencyImprove": "Consider maintaining a more consistent bedtime routine for better sleep quality.",
+        "qualityLabel": "Quality",
+        "qualityGood": "Minimal wakefulness indicates good sleep consolidation.",
+        "qualityImprove": "Frequent awakenings may indicate sleep fragmentation. Consider sleep environment factors.",
+        "pm": "PM",
+        "am": "AM"
+      },
       "medication": {
         "adherence": "Adherence Report",
         "adherenceDesc": "Doses taken vs missed",
@@ -2438,7 +2469,13 @@
         "took": "Took",
         "scheduled": "Scheduled",
         "achievedStepGoal": "Achieved daily step goal ({{steps}} steps)",
-        "mmHg": "mmHg"
+        "mmHg": "mmHg",
+        "recordedToday": "recorded today",
+        "healthStatusExcellent": "Excellent",
+        "healthStatusGood": "Good",
+        "healthStatusFair": "Fair",
+        "healthStatusNeedsAttention": "Needs Attention",
+        "healthStatusUnknown": "Unknown"
       }
   },
   "footer": {

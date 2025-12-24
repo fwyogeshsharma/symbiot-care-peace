@@ -154,14 +154,19 @@ export const DailyActivityReport = ({ selectedPerson, dateRange }: DailyActivity
           <CardTitle>{t('reports.content.activityLevelAnalysis')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-0">
             {dailyData.map((day, index) => {
               const level = day.steps >= 8000 ? t('reports.content.good') : day.steps >= 4000 ? t('reports.content.fair') : t('reports.content.low');
               const levelKey = day.steps >= 8000 ? 'good' : day.steps >= 4000 ? 'fair' : 'low';
               const color = levelKey === 'good' ? 'text-success' : levelKey === 'fair' ? 'text-warning' : 'text-destructive';
               return (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm">{day.date}</span>
+                <div
+                  key={index}
+                  className={`flex items-center justify-between py-3 px-4 ${
+                    index % 2 === 0 ? 'bg-muted/30' : 'bg-background'
+                  }`}
+                >
+                  <span className="text-sm font-medium">{day.date}</span>
                   <div className="flex items-center gap-4">
                     <span className="text-sm font-medium">{day.steps.toLocaleString()} {t('reports.content.steps')}</span>
                     <span className={`text-sm font-semibold ${color}`}>{level}</span>

@@ -238,10 +238,10 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
   };
 
   const dailyScore = calculateDailyScore();
-  const healthStatus = dailyScore === null ? 'Unknown' :
-    dailyScore >= 80 ? 'Excellent' :
-    dailyScore >= 60 ? 'Good' :
-    dailyScore >= 40 ? 'Fair' : 'Needs Attention';
+  const healthStatus = dailyScore === null ? t('reports.content.healthStatusUnknown') :
+    dailyScore >= 80 ? t('reports.content.healthStatusExcellent') :
+    dailyScore >= 60 ? t('reports.content.healthStatusGood') :
+    dailyScore >= 40 ? t('reports.content.healthStatusFair') : t('reports.content.healthStatusNeedsAttention');
 
   const statusColor = dailyScore === null ? 'secondary' :
     dailyScore >= 80 ? 'default' :
@@ -298,7 +298,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
             <Progress value={dailyScore} className="h-3 mb-2" />
           )}
           <p className="text-sm text-muted-foreground">
-            {healthData.length} {t('reports.content.readings')} recorded today
+            {healthData.length} {t('reports.content.readings')} {t('reports.content.recordedToday')}
           </p>
         </CardContent>
       </Card>

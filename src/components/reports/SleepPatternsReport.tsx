@@ -119,15 +119,15 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
 
   const formatBedtime = (hour: number) => {
     const h = hour >= 24 ? hour - 24 : hour;
-    return `${h}:00 ${h >= 12 ? 'PM' : 'AM'}`;
+    return `${h}:00 ${h >= 12 ? t('reports.sleepPatterns.pm') : t('reports.sleepPatterns.am')}`;
   };
 
   // Sleep stages distribution
   const stageDistribution = [
-    { name: 'Deep Sleep', value: avgDeep, color: '#6366f1', percentage: Math.round((avgDeep / totalSleepMinutes) * 100) },
-    { name: 'Light Sleep', value: avgLight, color: '#60a5fa', percentage: Math.round((avgLight / totalSleepMinutes) * 100) },
-    { name: 'REM Sleep', value: avgREM, color: '#a78bfa', percentage: Math.round((avgREM / totalSleepMinutes) * 100) },
-    { name: 'Awake', value: avgAwake, color: '#f59e0b', percentage: Math.round((avgAwake / (totalSleepMinutes + avgAwake)) * 100) },
+    { name: t('reports.content.deepSleep'), value: avgDeep, color: '#6366f1', percentage: Math.round((avgDeep / totalSleepMinutes) * 100) },
+    { name: t('reports.content.lightSleep'), value: avgLight, color: '#60a5fa', percentage: Math.round((avgLight / totalSleepMinutes) * 100) },
+    { name: t('reports.content.remSleep'), value: avgREM, color: '#a78bfa', percentage: Math.round((avgREM / totalSleepMinutes) * 100) },
+    { name: t('reports.content.awake'), value: avgAwake, color: '#f59e0b', percentage: Math.round((avgAwake / (totalSleepMinutes + avgAwake)) * 100) },
   ];
 
   console.log('Sleep data:', sleepData.length, 'Stages data:', stagesData.length);
@@ -143,12 +143,12 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
       <Card>
         <CardContent className="text-center py-12">
           <Moon className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-          <p className="text-lg font-medium mb-2">No Sleep Pattern Data Available</p>
+          <p className="text-lg font-medium mb-2">{t('reports.sleepPatterns.noData')}</p>
           <p className="text-sm text-muted-foreground mb-4">
-            Sleep pattern analysis requires sleep quality data for the selected period.
+            {t('reports.sleepPatterns.noDataDesc')}
           </p>
           <p className="text-xs text-muted-foreground">
-            Tip: Try selecting a different date range or ensure sleep tracking devices are recording data.
+            {t('reports.sleepPatterns.noDataTip')}
           </p>
         </CardContent>
       </Card>
@@ -165,9 +165,9 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
             <Moon className="h-4 w-4 text-indigo-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{avgDeep} min</div>
+            <div className="text-2xl font-bold">{avgDeep} {t('reports.sleepPatterns.min')}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {stageDistribution[0].percentage}% of sleep
+              {stageDistribution[0].percentage}{t('reports.sleepPatterns.percentOfSleep')}
             </p>
           </CardContent>
         </Card>
@@ -178,35 +178,35 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
             <Brain className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{avgREM} min</div>
+            <div className="text-2xl font-bold">{avgREM} {t('reports.sleepPatterns.min')}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {stageDistribution[2].percentage}% of sleep
+              {stageDistribution[2].percentage}{t('reports.sleepPatterns.percentOfSleep')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Sleep Cycles</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.sleepPatterns.sleepCycles')}</CardTitle>
             <ActivityIcon className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{sleepCycles}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              ~90 min each
+              {t('reports.sleepPatterns.minEach')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Avg Bedtime</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.sleepPatterns.avgBedtime')}</CardTitle>
             <Sunset className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatBedtime(avgBedtime)}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Typical sleep time
+              {t('reports.sleepPatterns.typicalSleepTime')}
             </p>
           </CardContent>
         </Card>
@@ -215,7 +215,7 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
       {/* Sleep Stages Distribution */}
       <Card>
         <CardHeader>
-          <CardTitle>Sleep Stages Distribution</CardTitle>
+          <CardTitle>{t('reports.sleepPatterns.stagesDistribution')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-2">
@@ -223,10 +223,10 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={stageDistribution} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" label={{ value: 'Minutes', position: 'insideBottom', offset: -5 }} />
+                  <XAxis type="number" label={{ value: t('reports.sleepPatterns.minutes'), position: 'insideBottom', offset: -5 }} />
                   <YAxis type="category" dataKey="name" width={100} />
                   <Tooltip />
-                  <Bar dataKey="value" name="Duration (min)">
+                  <Bar dataKey="value" name={t('reports.sleepPatterns.durationMin')}>
                     {stageDistribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
@@ -236,7 +236,7 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-medium mb-3">Average per Night</h4>
+              <h4 className="font-medium mb-3">{t('reports.sleepPatterns.averagePerNight')}</h4>
               {stageDistribution.map((stage, index) => (
                 <div key={index} className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
@@ -244,7 +244,7 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: stage.color }} />
                       <span>{stage.name}</span>
                     </div>
-                    <span className="font-medium">{stage.value} min ({stage.percentage}%)</span>
+                    <span className="font-medium">{stage.value} {t('reports.sleepPatterns.min')} ({stage.percentage}%)</span>
                   </div>
                 </div>
               ))}
@@ -254,16 +254,16 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
                   <span className="text-muted-foreground">•</span>
                   <span>
                     {stageDistribution[0].percentage >= 15 && stageDistribution[0].percentage <= 25
-                      ? 'Deep sleep duration is optimal (15-25% of total)'
-                      : 'Deep sleep could be improved'}
+                      ? t('reports.sleepPatterns.deepSleepOptimal')
+                      : t('reports.sleepPatterns.deepSleepImprove')}
                   </span>
                 </p>
                 <p className="flex items-start gap-2">
                   <span className="text-muted-foreground">•</span>
                   <span>
                     {stageDistribution[2].percentage >= 20 && stageDistribution[2].percentage <= 25
-                      ? 'REM sleep is in healthy range (20-25% of total)'
-                      : 'Consider factors affecting REM sleep'}
+                      ? t('reports.sleepPatterns.remSleepHealthy')
+                      : t('reports.sleepPatterns.remSleepConsider')}
                   </span>
                 </p>
               </div>
@@ -275,20 +275,20 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
       {/* Sleep Stages Over Time */}
       <Card>
         <CardHeader>
-          <CardTitle>Sleep Stages Trends</CardTitle>
+          <CardTitle>{t('reports.sleepPatterns.stagesTrends')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={350}>
             <AreaChart data={stagesData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
-              <YAxis label={{ value: 'Minutes', angle: -90, position: 'insideLeft' }} />
+              <YAxis label={{ value: t('reports.sleepPatterns.minutes'), angle: -90, position: 'insideLeft' }} />
               <Tooltip />
               <Legend />
-              <Area type="monotone" dataKey="deep" stackId="1" stroke="#6366f1" fill="#6366f1" name="Deep Sleep" />
-              <Area type="monotone" dataKey="light" stackId="1" stroke="#60a5fa" fill="#60a5fa" name="Light Sleep" />
-              <Area type="monotone" dataKey="rem" stackId="1" stroke="#a78bfa" fill="#a78bfa" name="REM Sleep" />
-              <Area type="monotone" dataKey="awake" stackId="1" stroke="#f59e0b" fill="#f59e0b" name="Awake" />
+              <Area type="monotone" dataKey="deep" stackId="1" stroke="#6366f1" fill="#6366f1" name={t('reports.content.deepSleep')} />
+              <Area type="monotone" dataKey="light" stackId="1" stroke="#60a5fa" fill="#60a5fa" name={t('reports.content.lightSleep')} />
+              <Area type="monotone" dataKey="rem" stackId="1" stroke="#a78bfa" fill="#a78bfa" name={t('reports.content.remSleep')} />
+              <Area type="monotone" dataKey="awake" stackId="1" stroke="#f59e0b" fill="#f59e0b" name={t('reports.content.awake')} />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>
@@ -299,33 +299,33 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sunrise className="h-5 w-5" />
-            Sleep Pattern Insights
+            {t('reports.sleepPatterns.insights')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <Badge variant="default">Cycles</Badge>
+              <Badge variant="default">{t('reports.sleepPatterns.cyclesLabel')}</Badge>
               <p className="text-sm">
-                Completing {sleepCycles} sleep cycles per night. Aim for 4-6 complete cycles (6-9 hours) for optimal rest.
+                {t('reports.sleepPatterns.cyclesDesc', { count: sleepCycles })}
               </p>
             </div>
 
             <div className="flex items-start gap-3">
-              <Badge variant="default">Consistency</Badge>
+              <Badge variant="default">{t('reports.sleepPatterns.consistencyLabel')}</Badge>
               <p className="text-sm">
                 {Math.abs(avgBedtime - 22) < 2
-                  ? 'Bedtime is consistent and within healthy range (10 PM - 11 PM).'
-                  : 'Consider maintaining a more consistent bedtime routine for better sleep quality.'}
+                  ? t('reports.sleepPatterns.consistencyGood')
+                  : t('reports.sleepPatterns.consistencyImprove')}
               </p>
             </div>
 
             <div className="flex items-start gap-3">
-              <Badge variant="default">Quality</Badge>
+              <Badge variant="default">{t('reports.sleepPatterns.qualityLabel')}</Badge>
               <p className="text-sm">
                 {avgAwake <= 15
-                  ? 'Minimal wakefulness indicates good sleep consolidation.'
-                  : 'Frequent awakenings may indicate sleep fragmentation. Consider sleep environment factors.'}
+                  ? t('reports.sleepPatterns.qualityGood')
+                  : t('reports.sleepPatterns.qualityImprove')}
               </p>
             </div>
           </div>

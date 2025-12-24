@@ -80,9 +80,9 @@ export const HealthAnomaliesReport = ({ selectedPerson, dateRange }: HealthAnoma
       ? ((range.min - value) / range.min) * 100
       : ((value - range.max) / range.max) * 100;
 
-    if (deviation > 20) return { level: 'Critical', color: 'destructive' };
-    if (deviation > 10) return { level: 'High', color: 'destructive' };
-    return { level: 'Moderate', color: 'warning' };
+    if (deviation > 20) return { level: t('reports.healthAnomalies.critical'), color: 'destructive' };
+    if (deviation > 10) return { level: t('reports.healthAnomalies.high'), color: 'destructive' };
+    return { level: t('reports.healthAnomalies.moderate'), color: 'warning' };
   };
 
   const getIcon = (dataType: string) => {
@@ -99,12 +99,12 @@ export const HealthAnomaliesReport = ({ selectedPerson, dateRange }: HealthAnoma
 
   const getTypeName = (dataType: string) => {
     const names: Record<string, string> = {
-      heart_rate: 'Heart Rate',
-      oxygen_saturation: 'Oxygen Saturation',
-      spo2: 'Oxygen Saturation',
-      temperature: 'Body Temperature',
-      blood_sugar: 'Blood Sugar',
-      glucose: 'Blood Glucose',
+      heart_rate: t('reports.healthAnomalies.heartRate'),
+      oxygen_saturation: t('reports.healthAnomalies.oxygenSaturation'),
+      spo2: t('reports.healthAnomalies.oxygenSaturation'),
+      temperature: t('reports.healthAnomalies.bodyTemperature'),
+      blood_sugar: t('reports.healthAnomalies.bloodSugar'),
+      glucose: t('reports.healthAnomalies.bloodGlucose'),
     };
     return names[dataType] || dataType;
   };
@@ -121,9 +121,9 @@ export const HealthAnomaliesReport = ({ selectedPerson, dateRange }: HealthAnoma
             <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
               <Heart className="w-8 h-8 text-success" />
             </div>
-            <h3 className="text-lg font-semibold text-success">All Readings Normal</h3>
+            <h3 className="text-lg font-semibold text-success">{t('reports.healthAnomalies.allReadingsNormal')}</h3>
             <p className="text-muted-foreground">
-              No health anomalies detected in the selected period
+              {t('reports.healthAnomalies.noAnomaliesDetected')}
             </p>
           </div>
         </CardContent>
@@ -144,15 +144,15 @@ export const HealthAnomaliesReport = ({ selectedPerson, dateRange }: HealthAnoma
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
             <div>
-              <p className="text-sm text-muted-foreground">Total Anomalies</p>
+              <p className="text-sm text-muted-foreground">{t('reports.healthAnomalies.totalAnomalies')}</p>
               <p className="text-3xl font-bold text-warning">{anomalies.length}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Affected Metrics</p>
+              <p className="text-sm text-muted-foreground">{t('reports.healthAnomalies.affectedMetrics')}</p>
               <p className="text-3xl font-bold">{Object.keys(anomaliesByType).length}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Date Range</p>
+              <p className="text-sm text-muted-foreground">{t('reports.healthAnomalies.dateRange')}</p>
               <p className="text-sm font-medium">
                 {format(dateRange.from, 'MMM dd')} - {format(dateRange.to, 'MMM dd')}
               </p>
@@ -171,10 +171,10 @@ export const HealthAnomaliesReport = ({ selectedPerson, dateRange }: HealthAnoma
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Icon className="h-5 w-5" />
-                {getTypeName(dataType)} Anomalies
+                {getTypeName(dataType)} {t('reports.healthAnomalies.anomalies')}
               </CardTitle>
               <p className="text-sm text-muted-foreground">
-                Normal range: {range.min} - {range.max} {range.unit}
+                {t('reports.healthAnomalies.normalRange')} {range.min} - {range.max} {range.unit}
               </p>
             </CardHeader>
             <CardContent>
@@ -198,7 +198,7 @@ export const HealthAnomaliesReport = ({ selectedPerson, dateRange }: HealthAnoma
                             {severity.level}
                           </Badge>
                           <Badge variant="outline">
-                            {isLow ? 'Below' : 'Above'} Normal
+                            {isLow ? t('reports.healthAnomalies.belowNormal') : t('reports.healthAnomalies.aboveNormal')}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -207,7 +207,7 @@ export const HealthAnomaliesReport = ({ selectedPerson, dateRange }: HealthAnoma
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium">
-                          {isLow ? 'Low' : 'High'} by{' '}
+                          {isLow ? t('reports.healthAnomalies.lowBy') : t('reports.healthAnomalies.highBy')}{' '}
                           {Math.abs(
                             isLow
                               ? range.min - value
@@ -228,15 +228,15 @@ export const HealthAnomaliesReport = ({ selectedPerson, dateRange }: HealthAnoma
       {/* Recommendations */}
       <Card className="border-info">
         <CardHeader>
-          <CardTitle>Recommendations</CardTitle>
+          <CardTitle>{t('reports.content.recommendations')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="list-disc list-inside space-y-2 text-sm">
-            <li>Consult with a healthcare provider about these readings</li>
-            <li>Ensure devices are properly calibrated and worn correctly</li>
-            <li>Monitor for patterns or recurring anomalies</li>
-            <li>Keep a log of activities and medications when anomalies occur</li>
-            <li>Seek immediate medical attention for critical readings</li>
+            <li>{t('reports.healthAnomalies.recommendations.consultProvider')}</li>
+            <li>{t('reports.healthAnomalies.recommendations.ensureCalibration')}</li>
+            <li>{t('reports.healthAnomalies.recommendations.monitorPatterns')}</li>
+            <li>{t('reports.healthAnomalies.recommendations.keepLog')}</li>
+            <li>{t('reports.healthAnomalies.recommendations.seekAttention')}</li>
           </ul>
         </CardContent>
       </Card>
