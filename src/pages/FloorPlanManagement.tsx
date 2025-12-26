@@ -98,6 +98,7 @@ export default function FloorPlanManagement() {
               elderlyPersons={elderlyPersons || []}
               selectedPersonId={selectedPersonId}
               onSelectPerson={setSelectedPersonId}
+              variant="list"
             />
           </div>
 

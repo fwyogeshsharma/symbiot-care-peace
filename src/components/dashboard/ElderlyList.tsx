@@ -16,9 +16,10 @@ interface ElderlyListProps {
   elderlyPersons: ElderlyPerson[];
   selectedPersonId: string | null;
   onSelectPerson: (id: string | null) => void;
+  variant?: 'grid' | 'list';
 }
 
-const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson }: ElderlyListProps) => {
+const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson, variant = 'grid' }: ElderlyListProps) => {
   const { t } = useTranslation();
   const getInitials = (name: string) => {
     return name
@@ -39,7 +40,7 @@ const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson }: Elder
           <p className="text-sm text-muted-foreground">{t('movement.elderlyList.noIndividuals')}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className={variant === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'}>
           {elderlyPersons.map((person) => (
             <div
               key={person.id}
@@ -51,27 +52,27 @@ const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson }: Elder
               }`}
             >
               <div className="flex items-stretch">
-                {/* Photo section - takes up 1/4 of the card */}
-                <div className="w-1/4 min-w-[100px] relative bg-gradient-to-br from-primary/5 to-primary/10">
+                {/* Photo section - responsive width */}
+                <div className={`${variant === 'list' ? 'w-20' : 'w-1/4 min-w-[100px]'} relative bg-gradient-to-br from-primary/5 to-primary/10 flex-shrink-0`}>
                   <Avatar className="w-full h-full rounded-none">
                     <AvatarImage
                       src={person.photo_url || undefined}
                       alt={person.full_name}
                       className="object-cover"
                     />
-                    <AvatarFallback className="bg-primary/10 text-primary font-bold text-2xl rounded-none">
+                    <AvatarFallback className={`bg-primary/10 text-primary font-bold ${variant === 'list' ? 'text-lg' : 'text-2xl'} rounded-none`}>
                       {getInitials(person.full_name)}
                     </AvatarFallback>
                   </Avatar>
                 </div>
 
-                {/* Content section - takes up 3/4 of the card */}
-                <div className="flex-1 p-4 flex flex-col justify-center">
-                  <h4 className="font-semibold text-base leading-tight mb-3 break-words">
+                {/* Content section */}
+                <div className="flex-1 p-3 flex flex-col justify-center min-w-0">
+                  <h4 className={`font-semibold ${variant === 'list' ? 'text-sm' : 'text-base'} leading-tight mb-2 break-words`}>
                     {person.full_name}
                   </h4>
 
-                  <div className="flex items-center flex-wrap gap-2">
+                  <div className="flex items-center flex-wrap gap-1.5">
                     <Badge
                       variant="outline"
                       className={`text-xs whitespace-nowrap ${person.status === 'active' ? 'border-success text-success' : 'border-muted'}`}
