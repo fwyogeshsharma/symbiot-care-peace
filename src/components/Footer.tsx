@@ -39,17 +39,10 @@ const InstagramColorIcon = () => (
   </svg>
 );
 
-// Colorful company logo with gradient
+// Company logo in blue
 const CompanyLogo = () => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="company-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#3B82F6" />
-        <stop offset="50%" stopColor="#8B5CF6" />
-        <stop offset="100%" stopColor="#EC4899" />
-      </linearGradient>
-    </defs>
-    <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="url(#company-gradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="#0697e0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
   </svg>
 );
 
