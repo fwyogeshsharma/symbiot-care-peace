@@ -67,7 +67,7 @@ export const Footer = () => {
               <Mail className="w-4 h-4" />
               <a
                 href="mailto:symbiot.doc@gmail.com"
-                className="text-muted-foreground hover:text-primary transition-colors underline"
+                className="text-muted-foreground hover:text-primary hover:underline transition-colors"
               >
                 symbiot.doc@gmail.com
               </a>
@@ -79,22 +79,22 @@ export const Footer = () => {
             <h3 className="text-lg font-semibold">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors underline">
+                <Link to="/" className="text-muted-foreground hover:text-primary hover:underline transition-colors">
                   {t('nav.home')}
                 </Link>
               </li>
               <li>
-                <Link to="/pricing" className="text-muted-foreground hover:text-primary transition-colors underline">
+                <Link to="/pricing" className="text-muted-foreground hover:text-primary hover:underline transition-colors">
                   {t('nav.pricing')}
                 </Link>
               </li>
               <li>
-                <Link to="/investor-info" className="text-muted-foreground hover:text-primary transition-colors underline">
+                <Link to="/investor-info" className="text-muted-foreground hover:text-primary hover:underline transition-colors">
                   {t('nav.investorInfo')}
                 </Link>
               </li>
               <li>
-                <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors underline">
+                <Link to="/faq" className="text-muted-foreground hover:text-primary hover:underline transition-colors">
                   {t('footer.faq', { defaultValue: 'FAQ' })}
                 </Link>
               </li>
@@ -111,22 +111,22 @@ export const Footer = () => {
             <h3 className="text-lg font-semibold">{t('footer.legal')}</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors underline">
+                <Link to="/privacy-policy" className="text-muted-foreground hover:text-primary hover:underline transition-colors">
                   {t('footer.privacyPolicy')}
                 </Link>
               </li>
               <li>
-                <Link to="/terms-of-service" className="text-muted-foreground hover:text-primary transition-colors underline">
+                <Link to="/terms-of-service" className="text-muted-foreground hover:text-primary hover:underline transition-colors">
                   {t('footer.termsOfService')}
                 </Link>
               </li>
               <li>
-                <Link to="/liability-disclaimer" className="text-muted-foreground hover:text-primary transition-colors underline">
+                <Link to="/liability-disclaimer" className="text-muted-foreground hover:text-primary hover:underline transition-colors">
                   {t('footer.liabilityDisclaimer')}
                 </Link>
               </li>
               <li>
-                <Link to="/cookie-policy" className="text-muted-foreground hover:text-primary transition-colors underline">
+                <Link to="/cookie-policy" className="text-muted-foreground hover:text-primary hover:underline transition-colors">
                   {t('footer.cookiePolicy')}
                 </Link>
               </li>
