@@ -506,19 +506,42 @@ async function checkAlerts(supabase: any, elderlyPersonId: string, currentScore:
 async function calculateHistoricalScores(supabase: any, elderlyPersonId: string, config: any, weights: any, forceRecompute: boolean) {
   console.log(`Starting historical ILQ calculation for ${elderlyPersonId}`);
 
-  // 1. Fetch ALL device data for this person
-  const { data: allDeviceData, error: deviceError } = await supabase
-    .from('device_data')
-    .select('*')
-    .eq('elderly_person_id', elderlyPersonId)
-    .order('recorded_at', { ascending: true });
+  // 1. Fetch ALL device data for this person using pagination
+  // Supabase has a max of 1000 rows per request, so we need to paginate
+  console.log('Fetching all device data with pagination...');
+  let allDeviceData: any[] = [];
+  let page = 0;
+  const pageSize = 1000;
+  let hasMore = true;
 
-  if (deviceError) {
-    console.error('Error fetching device data:', deviceError);
-    throw deviceError;
+  while (hasMore) {
+    const { data: pageData, error: deviceError } = await supabase
+      .from('device_data')
+      .select('*')
+      .eq('elderly_person_id', elderlyPersonId)
+      .order('recorded_at', { ascending: true })
+      .range(page * pageSize, (page + 1) * pageSize - 1);
+
+    if (deviceError) {
+      console.error('Error fetching device data:', deviceError);
+      throw deviceError;
+    }
+
+    if (!pageData || pageData.length === 0) {
+      hasMore = false;
+    } else {
+      allDeviceData = allDeviceData.concat(pageData);
+      console.log(`Fetched page ${page + 1}: ${pageData.length} records (total: ${allDeviceData.length})`);
+
+      if (pageData.length < pageSize) {
+        hasMore = false;  // Last page
+      } else {
+        page++;
+      }
+    }
   }
 
-  if (!allDeviceData || allDeviceData.length === 0) {
+  if (allDeviceData.length === 0) {
     return new Response(
       JSON.stringify({
         error: 'No historical data found',
@@ -528,7 +551,7 @@ async function calculateHistoricalScores(supabase: any, elderlyPersonId: string,
     );
   }
 
-  console.log(`Found ${allDeviceData.length} total data points`);
+  console.log(`Found ${allDeviceData.length} total data points across ${page + 1} pages`);
 
   // 2. Get existing scores to avoid duplicates (unless force_recompute)
   const { data: existingScores } = await supabase
@@ -559,7 +582,8 @@ async function calculateHistoricalScores(supabase: any, elderlyPersonId: string,
   const { data: allMedicationLogs } = await supabase
     .from('medication_adherence_logs')
     .select('*')
-    .eq('elderly_person_id', elderlyPersonId);
+    .eq('elderly_person_id', elderlyPersonId)
+    .limit(100000);  // Set high limit to ensure we get all historical data
 
   if (allMedicationLogs) {
     for (const log of allMedicationLogs) {
