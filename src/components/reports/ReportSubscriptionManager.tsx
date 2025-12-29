@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { TimePicker } from '@/components/ui/time-picker';
 import { Bell, Clock, Mail, Loader2, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -267,10 +267,9 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
                 <Clock className="w-4 h-4" />
                 {t('reports.subscription.scheduleTime', { defaultValue: 'Daily report time' })}
               </Label>
-              <Input
-                type="time"
+              <TimePicker
                 value={scheduleTime}
-                onChange={(e) => handleTimeChange(e.target.value)}
+                onChange={handleTimeChange}
                 disabled={upsertMutation.isPending}
                 className="w-full"
               />
@@ -317,10 +316,9 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
                 <Clock className="w-4 h-4" />
                 {t('reports.subscription.selectTime', { defaultValue: 'Select delivery time' })}
               </Label>
-              <Input
-                type="time"
+              <TimePicker
                 value={scheduleTime}
-                onChange={(e) => setScheduleTime(e.target.value)}
+                onChange={setScheduleTime}
                 className="w-full"
               />
             </div>
