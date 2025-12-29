@@ -211,10 +211,10 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={hourlyMovement}>
+            <LineChart data={hourlyMovement} margin={{ top: 20, right: 30, left: 60, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="hour" />
-              <YAxis />
+              <YAxis width={80} />
               <Tooltip />
               <Legend />
               <Line
@@ -239,23 +239,29 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={350}>
               <PieChart>
                 <Pie
                   data={timeDistribution}
                   cx="50%"
-                  cy="50%"
+                  cy="45%"
                   labelLine={false}
-                  label={({ timeSlot, percent }) => `${timeSlot}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
+                  label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                  outerRadius={90}
                   fill="#8884d8"
                   dataKey="count"
+                  nameKey="timeSlot"
                 >
                   {timeDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
+                <Legend
+                  verticalAlign="bottom"
+                  height={50}
+                  wrapperStyle={{ paddingTop: '20px' }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -270,7 +276,7 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={dwellTimeData.slice(0, 6)} layout="vertical">
+              <BarChart data={dwellTimeData.slice(0, 6)} layout="vertical" margin={{ top: 20, right: 30, left: 120, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" />
                 <YAxis type="category" dataKey="location" width={100} />

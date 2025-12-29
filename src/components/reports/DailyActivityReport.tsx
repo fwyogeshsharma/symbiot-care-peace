@@ -136,10 +136,10 @@ export const DailyActivityReport = ({ selectedPerson, dateRange }: DailyActivity
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={dailyData}>
+            <BarChart data={dailyData} margin={{ top: 20, right: 30, left: 60, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
-              <YAxis />
+              <YAxis width={80} />
               <Tooltip />
               <Legend />
               <Bar dataKey="steps" fill="#10b981" name={t('reports.content.totalSteps')} />
