@@ -280,8 +280,8 @@ export default function Tracking() {
 
   const handlePresetChange = (preset: string) => {
     setSelectedPreset(preset);
-    if (preset === 'today' || preset === 'last7days' || preset === 'last30days') {
-      setDateRange(getDateRangePreset(preset));
+    if (preset === 'today' || preset === 'last7days' || preset === 'last30days' || preset === 'all') {
+      setDateRange(getDateRangePreset(preset as 'today' | 'last7days' | 'last30days' | 'all'));
     }
   };
 
@@ -386,6 +386,7 @@ export default function Tracking() {
                   <SelectItem value="today">{t('tracking.today')}</SelectItem>
                   <SelectItem value="last7days">{t('tracking.last7Days')}</SelectItem>
                   <SelectItem value="last30days">{t('tracking.last30Days')}</SelectItem>
+                  <SelectItem value="all">{t('tracking.allAvailableData', 'All Available Data')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

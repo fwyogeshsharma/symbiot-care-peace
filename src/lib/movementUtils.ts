@@ -111,7 +111,7 @@ export const getDefaultDateRange = () => ({
   end: endOfDay(new Date()).toISOString(),
 });
 
-export const getDateRangePreset = (preset: 'today' | 'last7days' | 'last30days') => {
+export const getDateRangePreset = (preset: 'today' | 'last7days' | 'last30days' | 'all') => {
   const end = endOfDay(new Date());
   let start: Date;
 
@@ -124,6 +124,10 @@ export const getDateRangePreset = (preset: 'today' | 'last7days' | 'last30days')
       break;
     case 'last30days':
       start = startOfDay(subDays(new Date(), 30));
+      break;
+    case 'all':
+      // Use a date far in the past to get all available data
+      start = new Date('2000-01-01');
       break;
   }
 
