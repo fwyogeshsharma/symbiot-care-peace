@@ -43,7 +43,7 @@ export const processMovementData = (rawData: any[]): ProcessedMovementData => {
   let doorClosedCount = 0;
 
   rawData?.forEach((item) => {
-    const location = item.devices?.location || 'Unknown';
+    const location = item.devices?.location || 'Outside Floorplan';
     const timestamp = new Date(item.recorded_at);
     const hour = format(timestamp, 'HH:00');
 
