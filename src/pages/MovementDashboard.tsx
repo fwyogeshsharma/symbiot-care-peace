@@ -9,6 +9,8 @@ import { MovementHeatmap } from "@/components/dashboard/MovementHeatmap";
 import { DwellTimeAnalysis } from "@/components/dashboard/DwellTimeAnalysis";
 import { IdealProfileManager } from "@/components/dashboard/IdealProfileManager";
 import { ILQWidget } from "@/components/dashboard/ILQWidget";
+import { BedPadActivity } from "@/components/reports/BedPadActivity";
+import { ToiletSeatActivity } from "@/components/reports/ToiletSeatActivity";
 import ElderlyList from "@/components/dashboard/ElderlyList";
 import HomeHubCard from "@/components/dashboard/HomeHubCard";
 import SmartPhoneCard from "@/components/dashboard/SmartPhoneCard";
@@ -200,6 +202,39 @@ export default function MovementDashboard() {
           <MovementTimeline events={processedData.events} />
           <MovementHeatmap data={processedData} />
         </div>
+
+        {/* Bed Pad and Toilet Seat Activity */}
+        {selectedPersonId && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-1">{t('reports.bedPadActivity.title')}</h2>
+              <p className="text-muted-foreground mb-4">
+                {t('reports.activity.bedPadActivityDesc')}
+              </p>
+              <BedPadActivity
+                selectedPerson={selectedPersonId}
+                dateRange={{
+                  from: new Date(dateRange.start),
+                  to: new Date(dateRange.end)
+                }}
+              />
+            </div>
+
+            <div>
+              <h2 className="text-2xl font-bold mb-1">{t('reports.toiletSeatActivity.title')}</h2>
+              <p className="text-muted-foreground mb-4">
+                {t('reports.activity.toiletSeatActivityDesc')}
+              </p>
+              <ToiletSeatActivity
+                selectedPerson={selectedPersonId}
+                dateRange={{
+                  from: new Date(dateRange.start),
+                  to: new Date(dateRange.end)
+                }}
+              />
+            </div>
+          </div>
+        )}
       </main>
       <Footer />
     </div>

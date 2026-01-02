@@ -24,7 +24,8 @@
       "Bash(wc:*)",
       "Bash(dir:*)",
       "Bash(findstr:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(node scripts/check_device_data.js:*)"
     ],
     "deny": [],
     "ask": []
