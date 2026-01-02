@@ -119,8 +119,8 @@ export default function MovementDashboard() {
 
   const handlePresetChange = (preset: string) => {
     setSelectedPreset(preset);
-    if (preset === 'today' || preset === 'last7days' || preset === 'last30days') {
-      setDateRange(getDateRangePreset(preset));
+    if (preset === 'today' || preset === 'last7days' || preset === 'last30days' || preset === 'all') {
+      setDateRange(getDateRangePreset(preset as 'today' | 'last7days' | 'last30days' | 'all'));
     }
   };
 
@@ -155,6 +155,7 @@ export default function MovementDashboard() {
                 <SelectItem value="today">{t('movement.today')}</SelectItem>
                 <SelectItem value="last7days">{t('movement.last7days')}</SelectItem>
                 <SelectItem value="last30days">{t('movement.last30days')}</SelectItem>
+                <SelectItem value="all">{t('movement.allData')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
