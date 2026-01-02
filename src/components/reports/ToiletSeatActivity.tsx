@@ -62,19 +62,29 @@ export const ToiletSeatActivity = ({ selectedPerson, dateRange }: ToiletSeatActi
 
     toiletData.forEach((entry) => {
       let parsedValue: { duration?: number } = { duration: 0 };
-      if (typeof entry.value === 'string') {
+
+      if (typeof entry.value === 'number') {
+        // If value is a direct number, treat it as duration in minutes
+        parsedValue = { duration: entry.value };
+      } else if (typeof entry.value === 'string') {
         try {
-          parsedValue = JSON.parse(entry.value);
+          const parsed = JSON.parse(entry.value);
+          if (typeof parsed === 'number') {
+            parsedValue = { duration: parsed };
+          } else {
+            parsedValue = parsed;
+          }
         } catch (e) {
           console.warn('Failed to parse value:', entry.value, e);
         }
       } else if (typeof entry.value === 'object' && entry.value !== null) {
         parsedValue = entry.value as { duration?: number };
       }
+
       const recordedAt = parseISO(entry.recorded_at);
       const hour = recordedAt.getHours();
       const date = format(recordedAt, 'yyyy-MM-dd');
-      const duration = parsedValue?.duration || 0;
+      const duration = Math.round(parsedValue?.duration || 0);
 
       // Track daily usage
       if (!dailyData[date]) {
@@ -419,19 +429,29 @@ export const ToiletSeatActivity = ({ selectedPerson, dateRange }: ToiletSeatActi
           <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
             {toiletData.slice(-15).reverse().map((entry, index) => {
               let parsedValue: { duration?: number } = { duration: 0 };
-              if (typeof entry.value === 'string') {
+
+              if (typeof entry.value === 'number') {
+                // If value is a direct number, treat it as duration in minutes
+                parsedValue = { duration: entry.value };
+              } else if (typeof entry.value === 'string') {
                 try {
-                  parsedValue = JSON.parse(entry.value);
+                  const parsed = JSON.parse(entry.value);
+                  if (typeof parsed === 'number') {
+                    parsedValue = { duration: parsed };
+                  } else {
+                    parsedValue = parsed;
+                  }
                 } catch (e) {
                   console.warn('Failed to parse value:', entry.value, e);
                 }
               } else if (typeof entry.value === 'object' && entry.value !== null) {
                 parsedValue = entry.value as { duration?: number };
               }
+
               const recordedAt = parseISO(entry.recorded_at);
               const hour = recordedAt.getHours();
               const isNight = hour >= 22 || hour < 6;
-              const duration = parsedValue?.duration || 0;
+              const duration = Math.round(parsedValue?.duration || 0);
               const isLong = duration > 10;
 
               return (
@@ -447,7 +467,7 @@ export const ToiletSeatActivity = ({ selectedPerson, dateRange }: ToiletSeatActi
                         {format(recordedAt, 'MMM dd, yyyy HH:mm')}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Duration: {duration.toFixed(1)} minutes
+                        Duration: {duration} min
                       </p>
                     </div>
                   </div>
