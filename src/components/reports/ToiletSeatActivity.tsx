@@ -152,8 +152,8 @@ export const ToiletSeatActivity = ({ selectedPerson, dateRange }: ToiletSeatActi
   const prepareDayNightData = () => {
     if (!stats) return [];
     return [
-      { name: 'Night (10PM-6AM)', value: stats.nightUsage, fill: '#6366f1' },
-      { name: 'Day (6AM-10PM)', value: stats.dayUsage, fill: '#f59e0b' },
+      { name: 'Night (10PM-6AM)', value: stats.nightUsage, fill: '#3b82f6' },
+      { name: 'Day (6AM-10PM)', value: stats.dayUsage, fill: '#fbbf24' },
     ];
   };
 
@@ -297,7 +297,7 @@ export const ToiletSeatActivity = ({ selectedPerson, dateRange }: ToiletSeatActi
                 <YAxis label={{ value: 'Count', angle: -90, position: 'insideLeft' }} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="count" name="Usage Count" fill="#6366f1" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="count" name="Usage Count" fill="#3b82f6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -355,7 +355,7 @@ export const ToiletSeatActivity = ({ selectedPerson, dateRange }: ToiletSeatActi
                 <Legend />
                 <Bar dataKey="count" name="Usage Count" radius={[8, 8, 0, 0]}>
                   {hourlyChartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.isNight ? '#6366f1' : '#f59e0b'} />
+                    <Cell key={`cell-${index}`} fill={entry.isNight ? '#3b82f6' : '#fbbf24'} />
                   ))}
                 </Bar>
               </BarChart>
