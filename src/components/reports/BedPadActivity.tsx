@@ -61,15 +61,25 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
 
     bedPadData.forEach((entry) => {
       let parsedValue: { duration?: number; pressure?: number } = { duration: 0, pressure: 0 };
-      if (typeof entry.value === 'string') {
+
+      if (typeof entry.value === 'number') {
+        // If value is a direct number, treat it as duration in minutes
+        parsedValue = { duration: entry.value, pressure: 0 };
+      } else if (typeof entry.value === 'string') {
         try {
-          parsedValue = JSON.parse(entry.value);
+          const parsed = JSON.parse(entry.value);
+          if (typeof parsed === 'number') {
+            parsedValue = { duration: parsed, pressure: 0 };
+          } else {
+            parsedValue = parsed;
+          }
         } catch (e) {
           console.warn('Failed to parse value:', entry.value, e);
         }
       } else if (typeof entry.value === 'object' && entry.value !== null) {
         parsedValue = entry.value as { duration?: number; pressure?: number };
       }
+
       const recordedAt = parseISO(entry.recorded_at);
       const hour = recordedAt.getHours();
       const date = format(recordedAt, 'yyyy-MM-dd');
@@ -188,7 +198,24 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis label={{ value: 'Hours', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-card border rounded-lg p-3 shadow-lg">
+                          <p className="font-semibold mb-2">{data.date}</p>
+                          <div className="space-y-1 text-sm">
+                            <p>Duration: <span className="font-bold">{data.duration}h</span></p>
+                            <p>Sessions: <span className="font-bold">{data.sessions}</span></p>
+                            <p className="text-muted-foreground">Avg: <span className="font-medium">{(data.duration / data.sessions).toFixed(1)}h per session</span></p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
                 <Legend />
                 <Bar dataKey="duration" name="Hours in Bed" fill="#3b82f6" radius={[8, 8, 0, 0]} />
               </BarChart>
@@ -267,19 +294,29 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
           <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
             {bedPadData.slice(-10).reverse().map((entry, index) => {
               let parsedValue: { duration?: number; pressure?: number } = { duration: 0, pressure: 0 };
-              if (typeof entry.value === 'string') {
+
+              if (typeof entry.value === 'number') {
+                // If value is a direct number, treat it as duration in minutes
+                parsedValue = { duration: entry.value, pressure: 0 };
+              } else if (typeof entry.value === 'string') {
                 try {
-                  parsedValue = JSON.parse(entry.value);
+                  const parsed = JSON.parse(entry.value);
+                  if (typeof parsed === 'number') {
+                    parsedValue = { duration: parsed, pressure: 0 };
+                  } else {
+                    parsedValue = parsed;
+                  }
                 } catch (e) {
                   console.warn('Failed to parse value:', entry.value, e);
                 }
               } else if (typeof entry.value === 'object' && entry.value !== null) {
                 parsedValue = entry.value as { duration?: number; pressure?: number };
               }
+
               const recordedAt = parseISO(entry.recorded_at);
               const hour = recordedAt.getHours();
               const isNight = hour >= 20 || hour < 6;
-              const duration = parsedValue?.duration || 0;
+              const duration = Math.round(parsedValue?.duration || 0);
 
               return (
                 <div key={index} className="flex items-center justify-between py-3 border-b last:border-0">
