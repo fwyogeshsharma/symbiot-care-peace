@@ -36,13 +36,21 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
     },
   });
 
+  // Helper to extract location from value
+  const extractLocation = (value: any): string | null => {
+    if (typeof value === 'object' && value !== null) {
+      return value?.location || value?.room || null;
+    }
+    return typeof value === 'string' ? value : null;
+  };
+
   // Process location transitions
   const locationTransitions = locationData.reduce((acc: any, item, index) => {
     if (index === 0) return acc;
 
     const prevLocation = locationData[index - 1];
-    let currentLoc = typeof item.value === 'object' ? item.value?.location || item.value?.room : item.value;
-    let prevLoc = typeof prevLocation.value === 'object' ? prevLocation.value?.location || prevLocation.value?.room : prevLocation.value;
+    const currentLoc = extractLocation(item.value);
+    const prevLoc = extractLocation(prevLocation.value);
 
     if (currentLoc !== prevLoc && currentLoc && prevLoc) {
       const transition = `${prevLoc} → ${currentLoc}`;
@@ -77,9 +85,9 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
   const dwellTimeByLocation = locationData.reduce((acc: any, item, index) => {
     if (index === 0) return acc;
 
-    let currentLoc = typeof item.value === 'object' ? item.value?.location || item.value?.room : item.value;
+    const currentLoc = extractLocation(item.value);
     const prevItem = locationData[index - 1];
-    let prevLoc = typeof prevItem.value === 'object' ? prevItem.value?.location || prevItem.value?.room : prevItem.value;
+    const prevLoc = extractLocation(prevItem.value);
 
     if (currentLoc === prevLoc && currentLoc) {
       const duration = differenceInMinutes(new Date(item.recorded_at), new Date(prevItem.recorded_at));
@@ -109,12 +117,11 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
   // Calculate statistics
   const totalMovements = locationData.length;
   const totalLocations = new Set(locationData.map(item => {
-    let loc = typeof item.value === 'object' ? item.value?.location || item.value?.room : item.value;
-    return loc;
+    return extractLocation(item.value);
   }).filter(Boolean)).size;
 
   const mostVisitedLocation = dwellTimeData[0];
-  const totalTransitions = Object.values(locationTransitions).reduce((sum: number, count) => sum + (count as number), 0);
+  const totalTransitions = (Object.values(locationTransitions) as number[]).reduce((sum, count) => sum + count, 0);
 
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 

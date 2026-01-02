@@ -2,7 +2,7 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-interface TimePickerProps extends Omit<React.ComponentProps<"input">, "type"> {
+interface TimePickerProps extends Omit<React.ComponentProps<"input">, "type" | "onChange"> {
   value?: string;
   onChange?: (value: string) => void;
 }

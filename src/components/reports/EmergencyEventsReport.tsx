@@ -364,10 +364,10 @@ export const EmergencyEventsReport = ({ selectedPerson, dateRange }: EmergencyEv
                       {(alert as any).elderly_persons?.full_name && (
                         <span>• {(alert as any).elderly_persons.full_name}</span>
                       )}
-                      {alert.location && (
+                      {(alert as any).location && (
                         <span className="flex items-center gap-1">
                           <MapPin className="h-3 w-3" />
-                          {alert.location}
+                          {(alert as any).location}
                         </span>
                       )}
                     </div>

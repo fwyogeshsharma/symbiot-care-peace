@@ -60,14 +60,15 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
     const hourlyData: { [key: number]: number } = {};
 
     bedPadData.forEach((entry) => {
-      let value = entry.value;
+      let parsedValue: { duration?: number; pressure?: number } = { duration: 0, pressure: 0 };
       if (typeof entry.value === 'string') {
         try {
-          value = JSON.parse(entry.value);
+          parsedValue = JSON.parse(entry.value);
         } catch (e) {
           console.warn('Failed to parse value:', entry.value, e);
-          value = { duration: 0, pressure: 0 };
         }
+      } else if (typeof entry.value === 'object' && entry.value !== null) {
+        parsedValue = entry.value as { duration?: number; pressure?: number };
       }
       const recordedAt = parseISO(entry.recorded_at);
       const hour = recordedAt.getHours();
@@ -78,15 +79,15 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
         dailyData[date] = { duration: 0, sessions: 0 };
       }
       dailyData[date].sessions += 1;
-      dailyData[date].duration += value?.duration || 0;
+      dailyData[date].duration += parsedValue?.duration || 0;
 
       // Track hourly distribution
       hourlyData[hour] = (hourlyData[hour] || 0) + 1;
 
       // Accumulate stats
-      totalTimeInBed += value?.duration || 0;
+      totalTimeInBed += parsedValue?.duration || 0;
       sleepSessions += 1;
-      totalPressure += value?.pressure || 0;
+      totalPressure += parsedValue?.pressure || 0;
 
       // Night vs Day (Night: 8 PM to 6 AM)
       if (hour >= 20 || hour < 6) {
@@ -265,19 +266,20 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
         <CardContent>
           <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
             {bedPadData.slice(-10).reverse().map((entry, index) => {
-              let value = entry.value;
+              let parsedValue: { duration?: number; pressure?: number } = { duration: 0, pressure: 0 };
               if (typeof entry.value === 'string') {
                 try {
-                  value = JSON.parse(entry.value);
+                  parsedValue = JSON.parse(entry.value);
                 } catch (e) {
                   console.warn('Failed to parse value:', entry.value, e);
-                  value = { duration: 0, pressure: 0 };
                 }
+              } else if (typeof entry.value === 'object' && entry.value !== null) {
+                parsedValue = entry.value as { duration?: number; pressure?: number };
               }
               const recordedAt = parseISO(entry.recorded_at);
               const hour = recordedAt.getHours();
               const isNight = hour >= 20 || hour < 6;
-              const duration = value?.duration || 0;
+              const duration = parsedValue?.duration || 0;
 
               return (
                 <div key={index} className="flex items-center justify-between py-3 border-b last:border-0">

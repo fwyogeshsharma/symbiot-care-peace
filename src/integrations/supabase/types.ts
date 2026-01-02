@@ -125,6 +125,30 @@ export type Database = {
           },
         ]
       }
+      dashboard_layouts: {
+        Row: {
+          created_at: string
+          id: string
+          layout_config: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          layout_config?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          layout_config?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       device_association_logs: {
         Row: {
           created_at: string
@@ -1435,6 +1459,7 @@ export type Database = {
           elderly_person_id: string
           id: string
           is_active: boolean
+          last_sent_at: string | null
           report_type: string
           schedule_time: string
           timezone: string
@@ -1446,6 +1471,7 @@ export type Database = {
           elderly_person_id: string
           id?: string
           is_active?: boolean
+          last_sent_at?: string | null
           report_type?: string
           schedule_time?: string
           timezone?: string
@@ -1457,6 +1483,7 @@ export type Database = {
           elderly_person_id?: string
           id?: string
           is_active?: boolean
+          last_sent_at?: string | null
           report_type?: string
           schedule_time?: string
           timezone?: string
@@ -1469,6 +1496,13 @@ export type Database = {
             columns: ["elderly_person_id"]
             isOneToOne: false
             referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1503,6 +1537,30 @@ export type Database = {
           session_duration_minutes?: number | null
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      system_config: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          key: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          key: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          key?: string
+          updated_at?: string | null
+          value?: string
         }
         Relationships: []
       }
@@ -1546,6 +1604,14 @@ export type Database = {
           score: number
         }[]
       }
+      convert_local_to_utc_time: {
+        Args: { local_time: string; tz: string }
+        Returns: string
+      }
+      convert_schedule_time_to_utc: {
+        Args: { local_time: string; tz: string }
+        Returns: string
+      }
       delete_user_data_by_email: {
         Args: { user_email: string }
         Returns: {
@@ -1586,6 +1652,19 @@ export type Database = {
           id: string
         }[]
       }
+      get_subscriptions_due_now: {
+        Args: { time_window_minutes?: number }
+        Returns: {
+          created_at: string
+          elderly_person_id: string
+          id: string
+          report_type: string
+          schedule_time: string
+          timezone: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1595,6 +1674,34 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       lookup_user_by_email: { Args: { _email: string }; Returns: string }
+      show_recent_cron_runs: {
+        Args: never
+        Returns: {
+          duration: unknown
+          message: string
+          run_time: string
+          status: string
+        }[]
+      }
+      show_upcoming_reports: {
+        Args: never
+        Returns: {
+          minutes_until_next_run: number
+          person_name: string
+          schedule_time_utc: string
+          subscription_id: string
+          user_email: string
+          user_timezone: string
+          will_trigger_soon: boolean
+        }[]
+      }
+      test_http_connection: {
+        Args: never
+        Returns: {
+          details: string
+          test_result: string
+        }[]
+      }
       trigger_scheduled_reports: { Args: never; Returns: undefined }
     }
     Enums: {

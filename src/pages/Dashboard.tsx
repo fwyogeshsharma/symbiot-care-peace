@@ -29,6 +29,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [dateRange] = useState(getDateRangePreset('today'));
+  const [healthChartsOpen, setHealthChartsOpen] = useState(false);
 
   // Fetch elderly persons based on role
   const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
@@ -186,7 +187,11 @@ const Dashboard = () => {
                 <VitalMetrics selectedPersonId={selectedPersonId} />
               )}
               {isComponentEnabled('health-charts') && (
-                <HealthMetricsCharts selectedPersonId={selectedPersonId} />
+                <HealthMetricsCharts 
+                  open={healthChartsOpen} 
+                  onOpenChange={setHealthChartsOpen} 
+                  selectedPersonId={selectedPersonId} 
+                />
               )}
               {isComponentEnabled('movement-summary') && (
                 <MovementSummary data={processedMovementData} />
