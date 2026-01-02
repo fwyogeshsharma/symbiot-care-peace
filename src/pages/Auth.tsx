@@ -126,7 +126,8 @@ const Auth = () => {
         return;
       }
 
-      const baseUrl = window.location.origin;
+      // Use VITE_APP_URL to ensure correct domain (symbiot.faberwork.com)
+      const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${baseUrl}/auth`,
       });

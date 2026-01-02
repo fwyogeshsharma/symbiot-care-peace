@@ -136,7 +136,7 @@ export const MedicationTimingAnalysisReport = ({ selectedPerson, dateRange }: Me
       return diffMinutes > 30;
     })
     .map(log => ({
-      medicationName: log.medications?.name || 'Unknown Medication',
+      medicationName: (log as any).medications?.name || 'Unknown Medication',
       scheduledTime: new Date(log.scheduled_time),
       takenTime: new Date(log.timestamp),
       delayMinutes: differenceInMinutes(new Date(log.timestamp), new Date(log.scheduled_time)),
