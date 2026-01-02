@@ -13,6 +13,13 @@ interface DwellTimeAnalysisProps {
   } | null;
 }
 
+const toTitleCase = (str: string): string => {
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps) => {
   const { t } = useTranslation();
   const dwellTimes = calculateDwellTimes(data.events);
@@ -40,7 +47,7 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
     }
 
     return {
-      location,
+      location: toTitleCase(location),
       actual: Math.round(actualMinutes),
       ideal: idealMinutes,
       min: minMinutes,
