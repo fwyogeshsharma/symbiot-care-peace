@@ -240,7 +240,7 @@ export const ToiletHealthInsights = ({ selectedPerson, dateRange }: ToiletHealth
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>Toilet Health Insights (30 Days)</span>
+          <span>Restroom Health Indicators (30 Days)</span>
           <Badge variant="outline" className="text-xs font-normal">
             {stats.totalUsage} visits tracked
           </Badge>
