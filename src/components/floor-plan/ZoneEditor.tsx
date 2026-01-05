@@ -316,9 +316,10 @@ export function ZoneEditor({
 
       if (!existingFurniture) {
         // Create new furniture with exact coordinates
+        // Use center origin for consistent rotation handling (like zones)
         const furnitureObj = new Rect({
-          left: item.x * SCALE,
-          top: item.y * SCALE,
+          left: (item.x + item.width / 2) * SCALE,
+          top: (item.y + item.height / 2) * SCALE,
           width: item.width * SCALE,
           height: item.height * SCALE,
           fill: colors[item.type] + '80',
@@ -332,6 +333,8 @@ export function ZoneEditor({
           ry: 4,
           scaleX: 1,
           scaleY: 1,
+          originX: 'center',
+          originY: 'center',
         });
 
         furnitureObj.set('data', { furnitureId: item.id, type: 'furniture', furnitureType: item.type });
@@ -369,11 +372,12 @@ export function ZoneEditor({
         };
 
         const dim = dimensions[selectedFurnitureType];
+        // Store as top-left coordinates, but place centered at click position
         const newFurniture: FurnitureItem = {
           id: `furniture_${Date.now()}`,
           type: selectedFurnitureType,
-          x: pointer.x / SCALE,
-          y: pointer.y / SCALE,
+          x: pointer.x / SCALE - dim.width / 2,
+          y: pointer.y / SCALE - dim.height / 2,
           width: dim.width,
           height: dim.height,
           rotation: 0,
@@ -508,15 +512,20 @@ export function ZoneEditor({
       } else if (target.data.type === 'furniture' && target.data.furnitureId) {
         const furnitureId = target.data.furnitureId;
 
+        // Calculate width and height accounting for scaling
+        const actualWidth = ((target.width || 0) * (target.scaleX || 1)) / SCALE;
+        const actualHeight = ((target.height || 0) * (target.scaleY || 1)) / SCALE;
+
         // Extract new position, dimensions, and rotation
+        // Convert from center origin (Fabric.js) to top-left origin (database storage)
         const updatedFurniture = furniture.map(item =>
           item.id === furnitureId
             ? {
                 ...item,
-                x: (target.left || 0) / SCALE,
-                y: (target.top || 0) / SCALE,
-                width: ((target.width || 0) * (target.scaleX || 1)) / SCALE,
-                height: ((target.height || 0) * (target.scaleY || 1)) / SCALE,
+                x: (target.left || 0) / SCALE - actualWidth / 2,
+                y: (target.top || 0) / SCALE - actualHeight / 2,
+                width: actualWidth,
+                height: actualHeight,
                 rotation: target.angle || 0,
               }
             : item

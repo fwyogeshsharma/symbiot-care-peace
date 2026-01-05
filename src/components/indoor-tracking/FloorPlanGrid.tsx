@@ -283,17 +283,26 @@ export const FloorPlanGrid = ({
         const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
 
         let imgScale;
+        let left = 0;
+        let top = 0;
+
         if (imgAspectRatio > canvasAspectRatio) {
+          // Image is wider than canvas - scale to canvas width and center vertically
           imgScale = CANVAS_WIDTH / backgroundImage.width;
+          const scaledHeight = backgroundImage.height * imgScale;
+          top = (CANVAS_HEIGHT - scaledHeight) / 2;
         } else {
+          // Image is taller than canvas - scale to canvas height and center horizontally
           imgScale = CANVAS_HEIGHT / backgroundImage.height;
+          const scaledWidth = backgroundImage.width * imgScale;
+          left = (CANVAS_WIDTH - scaledWidth) / 2;
         }
 
         const scaledWidth = backgroundImage.width * imgScale;
         const scaledHeight = backgroundImage.height * imgScale;
 
         ctx.globalAlpha = 0.7;
-        ctx.drawImage(backgroundImage, 0, 0, scaledWidth, scaledHeight);
+        ctx.drawImage(backgroundImage, left, top, scaledWidth, scaledHeight);
         ctx.globalAlpha = 1.0;
       }
 
