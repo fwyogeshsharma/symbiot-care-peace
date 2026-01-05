@@ -17,6 +17,8 @@ import { useTranslation } from 'react-i18next';
 import { AlertNotificationDialog } from '@/components/dashboard/AlertNotificationDialog';
 import { toast } from 'sonner';
 import { Footer } from '@/components/Footer';
+import { ToiletHealthInsights } from '@/components/dashboard/ToiletHealthInsights';
+import { getDateRangePreset } from '@/lib/movementUtils';
 
 const Health = () => {
   const { user } = useAuth();
@@ -25,6 +27,7 @@ const Health = () => {
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [newAlert, setNewAlert] = useState<any>(null);
+  const [dateRange] = useState(getDateRangePreset('last30days'));
   const shouldShowTour = useShouldShowTour();
 
   // Fetch elderly persons based on role
@@ -141,6 +144,13 @@ const Health = () => {
 
   const avgHeartRate = calculateAvgHeartRate();
   const activityLevel = calculateActivityLevel();
+
+  // Auto-select first person when page loads
+  useEffect(() => {
+    if (elderlyPersons && elderlyPersons.length > 0 && !selectedPersonId) {
+      setSelectedPersonId(elderlyPersons[0].id);
+    }
+  }, [elderlyPersons, selectedPersonId]);
 
   // Subscribe to real-time updates
   useEffect(() => {
@@ -374,6 +384,12 @@ const Health = () => {
             <div data-tour="vital-metrics">
               <VitalMetrics selectedPersonId={selectedPersonId} />
             </div>
+            {selectedPersonId && (
+              <ToiletHealthInsights
+                selectedPerson={selectedPersonId}
+                dateRange={{ from: dateRange.start, to: dateRange.end }}
+              />
+            )}
           </div>
 
           {/* Right Column - Medication, Environmental, Emergency Events & Alerts */}
