@@ -12,6 +12,10 @@ import { ILQWidget } from "@/components/dashboard/ILQWidget";
 import ElderlyList from "@/components/dashboard/ElderlyList";
 import HomeHubCard from "@/components/dashboard/HomeHubCard";
 import SmartPhoneCard from "@/components/dashboard/SmartPhoneCard";
+import { BedActivity } from "@/components/dashboard/BedActivity";
+import { ToiletActivity } from "@/components/dashboard/ToiletActivity";
+import { BedActivityGraph } from "@/components/dashboard/BedActivityGraph";
+import { ToiletActivityGraph } from "@/components/dashboard/ToiletActivityGraph";
 import { Calendar } from "lucide-react";
 import {
   Select,
@@ -63,17 +67,9 @@ export default function MovementDashboard() {
             throw error;
           }
 
-          // Filter for activity-related data
-          const filtered = (data || []).filter((item: any) => {
-            const deviceType = item.devices?.device_type;
-            const deviceCategory = item.devices?.device_types?.category;
-            const dataType = item.data_type;
-
-            return isActivityDevice(deviceType, deviceCategory) || isActivityDataType(dataType);
-          });
-
-          console.log('MovementDashboard: Fetched movement data', { count: filtered.length });
-          return filtered;
+          // Return ALL device data - no filtering
+          console.log('MovementDashboard: Fetched all device data', { count: data?.length || 0 });
+          return data || [];
         } catch (err) {
           console.error('Error fetching movement data:', err);
           return [];
@@ -81,6 +77,82 @@ export default function MovementDashboard() {
       },
       enabled: !!selectedPersonId,
       retry: 2,
+    });
+
+    // Fetch toilet and bed activity data separately - with comprehensive filtering
+    const { data: toiletBedData = [] } = useQuery({
+      queryKey: ['toilet-bed-activity', selectedPersonId, dateRange],
+      queryFn: async () => {
+        if (!selectedPersonId) return [];
+
+        try {
+          // Fetch all device data for the user in the date range
+          const { data, error } = await supabase
+            .from('device_data')
+            .select(`
+              recorded_at,
+              data_type,
+              value,
+              device_id,
+              devices!inner(
+                location,
+                device_name,
+                device_type
+              )
+            `)
+            .eq('elderly_person_id', selectedPersonId)
+            .gte('recorded_at', dateRange.start)
+            .lte('recorded_at', dateRange.end)
+            .order('recorded_at', { ascending: false });
+
+          if (error) {
+            console.error('Toilet/bed activity fetch error:', error);
+            return [];
+          }
+
+          // Filter for bed and toilet related data
+          const filtered = (data || []).filter((item: any) => {
+            const location = item.devices?.location?.toLowerCase() || '';
+            const deviceName = item.devices?.device_name?.toLowerCase() || '';
+            const deviceType = item.devices?.device_type?.toLowerCase() || '';
+            const dataType = item.data_type?.toLowerCase() || '';
+
+            // Check if it's bed related
+            const isBed = location.includes('bed') ||
+                         location.includes('bedroom') ||
+                         deviceName.includes('bed') ||
+                         deviceType.includes('bed') ||
+                         dataType.includes('bed') ||
+                         dataType.includes('pressure') ||
+                         dataType.includes('mat');
+
+            // Check if it's toilet related
+            const isToilet = location.includes('toilet') ||
+                            location.includes('bathroom') ||
+                            location.includes('washroom') ||
+                            location.includes('restroom') ||
+                            deviceName.includes('toilet') ||
+                            deviceType.includes('toilet') ||
+                            dataType.includes('toilet');
+
+            return isBed || isToilet;
+          });
+
+          console.log('Toilet/Bed data:', { total: data?.length, filtered: filtered.length });
+
+          return filtered.map((item: any) => ({
+            timestamp: item.recorded_at,
+            location: item.devices?.location || '',
+            dataType: item.data_type,
+            value: item.value,
+            deviceName: item.devices?.device_name || '',
+          }));
+        } catch (err) {
+          console.error('Error fetching toilet/bed activity:', err);
+          return [];
+        }
+      },
+      enabled: !!selectedPersonId,
     });
 
     // Fetch active ideal profile
@@ -269,6 +341,18 @@ export default function MovementDashboard() {
             <>
               <div data-tour="movement-summary">
                 <MovementSummary data={processedData} />
+              </div>
+
+              {/* Bed Activity */}
+              <div className="grid gap-6 lg:grid-cols-2">
+                <BedActivity events={toiletBedData} />
+                <BedActivityGraph events={toiletBedData} />
+              </div>
+
+              {/* Toilet Activity */}
+              <div className="grid gap-6 lg:grid-cols-2">
+                <ToiletActivity events={toiletBedData} />
+                <ToiletActivityGraph events={toiletBedData} />
               </div>
 
               {/* Dwell Time Analysis - Priority Feature */}

@@ -10,6 +10,7 @@ import ElderlyList from '@/components/dashboard/ElderlyList';
 import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
 import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
+import { ToiletActivity } from '@/components/dashboard/ToiletActivity';
 import Header from '@/components/layout/Header';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
@@ -85,9 +86,9 @@ const Dashboard = () => {
     queryKey: ['activity-level', user?.id, elderlyPersons],
     queryFn: async () => {
       if (!elderlyPersons || elderlyPersons.length === 0) return [];
-      
+
       const elderlyIds = elderlyPersons.map(p => p.id);
-      
+
       const { data, error } = await supabase
         .from('device_data')
         .select('value, data_type')
@@ -95,11 +96,38 @@ const Dashboard = () => {
         .in('elderly_person_id', elderlyIds)
         .gte('recorded_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
         .order('recorded_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
     enabled: !!user && !!elderlyPersons && elderlyPersons.length > 0,
+  });
+
+  // Fetch toilet activity data
+  const { data: toiletActivityData = [] } = useQuery({
+    queryKey: ['toilet-activity', selectedPersonId],
+    queryFn: async () => {
+      if (!selectedPersonId) return [];
+
+      const { data, error } = await supabase
+        .from('device_data')
+        .select('recorded_at, data_type, value, devices(location, device_name)')
+        .eq('elderly_person_id', selectedPersonId)
+        .or('data_type.eq.toilet_usage,data_type.eq.toilet_occupancy')
+        .gte('recorded_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+        .order('recorded_at', { ascending: false });
+
+      if (error) throw error;
+
+      return (data || []).map(item => ({
+        timestamp: item.recorded_at,
+        location: item.devices?.location || 'Toilet',
+        dataType: item.data_type,
+        value: item.value,
+        deviceName: item.devices?.device_name || 'Toilet Sensor',
+      }));
+    },
+    enabled: !!selectedPersonId,
   });
 
   // Calculate average heart rate
@@ -348,8 +376,8 @@ const Dashboard = () => {
           {/* Left Column - Elderly Persons & Devices */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             <div data-tour="elderly-list">
-              <ElderlyList 
-                elderlyPersons={elderlyPersons || []} 
+              <ElderlyList
+                elderlyPersons={elderlyPersons || []}
                 selectedPersonId={selectedPersonId}
                 onSelectPerson={setSelectedPersonId}
               />
@@ -357,6 +385,11 @@ const Dashboard = () => {
             <div data-tour="vital-metrics">
               <VitalMetrics selectedPersonId={selectedPersonId} />
             </div>
+            {selectedPersonId && toiletActivityData.length > 0 && (
+              <div data-tour="toilet-activity">
+                <ToiletActivity events={toiletActivityData} />
+              </div>
+            )}
           </div>
 
           {/* Right Column - Medication, Environmental, Emergency Events & Alerts */}

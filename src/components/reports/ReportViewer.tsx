@@ -16,6 +16,8 @@ import { WeekOverWeekReport } from './WeekOverWeekReport';
 import { MonthOverMonthReport } from './MonthOverMonthReport';
 import { EndOfDayReport } from './EndOfDayReport';
 import { useTranslation } from 'react-i18next';
+import { exportReport } from '@/lib/reportExport';
+import { useState } from 'react';
 
 interface ReportViewerProps {
   open: boolean;
@@ -23,6 +25,8 @@ interface ReportViewerProps {
   reportName: string;
   selectedPerson: string;
   dateRange: { from: Date; to: Date };
+  elderlyPersons?: any[];
+  reportType?: string;
 }
 
 export const ReportViewer = ({
@@ -31,12 +35,30 @@ export const ReportViewer = ({
   reportName,
   selectedPerson,
   dateRange,
+  elderlyPersons = [],
+  reportType = '',
 }: ReportViewerProps) => {
   const { t } = useTranslation();
+  const [isExporting, setIsExporting] = useState(false);
 
-  const handleExport = () => {
-    // TODO: Implement PDF export
-    console.log('Exporting report:', reportName);
+  const handleExport = async () => {
+    if (isExporting) return;
+
+    setIsExporting(true);
+    try {
+      await exportReport({
+        reportName,
+        reportType,
+        selectedPerson,
+        dateRange,
+        elderlyPersons,
+        elementId: 'report-content',
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handlePrint = () => {
@@ -175,15 +197,17 @@ export const ReportViewer = ({
                 variant="outline"
                 size="sm"
                 onClick={handleExport}
+                disabled={isExporting}
                 title="Export to PDF"
               >
                 <Download className="w-4 h-4" />
+                {isExporting && <span className="ml-2 text-xs">Exporting...</span>}
               </Button>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="mt-6">
+        <div id="report-content" className="mt-6">
           {renderReport()}
         </div>
       </DialogContent>

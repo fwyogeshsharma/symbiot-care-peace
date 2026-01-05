@@ -36,7 +36,18 @@
       "Bash(./gradlew uninstallDebug:*)",
       "Bash(./gradlew assembleRelease:*)",
       "Bash(cmd /c \"dir android\\app\\build\\outputs\\apk\\release\\*.apk\")",
-      "Bash(cmd /c \"dir android\\app\\build\\outputs\\apk\\release\\app-release.apk\")"
+      "Bash(cmd /c \"dir android\\app\\build\\outputs\\apk\\release\\app-release.apk\")",
+      "Bash(npm install)",
+      "Bash(npm run cap:sync:*)",
+      "Bash(gradlew.bat installDebug:*)",
+      "Bash(android\\\\gradlew.bat installDebug:*)",
+      "Bash(./android/gradlew.bat:*)",
+      "Bash(npm run cap:android:*)",
+      "Bash(\"C:\\\\Users\\\\ACSS\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" devices)",
+      "Bash(\"C:\\\\Users\\\\ACSS\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" install -r android/app/build/outputs/apk/release/app-release.apk)",
+      "Bash(\"C:\\\\Users\\\\ACSS\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" uninstall com.symbiot.care)",
+      "Bash(\"C:\\\\Users\\\\ACSS\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" install android/app/build/outputs/apk/release/app-release.apk)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

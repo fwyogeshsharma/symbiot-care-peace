@@ -31,7 +31,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { ReportViewer } from '@/components/reports/ReportViewer';
 import { ReportSubscriptionManager } from '@/components/reports/ReportSubscriptionManager';
-import { Footer } from '@/components/Footer';
+import { exportReport, exportAllReports } from '@/lib/reportExport';
+import { useState as useStateHook } from 'react';
 
 const Reports = () => {
   const { t } = useTranslation();
@@ -42,7 +43,9 @@ const Reports = () => {
   });
   const [selectedPerson, setSelectedPerson] = useState<string>('all');
   const [currentReport, setCurrentReport] = useState<string | null>(null);
+  const [currentReportType, setCurrentReportType] = useState<string>('');
   const [reportViewerOpen, setReportViewerOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Fetch elderly persons
   const { data: elderlyPersons = [] } = useQuery({
@@ -212,13 +215,47 @@ const Reports = () => {
     },
   ];
 
-  const handleExport = (reportType: string) => {
-    // TODO: Implement export functionality
-    console.log('Exporting report:', reportType);
+  const handleExport = async (reportName: string, reportType: string) => {
+    if (isExporting) return;
+
+    setIsExporting(true);
+    try {
+      await exportReport({
+        reportName,
+        reportType,
+        selectedPerson,
+        dateRange,
+        elderlyPersons,
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
-  const handleGenerate = (reportName: string) => {
+  const handleExportAll = async (categoryId: string, reports: any[]) => {
+    if (isExporting) return;
+
+    setIsExporting(true);
+    try {
+      await exportAllReports(
+        categoryId,
+        reports,
+        selectedPerson,
+        dateRange,
+        elderlyPersons
+      );
+    } catch (error) {
+      console.error('Export all failed:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleGenerate = (reportName: string, reportType: string) => {
     setCurrentReport(reportName);
+    setCurrentReportType(reportType);
     setReportViewerOpen(true);
   };
 
@@ -233,14 +270,16 @@ const Reports = () => {
         reportName={currentReport || ''}
         selectedPerson={selectedPerson}
         dateRange={dateRange}
+        elderlyPersons={elderlyPersons}
+        reportType={currentReportType}
       />
 
-      <main className="container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">
+      <main className="container mx-auto px-4 py-4 sm:py-6">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
             {t('reports.title', { defaultValue: 'Reports' })}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             {t('reports.subtitle', { defaultValue: 'Generate comprehensive reports and analytics' })}
           </p>
         </div>
@@ -316,7 +355,21 @@ const Reports = () => {
                           setDateRange({ from: range.from, to: range.to });
                         }
                       }}
+                      numberOfMonths={1}
+                      className="sm:hidden"
+                    />
+                    <Calendar
+                      initialFocus
+                      mode="range"
+                      defaultMonth={dateRange?.from}
+                      selected={{ from: dateRange?.from, to: dateRange?.to }}
+                      onSelect={(range: any) => {
+                        if (range?.from && range?.to) {
+                          setDateRange({ from: range.from, to: range.to });
+                        }
+                      }}
                       numberOfMonths={2}
+                      className="hidden sm:block"
                     />
                   </PopoverContent>
                 </Popover>
@@ -327,7 +380,7 @@ const Reports = () => {
                 <label className="text-sm font-medium mb-2 block">
                   {t('reports.quickSelect', { defaultValue: 'Quick Select' })}
                 </label>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -336,7 +389,7 @@ const Reports = () => {
                       to: new Date(),
                     })}
                   >
-                    {t('reports.last7Days', { defaultValue: 'Last 7 Days' })}
+                    {t('reports.last7Days', { defaultValue: '7 Days' })}
                   </Button>
                   <Button
                     variant="outline"
@@ -346,7 +399,7 @@ const Reports = () => {
                       to: new Date(),
                     })}
                   >
-                    {t('reports.last30Days', { defaultValue: 'Last 30 Days' })}
+                    {t('reports.last30Days', { defaultValue: '30 Days' })}
                   </Button>
                   <Button
                     variant="outline"
@@ -356,7 +409,7 @@ const Reports = () => {
                       to: new Date(),
                     })}
                   >
-                    {t('reports.last3Months', { defaultValue: 'Last 3 Months' })}
+                    {t('reports.last3Months', { defaultValue: '3 Months' })}
                   </Button>
                 </div>
               </div>
@@ -369,13 +422,43 @@ const Reports = () => {
 
         {/* Report Categories */}
         <Tabs defaultValue="daily" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 xl:grid-cols-9">
+          {/* Mobile: Dropdown Select */}
+          <div className="block lg:hidden mb-4">
+            <Select
+              defaultValue="daily"
+              onValueChange={(value) => {
+                const tabsList = document.querySelector('[role="tablist"]');
+                const trigger = tabsList?.querySelector(`[value="${value}"]`) as HTMLElement;
+                trigger?.click();
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select report category" />
+              </SelectTrigger>
+              <SelectContent>
+                {reportCategories.map((category) => {
+                  const Icon = category.icon;
+                  return (
+                    <SelectItem key={category.id} value={category.id}>
+                      <div className="flex items-center gap-2">
+                        <Icon className="w-4 h-4" />
+                        {category.title}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Desktop: Tabs */}
+          <TabsList className="hidden lg:grid w-full lg:grid-cols-3 xl:grid-cols-5">
             {reportCategories.map((category) => {
               const Icon = category.icon;
               return (
                 <TabsTrigger key={category.id} value={category.id} className="gap-2">
                   <Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{category.title}</span>
+                  <span>{category.title}</span>
                 </TabsTrigger>
               );
             })}
@@ -385,8 +468,8 @@ const Reports = () => {
             <TabsContent key={category.id} value={category.id}>
               <Card>
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex-1">
                       <CardTitle className="flex items-center gap-2">
                         {React.createElement(category.icon, { className: 'w-5 h-5' })}
                         {category.title}
@@ -398,40 +481,44 @@ const Reports = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleExport(category.id)}
+                      className="w-full sm:w-auto"
+                      onClick={() => handleExportAll(category.id, category.reports)}
+                      disabled={isExporting}
                     >
                       <Download className="w-4 h-4 mr-2" />
-                      {t('reports.exportAll', { defaultValue: 'Export All' })}
+                      {isExporting ? t('reports.exporting', { defaultValue: 'Exporting...' }) : t('reports.exportAll', { defaultValue: 'Export All' })}
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                     {category.reports.map((report, index) => (
                       <Card key={index} className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
+                        <CardHeader className="pb-3">
                           <CardTitle className="text-base flex items-center gap-2">
                             <FileText className="w-4 h-4" />
                             {report.name}
                           </CardTitle>
-                          <CardDescription className="text-sm">
+                          <CardDescription className="text-sm line-clamp-2">
                             {report.description}
                           </CardDescription>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="pt-0">
                           <div className="flex gap-2">
                             <Button
                               size="sm"
                               className="flex-1"
-                              onClick={() => handleGenerate(report.name)}
+                              onClick={() => handleGenerate(report.name, category.id)}
                             >
-                              <BarChart3 className="w-4 h-4 mr-2" />
-                              {t('reports.generate', { defaultValue: 'Generate' })}
+                              <BarChart3 className="w-4 h-4 mr-1 sm:mr-2" />
+                              <span className="hidden sm:inline">{t('reports.generate', { defaultValue: 'Generate' })}</span>
+                              <span className="sm:hidden">View</span>
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleExport(report.name)}
+                              onClick={() => handleExport(report.name, category.id)}
+                              disabled={isExporting}
                             >
                               <Download className="w-4 h-4" />
                             </Button>
@@ -446,7 +533,6 @@ const Reports = () => {
           ))}
         </Tabs>
       </main>
-      <Footer />
     </div>
   );
 };

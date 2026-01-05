@@ -23,6 +23,12 @@ export const ACTIVITY_DATA_TYPES = [
   'steps',
   'camera_status',
   'recording_active',
+  'bed_occupancy',
+  'bed_presence',
+  'toilet_usage',
+  'toilet_occupancy',
+  'pressure',
+  'weight',
 ] as const;
 
 // Data types that represent health metrics
@@ -56,6 +62,7 @@ export const ACTIVITY_DEVICE_CATEGORIES = [
   DEVICE_CATEGORIES.SAFETY,
   DEVICE_CATEGORIES.WEARABLE,
   DEVICE_CATEGORIES.FALL_DETECTION,
+  DEVICE_CATEGORIES.HEALTH,
 ] as const;
 
 // Device categories that should appear on Dashboard (Health)
