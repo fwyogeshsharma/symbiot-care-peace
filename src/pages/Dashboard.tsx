@@ -106,6 +106,13 @@ const Dashboard = () => {
 
   const processedMovementData = processMovementData(rawMovementData || []);
 
+  // Auto-select first person when dashboard loads
+  useEffect(() => {
+    if (elderlyPersons && elderlyPersons.length > 0 && !selectedPersonId) {
+      setSelectedPersonId(elderlyPersons[0].id);
+    }
+  }, [elderlyPersons, selectedPersonId]);
+
   // Check if a component is enabled
   const isComponentEnabled = (componentId: string) => {
     if (!dashboardLayout?.layout_config) {
