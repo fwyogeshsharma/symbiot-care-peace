@@ -7,8 +7,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Footer } from "@/components/Footer";
-import Snowfall from "react-snowfall";
-import { ChristmasTree } from "@/components/ChristmasTree";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -82,9 +80,6 @@ const Index = () => {
                   {t('index.hero.knowMore')}
                 </Button>
               </div>
-            </div>
-            <div className="flex justify-center items-center">
-              <ChristmasTree />
             </div>
           </div>
         </div>
@@ -179,18 +174,6 @@ const Index = () => {
 
       {/* Footer */}
       <Footer />
-
-      {/* Christmas Snowfall Effect */}
-      <Snowfall
-        color="white"
-        snowflakeCount={200}
-        style={{
-          position: 'fixed',
-          width: '100vw',
-          height: '100vh',
-          zIndex: 99
-        }}
-      />
     </div>;
 };
 export default Index;
