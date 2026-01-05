@@ -489,7 +489,7 @@ export const FloorPlanGrid = ({
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
               <span className="font-medium">Current Zone:</span>
-              <span className="text-muted-foreground">{currentPosition.zone}</span>
+              <span className="text-muted-foreground">{currentPosition.zone || 'Indoor'}</span>
             </div>
             {typeof currentPosition.x === 'number' && typeof currentPosition.y === 'number' && (
               <div className="text-muted-foreground">

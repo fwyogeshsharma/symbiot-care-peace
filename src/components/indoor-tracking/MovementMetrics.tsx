@@ -67,7 +67,7 @@ export const MovementMetrics = ({ data }: MovementMetricsProps) => {
         <CardContent>
           <div className="text-2xl font-bold">{totalVisits}</div>
           <p className="text-xs text-muted-foreground">
-            {mostVisitedZone ? `${t('tracking.metrics.most')}: ${mostVisitedZone[0]}` : t('tracking.metrics.noData')}
+            {mostVisitedZone ? `${t('tracking.metrics.most')}: ${mostVisitedZone[0] || 'Indoor'}` : t('tracking.metrics.noData')}
           </p>
         </CardContent>
       </Card>
@@ -98,7 +98,7 @@ export const MovementMetrics = ({ data }: MovementMetricsProps) => {
               .map(([zone, stats]) => (
                 <div key={zone} className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{zone}</span>
+                    <span className="font-medium">{zone || 'Indoor'}</span>
                     <span className="text-muted-foreground">
                       {stats.visits} {t('tracking.metrics.visits')} • {formatDuration(stats.duration)}
                     </span>

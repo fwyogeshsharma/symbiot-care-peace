@@ -50,73 +50,94 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
   const calculateStats = () => {
     if (!bedPadData.length) return null;
 
-    let totalTimeInBed = 0;
-    let sleepSessions = 0;
+    let totalDuration = 0;
     let totalPressure = 0;
-    let nightSessions = 0;
-    let daySessions = 0;
+    let pressureCount = 0;
+    let occupiedCount = 0;
+    let nightOccupied = 0;
+    let dayOccupied = 0;
+    let nightDuration = 0;
+    let dayDuration = 0;
 
-    const dailyData: { [key: string]: { duration: number; sessions: number } } = {};
-    const hourlyData: { [key: number]: number } = {};
+    const dailyData: { [key: string]: { occupied: number; avgPressure: number; total: number; duration: number } } = {};
+    const hourlyData: { [key: number]: { occupied: number; total: number; duration: number } } = {};
 
     bedPadData.forEach((entry) => {
-      let parsedValue: { duration?: number; pressure?: number } = { duration: 0, pressure: 0 };
+      let parsedValue: { duration?: number; pressure?: number; occupancy?: boolean } = {
+        duration: 0,
+        pressure: 0,
+        occupancy: false
+      };
 
-      if (typeof entry.value === 'number') {
-        // If value is a direct number, treat it as duration in minutes
-        parsedValue = { duration: entry.value, pressure: 0 };
-      } else if (typeof entry.value === 'string') {
+      if (typeof entry.value === 'string') {
         try {
-          const parsed = JSON.parse(entry.value);
-          if (typeof parsed === 'number') {
-            parsedValue = { duration: parsed, pressure: 0 };
-          } else {
-            parsedValue = parsed;
-          }
+          parsedValue = JSON.parse(entry.value);
         } catch (e) {
           console.warn('Failed to parse value:', entry.value, e);
         }
       } else if (typeof entry.value === 'object' && entry.value !== null) {
-        parsedValue = entry.value as { duration?: number; pressure?: number };
+        parsedValue = entry.value as { duration?: number; pressure?: number; occupancy?: boolean };
       }
 
       const recordedAt = parseISO(entry.recorded_at);
       const hour = recordedAt.getHours();
       const date = format(recordedAt, 'yyyy-MM-dd');
+      const isOccupied = parsedValue?.occupancy || false;
+      const duration = parsedValue?.duration || 0;
 
       // Track daily sessions
       if (!dailyData[date]) {
-        dailyData[date] = { duration: 0, sessions: 0 };
+        dailyData[date] = { occupied: 0, avgPressure: 0, total: 0, duration: 0 };
       }
-      dailyData[date].sessions += 1;
-      dailyData[date].duration += parsedValue?.duration || 0;
+      dailyData[date].total += 1;
+      dailyData[date].duration += duration;
+      if (isOccupied) dailyData[date].occupied += 1;
+      if (parsedValue?.pressure) {
+        dailyData[date].avgPressure += parsedValue.pressure;
+      }
 
       // Track hourly distribution
-      hourlyData[hour] = (hourlyData[hour] || 0) + 1;
+      if (!hourlyData[hour]) {
+        hourlyData[hour] = { occupied: 0, total: 0, duration: 0 };
+      }
+      hourlyData[hour].total += 1;
+      hourlyData[hour].duration += duration;
+      if (isOccupied) hourlyData[hour].occupied += 1;
 
       // Accumulate stats
-      totalTimeInBed += parsedValue?.duration || 0;
-      sleepSessions += 1;
-      totalPressure += parsedValue?.pressure || 0;
-
-      // Night vs Day (Night: 8 PM to 6 AM)
-      if (hour >= 20 || hour < 6) {
-        nightSessions += 1;
-      } else {
-        daySessions += 1;
+      totalDuration += duration;
+      if (parsedValue?.pressure) {
+        totalPressure += parsedValue.pressure;
+        pressureCount += 1;
+      }
+      if (isOccupied) {
+        occupiedCount += 1;
+        // Night vs Day (Night: 8 PM to 6 AM)
+        if (hour >= 20 || hour < 6) {
+          nightOccupied += 1;
+          nightDuration += duration;
+        } else {
+          dayOccupied += 1;
+          dayDuration += duration;
+        }
       }
     });
 
-    const avgTimeInBed = sleepSessions > 0 ? totalTimeInBed / sleepSessions : 0;
-    const avgPressure = sleepSessions > 0 ? totalPressure / sleepSessions : 0;
+    const avgPressure = pressureCount > 0 ? totalPressure / pressureCount : 0;
+    const occupancyRate = bedPadData.length > 0 ? (occupiedCount / bedPadData.length) * 100 : 0;
+    const avgDuration = bedPadData.length > 0 ? totalDuration / bedPadData.length : 0;
 
     return {
-      totalTimeInBed: Math.round(totalTimeInBed / 60), // Convert to hours
-      avgTimeInBed: Math.round(avgTimeInBed),
-      sleepSessions,
+      totalReadings: bedPadData.length,
+      occupiedCount,
+      occupancyRate: occupancyRate.toFixed(1),
       avgPressure: avgPressure.toFixed(1),
-      nightSessions,
-      daySessions,
+      totalDuration: Math.round(totalDuration / 60), // Convert to hours
+      avgDuration: Math.round(avgDuration),
+      nightOccupied,
+      dayOccupied,
+      nightDuration: Math.round(nightDuration / 60),
+      dayDuration: Math.round(dayDuration / 60),
       dailyData,
       hourlyData,
     };
@@ -129,26 +150,35 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
     if (!stats) return [];
     return Object.entries(stats.dailyData).map(([date, data]) => ({
       date: format(parseISO(date), 'MMM dd'),
+      occupied: data.occupied,
+      total: data.total,
       duration: Math.round(data.duration / 60), // Convert to hours
-      sessions: data.sessions,
+      occupancyRate: data.total > 0 ? ((data.occupied / data.total) * 100).toFixed(1) : 0,
+      avgPressure: data.total > 0 ? (data.avgPressure / data.total).toFixed(1) : 0,
     }));
   };
 
   const prepareHourlyChartData = () => {
     if (!stats) return [];
     const hours = Array.from({ length: 24 }, (_, i) => i);
-    return hours.map((hour) => ({
-      hour: `${hour}:00`,
-      count: stats.hourlyData[hour] || 0,
-      label: hour < 12 ? `${hour} AM` : `${hour - 12} PM`,
-    }));
+    return hours.map((hour) => {
+      const data = stats.hourlyData[hour];
+      return {
+        hour: `${hour}:00`,
+        occupied: data?.occupied || 0,
+        total: data?.total || 0,
+        duration: data ? Math.round(data.duration) : 0, // Keep in minutes
+        occupancyRate: data && data.total > 0 ? ((data.occupied / data.total) * 100).toFixed(1) : 0,
+        label: hour < 12 ? `${hour} AM` : `${hour - 12} PM`,
+      };
+    });
   };
 
   const prepareDayNightData = () => {
     if (!stats) return [];
     return [
-      { name: 'Night (8PM-6AM)', value: stats.nightSessions, fill: '#3b82f6' },
-      { name: 'Day (6AM-8PM)', value: stats.daySessions, fill: '#fbbf24' },
+      { name: 'Night (8PM-6AM)', value: stats.nightOccupied, fill: '#3b82f6' },
+      { name: 'Day (6AM-8PM)', value: stats.dayOccupied, fill: '#fbbf24' },
     ];
   };
 
@@ -168,7 +198,7 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
     );
   }
 
-  if (!stats || stats.sleepSessions === 0) {
+  if (!stats || stats.totalReadings === 0) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-12">
@@ -187,17 +217,17 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
     <div className="space-y-6">
       {/* Charts Row */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Daily Usage Trend */}
+        {/* Daily Occupancy Trend */}
         <Card>
           <CardHeader>
-            <CardTitle>Daily Bed Usage</CardTitle>
+            <CardTitle>Daily Bed Occupancy</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={dailyChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
-                <YAxis label={{ value: 'Hours', angle: -90, position: 'insideLeft' }} />
+                <YAxis label={{ value: 'Occupied Readings', angle: -90, position: 'insideLeft' }} />
                 <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
@@ -206,9 +236,10 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
                         <div className="bg-card border rounded-lg p-3 shadow-lg">
                           <p className="font-semibold mb-2">{data.date}</p>
                           <div className="space-y-1 text-sm">
+                            <p>Occupied: <span className="font-bold">{data.occupied}</span> / {data.total}</p>
                             <p>Duration: <span className="font-bold">{data.duration}h</span></p>
-                            <p>Sessions: <span className="font-bold">{data.sessions}</span></p>
-                            <p className="text-muted-foreground">Avg: <span className="font-medium">{(data.duration / data.sessions).toFixed(1)}h per session</span></p>
+                            <p>Occupancy Rate: <span className="font-bold">{data.occupancyRate}%</span></p>
+                            <p>Avg Pressure: <span className="font-bold">{data.avgPressure}</span></p>
                           </div>
                         </div>
                       );
@@ -217,7 +248,7 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
                   }}
                 />
                 <Legend />
-                <Bar dataKey="duration" name="Hours in Bed" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="occupied" name="Occupied Readings" fill="#3b82f6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -255,7 +286,7 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
       {/* Hourly Distribution */}
       <Card>
         <CardHeader>
-          <CardTitle>Hourly Bed Usage Pattern</CardTitle>
+          <CardTitle>Hourly Bed Occupancy Pattern</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -268,13 +299,30 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
                 height={80}
                 interval={2}
               />
-              <YAxis label={{ value: 'Usage Count', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
+              <YAxis label={{ value: 'Occupied Count', angle: -90, position: 'insideLeft' }} />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-card border rounded-lg p-3 shadow-lg">
+                        <p className="font-semibold mb-2">{data.hour}</p>
+                        <div className="space-y-1 text-sm">
+                          <p>Occupied: <span className="font-bold">{data.occupied}</span> / {data.total}</p>
+                          <p>Duration: <span className="font-bold">{data.duration} min</span></p>
+                          <p>Rate: <span className="font-bold">{data.occupancyRate}%</span></p>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
               <Legend />
               <Line
                 type="monotone"
-                dataKey="count"
-                name="Bed Usage"
+                dataKey="occupied"
+                name="Occupied Readings"
                 stroke="#3b82f6"
                 strokeWidth={2}
                 dot={{ r: 4 }}
@@ -288,35 +336,35 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
       {/* Recent Activity Details */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Bed Activity</CardTitle>
+          <CardTitle>Recent Bed Pad Readings</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
             {bedPadData.slice(-10).reverse().map((entry, index) => {
-              let parsedValue: { duration?: number; pressure?: number } = { duration: 0, pressure: 0 };
+              let parsedValue: { duration?: number; pressure?: number; occupancy?: boolean } = {
+                duration: 0,
+                pressure: 0,
+                occupancy: false
+              };
 
-              if (typeof entry.value === 'number') {
-                // If value is a direct number, treat it as duration in minutes
-                parsedValue = { duration: entry.value, pressure: 0 };
-              } else if (typeof entry.value === 'string') {
+              if (typeof entry.value === 'string') {
                 try {
-                  const parsed = JSON.parse(entry.value);
-                  if (typeof parsed === 'number') {
-                    parsedValue = { duration: parsed, pressure: 0 };
-                  } else {
-                    parsedValue = parsed;
-                  }
+                  parsedValue = JSON.parse(entry.value);
                 } catch (e) {
                   console.warn('Failed to parse value:', entry.value, e);
                 }
               } else if (typeof entry.value === 'object' && entry.value !== null) {
-                parsedValue = entry.value as { duration?: number; pressure?: number };
+                parsedValue = entry.value as { duration?: number; pressure?: number; occupancy?: boolean };
               }
 
               const recordedAt = parseISO(entry.recorded_at);
               const hour = recordedAt.getHours();
               const isNight = hour >= 20 || hour < 6;
-              const duration = Math.round(parsedValue?.duration || 0);
+              const isOccupied = parsedValue?.occupancy || false;
+              const pressure = parsedValue?.pressure || 0;
+              const duration = parsedValue?.duration || 0;
+              const durationHours = Math.floor(duration / 60);
+              const durationMinutes = Math.round(duration % 60);
 
               return (
                 <div key={index} className="flex items-center justify-between py-3 border-b last:border-0">
@@ -331,12 +379,12 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
                         {format(recordedAt, 'MMM dd, yyyy HH:mm')}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Duration: {Math.floor(duration / 60)}h {duration % 60}m
+                        Duration: {durationHours}h {durationMinutes}m | Pressure: {pressure.toFixed(1)} | Occupancy: {isOccupied ? 'Occupied' : 'Empty'}
                       </p>
                     </div>
                   </div>
-                  <Badge variant={isNight ? 'default' : 'secondary'}>
-                    {isNight ? 'Night' : 'Day'}
+                  <Badge variant={isOccupied ? 'default' : 'secondary'}>
+                    Occupancy: {isOccupied ? 'Occupied' : 'Empty'}
                   </Badge>
                 </div>
               );
