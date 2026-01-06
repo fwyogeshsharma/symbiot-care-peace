@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 interface ManageUserRequest {
-  action: 'block' | 'unblock' | 'delete' | 'reset-password';
+  action: 'block' | 'unblock' | 'delete' | 'reset-password' | 'delete-data';
   userId: string;
   password?: string;
 }
@@ -166,6 +166,69 @@ Deno.serve(async (req) => {
         JSON.stringify({ success: true, message: 'Password reset successfully' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
+
+    } else if (action === 'delete-data') {
+      try {
+        console.log(`Starting delete-data action for user: ${userId}`);
+
+        // Get elderly persons that belong to THIS specific user only (where they are the owner)
+        const { data: elderlyPersons, error: elderlyError } = await supabaseAdmin
+          .from('elderly_persons')
+          .select('id, full_name')
+          .eq('user_id', userId);
+
+        if (elderlyError) {
+          console.error('Error fetching elderly persons owned by user:', elderlyError);
+          throw new Error(`Failed to get elderly persons: ${elderlyError.message}`);
+        }
+
+        console.log(`Found ${elderlyPersons?.length || 0} elderly persons owned by user ${userId}`);
+        if (elderlyPersons && elderlyPersons.length > 0) {
+          console.log('Elderly persons:', elderlyPersons.map(ep => `${ep.full_name} (${ep.id})`));
+        }
+
+        // Extract elderly person IDs
+        const uniqueElderlyIds = elderlyPersons?.map((ep: any) => ep.id) || [];
+
+        console.log(`Total elderly person IDs to delete data for: ${uniqueElderlyIds.length}`, uniqueElderlyIds);
+
+        if (uniqueElderlyIds.length === 0) {
+          console.log('No elderly persons found, returning success');
+          return new Response(
+            JSON.stringify({ success: true, message: 'No data found to delete' }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+          );
+        }
+
+        // Call the database function to delete all data
+        console.log('Calling delete_elderly_person_data function...');
+
+        const { data: deletedCounts, error: deleteError } = await supabaseAdmin
+          .rpc('delete_elderly_person_data', {
+            elderly_person_ids: uniqueElderlyIds
+          });
+
+        if (deleteError) {
+          console.error('Error calling delete_elderly_person_data:', deleteError);
+          throw new Error(`Failed to delete data: ${deleteError.message}`);
+        }
+
+        console.log(`Data deletion completed for user ${userId}`);
+        console.log('Deleted counts:', deletedCounts);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: 'All device data deleted successfully',
+            deletedCounts
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        );
+      } catch (error) {
+        console.error('Unexpected error in delete-data action:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        throw new Error(`Delete data failed: ${errorMessage}`);
+      }
 
     } else {
       return new Response(

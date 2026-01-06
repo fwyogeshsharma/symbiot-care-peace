@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { UserX, UserCheck, Trash2, Shield, Key, Copy, RefreshCw } from 'lucide-react';
+import { UserX, UserCheck, Trash2, Shield, Key, Copy, RefreshCw, Database } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface UserProfile {
@@ -30,7 +30,7 @@ export default function UserManagement() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [actionDialog, setActionDialog] = useState<{ open: boolean; action: 'block' | 'unblock' | 'delete' | null; userId: string | null; userName: string | null }>({
+  const [actionDialog, setActionDialog] = useState<{ open: boolean; action: 'block' | 'unblock' | 'delete' | 'delete-data' | null; userId: string | null; userName: string | null }>({
     open: false,
     action: null,
     userId: null,
@@ -82,7 +82,7 @@ export default function UserManagement() {
   });
 
   const manageUserMutation = useMutation({
-    mutationFn: async ({ action, userId }: { action: 'block' | 'unblock' | 'delete'; userId: string }) => {
+    mutationFn: async ({ action, userId }: { action: 'block' | 'unblock' | 'delete' | 'delete-data'; userId: string }) => {
       const { data, error } = await supabase.functions.invoke('manage-users', {
         body: { action, userId },
       });
@@ -92,7 +92,7 @@ export default function UserManagement() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['all-users'] });
-      const actionText = variables.action === 'delete' ? 'deleted' : variables.action === 'block' ? 'blocked' : 'unblocked';
+      const actionText = variables.action === 'delete' ? 'deleted' : variables.action === 'block' ? 'blocked' : variables.action === 'unblock' ? 'unblocked' : 'data deleted';
       toast({
         title: 'Success',
         description: `User ${actionText} successfully`,
@@ -134,7 +134,7 @@ export default function UserManagement() {
     },
   });
 
-  const handleAction = (action: 'block' | 'unblock' | 'delete', userId: string, userName: string) => {
+  const handleAction = (action: 'block' | 'unblock' | 'delete' | 'delete-data', userId: string, userName: string) => {
     setActionDialog({ open: true, action, userId, userName });
   };
 
@@ -200,6 +200,12 @@ export default function UserManagement() {
           title: 'Delete User',
           description: `Are you sure you want to permanently delete ${actionDialog.userName}? This will remove all their data and cannot be undone.`,
           actionText: 'Delete Permanently',
+        };
+      case 'delete-data':
+        return {
+          title: 'Delete User Data',
+          description: `Are you sure you want to delete all device data for ${actionDialog.userName}? This will permanently remove data from device_data, medication_adherence_logs, geofence_events, geofence_places, ilq_alerts, ilq_trends, ilq_scores, and other related tables. This action cannot be undone.`,
+          actionText: 'Delete All Data',
         };
       default:
         return { title: '', description: '', actionText: '' };
@@ -296,6 +302,16 @@ export default function UserManagement() {
                                 )}
                                 <Button
                                   size="sm"
+                                  variant="outline"
+                                  onClick={() => handleAction('delete-data', user.id, user.full_name || user.email)}
+                                  className="text-orange-600 hover:text-orange-700 border-orange-300 hover:bg-orange-50"
+                                  title="Delete all device data for this user"
+                                >
+                                  <Database className="h-4 w-4 mr-1" />
+                                  Delete Data
+                                </Button>
+                                <Button
+                                  size="sm"
                                   variant="destructive"
                                   onClick={() => handleAction('delete', user.id, user.full_name || user.email)}
                                 >
@@ -326,7 +342,13 @@ export default function UserManagement() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmAction}
-              className={actionDialog.action === 'delete' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
+              className={
+                actionDialog.action === 'delete'
+                  ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                  : actionDialog.action === 'delete-data'
+                  ? 'bg-orange-600 text-white hover:bg-orange-700'
+                  : ''
+              }
             >
               {dialogContent.actionText}
             </AlertDialogAction>
