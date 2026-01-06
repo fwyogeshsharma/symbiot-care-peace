@@ -326,7 +326,10 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       case 'sleep_stage':
         const stage = extractStringValue(value, type);
         if (!stage) return 'N/A';
-        return String(stage).charAt(0).toUpperCase() + String(stage).slice(1);
+        // Display REM in all caps, others with first letter capitalized
+        const stageStr = String(stage).toLowerCase();
+        if (stageStr === 'rem') return 'REM';
+        return stageStr.charAt(0).toUpperCase() + stageStr.slice(1);
 
       case 'medication_taken':
         const taken = extractBooleanValue(value, type);
