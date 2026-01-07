@@ -103,7 +103,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.alerts'),
     keywords: ['severity', 'critical', 'high', 'medium', 'low', 'priority'],
     relatedPages: ['/alerts'],
-    youtubeUrl: 'https://youtu.be/fx7g0E0xM1U',
+    youtubeUrl: 'https://youtu.be/Dzx-AQMvgWU',
   },
   {
     id: 'alert-types',
@@ -112,7 +112,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.alerts'),
     keywords: ['type', 'vital signs', 'panic', 'sos', 'geofence', 'device', 'inactivity'],
     relatedPages: ['/alerts'],
-    youtubeUrl: 'https://youtu.be/ideFkK_MaPQ',
+    youtubeUrl: 'https://youtu.be/_4rDzYjixE4',
   },
   {
     id: 'acknowledging-alerts',
@@ -148,7 +148,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.tracking'),
     keywords: ['indoor', 'floor plan', 'zone', 'location', 'position'],
     relatedPages: ['/tracking', '/indoor-tracking'],
-    youtubeUrl: 'https://youtu.be/w-J2MHGQXS0',
+    youtubeUrl: 'https://youtu.be/rFLo6qCbKYo',
   },
   {
     id: 'outdoor-tracking',
@@ -174,7 +174,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.dataSharing'),
     keywords: ['share', 'family', 'access', 'permission', 'invite'],
     relatedPages: ['/data-sharing'],
-    youtubeUrl: 'https://youtu.be/Kb3QtZ9t8Ds',
+    youtubeUrl: 'https://youtu.be/fFZBk7yu12I',
   },
   // Troubleshooting
   {
@@ -317,7 +317,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['alert', 'notification', 'warning', 'emergency'],
     relatedPages: ['/alerts'],
-    youtubeUrl: 'https://youtu.be/u4jtgPbpp1k',
+    youtubeUrl: 'https://youtu.be/uLXOgl1z6BU',
   },
   {
     id: 'alert-severity',
@@ -326,7 +326,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['severity', 'critical', 'high', 'medium', 'low', 'priority'],
     relatedPages: ['/alerts'],
-    youtubeUrl: 'https://youtu.be/fx7g0E0xM1U',
+    youtubeUrl: 'https://youtu.be/Dzx-AQMvgWU',
   },
   {
     id: 'alert-types',
@@ -335,7 +335,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['type', 'vital signs', 'panic', 'sos', 'geofence', 'device', 'inactivity'],
     relatedPages: ['/alerts'],
-    youtubeUrl: 'https://youtu.be/ideFkK_MaPQ',
+    youtubeUrl: 'https://youtu.be/_4rDzYjixE4',
   },
   {
     id: 'acknowledging-alerts',
@@ -373,7 +373,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Tracking',
     keywords: ['indoor', 'floor plan', 'zone', 'location', 'position'],
     relatedPages: ['/tracking', '/indoor-tracking'],
-    youtubeUrl: 'https://youtu.be/w-J2MHGQXS0',
+    youtubeUrl: 'https://youtu.be/rFLo6qCbKYo',
   },
   {
     id: 'outdoor-tracking',
@@ -400,7 +400,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Data Sharing',
     keywords: ['share', 'family', 'access', 'permission', 'invite'],
     relatedPages: ['/data-sharing'],
-    youtubeUrl: 'https://youtu.be/Kb3QtZ9t8Ds',
+    youtubeUrl: 'https://youtu.be/fFZBk7yu12I',
   },
 
   // Troubleshooting
