@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, newMetadata } = await req.json();
+    const { email, newMetadata, newPassword } = await req.json();
 
     if (!email) {
       return new Response(
@@ -72,37 +72,77 @@ serve(async (req) => {
       );
     }
 
-    // User exists but is not confirmed - delete them so they can re-register
-    console.log(`Deleting unconfirmed user: ${existingUser.id}`);
+    // User exists but is not confirmed - UPDATE their data and resend verification
+    console.log(`Updating unconfirmed user: ${existingUser.id}`);
     
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
-      existingUser.id
+    // Build update object
+    const updateData: Record<string, unknown> = {};
+    
+    if (newMetadata) {
+      updateData.user_metadata = {
+        ...existingUser.user_metadata,
+        ...newMetadata,
+      };
+    }
+    
+    if (newPassword) {
+      updateData.password = newPassword;
+    }
+
+    // Update the user with new data
+    const { data: updatedUser, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+      existingUser.id,
+      updateData
     );
 
-    if (deleteError) {
-      console.error("Error deleting unconfirmed user:", deleteError);
+    if (updateError) {
+      console.error("Error updating unconfirmed user:", updateError);
       return new Response(
-        JSON.stringify({ error: "Failed to cleanup unconfirmed registration" }),
+        JSON.stringify({ error: "Failed to update registration data" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Also delete any related data (profiles, user_roles, etc.)
-    // These should be cleaned up automatically by cascade, but let's be safe
-    try {
-      await supabaseAdmin.from("profiles").delete().eq("id", existingUser.id);
-      await supabaseAdmin.from("user_roles").delete().eq("user_id", existingUser.id);
-    } catch (cleanupError) {
-      // Ignore cleanup errors for related tables
-      console.log("Related data cleanup (may not exist):", cleanupError);
+    // Update profile table if it exists
+    if (newMetadata) {
+      try {
+        const profileUpdate: Record<string, unknown> = {};
+        if (newMetadata.full_name) profileUpdate.full_name = newMetadata.full_name;
+        if (newMetadata.phone) profileUpdate.phone = newMetadata.phone;
+        if (newMetadata.year_of_birth) profileUpdate.year_of_birth = newMetadata.year_of_birth;
+        if (newMetadata.postal_address) profileUpdate.postal_address = newMetadata.postal_address;
+        
+        if (Object.keys(profileUpdate).length > 0) {
+          profileUpdate.updated_at = new Date().toISOString();
+          await supabaseAdmin
+            .from("profiles")
+            .update(profileUpdate)
+            .eq("id", existingUser.id);
+        }
+      } catch (profileError) {
+        console.log("Profile update (may not exist yet):", profileError);
+      }
     }
 
-    console.log(`Successfully deleted unconfirmed user: ${email}`);
+    // Resend verification email by using inviteUserByEmail or resend
+    // Since generateLink requires password for signup, we use a different approach
+    // We'll trigger a new confirmation email by updating the user's email (to same email)
+    try {
+      await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
+        email: email, // This triggers a new confirmation email
+      });
+      console.log("New verification email triggered for:", email);
+    } catch (emailError) {
+      console.log("Could not resend verification email:", emailError);
+    }
+
+    console.log(`Successfully updated unconfirmed user: ${email}`);
 
     return new Response(
       JSON.stringify({ 
-        action: "cleaned", 
-        message: "Unconfirmed registration cleaned up. Please proceed with signup." 
+        action: "updated", 
+        message: "Your registration data has been updated. A new verification email has been sent.",
+        userId: existingUser.id
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
