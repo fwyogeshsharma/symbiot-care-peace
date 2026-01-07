@@ -284,9 +284,36 @@ const Auth = () => {
           return;
         }
 
+        // First, check if there's an unconfirmed user with this email and clean it up
+        try {
+          const cleanupResponse = await supabase.functions.invoke('cleanup-unconfirmed-user', {
+            body: { email }
+          });
+
+          if (cleanupResponse.error) {
+            console.error("Cleanup function error:", cleanupResponse.error);
+            // Continue with signup anyway - the function might not be deployed yet
+          } else if (cleanupResponse.data?.action === 'blocked') {
+            // User is already confirmed, can't re-register
+            toast({
+              title: "Sign Up Failed",
+              description: cleanupResponse.data.message,
+              variant: "destructive",
+            });
+            setLoading(false);
+            return;
+          }
+          // If action is 'cleaned' or 'proceed', continue with signup
+        } catch (cleanupError) {
+          console.error("Cleanup error:", cleanupError);
+          // Continue with signup anyway
+        }
+
         const { error, isDuplicate } = await signUp(email, password, fullName, phone, role, yearOfBirth ? parseInt(yearOfBirth) : undefined, postalAddress);
         
         if (isDuplicate) {
+          // This shouldn't happen anymore since we clean up unconfirmed users
+          // But keep as fallback for confirmed users
           toast({
             title: "Sign Up Failed",
             description: "This email is already registered. Please sign in instead.",
@@ -301,7 +328,7 @@ const Auth = () => {
         } else {
           toast({
             title: "Success!",
-            description: "Please check your email to verify your account.",
+            description: "Please check your email to verify your account. Any previous verification emails are no longer valid.",
           });
           // Switch to login view after successful sign-up
           setIsLogin(true);

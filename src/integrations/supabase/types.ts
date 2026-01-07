@@ -1612,6 +1612,10 @@ export type Database = {
         Args: { local_time: string; tz: string }
         Returns: string
       }
+      delete_elderly_person_data: {
+        Args: { elderly_person_ids: string[] }
+        Returns: Json
+      }
       delete_user_data_by_email: {
         Args: { user_email: string }
         Returns: {
