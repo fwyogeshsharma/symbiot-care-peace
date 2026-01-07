@@ -284,10 +284,20 @@ const Auth = () => {
           return;
         }
 
-        // First, check if there's an unconfirmed user with this email and clean it up
+        // First, check if there's an unconfirmed user with this email - update their data if so
         try {
           const cleanupResponse = await supabase.functions.invoke('cleanup-unconfirmed-user', {
-            body: { email }
+            body: { 
+              email,
+              newMetadata: {
+                full_name: fullName,
+                phone: phone,
+                role: role,
+                year_of_birth: yearOfBirth ? parseInt(yearOfBirth) : undefined,
+                postal_address: postalAddress
+              },
+              newPassword: password
+            }
           });
 
           if (cleanupResponse.error) {
@@ -302,8 +312,17 @@ const Auth = () => {
             });
             setLoading(false);
             return;
+          } else if (cleanupResponse.data?.action === 'updated') {
+            // User data was updated and new verification email sent
+            toast({
+              title: "Registration Updated!",
+              description: "Your data has been updated. A new verification email has been sent. Previous verification emails are no longer valid.",
+            });
+            setIsLogin(true);
+            setLoading(false);
+            return;
           }
-          // If action is 'cleaned' or 'proceed', continue with signup
+          // If action is 'proceed', continue with normal signup
         } catch (cleanupError) {
           console.error("Cleanup error:", cleanupError);
           // Continue with signup anyway
@@ -312,7 +331,7 @@ const Auth = () => {
         const { error, isDuplicate } = await signUp(email, password, fullName, phone, role, yearOfBirth ? parseInt(yearOfBirth) : undefined, postalAddress);
         
         if (isDuplicate) {
-          // This shouldn't happen anymore since we clean up unconfirmed users
+          // This shouldn't happen anymore since we handle unconfirmed users
           // But keep as fallback for confirmed users
           toast({
             title: "Sign Up Failed",
@@ -328,7 +347,7 @@ const Auth = () => {
         } else {
           toast({
             title: "Success!",
-            description: "Please check your email to verify your account. Any previous verification emails are no longer valid.",
+            description: "Please check your email to verify your account.",
           });
           // Switch to login view after successful sign-up
           setIsLogin(true);
