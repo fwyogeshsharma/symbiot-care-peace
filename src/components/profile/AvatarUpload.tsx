@@ -3,9 +3,19 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Slider } from '@/components/ui/slider';
-import { Camera, Upload, Loader2, ZoomIn, ZoomOut } from 'lucide-react';
+import { Camera, Upload, Loader2, ZoomIn, ZoomOut, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface AvatarUploadProps {
   userId: string;
@@ -17,11 +27,14 @@ interface AvatarUploadProps {
 export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChange }: AvatarUploadProps) => {
   const [imgSrc, setImgSrc] = useState('');
   const [scale, setScale] = useState(1);
+  const [baseScale, setBaseScale] = useState(1); // Minimum scale to fill the circle
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,7 +44,7 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      
+
       if (!file.type.startsWith('image/')) {
         toast({
           title: 'Invalid file type',
@@ -56,7 +69,15 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
         img.onload = () => {
           imageRef.current = img;
           setImgSrc(reader.result?.toString() || '');
-          setScale(1);
+          // Calculate minimum scale to fill the circle
+          const previewSize = 200;
+          const imgAspect = img.naturalWidth / img.naturalHeight;
+          // Scale so the smaller dimension fills the preview
+          const minScale = imgAspect > 1
+            ? previewSize / img.naturalHeight
+            : previewSize / img.naturalWidth;
+          setBaseScale(minScale);
+          setScale(minScale);
           setPosition({ x: 0, y: 0 });
           setIsDialogOpen(true);
         };
@@ -88,9 +109,9 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 1) {
       setIsDragging(true);
-      setDragStart({ 
-        x: e.touches[0].clientX - position.x, 
-        y: e.touches[0].clientY - position.y 
+      setDragStart({
+        x: e.touches[0].clientX - position.x,
+        y: e.touches[0].clientY - position.y
       });
     }
   };
@@ -110,7 +131,7 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
   const getCroppedImage = async (): Promise<Blob> => {
     const canvas = canvasRef.current;
     const img = imageRef.current;
-    
+
     if (!canvas || !img) {
       throw new Error('Canvas or image not available');
     }
@@ -120,54 +141,55 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
       throw new Error('Canvas context not available');
     }
 
-    // Output size
+    // Output size for the final avatar
     const outputSize = 256;
     canvas.width = outputSize;
     canvas.height = outputSize;
 
-    // Preview container size (matches the preview div)
+    // Preview container size (same as the circular preview)
     const previewSize = 200;
-    
-    // Calculate how the image is displayed in the preview
-    const imgAspect = img.naturalWidth / img.naturalHeight;
-    let displayWidth, displayHeight;
-    
-    if (imgAspect > 1) {
-      displayHeight = previewSize * scale;
-      displayWidth = displayHeight * imgAspect;
-    } else {
-      displayWidth = previewSize * scale;
-      displayHeight = displayWidth / imgAspect;
-    }
 
-    // Calculate crop region in source image coordinates
-    const scaleFactorX = img.naturalWidth / displayWidth;
-    const scaleFactorY = img.naturalHeight / displayHeight;
+    // Calculate displayed image size in preview (scaled from natural size)
+    const displayWidth = img.naturalWidth * scale;
+    const displayHeight = img.naturalHeight * scale;
 
-    // Center of preview
+    // Center of the preview circle
     const centerX = previewSize / 2;
     const centerY = previewSize / 2;
 
-    // Image position in preview (centered + user offset)
+    // Image center in preview (with user's drag offset)
     const imgCenterX = centerX + position.x;
     const imgCenterY = centerY + position.y;
 
-    // Crop area in preview coordinates
-    const cropStartX = centerX - previewSize / 2;
-    const cropStartY = centerY - previewSize / 2;
+    // Calculate the crop area - what part of the displayed image is visible in the circle
+    // This is a square crop area from the center of the image
+    const cropX = (displayWidth / 2 - imgCenterX);
+    const cropY = (displayHeight / 2 - imgCenterY);
 
-    // Source coordinates
-    const srcX = (cropStartX - (imgCenterX - displayWidth / 2)) * scaleFactorX;
-    const srcY = (cropStartY - (imgCenterY - displayHeight / 2)) * scaleFactorY;
-    const srcWidth = previewSize * scaleFactorX;
-    const srcHeight = previewSize * scaleFactorY;
+    // The crop area is the size of the preview circle
+    const cropSize = previewSize;
 
-    // Clear and draw
-    ctx.clearRect(0, 0, outputSize, outputSize);
+    // Convert from display coordinates to source image coordinates
+    const sourceScale = img.naturalWidth / displayWidth;
+    const srcX = cropX * sourceScale;
+    const srcY = cropY * sourceScale;
+    const srcSize = cropSize * sourceScale;
+
+    // Fill with white background first
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, outputSize, outputSize);
+
+    // Draw the cropped image on top of white background
     ctx.drawImage(
       img,
-      srcX, srcY, srcWidth, srcHeight,
-      0, 0, outputSize, outputSize
+      srcX,
+      srcY,
+      srcSize,
+      srcSize,
+      0,
+      0,
+      outputSize,
+      outputSize
     );
 
     return new Promise((resolve, reject) => {
@@ -219,7 +241,7 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
       onAvatarChange(publicUrl);
       setIsDialogOpen(false);
       setImgSrc('');
-      
+
       toast({
         title: 'Avatar updated',
         description: 'Your profile photo has been updated successfully',
@@ -236,6 +258,44 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
     }
   };
 
+  const handleRemoveAvatar = async () => {
+    setIsRemoving(true);
+    try {
+      // Delete from storage if exists
+      if (currentAvatarUrl && currentAvatarUrl.includes('/avatars/')) {
+        const oldPath = currentAvatarUrl.split('/avatars/').pop();
+        if (oldPath) {
+          await supabase.storage.from('avatars').remove([oldPath]);
+        }
+      }
+
+      // Update profile to remove avatar_url
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: null })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+
+      onAvatarChange('');
+      setIsRemoveDialogOpen(false);
+
+      toast({
+        title: 'Avatar removed',
+        description: 'Your profile photo has been removed',
+      });
+    } catch (error: any) {
+      console.error('Avatar removal error:', error);
+      toast({
+        title: 'Removal failed',
+        description: error.message || 'Failed to remove avatar',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsRemoving(false);
+    }
+  };
+
   const getInitials = (name: string | null) => {
     if (!name) return 'U';
     return name
@@ -249,19 +309,44 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
   return (
     <>
       <div className="relative group">
-        <Avatar className="w-16 h-16 sm:w-20 sm:h-20 cursor-pointer ring-2 ring-background shadow-lg">
-          <AvatarImage src={currentAvatarUrl || undefined} alt={fullName || 'User'} />
+        <Avatar className="w-16 h-16 sm:w-20 sm:h-20 cursor-pointer ring-2 ring-background shadow-lg bg-white">
+          <AvatarImage src={currentAvatarUrl || undefined} alt={fullName || 'User'} className="bg-white" />
           <AvatarFallback className="bg-primary/10 text-primary text-lg sm:text-xl font-semibold">
             {getInitials(fullName)}
           </AvatarFallback>
         </Avatar>
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-          aria-label="Change profile photo"
-        >
-          <Camera className="w-6 h-6 text-white" />
-        </button>
+
+        {/* Hover overlay - split into left (camera) and right (trash) halves */}
+        {currentAvatarUrl ? (
+          <div className="absolute inset-0 rounded-full overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
+            {/* Left half - Camera (Change photo) */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute left-0 top-0 bottom-0 w-1/2 flex items-center justify-center bg-black/50 hover:bg-black/70 transition-colors"
+              aria-label="Change profile photo"
+            >
+              <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </button>
+
+            {/* Right half - Trash (Delete photo) */}
+            <button
+              onClick={() => setIsRemoveDialogOpen(true)}
+              className="absolute right-0 top-0 bottom-0 w-1/2 flex items-center justify-center bg-black/50 hover:bg-black/70 transition-colors"
+              aria-label="Remove profile photo"
+            >
+              <Trash2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            aria-label="Upload profile photo"
+          >
+            <Camera className="w-6 h-6 text-white" />
+          </button>
+        )}
+
         <input
           ref={fileInputRef}
           type="file"
@@ -271,17 +356,18 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
         />
       </div>
 
+      {/* Crop/Adjust Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-sm sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Adjust Profile Photo</DialogTitle>
           </DialogHeader>
-          
+
           <div className="flex flex-col items-center gap-4">
             {/* Preview area with circular mask */}
-            <div 
+            <div
               ref={containerRef}
-              className="relative w-[200px] h-[200px] rounded-full overflow-hidden bg-muted cursor-move select-none touch-none"
+              className="relative w-[200px] h-[200px] rounded-full overflow-hidden bg-white border-2 border-border cursor-move select-none touch-none"
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
@@ -290,20 +376,18 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
-              {imgSrc && (
+              {imgSrc && imageRef.current && (
                 <img
                   src={imgSrc}
                   alt="Preview"
                   className="absolute pointer-events-none"
                   style={{
-                    transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px)) scale(${scale})`,
-                    transformOrigin: 'center',
                     left: '50%',
                     top: '50%',
+                    transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
+                    width: `${imageRef.current.naturalWidth * scale}px`,
+                    height: `${imageRef.current.naturalHeight * scale}px`,
                     maxWidth: 'none',
-                    minWidth: '100%',
-                    minHeight: '100%',
-                    objectFit: 'cover',
                   }}
                   draggable={false}
                 />
@@ -318,9 +402,9 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
               <Slider
                 value={[scale]}
                 onValueChange={(value) => setScale(value[0])}
-                min={0.5}
-                max={3}
-                step={0.1}
+                min={baseScale}
+                max={baseScale * 3}
+                step={baseScale * 0.05}
                 className="flex-1"
               />
               <ZoomIn className="w-4 h-4 text-muted-foreground" />
@@ -361,6 +445,35 @@ export const AvatarUpload = ({ userId, currentAvatarUrl, fullName, onAvatarChang
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Remove Confirmation Dialog */}
+      <AlertDialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Profile Photo?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove your profile photo? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRemoving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRemoveAvatar}
+              disabled={isRemoving}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isRemoving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Removing...
+                </>
+              ) : (
+                'Remove Photo'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

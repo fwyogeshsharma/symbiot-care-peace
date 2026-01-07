@@ -284,8 +284,8 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         onClick={() => navigate('/profile')}
         className={cn(isMobile ? 'w-full justify-start' : 'gap-2')}
       >
-        <Avatar className={cn("w-6 h-6", isMobile && "mr-2")}>
-          <AvatarImage src={userProfile?.avatar_url || undefined} alt={userProfile?.full_name || 'User'} />
+        <Avatar className={cn("w-6 h-6 bg-white", isMobile && "mr-2")}>
+          <AvatarImage src={userProfile?.avatar_url || undefined} alt={userProfile?.full_name || 'User'} className="bg-white" />
           <AvatarFallback className="bg-primary/10 text-primary text-xs">
             {getInitials(userProfile?.full_name)}
           </AvatarFallback>

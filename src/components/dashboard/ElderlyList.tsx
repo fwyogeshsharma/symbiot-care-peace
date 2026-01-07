@@ -54,11 +54,11 @@ const ElderlyList = ({ elderlyPersons, selectedPersonId, onSelectPerson, variant
               <div className="flex items-stretch">
                 {/* Photo section - responsive width */}
                 <div className={`${variant === 'list' ? 'w-20' : 'w-1/4 min-w-[100px]'} relative bg-gradient-to-br from-primary/5 to-primary/10 flex-shrink-0`}>
-                  <Avatar className="w-full h-full rounded-none">
+                  <Avatar className="w-full h-full rounded-none bg-white">
                     <AvatarImage
                       src={person.photo_url || undefined}
                       alt={person.full_name}
-                      className="object-cover"
+                      className="object-cover bg-white"
                     />
                     <AvatarFallback className={`bg-primary/10 text-primary font-bold ${variant === 'list' ? 'text-lg' : 'text-2xl'} rounded-none`}>
                       {getInitials(person.full_name)}
