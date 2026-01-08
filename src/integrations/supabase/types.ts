@@ -1002,6 +1002,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "ilq_alerts_acknowledged_by_fkey"
+            columns: ["acknowledged_by"]
+            isOneToOne: false
+            referencedRelation: "verified_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "ilq_alerts_elderly_person_id_fkey"
             columns: ["elderly_person_id"]
             isOneToOne: false
@@ -1505,6 +1512,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "report_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "verified_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       session_logs: {
@@ -1587,7 +1601,18 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      verified_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       backfill_alert_recipients: { Args: never; Returns: undefined }

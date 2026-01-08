@@ -232,6 +232,71 @@ export const calculateTotalDistance = (positions: Position[]): number => {
   return total;
 };
 
+// Helper function to extract position from various data formats
+const extractPosition = (value: any): Position | null => {
+  if (!value) return null;
+  
+  // Direct Position object: { x: number, y: number, zone: string }
+  if (typeof value.x === 'number' && typeof value.y === 'number') {
+    return {
+      x: value.x,
+      y: value.y,
+      zone: value.zone || 'Unknown',
+      accuracy: value.accuracy,
+      speed: value.speed
+    };
+  }
+  
+  // Nested position object: { position: { x, y }, zone }
+  if (value.position && typeof value.position.x === 'number' && typeof value.position.y === 'number') {
+    return {
+      x: value.position.x,
+      y: value.position.y,
+      zone: value.zone || value.position.zone || 'Unknown',
+      accuracy: value.accuracy || value.position.accuracy,
+      speed: value.speed || value.position.speed
+    };
+  }
+  
+  // Coordinate format: { coordinates: { x, y } }
+  if (value.coordinates && typeof value.coordinates.x === 'number' && typeof value.coordinates.y === 'number') {
+    return {
+      x: value.coordinates.x,
+      y: value.coordinates.y,
+      zone: value.zone || 'Unknown',
+      accuracy: value.accuracy,
+      speed: value.speed
+    };
+  }
+  
+  // Array format: [x, y]
+  if (Array.isArray(value) && value.length >= 2 && typeof value[0] === 'number' && typeof value[1] === 'number') {
+    return {
+      x: value[0],
+      y: value[1],
+      zone: 'Unknown',
+      accuracy: undefined,
+      speed: undefined
+    };
+  }
+  
+  // String coordinates: "x,y"
+  if (typeof value === 'string' && value.includes(',')) {
+    const parts = value.split(',').map(s => parseFloat(s.trim()));
+    if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+      return {
+        x: parts[0],
+        y: parts[1],
+        zone: 'Unknown',
+        accuracy: undefined,
+        speed: undefined
+      };
+    }
+  }
+  
+  return null;
+};
+
 // Process position data for analytics
 export const processPositionData = (
   rawData: any[],
@@ -242,11 +307,17 @@ export const processPositionData = (
   let totalDistance = 0;
   let totalSpeed = 0;
   let speedCount = 0;
+  let prevPosition: Position | null = null;
   
   rawData.forEach((item, index) => {
     if (item.data_type !== 'position') return;
     
-    const position = item.value as Position;
+    const position = extractPosition(item.value);
+    if (!position) {
+      console.warn('Could not extract position from data:', item.value);
+      return;
+    }
+    
     const timestamp = new Date(item.recorded_at);
     
     events.push({
@@ -262,27 +333,25 @@ export const processPositionData = (
     } else {
       zoneStats[position.zone].duration += intervalSeconds;
       // Count a new visit if we left and came back
-      if (index > 0 && rawData[index - 1].value.zone !== position.zone) {
+      if (prevPosition && prevPosition.zone !== position.zone) {
         zoneStats[position.zone].visits++;
       }
     }
     
     // Calculate distance
-    if (index > 0) {
-      const prev = rawData[index - 1].value as Position;
-      // Validate that coordinates are valid numbers
+    if (prevPosition) {
       if (
         typeof position.x === 'number' &&
         typeof position.y === 'number' &&
-        typeof prev.x === 'number' &&
-        typeof prev.y === 'number' &&
+        typeof prevPosition.x === 'number' &&
+        typeof prevPosition.y === 'number' &&
         !isNaN(position.x) &&
         !isNaN(position.y) &&
-        !isNaN(prev.x) &&
-        !isNaN(prev.y)
+        !isNaN(prevPosition.x) &&
+        !isNaN(prevPosition.y)
       ) {
-        const dx = position.x - prev.x;
-        const dy = position.y - prev.y;
+        const dx = position.x - prevPosition.x;
+        const dy = position.y - prevPosition.y;
         totalDistance += Math.sqrt(dx * dx + dy * dy);
       }
     }
@@ -292,6 +361,8 @@ export const processPositionData = (
       totalSpeed += position.speed;
       speedCount++;
     }
+    
+    prevPosition = position;
   });
   
   return {
