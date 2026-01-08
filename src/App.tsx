@@ -38,6 +38,7 @@ import CookiePolicy from "./pages/CookiePolicy";
 import LiabilityDisclaimer from "./pages/LiabilityDisclaimer";
 import FAQ from "./pages/FAQ";
 import CustomizeDashboard from "./pages/CustomizeDashboard";
+import SupportedDevices from "./pages/SupportedDevices";
 
 const queryClient = new QueryClient();
 
@@ -220,6 +221,7 @@ const App = () => (
             <Route path="/liability-disclaimer" element={<LiabilityDisclaimer />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
             <Route path="/faq" element={<FAQ />} />
+            <Route path="/supported-devices" element={<SupportedDevices />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

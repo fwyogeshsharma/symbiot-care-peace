@@ -98,6 +98,11 @@ export const Footer = () => {
                   {t('footer.faq', { defaultValue: 'FAQ' })}
                 </Link>
               </li>
+              <li>
+                <Link to="/supported-devices" className="text-muted-foreground hover:text-primary hover:underline transition-colors">
+                  {t('footer.supportedDevices', { defaultValue: 'Supported Devices' })}
+                </Link>
+              </li>
               {/*<li>*/}
               {/*  <Link to="/dashboard" className="text-muted-foreground hover:text-primary transition-colors">*/}
               {/*    {t('nav.dashboard')}*/}
