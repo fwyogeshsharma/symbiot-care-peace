@@ -280,10 +280,16 @@ export default function Tracking() {
 
   const handlePresetChange = (preset: string) => {
     setSelectedPreset(preset);
+    setCurrentPositionIndex(0); // Reset playback position when changing date range
     if (preset === 'today' || preset === 'last7days' || preset === 'last30days' || preset === 'all') {
       setDateRange(getDateRangePreset(preset as 'today' | 'last7days' | 'last30days' | 'all'));
     }
   };
+
+  // Reset position index when data changes
+  useEffect(() => {
+    setCurrentPositionIndex(0);
+  }, [positionData]);
 
   // Process indoor tracking data - Memoized to avoid recomputation on every render
   const processedData = useMemo(
@@ -301,8 +307,9 @@ export default function Tracking() {
 
   const currentPosition = positionEvents[currentPositionIndex]?.position;
 
+  // Trail includes positions from start up to current (inclusive), limited to last 50
   const trail = useMemo(
-    () => positionEvents.slice(Math.max(0, currentPositionIndex - 50), currentPositionIndex)
+    () => positionEvents.slice(Math.max(0, currentPositionIndex - 49), currentPositionIndex + 1)
       .map(p => p.position),
     [positionEvents, currentPositionIndex]
   );
