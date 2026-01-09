@@ -1,7 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Wand2, Loader2 } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import DeviceManagement from './DeviceManagement';
@@ -15,7 +14,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { generateSampleDataPoints, generateSampleDataFromModelSpecs } from '@/lib/sampleDataGenerator';
 import { useAllDeviceTypes } from '@/hooks/useDeviceTypes';
 import { useAllDeviceCompanies } from '@/hooks/useDeviceCompanies';
 import { useTranslation } from 'react-i18next';
@@ -145,130 +143,6 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
     },
   });
 
-  // Generate fake data mutation
-  const generateDataMutation = useMutation({
-    mutationFn: async (device: any) => {
-      const now = new Date();
-      const sampleData: any[] = [];
-
-      // Fetch geofences for GPS devices
-      const { data: geofences } = await supabase
-        .from('geofence_places')
-        .select('*')
-        .eq('elderly_person_id', device.elderly_person_id)
-        .eq('is_active', true);
-
-      // Check if device has a model with specifications
-      if (device.model_id) {
-        const { data: deviceModel } = await supabase
-          .from('device_models')
-          .select('specifications, supported_data_types')
-          .eq('id', device.model_id)
-          .single();
-
-        if (deviceModel?.specifications && Object.keys(deviceModel.specifications).length > 0) {
-          console.log('Generating data from model specifications:', deviceModel.specifications);
-          const modelData = generateSampleDataFromModelSpecs(
-            deviceModel.specifications as any,
-            deviceModel.supported_data_types || [],
-            device,
-            168, // 7 days
-            2, // every 2 hours
-            geofences || []
-          );
-          sampleData.push(...modelData);
-        }
-      }
-
-      // If no model data was generated, use the default logic
-      if (sampleData.length === 0) {
-        // Special handling for worker-wearable devices with position data
-        if (device.device_type === 'worker_wearable') {
-          const { generateIndoorMovementPath } = await import('@/lib/positionUtils');
-
-          // Check if floor plan exists (required for position data)
-          const { data: floorPlan } = await supabase
-            .from('floor_plans')
-            .select('*')
-            .eq('elderly_person_id', device.elderly_person_id)
-            .maybeSingle();
-
-          if (floorPlan) {
-            // Generate 24 hours of indoor movement data
-            const startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-            const positions = generateIndoorMovementPath(
-              floorPlan.zones as any,
-              { width: floorPlan.width, height: floorPlan.height },
-              startTime,
-              24,
-              30 // position every 30 seconds
-            );
-
-            // Create position data records
-            positions.forEach((position, index) => {
-              const recordedAt = new Date(startTime.getTime() + index * 30 * 1000);
-              sampleData.push({
-                device_id: device.id,
-                elderly_person_id: device.elderly_person_id,
-                data_type: 'position',
-                value: position,
-                unit: 'meters',
-                recorded_at: recordedAt.toISOString(),
-              });
-            });
-          }
-        } else {
-          // Use database-driven data configs for other device types
-          const { data: deviceTypeDataConfigs } = await supabase
-            .from('device_type_data_configs')
-            .select(`
-              *,
-              device_types!inner(code)
-            `)
-            .eq('device_types.code', device.device_type);
-
-          if (deviceTypeDataConfigs && deviceTypeDataConfigs.length > 0) {
-            const generatedData = generateSampleDataPoints(
-              deviceTypeDataConfigs as any,
-              device,
-              168, // 7 days
-              2, // every 2 hours
-              geofences || []
-            );
-            sampleData.push(...generatedData);
-          }
-        }
-      }
-
-      // Insert sample data
-      if (sampleData.length > 0) {
-        const { error } = await supabase
-          .from('device_data')
-          .insert(sampleData);
-
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['devices'] });
-      queryClient.invalidateQueries({ queryKey: ['device-data'] });
-      queryClient.invalidateQueries({ queryKey: ['movement-data'] });
-      queryClient.invalidateQueries({ queryKey: ['floor-plan'] });
-      queryClient.invalidateQueries({ queryKey: ['position-data'] });
-      toast({
-        title: t('devices.dataGeneration.generated'),
-        description: t('devices.dataGeneration.generatedDesc'),
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: t('devices.dataGeneration.failed'),
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
   // Delete device mutation
   const deleteDeviceMutation = useMutation({
     mutationFn: async (data: { id: string; deleteData: boolean }) => {
@@ -388,34 +262,6 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                     >
                       {t(`devices.${device.status}`, { defaultValue: device.status })}
                     </Badge>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant={hasNoData ? "default" : "ghost"}
-                            size="sm"
-                            className="h-7 px-2 sm:px-3"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              generateDataMutation.mutate(device);
-                            }}
-                            disabled={generateDataMutation.isPending}
-                          >
-                            {generateDataMutation.isPending ? (
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            ) : (
-                              <>
-                                <Wand2 className="w-3.5 h-3.5" />
-                                {hasNoData && <span className="ml-1 hidden sm:inline">{t('devices.generateData')}</span>}
-                              </>
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{t('devices.generateDataTooltip')}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
                     <Button
                       variant="ghost"
                       size="icon"
