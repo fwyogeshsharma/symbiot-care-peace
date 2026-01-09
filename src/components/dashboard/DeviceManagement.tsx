@@ -166,38 +166,14 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
         // Special handling for worker-wearable devices
         if (device.device_type === 'worker_wearable') {
           // Import position utilities
-          const { getDefaultFloorPlan, generateIndoorMovementPath } = await import('@/lib/positionUtils');
+          const { generateIndoorMovementPath } = await import('@/lib/positionUtils');
 
-          // Create floor plan if it doesn't exist
-          const { data: existingFloorPlan } = await supabase
-            .from('floor_plans')
-            .select('id')
-            .eq('elderly_person_id', device.elderly_person_id)
-            .maybeSingle();
-
-          let floorPlanId = existingFloorPlan?.id;
-
-          if (!existingFloorPlan) {
-            const defaultFloorPlan = getDefaultFloorPlan(device.elderly_person_id);
-            const { data: newFloorPlan } = await supabase
-              .from('floor_plans')
-              .insert([{
-                ...defaultFloorPlan,
-                furniture: defaultFloorPlan.furniture as any,
-                zones: defaultFloorPlan.zones as any
-              }])
-              .select('*')
-              .single();
-
-            floorPlanId = newFloorPlan?.id;
-          }
-
-          // Fetch the floor plan to generate movement
+          // Check if floor plan exists (required for position data)
           const { data: floorPlan } = await supabase
             .from('floor_plans')
             .select('*')
-            .eq('id', floorPlanId)
-            .single();
+            .eq('elderly_person_id', device.elderly_person_id)
+            .maybeSingle();
 
           if (floorPlan) {
             // Generate 24 hours of indoor movement data
