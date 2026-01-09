@@ -4,12 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { FloorPlanGrid } from '@/components/indoor-tracking/FloorPlanGrid';
 import { MovementPlayback } from '@/components/indoor-tracking/MovementPlayback';
 import { MovementMetrics } from '@/components/indoor-tracking/MovementMetrics';
+import { ZoneHistory } from '@/components/indoor-tracking/ZoneHistory';
 import { MapView } from '@/components/outdoor-tracking/MapView';
 import { GeofenceManager } from '@/components/outdoor-tracking/GeofenceManager';
 import { GeofenceEventsTimeline } from '@/components/outdoor-tracking/GeofenceEventsTimeline';
 import { GPSMetrics } from '@/components/outdoor-tracking/GPSMetrics';
 import CameraGrid from '@/components/camera/CameraGrid';
-import { processPositionData } from '@/lib/positionUtils';
+import { processPositionData, processZoneHistory } from '@/lib/positionUtils';
 import { processGPSTrail, GPSCoordinate } from '@/lib/gpsUtils';
 import { GeofencePlace } from '@/lib/geofenceUtils';
 import { detectGeofenceEvents } from '@/lib/geofenceDetectionService';
@@ -305,6 +306,11 @@ export default function Tracking() {
     [processedData]
   );
 
+  const zoneVisits = useMemo(
+    () => processedData ? processZoneHistory(processedData.events) : [],
+    [processedData]
+  );
+
   const currentPosition = positionEvents[currentPositionIndex]?.position;
 
   // Trail includes positions from start up to current (inclusive), limited to last 50
@@ -487,6 +493,9 @@ export default function Tracking() {
                   </div>
 
                   {processedData && <MovementMetrics data={processedData} />}
+
+                  {/* Zone Visit History Table */}
+                  {processedData && <ZoneHistory visits={zoneVisits} />}
                 </>
               )}
             </TabsContent>

@@ -50,6 +50,15 @@ export interface ProcessedPositionData {
   averageSpeed: number;
 }
 
+export interface ZoneVisit {
+  id: string;
+  zoneName: string;
+  entryTime: Date;
+  exitTime: Date;
+  duration: number; // in seconds
+  eventCount: number;
+}
+
 // Generate realistic indoor movement path using random walk
 export const generateIndoorMovementPath = (
   zones: Zone[],
@@ -371,4 +380,57 @@ export const processPositionData = (
     totalDistance,
     averageSpeed: speedCount > 0 ? totalSpeed / speedCount : 0
   };
+};
+
+// Process zone history from position events to get detailed zone visit records
+export const processZoneHistory = (events: PositionEvent[]): ZoneVisit[] => {
+  if (events.length === 0) return [];
+
+  const visits: ZoneVisit[] = [];
+  let currentZone = events[0].position.zone || 'Indoor';
+  let entryTime = events[0].timestamp;
+  let eventCount = 1;
+
+  for (let i = 1; i < events.length; i++) {
+    const event = events[i];
+    const zone = event.position.zone || 'Indoor';
+
+    if (zone !== currentZone) {
+      // Zone changed - record the visit
+      const exitTime = events[i - 1].timestamp;
+      const duration = (exitTime.getTime() - entryTime.getTime()) / 1000;
+
+      visits.push({
+        id: `${entryTime.getTime()}-${currentZone}`,
+        zoneName: currentZone,
+        entryTime,
+        exitTime,
+        duration,
+        eventCount
+      });
+
+      // Start new zone visit
+      currentZone = zone;
+      entryTime = event.timestamp;
+      eventCount = 1;
+    } else {
+      eventCount++;
+    }
+  }
+
+  // Record the last visit
+  const lastEvent = events[events.length - 1];
+  const duration = (lastEvent.timestamp.getTime() - entryTime.getTime()) / 1000;
+
+  visits.push({
+    id: `${entryTime.getTime()}-${currentZone}`,
+    zoneName: currentZone,
+    entryTime,
+    exitTime: lastEvent.timestamp,
+    duration,
+    eventCount
+  });
+
+  // Sort by entry time descending (most recent first)
+  return visits.sort((a, b) => b.entryTime.getTime() - a.entryTime.getTime());
 };
