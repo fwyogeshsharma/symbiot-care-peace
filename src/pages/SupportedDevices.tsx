@@ -28,6 +28,15 @@ interface CompanyDeviceType {
 const SupportedDevices = () => {
   const { t } = useTranslation();
 
+  // Convert string to title case
+  const toTitleCase = (str: string): string => {
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   // Map company names to their logo files in the public folder
   const getCompanyLogo = (companyName: string): string => {
     const logoMap: { [key: string]: string } = {
@@ -226,8 +235,8 @@ const SupportedDevices = () => {
                     <TableCell className="font-medium">{item.companyName}</TableCell>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{item.deviceTypeName}</div>
-                        <div className="text-sm text-muted-foreground">{item.deviceTypeCategory}</div>
+                        <div className="font-medium">{toTitleCase(item.deviceTypeName)}</div>
+                        <div className="text-sm text-muted-foreground">{toTitleCase(item.deviceTypeCategory)}</div>
                       </div>
                     </TableCell>
                     <TableCell>
