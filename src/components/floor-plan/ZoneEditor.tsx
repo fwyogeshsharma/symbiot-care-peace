@@ -386,6 +386,8 @@ export function ZoneEditor({
         const newState = { zones, furniture: [...furniture, newFurniture] };
         addToHistory(newState);
         setFurniture(newState.furniture);
+        setActiveTool("select");
+        setSelectedFurnitureType(null);
         toast.success(`${selectedFurnitureType} placed`);
       } else if (activeTool === "rectangle") {
         const pointer = fabricCanvas.getPointer(e.e);
