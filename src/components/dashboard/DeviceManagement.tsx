@@ -39,7 +39,6 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
   const [modelId, setModelId] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
-  const [generateFakeData, setGenerateFakeData] = useState(false);
   const [showGeofenceAlert, setShowGeofenceAlert] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -94,20 +93,13 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
       return data;
     },
     onSuccess: async (device) => {
-      // Generate sample data only if checkbox is checked
-      if (generateFakeData) {
-        await generateSampleData(device);
-      }
-      
       queryClient.invalidateQueries({ queryKey: ['devices'] });
       queryClient.invalidateQueries({ queryKey: ['device-data'] });
       queryClient.invalidateQueries({ queryKey: ['floor-plan'] });
       queryClient.invalidateQueries({ queryKey: ['position-data'] });
       toast({
         title: t('devices.register.success'),
-        description: generateFakeData
-          ? t('devices.register.successWithData')
-          : t('devices.register.successNoData'),
+        description: t('devices.register.successNoData'),
       });
       // Generate API key for display
       generateApiKey();
@@ -367,7 +359,6 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
     setModelId('');
     setApiKey('');
     setShowApiKey(false);
-    setGenerateFakeData(false);
     setOpen(false);
   };
 
@@ -524,23 +515,6 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
                 placeholder={t('devices.register.locationPlaceholder')}
               />
             </div>
-
-            <div className="flex items-center space-x-2 py-2">
-              <Checkbox
-                id="generate-fake-data"
-                checked={generateFakeData}
-                onCheckedChange={(checked) => setGenerateFakeData(checked === true)}
-              />
-              <Label
-                htmlFor="generate-fake-data"
-                className="text-sm font-normal cursor-pointer"
-              >
-                {t('devices.register.generateSampleData')}
-              </Label>
-            </div>
-            <p className="text-xs text-muted-foreground -mt-2">
-              {t('devices.register.generateSampleDataDesc')}
-            </p>
 
             <Button type="submit" className="w-full" disabled={addDeviceMutation.isPending}>
               {addDeviceMutation.isPending ? t('devices.register.registering') : t('devices.register.registerDevice')}
