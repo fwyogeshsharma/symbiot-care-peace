@@ -318,6 +318,14 @@ const Auth = () => {
               title: "Registration Updated!",
               description: "Your data has been updated. A new verification email has been sent. Previous verification emails are no longer valid.",
             });
+            // Clear signup form fields
+            setPassword('');
+            setConfirmPassword('');
+            setFullName('');
+            setPhone('');
+            setRole('caregiver');
+            setYearOfBirth('');
+            setPostalAddress('');
             setIsLogin(true);
             setLoading(false);
             return;
@@ -349,6 +357,14 @@ const Auth = () => {
             title: "Success!",
             description: "Please check your email to verify your account.",
           });
+          // Clear signup form fields
+          setPassword('');
+          setConfirmPassword('');
+          setFullName('');
+          setPhone('');
+          setRole('caregiver');
+          setYearOfBirth('');
+          setPostalAddress('');
           // Switch to login view after successful sign-up
           setIsLogin(true);
         }
