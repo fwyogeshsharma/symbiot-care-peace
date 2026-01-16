@@ -285,17 +285,9 @@ const Dashboard = () => {
       {/* Profile Completion Dialog for OAuth users */}
       <ProfileCompletionDialog
         open={showProfileCompletion}
-        onComplete={async () => {
+        onComplete={() => {
           setShowProfileCompletion(false);
-
-          // Invalidate all relevant queries to refresh data
-          queryClient.invalidateQueries({ queryKey: ['profile'] });
-          queryClient.invalidateQueries({ queryKey: ['user-roles'] });
-          queryClient.invalidateQueries({ queryKey: ['elderly-persons'] });
-          queryClient.invalidateQueries({ queryKey: ['user-elderly-person'] });
-          queryClient.invalidateQueries({ queryKey: ['accessible-elderly-persons'] });
-
-          // Refresh the page to reload user data and auth context
+          // Refresh the page to reload user data
           window.location.reload();
         }}
       />

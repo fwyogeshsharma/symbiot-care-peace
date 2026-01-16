@@ -123,13 +123,7 @@ export const ProfileCompletionDialog = ({ open, onComplete }: ProfileCompletionD
       // Get user data
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Delete existing roles for this user to prevent duplicates
-        await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', user.id);
-
-        // Insert new user role
+        // Insert user role
         await supabase.from('user_roles').insert({
           user_id: user.id,
           role: role,
@@ -150,44 +144,6 @@ export const ProfileCompletionDialog = ({ open, onComplete }: ProfileCompletionD
 
         if (profileError) {
           console.error('Error updating profile:', profileError);
-        }
-
-        // Handle elderly_person record based on role
-        // This ensures self-monitoring permissions are set correctly across the entire app
-        if (role === 'elderly' || role === 'relative') {
-          // For elderly or relative, create/update elderly_person record so they can monitor themselves
-          console.log(`Creating/updating elderly_person record for ${role} user:`, user.id);
-          const { error: elderlyError } = await supabase
-            .from('elderly_persons')
-            .upsert({
-              user_id: user.id,
-              full_name: fullName,
-              date_of_birth: null, // Can be updated later in profile
-              medical_conditions: null,
-              emergency_contact: phone,
-              updated_at: new Date().toISOString(),
-            }, {
-              onConflict: 'user_id'
-            });
-
-          if (elderlyError) {
-            console.error('Error creating elderly_person record:', elderlyError);
-          } else {
-            console.log('Successfully created/updated elderly_person record for self-monitoring');
-          }
-        } else if (role === 'caregiver') {
-          // For caregiver, delete any existing elderly_person record so they cannot monitor themselves
-          console.log('Removing elderly_person record for caregiver user:', user.id);
-          const { error: deleteError } = await supabase
-            .from('elderly_persons')
-            .delete()
-            .eq('user_id', user.id);
-
-          if (deleteError) {
-            console.error('Error deleting elderly_person record:', deleteError);
-          } else {
-            console.log('Successfully removed elderly_person record - caregiver cannot self-monitor');
-          }
         }
       }
 
@@ -273,17 +229,13 @@ export const ProfileCompletionDialog = ({ open, onComplete }: ProfileCompletionD
 
             {/* Self-monitoring info based on role */}
             {role === 'caregiver' ? (
-              <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-md p-3 mt-2">
-                <p className="text-xs text-amber-900 dark:text-amber-100">
-                  ⚠️ <strong>Caregiver Role:</strong> You will be able to monitor others but <strong>cannot monitor yourself</strong>. Any existing self-monitoring data will be removed.
-                </p>
-              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                ℹ️ As a caregiver, you will be able to monitor others but cannot monitor yourself.
+              </p>
             ) : (
-              <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-md p-3 mt-2">
-                <p className="text-xs text-green-900 dark:text-green-100">
-                  ✓ <strong>{role === 'elderly' ? 'Elderly' : 'Family Member'} Role:</strong> You can monitor yourself and others. A profile will be created for self-monitoring.
-                </p>
-              </div>
+              <p className="text-xs text-primary mt-2">
+                ✓ As {role === 'elderly' ? 'an elderly person' : 'a family member'}, you can monitor yourself and others.
+              </p>
             )}
           </div>
 
