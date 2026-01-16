@@ -178,10 +178,38 @@ const Auth = () => {
     }
   }, []);
 
-  // Only redirect to dashboard if user is logged in AND NOT in password reset flow
-  if (user && !isResetPassword) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // Check for devices and redirect accordingly if user is already logged in
+  useEffect(() => {
+    const checkDevicesAndRedirect = async () => {
+      if (user && !isResetPassword) {
+        // Check if user has access to any elderly persons and devices
+        const { data: elderlyPersons, error: elderlyError } = await supabase
+          .rpc('get_accessible_elderly_persons', { _user_id: user.id });
+
+        if (!elderlyError && elderlyPersons && elderlyPersons.length > 0) {
+          // Check if any of these elderly persons have devices
+          const elderlyIds = elderlyPersons.map((person: any) => person.id);
+          const { data: devices, error: devicesError } = await supabase
+            .from('devices')
+            .select('id')
+            .in('elderly_person_id', elderlyIds)
+            .limit(1);
+
+          // If devices exist, redirect to dashboard, otherwise go to device status page
+          if (!devicesError && devices && devices.length > 0) {
+            navigate('/dashboard', { replace: true });
+          } else {
+            navigate('/device-status', { replace: true });
+          }
+        } else {
+          // No elderly persons accessible, go to device status to set things up
+          navigate('/device-status', { replace: true });
+        }
+      }
+    };
+
+    checkDevicesAndRedirect();
+  }, [user, isResetPassword, navigate]);
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();

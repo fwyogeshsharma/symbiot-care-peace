@@ -135,7 +135,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user_id: data.user.id,
         login_at: new Date().toISOString(),
       });
-      navigate('/dashboard');
+
+      // Check if user has access to any elderly persons and devices
+      const { data: elderlyPersons, error: elderlyError } = await supabase
+        .rpc('get_accessible_elderly_persons', { _user_id: data.user.id });
+
+      if (!elderlyError && elderlyPersons && elderlyPersons.length > 0) {
+        // Check if any of these elderly persons have devices
+        const elderlyIds = elderlyPersons.map((person: any) => person.id);
+        const { data: devices, error: devicesError } = await supabase
+          .from('devices')
+          .select('id')
+          .in('elderly_person_id', elderlyIds)
+          .limit(1);
+
+        // If no devices exist, redirect to device status page, otherwise go to dashboard
+        if (!devicesError && devices && devices.length > 0) {
+          navigate('/dashboard');
+        } else {
+          navigate('/device-status');
+        }
+      } else {
+        // No elderly persons accessible, go to device status to set things up
+        navigate('/device-status');
+      }
     }
 
     return { error };

@@ -1003,7 +1003,7 @@
     "location": "Location",
     "platformMetrics": "Platform Metrics",
     "deviceTypes": "Device Types",
-    "noDevices": "No devices registered yet",
+    "noDevices": "Add devices to get your health metrics",
     "noData": "No Data",
     "records": "records",
     "generateData": "Generate Data",
