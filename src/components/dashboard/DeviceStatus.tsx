@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2 } from 'lucide-react';
+import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import DeviceManagement from './DeviceManagement';
@@ -244,9 +244,10 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                     )}
                     <span className="font-medium text-sm truncate">{device.device_name}</span>
                     {hasNoData ? (
-                      <Badge variant="outline" className="text-xs border-warning text-warning flex-shrink-0">
-                        {t('devices.noData')}
-                      </Badge>
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-shrink-0">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>{t('devices.connecting', { defaultValue: 'Connecting...' })}</span>
+                      </div>
                     ) : (
                       <Badge variant="outline" className="text-xs hidden sm:inline-flex flex-shrink-0">
                         {dataCount} {t('devices.records')}
@@ -298,8 +299,13 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                   </div>
                 </div>
 
-                {/* Show record count on mobile */}
-                {!hasNoData && (
+                {/* Show record count or connecting status on mobile */}
+                {hasNoData ? (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1 sm:hidden">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>{t('devices.connecting', { defaultValue: 'Connecting...' })}</span>
+                  </div>
+                ) : (
                   <div className="text-xs text-muted-foreground mt-1 sm:hidden">
                     {dataCount} {t('devices.records')}
                   </div>
