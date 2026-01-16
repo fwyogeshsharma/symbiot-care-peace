@@ -542,8 +542,8 @@ const Auth = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="role">{t('auth.selectRole')}</Label>
-                <Select value={role} onValueChange={handleRoleChange}>
+                <Label htmlFor="role">{t('auth.selectRole')} *</Label>
+                <Select value={role} onValueChange={handleRoleChange} required>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -558,7 +558,7 @@ const Auth = () => {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">{t('auth.email')}</Label>
+            <Label htmlFor="email">{t('auth.email')} *</Label>
             <Input
               id="email"
               type="email"
@@ -570,7 +570,7 @@ const Auth = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">{t('auth.password')}</Label>
+            <Label htmlFor="password">{t('auth.password')} *</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -607,7 +607,7 @@ const Auth = () => {
 
           {!isLogin && (
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
+              <Label htmlFor="confirmPassword">{t('auth.confirmPassword')} *</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
