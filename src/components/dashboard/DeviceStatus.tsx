@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Loader2, MapPin } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import DeviceManagement from './DeviceManagement';
@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAllDeviceTypes } from '@/hooks/useDeviceTypes';
 import { useAllDeviceCompanies } from '@/hooks/useDeviceCompanies';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 interface DeviceStatusProps {
   selectedPersonId?: string | null;
@@ -32,7 +33,8 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   const [copiedApiKey, setCopiedApiKey] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+  const navigate = useNavigate();
+
   // Fetch all device types for the edit dialog
   const { data: allDeviceTypes = [] } = useAllDeviceTypes();
 
@@ -206,6 +208,11 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
     });
   };
 
+  const handleLocateDevice = (device: any) => {
+    // Navigate to device history to see device data
+    setHistoryDevice(device);
+  };
+
   return (
     <Card className="p-3 sm:p-6">
       <div className="flex items-center justify-between mb-4">
@@ -268,6 +275,18 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                     >
                       {t(`devices.${device.status}`, { defaultValue: device.status })}
                     </Badge>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLocateDevice(device);
+                      }}
+                      title={t('devices.viewData', { defaultValue: 'View device data' })}
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"

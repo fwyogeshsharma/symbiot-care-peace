@@ -11,6 +11,7 @@ import HealthMetricsCharts from './HealthMetricsCharts';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
 import { extractNumericValue, extractBloodPressure, extractBooleanValue, extractStringValue } from '@/lib/valueExtractor';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 // Map language codes to date-fns locales
 const getDateLocale = (language: string) => {
@@ -39,6 +40,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   const [showCharts, setShowCharts] = useState(false);
   const { t, i18n } = useTranslation();
   const dateLocale = getDateLocale(i18n.language);
+  const navigate = useNavigate();
 
   // Function to translate device name based on device type
   const getTranslatedDeviceName = (deviceName: string | undefined) => {
@@ -535,9 +537,17 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
           <CardTitle>{t('healthMetrics.title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-center py-8">
-            {t('healthMetrics.noData')}
-          </p>
+          <div className="text-center py-8">
+            <p className="text-muted-foreground mb-4">
+              {t('healthMetrics.noData')}
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/device-status')}
+            >
+              {t('healthMetrics.goToDevices')}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );

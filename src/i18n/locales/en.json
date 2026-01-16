@@ -86,7 +86,8 @@
   "healthMetrics": {
     "title": "Health Metrics",
     "viewCharts": "View Charts",
-    "noData": "No health data available yet",
+    "noData": "Add device to get health metrics",
+    "goToDevices": "Go to Device Page",
     "types": {
       "heart_rate": "Heart Rate",
       "blood_pressure": "Blood Pressure",
@@ -1006,6 +1007,7 @@
     "noDevices": "Add devices to get your health metrics",
     "noData": "No Data",
     "records": "records",
+    "viewData": "View device data",
     "generateData": "Generate Data",
     "generateDataTooltip": "Generate 7 days of sample data for testing",
     "unassigned": "Unassigned",
