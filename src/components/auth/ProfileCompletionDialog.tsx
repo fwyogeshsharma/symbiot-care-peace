@@ -13,7 +13,15 @@ const profileSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
   role: z.enum(['elderly', 'caregiver', 'relative']),
   phone: z.string().min(10, 'Phone number must be at least 10 digits').regex(/^[0-9+\-\s()]*$/, 'Invalid phone number format'),
+  yearOfBirth: z.number({
+    required_error: "Year of birth is required",
+    invalid_type_error: "Please enter a valid year",
+  }).min(1900, 'Year must be at least 1900').max(new Date().getFullYear(), 'Year cannot be in the future'),
   postalAddress: z.string().min(5, 'Postal address must be at least 5 characters'),
+  city: z.string().min(2, 'City is required'),
+  state: z.string().min(2, 'State/Province is required'),
+  zone: z.string().optional(),
+  country: z.string().min(2, 'Country is required'),
 });
 
 interface ProfileCompletionDialogProps {
@@ -29,8 +37,14 @@ export const ProfileCompletionDialog = ({ open, onComplete }: ProfileCompletionD
   const [role, setRole] = useState<string>('caregiver');
   const [fullName, setFullName] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
+  const [yearOfBirth, setYearOfBirth] = useState<string>('');
   const [postalAddress, setPostalAddress] = useState<string>('');
-  const [showSkipWarning, setShowSkipWarning] = useState(false);
+  const [city, setCity] = useState<string>('');
+  const [state, setState] = useState<string>('');
+  const [zone, setZone] = useState<string>('');
+  const [country, setCountry] = useState<string>('');
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
 
   // Pre-fill user data from OAuth if available
   useEffect(() => {
@@ -61,40 +75,56 @@ export const ProfileCompletionDialog = ({ open, onComplete }: ProfileCompletionD
     }
   }, [open]);
 
-  const handleAttemptClose = () => {
-    setShowSkipWarning(true);
-    toast({
-      title: "Profile Completion Required",
-      description: "You must complete your profile to access the dashboard. This information is necessary to use the platform.",
-      variant: "destructive",
-      duration: 5000,
-    });
-  };
+  const fetchGeolocation = async () => {
+    if (!postalAddress || !city || !state || !country) {
+      return;
+    }
 
-  // Listen for escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
-        e.preventDefault();
-        handleAttemptClose();
+    try {
+      const fullAddress = `${postalAddress}, ${city}, ${state}, ${country}`;
+      const encodedAddress = encodeURIComponent(fullAddress);
+
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`,
+        {
+          headers: {
+            'User-Agent': 'Symbiot Care Peace App',
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.length > 0) {
+          const { lat, lon } = data[0];
+          setLatitude(parseFloat(lat));
+          setLongitude(parseFloat(lon));
+        }
       }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [open]);
+    } catch (error) {
+      console.error('Error fetching geolocation:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Fetch geolocation
+      await fetchGeolocation();
+
       // Validate form
       const validation = profileSchema.safeParse({
         fullName,
         role,
         phone,
+        yearOfBirth: yearOfBirth ? parseInt(yearOfBirth) : undefined,
         postalAddress,
+        city,
+        state,
+        zone: zone || undefined,
+        country,
       });
 
       if (!validation.success) {
@@ -113,38 +143,27 @@ export const ProfileCompletionDialog = ({ open, onComplete }: ProfileCompletionD
           full_name: fullName,
           role,
           phone,
+          year_of_birth: parseInt(yearOfBirth),
           postal_address: postalAddress,
+          city,
+          state,
+          zone,
+          country,
+          latitude,
+          longitude,
           profile_completed: true,
         },
       });
 
       if (updateError) throw updateError;
 
-      // Get user data
+      // Insert user role
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Insert user role
         await supabase.from('user_roles').insert({
           user_id: user.id,
           role: role,
         });
-
-        // Update or insert profile data in profiles table
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: user.id,
-            full_name: fullName,
-            phone: phone,
-            postal_address: postalAddress,
-            updated_at: new Date().toISOString(),
-          }, {
-            onConflict: 'id'
-          });
-
-        if (profileError) {
-          console.error('Error updating profile:', profileError);
-        }
       }
 
       toast({
@@ -166,40 +185,13 @@ export const ProfileCompletionDialog = ({ open, onComplete }: ProfileCompletionD
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent
-        className="max-w-md"
-        onInteractOutside={(e) => {
-          e.preventDefault();
-          handleAttemptClose();
-        }}
-        onEscapeKeyDown={(e) => {
-          e.preventDefault();
-          handleAttemptClose();
-        }}
-      >
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Complete Your Profile</DialogTitle>
           <DialogDescription>
             Please provide additional information to complete your registration
           </DialogDescription>
         </DialogHeader>
-
-        {/* Warning Banner */}
-        {showSkipWarning && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 mb-4">
-            <div className="flex items-start gap-2">
-              <div className="text-destructive mt-0.5">⚠️</div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-destructive">
-                  Profile Completion Required
-                </p>
-                <p className="text-xs text-destructive/80 mt-1">
-                  You cannot skip this step. This information is required to use the Symbiot Care Peace platform and ensure proper functionality.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -226,17 +218,6 @@ export const ProfileCompletionDialog = ({ open, onComplete }: ProfileCompletionD
                 <SelectItem value="relative">{t('auth.roles.relative')}</SelectItem>
               </SelectContent>
             </Select>
-
-            {/* Self-monitoring info based on role */}
-            {role === 'caregiver' ? (
-              <p className="text-xs text-muted-foreground mt-2">
-                ℹ️ As a caregiver, you will be able to monitor others but cannot monitor yourself.
-              </p>
-            ) : (
-              <p className="text-xs text-primary mt-2">
-                ✓ As {role === 'elderly' ? 'an elderly person' : 'a family member'}, you can monitor yourself and others.
-              </p>
-            )}
           </div>
 
           <div className="space-y-2">
@@ -252,6 +233,20 @@ export const ProfileCompletionDialog = ({ open, onComplete }: ProfileCompletionD
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="yearOfBirth">Year of Birth *</Label>
+            <Input
+              id="yearOfBirth"
+              type="number"
+              value={yearOfBirth}
+              onChange={(e) => setYearOfBirth(e.target.value)}
+              required
+              min="1900"
+              max={new Date().getFullYear()}
+              placeholder={`e.g., ${new Date().getFullYear() - 30}`}
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="postalAddress">Postal Address *</Label>
             <Input
               id="postalAddress"
@@ -259,14 +254,59 @@ export const ProfileCompletionDialog = ({ open, onComplete }: ProfileCompletionD
               value={postalAddress}
               onChange={(e) => setPostalAddress(e.target.value)}
               required
-              placeholder="Enter your complete postal address"
+              placeholder="Enter your street address"
             />
           </div>
 
-          <div className="bg-muted/50 border border-muted rounded-lg p-3 text-center">
-            <p className="text-xs text-muted-foreground">
-              <strong>Note:</strong> This form cannot be skipped. All fields are required to access the dashboard.
-            </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="city">City *</Label>
+              <Input
+                id="city"
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                required
+                placeholder="City"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="state">State/Province *</Label>
+              <Input
+                id="state"
+                type="text"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                required
+                placeholder="State or Province"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="zone">Zone (Optional)</Label>
+              <Input
+                id="zone"
+                type="text"
+                value={zone}
+                onChange={(e) => setZone(e.target.value)}
+                placeholder="Zone or District"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="country">Country *</Label>
+              <Input
+                id="country"
+                type="text"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                required
+                placeholder="Country"
+              />
+            </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
