@@ -112,8 +112,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           zone: zone,
           country: country,
           latitude: latitude,
-          longitude: longitude,
-          profile_completed: true
+          longitude: longitude
         }
       }
     });
