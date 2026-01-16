@@ -339,11 +339,29 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
     }
   }, [open]);
 
-  // Reset company and model when device type changes
+  // Reset company and model when device type changes, and auto-populate device name
   useEffect(() => {
     setCompanyId('');
     setModelId('');
-  }, [deviceType]);
+
+    // Auto-populate device name when device type is selected
+    if (deviceType && userElderlyPerson?.full_name) {
+      const selectedType = deviceTypes.find(t => t.code === deviceType);
+      if (selectedType) {
+        // Get device type name (translated if available, otherwise use default name)
+        const deviceTypeName = t(`devices.types.${selectedType.code}`, { defaultValue: '' }) || selectedType.name;
+
+        // Generate initials from device type name
+        const initials = deviceTypeName
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase())
+          .join('');
+
+        // Set device name as "User Name - (INITIALS)"
+        setDeviceName(`${userElderlyPerson.full_name} - (${initials})`);
+      }
+    }
+  }, [deviceType, userElderlyPerson?.full_name, deviceTypes, t]);
 
   // Reset model when company changes
   useEffect(() => {
