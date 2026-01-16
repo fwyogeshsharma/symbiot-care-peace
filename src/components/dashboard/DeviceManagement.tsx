@@ -377,6 +377,10 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
     setModelId('');
     setApiKey('');
     setShowApiKey(false);
+  };
+
+  const closeDialog = () => {
+    resetForm();
     setOpen(false);
   };
 
@@ -577,9 +581,14 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
               </code>
             </div>
 
-            <Button onClick={resetForm} className="w-full">
-              {t('devices.register.registerAnother')}
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={resetForm} className="flex-1">
+                {t('devices.register.registerAnother')}
+              </Button>
+              <Button onClick={closeDialog} variant="outline" className="flex-1">
+                {t('common.close', { defaultValue: 'Close' })}
+              </Button>
+            </div>
           </div>
         )}
           </TabsContent>
