@@ -61,24 +61,24 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   });
 
   // Fetch data counts for each device
-  const { data: dataCounts = {} } = useQuery({
+  const { data: dataCounts = {}, isLoading: isLoadingCounts } = useQuery({
     queryKey: ['device-data-counts', selectedPersonId],
     queryFn: async () => {
       if (!devices || devices.length === 0) return {};
-      
+
       const counts: Record<string, number> = {};
-      
+
       for (const device of devices) {
         const { count, error } = await supabase
           .from('device_data')
           .select('*', { count: 'exact', head: true })
           .eq('device_id', device.id);
-        
+
         if (!error) {
           counts[device.id] = count || 0;
         }
       }
-      
+
       return counts;
     },
     enabled: !!devices && devices.length > 0,
@@ -224,7 +224,8 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
         <div className="space-y-3">
           {devices.map((device) => {
             const dataCount = dataCounts[device.id] || 0;
-            const hasNoData = dataCount === 0;
+            const isLoading = isLoadingCounts && dataCounts[device.id] === undefined;
+            const hasNoData = !isLoading && dataCount === 0;
 
             return (
               <div
@@ -243,11 +244,15 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                       <WifiOff className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                     )}
                     <span className="font-medium text-sm truncate">{device.device_name}</span>
-                    {hasNoData ? (
+                    {isLoading ? (
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-shrink-0">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         <span>{t('devices.connecting', { defaultValue: 'Connecting...' })}</span>
                       </div>
+                    ) : hasNoData ? (
+                      <span className="text-xs text-muted-foreground flex-shrink-0">
+                        {t('devices.notConnected', { defaultValue: "Device isn't connected" })}
+                      </span>
                     ) : (
                       <Badge variant="outline" className="text-xs hidden sm:inline-flex flex-shrink-0">
                         {dataCount} {t('devices.records')}
@@ -300,10 +305,14 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                 </div>
 
                 {/* Show record count or connecting status on mobile */}
-                {hasNoData ? (
+                {isLoading ? (
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1 sm:hidden">
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     <span>{t('devices.connecting', { defaultValue: 'Connecting...' })}</span>
+                  </div>
+                ) : hasNoData ? (
+                  <div className="text-xs text-muted-foreground mt-1 sm:hidden">
+                    {t('devices.notConnected', { defaultValue: "Device isn't connected" })}
                   </div>
                 ) : (
                   <div className="text-xs text-muted-foreground mt-1 sm:hidden">
