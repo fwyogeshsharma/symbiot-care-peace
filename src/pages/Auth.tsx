@@ -30,6 +30,10 @@ const signupSchema = z.object({
     invalid_type_error: "Please enter a valid year",
   }).min(1900, 'Year must be at least 1900').max(new Date().getFullYear(), 'Year cannot be in the future'),
   postalAddress: z.string().min(5, 'Postal address must be at least 5 characters'),
+  city: z.string().min(2, 'City is required'),
+  state: z.string().min(2, 'State/Province is required'),
+  zone: z.string().optional(),
+  country: z.string().min(2, 'Country is required'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -49,6 +53,12 @@ const Auth = () => {
   const [role, setRole] = useState<string>('caregiver');
   const [yearOfBirth, setYearOfBirth] = useState<string>('');
   const [postalAddress, setPostalAddress] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [state, setState] = useState<string>('');
+  const [zone, setZone] = useState<string>('');
+  const [country, setCountry] = useState<string>('');
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -66,6 +76,41 @@ const Auth = () => {
     if (audioRef.current) {
       audioRef.current.currentTime = 0; // Reset to start
       audioRef.current.play().catch(err => console.log('Audio play failed:', err));
+    }
+  };
+
+  const fetchGeolocation = async () => {
+    if (!postalAddress || !city || !state || !country) {
+      return;
+    }
+
+    try {
+      // Combine address fields for geocoding
+      const fullAddress = `${postalAddress}, ${city}, ${state}, ${country}`;
+      const encodedAddress = encodeURIComponent(fullAddress);
+
+      // Use OpenStreetMap Nominatim API for geocoding
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`,
+        {
+          headers: {
+            'User-Agent': 'Symbiot Care Peace App', // Required by Nominatim
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.length > 0) {
+          const { lat, lon } = data[0];
+          setLatitude(parseFloat(lat));
+          setLongitude(parseFloat(lon));
+          console.log('Geolocation found:', { lat, lon });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching geolocation:', error);
+      // Don't show error to user, geolocation is optional
     }
   };
 
@@ -264,6 +309,9 @@ const Auth = () => {
           });
         }
       } else {
+        // Fetch geolocation before validation
+        await fetchGeolocation();
+
         const validation = signupSchema.safeParse({
           email,
           password,
@@ -272,7 +320,11 @@ const Auth = () => {
           phone,
           role,
           yearOfBirth: yearOfBirth ? parseInt(yearOfBirth) : undefined,
-          postalAddress
+          postalAddress,
+          city,
+          state,
+          zone: zone || undefined,
+          country
         });
         if (!validation.success) {
           toast({
@@ -287,14 +339,20 @@ const Auth = () => {
         // First, check if there's an unconfirmed user with this email - update their data if so
         try {
           const cleanupResponse = await supabase.functions.invoke('cleanup-unconfirmed-user', {
-            body: { 
+            body: {
               email,
               newMetadata: {
                 full_name: fullName,
                 phone: phone,
                 role: role,
                 year_of_birth: yearOfBirth ? parseInt(yearOfBirth) : undefined,
-                postal_address: postalAddress
+                postal_address: postalAddress,
+                city: city,
+                state: state,
+                zone: zone,
+                country: country,
+                latitude: latitude,
+                longitude: longitude
               },
               newPassword: password
             }
@@ -326,6 +384,12 @@ const Auth = () => {
             setRole('caregiver');
             setYearOfBirth('');
             setPostalAddress('');
+            setCity('');
+            setState('');
+            setZone('');
+            setCountry('');
+            setLatitude(null);
+            setLongitude(null);
             setIsLogin(true);
             setLoading(false);
             return;
@@ -336,7 +400,21 @@ const Auth = () => {
           // Continue with signup anyway
         }
 
-        const { error, isDuplicate } = await signUp(email, password, fullName, phone, role, yearOfBirth ? parseInt(yearOfBirth) : undefined, postalAddress);
+        const { error, isDuplicate } = await signUp(
+          email,
+          password,
+          fullName,
+          phone,
+          role,
+          yearOfBirth ? parseInt(yearOfBirth) : undefined,
+          postalAddress,
+          city,
+          state,
+          zone,
+          country,
+          latitude || undefined,
+          longitude || undefined
+        );
         
         if (isDuplicate) {
           // This shouldn't happen anymore since we handle unconfirmed users
@@ -365,6 +443,12 @@ const Auth = () => {
           setRole('caregiver');
           setYearOfBirth('');
           setPostalAddress('');
+          setCity('');
+          setState('');
+          setZone('');
+          setCountry('');
+          setLatitude(null);
+          setLongitude(null);
           // Switch to login view after successful sign-up
           setIsLogin(true);
         }
@@ -537,8 +621,59 @@ const Auth = () => {
                   value={postalAddress}
                   onChange={(e) => setPostalAddress(e.target.value)}
                   required
-                  placeholder="Enter your full postal address"
+                  placeholder="Enter your street address"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">City *</Label>
+                  <Input
+                    id="city"
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    required
+                    placeholder="City"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="state">State/Province *</Label>
+                  <Input
+                    id="state"
+                    type="text"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    required
+                    placeholder="State or Province"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="zone">Zone (Optional)</Label>
+                  <Input
+                    id="zone"
+                    type="text"
+                    value={zone}
+                    onChange={(e) => setZone(e.target.value)}
+                    placeholder="Zone or District"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country *</Label>
+                  <Input
+                    id="country"
+                    type="text"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    required
+                    placeholder="Country"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">

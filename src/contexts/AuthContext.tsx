@@ -8,7 +8,7 @@ interface AuthContextType {
   session: Session | null;
   userRole: string | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, phone: string, role: string, yearOfBirth?: number, postalAddress?: string) => Promise<{ error: any; isDuplicate?: boolean }>;
+  signUp: (email: string, password: string, fullName: string, phone: string, role: string, yearOfBirth?: number, postalAddress?: string, city?: string, state?: string, zone?: string, country?: string, latitude?: number, longitude?: number) => Promise<{ error: any; isDuplicate?: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, phone: string, role: string, yearOfBirth?: number, postalAddress?: string) => {
+  const signUp = async (email: string, password: string, fullName: string, phone: string, role: string, yearOfBirth?: number, postalAddress?: string, city?: string, state?: string, zone?: string, country?: string, latitude?: number, longitude?: number) => {
     const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
     const redirectUrl = `${baseUrl}/dashboard`;
 
@@ -106,7 +106,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           phone: phone,
           role: role,
           year_of_birth: yearOfBirth,
-          postal_address: postalAddress
+          postal_address: postalAddress,
+          city: city,
+          state: state,
+          zone: zone,
+          country: country,
+          latitude: latitude,
+          longitude: longitude
         }
       }
     });
