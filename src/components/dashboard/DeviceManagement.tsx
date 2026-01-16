@@ -410,17 +410,6 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
         {!showApiKey ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="device-name">{t('devices.register.deviceName')} *</Label>
-              <Input
-                id="device-name"
-                value={deviceName}
-                onChange={(e) => setDeviceName(e.target.value)}
-                placeholder={t('devices.register.deviceNamePlaceholder')}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="device-type">{t('devices.register.deviceType')} *</Label>
               <Select value={deviceType} onValueChange={setDeviceType} required>
                 <SelectTrigger id="device-type">
@@ -441,6 +430,17 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
                   })}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="device-name">{t('devices.register.deviceName')} *</Label>
+              <Input
+                id="device-name"
+                value={deviceName}
+                onChange={(e) => setDeviceName(e.target.value)}
+                placeholder={t('devices.register.deviceNamePlaceholder')}
+                required
+              />
             </div>
 
             {deviceType && deviceCompanies.length > 0 && (
