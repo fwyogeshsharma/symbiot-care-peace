@@ -30,10 +30,10 @@ const signupSchema = z.object({
     invalid_type_error: "Please enter a valid year",
   }).min(1900, 'Year must be at least 1900').max(new Date().getFullYear(), 'Year cannot be in the future'),
   postalAddress: z.string().min(5, 'Postal address must be at least 5 characters'),
-  city: z.string().min(2, 'City is required'),
-  state: z.string().min(2, 'State/Province is required'),
-  zone: z.string().optional(),
-  country: z.string().min(2, 'Country is required'),
+  city: z.string().min(2, 'City is required').regex(/^[a-zA-Z\s\-'\.]+$/, 'City can only contain letters, spaces, hyphens, and apostrophes'),
+  state: z.string().min(2, 'State/Province is required').regex(/^[a-zA-Z\s\-'\.]+$/, 'State/Province can only contain letters, spaces, hyphens, and apostrophes'),
+  zone: z.string().regex(/^[a-zA-Z\s\-'\.]*$/, 'Zone can only contain letters, spaces, hyphens, and apostrophes').optional(),
+  country: z.string().min(2, 'Country is required').regex(/^[a-zA-Z\s\-'\.]+$/, 'Country can only contain letters, spaces, hyphens, and apostrophes'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -77,6 +77,11 @@ const Auth = () => {
       audioRef.current.currentTime = 0; // Reset to start
       audioRef.current.play().catch(err => console.log('Audio play failed:', err));
     }
+  };
+
+  // Filter function to allow only letters, spaces, hyphens, apostrophes, and periods
+  const filterTextInput = (value: string) => {
+    return value.replace(/[^a-zA-Z\s\-'\.]/g, '');
   };
 
   const fetchGeolocation = async () => {
@@ -661,7 +666,7 @@ const Auth = () => {
                     id="city"
                     type="text"
                     value={city}
-                    onChange={(e) => setCity(e.target.value)}
+                    onChange={(e) => setCity(filterTextInput(e.target.value))}
                     required
                     placeholder="City"
                   />
@@ -673,7 +678,7 @@ const Auth = () => {
                     id="state"
                     type="text"
                     value={state}
-                    onChange={(e) => setState(e.target.value)}
+                    onChange={(e) => setState(filterTextInput(e.target.value))}
                     required
                     placeholder="State or Province"
                   />
@@ -687,7 +692,7 @@ const Auth = () => {
                     id="zone"
                     type="text"
                     value={zone}
-                    onChange={(e) => setZone(e.target.value)}
+                    onChange={(e) => setZone(filterTextInput(e.target.value))}
                     placeholder="Zone or District"
                   />
                 </div>
@@ -698,7 +703,7 @@ const Auth = () => {
                     id="country"
                     type="text"
                     value={country}
-                    onChange={(e) => setCountry(e.target.value)}
+                    onChange={(e) => setCountry(filterTextInput(e.target.value))}
                     required
                     placeholder="Country"
                   />
