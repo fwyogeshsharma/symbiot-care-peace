@@ -380,7 +380,8 @@ const Auth = () => {
                 zone: zone,
                 country: country,
                 latitude: latitude,
-                longitude: longitude
+                longitude: longitude,
+                profile_completed: true
               },
               newPassword: password
             }

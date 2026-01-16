@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { processMovementData, getDateRangePreset } from '@/lib/movementUtils';
+import { ProfileCompletionDialog } from '@/components/auth/ProfileCompletionDialog';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -30,6 +31,24 @@ const Dashboard = () => {
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [dateRange] = useState(getDateRangePreset('today'));
   const [healthChartsOpen, setHealthChartsOpen] = useState(false);
+  const [showProfileCompletion, setShowProfileCompletion] = useState(false);
+
+  // Check if user needs to complete profile
+  useEffect(() => {
+    const checkProfileCompletion = async () => {
+      if (user) {
+        const { data: { user: userData } } = await supabase.auth.getUser();
+        const profileCompleted = userData?.user_metadata?.profile_completed;
+
+        // Show dialog if profile is not completed
+        if (!profileCompleted) {
+          setShowProfileCompletion(true);
+        }
+      }
+    };
+
+    checkProfileCompletion();
+  }, [user]);
 
   // Fetch elderly persons based on role
   const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
@@ -262,6 +281,16 @@ const Dashboard = () => {
       </main>
 
       <Footer />
+
+      {/* Profile Completion Dialog for OAuth users */}
+      <ProfileCompletionDialog
+        open={showProfileCompletion}
+        onComplete={() => {
+          setShowProfileCompletion(false);
+          // Refresh the page to reload user data
+          window.location.reload();
+        }}
+      />
     </div>
   );
 };
