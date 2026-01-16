@@ -1219,8 +1219,8 @@
     "last7Days": "Last 7 Days",
     "last30Days": "Last 30 Days",
     "noFloorPlan": {
-      "title": "No Floor Plan Found",
-      "description": "Register a worker-wearable device to see indoor tracking"
+      "title": "Add a Floor Plan",
+      "description": "Please add a floor plan to enable indoor tracking"
     },
     "noGpsData": {
       "title": "No GPS Data or Geofences",
