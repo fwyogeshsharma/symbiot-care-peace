@@ -93,7 +93,7 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
       dailyData[date].duration += duration;
       if (isOccupied) dailyData[date].occupied += 1;
       if (parsedValue?.pressure) {
-        dailyData[date].avgPressure += parsedValue.pressure;
+        dailyData[date].avgPressure += Number(parsedValue.pressure) || 0;
       }
 
       // Track hourly distribution
@@ -107,7 +107,7 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
       // Accumulate stats
       totalDuration += duration;
       if (parsedValue?.pressure) {
-        totalPressure += parsedValue.pressure;
+        totalPressure += Number(parsedValue.pressure) || 0;
         pressureCount += 1;
       }
       if (isOccupied) {
@@ -361,8 +361,8 @@ export const BedPadActivity = ({ selectedPerson, dateRange }: BedPadActivityProp
               const hour = recordedAt.getHours();
               const isNight = hour >= 20 || hour < 6;
               const isOccupied = parsedValue?.occupancy || false;
-              const pressure = parsedValue?.pressure || 0;
-              const duration = parsedValue?.duration || 0;
+              const pressure = Number(parsedValue?.pressure) || 0;
+              const duration = Number(parsedValue?.duration) || 0;
               const durationHours = Math.floor(duration / 60);
               const durationMinutes = Math.round(duration % 60);
 
