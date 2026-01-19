@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Loader2, MapPin } from 'lucide-react';
+import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Loader2, ArrowRight } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import DeviceManagement from './DeviceManagement';
@@ -213,6 +213,31 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
     setHistoryDevice(device);
   };
 
+  const handleNavigateToDevicePage = (device: any) => {
+    const deviceType = device.device_type?.toLowerCase();
+
+    // Route based on device type
+    if (deviceType === 'bed_pad' || deviceType === 'sleep_monitor') {
+      // Navigate to movement dashboard for bed pad activity with hash to scroll
+      navigate('/movement-dashboard#bed-pad-activity');
+    } else if (deviceType === 'toilet_seat') {
+      // Navigate to movement dashboard for toilet seat activity with hash to scroll
+      navigate('/movement-dashboard#toilet-seat-activity');
+    } else if (deviceType === 'smart_home_hub' || deviceType === 'home_hub') {
+      // Navigate to movement dashboard for smart home hub
+      navigate('/movement-dashboard#home-hub');
+    } else if (deviceType === 'smart_phone' || deviceType === 'smartphone') {
+      // Navigate to movement dashboard for smartphone
+      navigate('/movement-dashboard#smartphone');
+    } else if (deviceType === 'gps_tracker' || deviceType === 'gps') {
+      // Navigate to tracking page for GPS devices (outdoor tracking tab)
+      navigate('/tracking');
+    } else {
+      // Default to health page for all other devices
+      navigate('/health');
+    }
+  };
+
   return (
     <Card className="p-3 sm:p-6">
       <div className="flex items-center justify-between mb-4">
@@ -281,11 +306,11 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                       className="h-7 w-7"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleLocateDevice(device);
+                        handleNavigateToDevicePage(device);
                       }}
-                      title={t('devices.viewData', { defaultValue: 'View device data' })}
+                      title={t('devices.viewDetails', { defaultValue: 'View device details' })}
                     >
-                      <MapPin className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </Button>
                     <Button
                       variant="ghost"

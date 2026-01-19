@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import { MovementSummary } from "@/components/dashboard/MovementSummary";
@@ -33,6 +34,7 @@ import { useElderly } from "@/contexts/ElderlyContext";
 export default function MovementDashboard() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const location = useLocation();
   const { elderlyPersons, selectedPersonId, setSelectedPersonId, isLoading: elderlyLoading } = useElderly();
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
   const [selectedPreset, setSelectedPreset] = useState<string>('today');
@@ -108,6 +110,19 @@ export default function MovementDashboard() {
     };
   }, [selectedPersonId, queryClient]);
 
+  // Handle hash navigation to scroll to specific components
+  useEffect(() => {
+    if (location.hash && !isLoading) {
+      const elementId = location.hash.substring(1); // Remove the # symbol
+      setTimeout(() => {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500); // Delay to ensure content is loaded
+    }
+  }, [location.hash, isLoading]);
+
   const processedData = processMovementData(rawMovementData);
 
   // Check for dwell time deviations and generate alerts
@@ -178,8 +193,12 @@ export default function MovementDashboard() {
         {/* Home Hub and Smart Phone Cards */}
         {selectedPersonId && (
           <div className="grid gap-6 lg:grid-cols-2">
-            <HomeHubCard selectedPersonId={selectedPersonId} />
-            <SmartPhoneCard selectedPersonId={selectedPersonId} />
+            <div id="home-hub">
+              <HomeHubCard selectedPersonId={selectedPersonId} />
+            </div>
+            <div id="smartphone">
+              <SmartPhoneCard selectedPersonId={selectedPersonId} />
+            </div>
           </div>
         )}
 
@@ -207,7 +226,7 @@ export default function MovementDashboard() {
         {/* Bed Pad and Toilet Seat Activity */}
         {selectedPersonId && (
           <div className="space-y-6">
-            <div>
+            <div id="bed-pad-activity">
               <h2 className="text-2xl font-bold mb-1">{t('reports.bedPadActivity.title')}</h2>
               <p className="text-muted-foreground mb-4">
                 {t('reports.activity.bedPadActivityDesc')}
@@ -221,7 +240,7 @@ export default function MovementDashboard() {
               />
             </div>
 
-            <div>
+            <div id="toilet-seat-activity">
               <h2 className="text-2xl font-bold mb-1">{t('reports.toiletSeatActivity.title')}</h2>
               <p className="text-muted-foreground mb-4">
                 {t('reports.activity.toiletSeatActivityDesc')}
