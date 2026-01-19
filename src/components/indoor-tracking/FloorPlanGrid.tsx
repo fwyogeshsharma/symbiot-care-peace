@@ -158,14 +158,14 @@ export const FloorPlanGrid = ({
 
     // Draw furniture
     const furnitureColors: Record<string, string> = {
-      bed: '#ef4444',
-      chair: '#f59e0b',
-      table: '#84cc16',
-      sofa: '#06b6d4',
-      desk: '#8b5cf6',
-      toilet: '#ec4899',
-      sink: '#14b8a6',
-      door: '#6b7280',
+      bed: '#F4A6A6',
+      chair: '#F2C94C',
+      table: '#9CCC65',
+      sofa: '#6ED3CF',
+      desk: '#B39DDB',
+      toilet: '#FFB6B6',
+      sink: '#81D4FA',
+      door: '#6B7280',
     };
 
     if (floorPlan.furniture && floorPlan.furniture.length > 0) {
@@ -360,14 +360,14 @@ export const FloorPlanGrid = ({
 
       // Redraw furniture with separate X and Y scaling
       const furnitureColors = {
-        bed: '#ef4444',
-        chair: '#f59e0b',
-        table: '#84cc16',
-        sofa: '#06b6d4',
-        desk: '#8b5cf6',
-        toilet: '#ec4899',
-        sink: '#14b8a6',
-        door: '#6b7280',
+        bed: '#F4A6A6',
+        chair: '#F2C94C',
+        table: '#9CCC65',
+        sofa: '#6ED3CF',
+        desk: '#B39DDB',
+        toilet: '#FFB6B6',
+        sink: '#81D4FA',
+        door: '#6B7280',
       };
 
       if (floorPlan.furniture && floorPlan.furniture.length > 0) {
