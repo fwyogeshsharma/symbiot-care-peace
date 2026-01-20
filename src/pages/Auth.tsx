@@ -30,10 +30,10 @@ const signupSchema = z.object({
     invalid_type_error: "Please enter a valid year",
   }).min(1900, 'Year must be at least 1900').max(new Date().getFullYear(), 'Year cannot be in the future'),
   postalAddress: z.string().min(5, 'Postal address must be at least 5 characters'),
-  city: z.string().min(2, 'City is required'),
-  state: z.string().min(2, 'State/Province is required'),
-  zone: z.string().optional(),
-  country: z.string().min(2, 'Country is required'),
+  city: z.string().min(2, 'City is required').regex(/^[a-zA-Z\s]+$/, 'City must contain only letters'),
+  state: z.string().min(2, 'State/Province is required').regex(/^[a-zA-Z\s]+$/, 'State/Province must contain only letters'),
+  zone: z.string().regex(/^[a-zA-Z\s]*$/, 'Zone must contain only letters').optional(),
+  country: z.string().min(2, 'Country is required').regex(/^[a-zA-Z\s]+$/, 'Country must contain only letters'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -688,7 +688,7 @@ const Auth = () => {
                     id="city"
                     type="text"
                     value={city}
-                    onChange={(e) => setCity(e.target.value)}
+                    onChange={(e) => setCity(e.target.value.replace(/[^a-zA-Z\s]/g, ''))}
                     required
                     placeholder="City"
                   />
@@ -700,7 +700,7 @@ const Auth = () => {
                     id="state"
                     type="text"
                     value={state}
-                    onChange={(e) => setState(e.target.value)}
+                    onChange={(e) => setState(e.target.value.replace(/[^a-zA-Z\s]/g, ''))}
                     required
                     placeholder="State or Province"
                   />
@@ -714,7 +714,7 @@ const Auth = () => {
                     id="zone"
                     type="text"
                     value={zone}
-                    onChange={(e) => setZone(e.target.value)}
+                    onChange={(e) => setZone(e.target.value.replace(/[^a-zA-Z\s]/g, ''))}
                     placeholder="Zone or District"
                   />
                 </div>
@@ -725,7 +725,7 @@ const Auth = () => {
                     id="country"
                     type="text"
                     value={country}
-                    onChange={(e) => setCountry(e.target.value)}
+                    onChange={(e) => setCountry(e.target.value.replace(/[^a-zA-Z\s]/g, ''))}
                     required
                     placeholder="Country"
                   />
