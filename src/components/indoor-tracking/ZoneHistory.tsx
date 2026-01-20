@@ -105,68 +105,82 @@ export const ZoneHistory = ({ visits = [] }: ZoneHistoryProps) => {
       <CardContent>
         <div className="relative">
           {/* Fixed Header Table */}
-          <div className="border-b">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[35%]">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleSort('zoneName')}
-                      className="h-8 px-2 lg:px-3"
-                    >
-                      {t('tracking.zoneHistory.zone', 'Zone')}
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead className="w-[20%]">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleSort('entryTime')}
-                      className="h-8 px-2 lg:px-3"
-                    >
-                      {t('tracking.zoneHistory.entryTime', 'Entry Time')}
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead className="w-[20%]">{t('tracking.zoneHistory.exitTime', 'Exit Time')}</TableHead>
-                  <TableHead className="w-[25%]">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleSort('duration')}
-                      className="h-8 px-2 lg:px-3"
-                    >
-                      {t('tracking.zoneHistory.duration', 'Duration')}
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-            </Table>
+          <div className="border-b overflow-hidden">
+            <div className="overflow-y-scroll" style={{ scrollbarGutter: 'stable' }}>
+              <Table className="table-fixed">
+                <colgroup>
+                  <col style={{ width: '35%' }} />
+                  <col style={{ width: '20%' }} />
+                  <col style={{ width: '20%' }} />
+                  <col style={{ width: '25%' }} />
+                </colgroup>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('zoneName')}
+                        className="h-8 px-2 lg:px-3"
+                      >
+                        {t('tracking.zoneHistory.zone', 'Zone')}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </TableHead>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('entryTime')}
+                        className="h-8 px-2 lg:px-3"
+                      >
+                        {t('tracking.zoneHistory.entryTime', 'Entry Time')}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </TableHead>
+                    <TableHead>{t('tracking.zoneHistory.exitTime', 'Exit Time')}</TableHead>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('duration')}
+                        className="h-8 px-2 lg:px-3"
+                      >
+                        {t('tracking.zoneHistory.duration', 'Duration')}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+              </Table>
+            </div>
           </div>
 
           {/* Scrollable Body Table */}
           <div className="overflow-auto h-[400px]">
-            <Table>
+            <Table className="table-fixed">
+              <colgroup>
+                <col style={{ width: '35%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '25%' }} />
+              </colgroup>
               <TableBody>
                 {sortedVisits.map((visit) => (
                   <TableRow key={visit.id}>
-                    <TableCell className="w-[35%]">
+                    <TableCell>
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">{visit.zoneName}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="w-[20%]">
+                    <TableCell>
                       {format(visit.entryTime, 'HH:mm:ss')}
                     </TableCell>
-                    <TableCell className="w-[20%]">
+                    <TableCell>
                       {format(visit.exitTime, 'HH:mm:ss')}
                     </TableCell>
-                    <TableCell className="w-[25%]">
+                    <TableCell>
                       <Badge variant={getDurationColor(visit.duration)}>
                         {formatDuration(visit.duration)}
                       </Badge>
