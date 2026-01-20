@@ -7,15 +7,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Globe, Share2, MapPin, Calendar, LayoutDashboard } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Globe, MapPin, Calendar, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { restartTour } from '@/components/help/OnboardingTour';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import DataSharing from '@/components/dashboard/DataSharing';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { Footer } from '@/components/Footer';
 
@@ -176,23 +174,7 @@ const Profile = () => {
       </header>
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-2xl">
-        <Tabs defaultValue="profile" className="w-full">
-          <TabsList className={`grid w-full mb-6 ${userRole === 'caregiver' ? 'grid-cols-1' : 'grid-cols-2'}`}>
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <User className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('profile.title')}</span>
-              <span className="sm:hidden">{t('profile.title')}</span>
-            </TabsTrigger>
-            {userRole !== 'caregiver' && (
-              <TabsTrigger value="data-sharing" className="flex items-center gap-2">
-                <Share2 className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('nav.dataSharing')}</span>
-                <span className="sm:hidden">{t('nav.dataSharing')}</span>
-              </TabsTrigger>
-            )}
-          </TabsList>
-
-          <TabsContent value="profile" className="space-y-6">
+        <div className="space-y-6">
             <Card className="p-4 sm:p-6 overflow-visible">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3 sm:gap-4">
@@ -401,14 +383,7 @@ const Profile = () => {
                 </Button>
               </div>
             </Card>
-          </TabsContent>
-
-          {userRole !== 'caregiver' && (
-            <TabsContent value="data-sharing">
-              {user && <DataSharing userId={user.id} />}
-            </TabsContent>
-          )}
-        </Tabs>
+        </div>
       </main>
       <Footer />
     </div>

@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText, LayoutDashboard, ChevronDown, FileBarChart } from 'lucide-react';
+import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText, LayoutDashboard, ChevronDown, FileBarChart, Lightbulb, Share2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -107,8 +107,12 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
     return isActive('/health') || isActive('/movement-dashboard');
   };
 
-  const isInsightsMenuActive = () => {
-    return isActive('/reports') || isActive('/alerts');
+  const isInsightMenuActive = () => {
+    return isActive('/tracking') || isActive('/reports') || isActive('/alerts');
+  };
+
+  const isSettingsMenuActive = () => {
+    return isActive('/device-status') || isActive('/profile') || isActive('/data-sharing');
   };
 
   const NavButtons = ({ isMobile = false }: { isMobile?: boolean }) => (
@@ -182,46 +186,29 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         </>
       )}
 
-      {/* Tracking Button */}
-      <Button
-        data-tour="nav-tracking"
-        variant={isActive('/tracking') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/tracking')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <MapPin className="w-4 h-4 mr-2" />
-        {t('nav.tracking')}
-      </Button>
-
-      {/* Devices Button */}
-      <Button
-        data-tour="nav-devices"
-        variant={isActive('/device-status') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/device-status')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <Wifi className="w-4 h-4 mr-2" />
-        {t('nav.devices')}
-      </Button>
-
-      {/* Insights Dropdown - Desktop Only */}
+      {/* Insight Dropdown - Desktop Only */}
       {!isMobile ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              data-tour="nav-insights"
-              variant={isInsightsMenuActive() ? 'default' : 'ghost'}
+              data-tour="nav-insight"
+              variant={isInsightMenuActive() ? 'default' : 'ghost'}
               size="sm"
               className="flex items-center gap-1"
             >
-              <FileBarChart className="w-4 h-4 mr-2" />
+              <Lightbulb className="w-4 h-4 mr-2" />
               {t('nav.insights', { defaultValue: 'Insights' })}
               <ChevronDown className="w-3 h-3 ml-1" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem
+              onClick={() => navigate('/tracking')}
+              className="cursor-pointer"
+            >
+              <MapPin className="w-4 h-4 mr-2" />
+              {t('nav.mobility', { defaultValue: 'Mobility' })}
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => navigate('/reports')}
               className="cursor-pointer"
@@ -242,6 +229,16 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
         /* Mobile - Show items separately */
         <>
           <Button
+            data-tour="nav-tracking"
+            variant={isActive('/tracking') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/tracking')}
+            className="w-full justify-start"
+          >
+            <MapPin className="w-4 h-4 mr-2" />
+            {t('nav.mobility', { defaultValue: 'Mobility' })}
+          </Button>
+          <Button
             data-tour="nav-reports"
             variant={isActive('/reports') ? 'default' : 'ghost'}
             size="default"
@@ -261,6 +258,67 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
             <AlertTriangle className="w-4 h-4 mr-2" />
             {t('nav.alerts')}
           </Button>
+        </>
+      )}
+
+      {/* Settings Dropdown - Desktop Only */}
+      {!isMobile ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              data-tour="nav-settings"
+              variant={isSettingsMenuActive() ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-1"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              {t('nav.settings', { defaultValue: 'Settings' })}
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem
+              onClick={() => navigate('/device-status')}
+              className="cursor-pointer"
+            >
+              <Wifi className="w-4 h-4 mr-2" />
+              {t('nav.devices')}
+            </DropdownMenuItem>
+            {userRole !== 'caregiver' && (
+              <DropdownMenuItem
+                onClick={() => navigate('/data-sharing')}
+                className="cursor-pointer"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                {t('nav.dataSharing')}
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        /* Mobile - Show items separately */
+        <>
+          <Button
+            data-tour="nav-devices"
+            variant={isActive('/device-status') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/device-status')}
+            className="w-full justify-start"
+          >
+            <Wifi className="w-4 h-4 mr-2" />
+            {t('nav.devices')}
+          </Button>
+          {userRole !== 'caregiver' && (
+            <Button
+              variant={isActive('/data-sharing') ? 'default' : 'ghost'}
+              size="default"
+              onClick={() => navigate('/data-sharing')}
+              className="w-full justify-start"
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              {t('nav.dataSharing')}
+            </Button>
+          )}
         </>
       )}
       <Button
