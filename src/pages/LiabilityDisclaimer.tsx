@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 
 const LiabilityDisclaimer = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -17,12 +18,10 @@ const LiabilityDisclaimer = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b bg-card shadow-sm sticky top-0 z-10 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to="/">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t('common.back')}
-            </Button>
-          </Link>
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t('common.back')}
+          </Button>
           <h1 className="text-2xl font-bold">{t('liabilityDisclaimer.title')}</h1>
         </div>
       </header>
