@@ -192,7 +192,7 @@ export default function FloorPlanManagement() {
                     <CardContent className="flex flex-col items-center justify-center h-64 gap-4">
                       <Map className="h-12 w-12 text-muted-foreground" />
                       <p className="text-muted-foreground">
-                        No floor plans yet
+                        Add a Floor Plan
                       </p>
                       <Button onClick={() => setShowCreateDialog(true)}>
                         <Plus className="h-4 w-4 mr-2" />

@@ -1191,8 +1191,8 @@
     "last7Days": "Letzte 7 Tage",
     "last30Days": "Letzte 30 Tage",
     "noFloorPlan": {
-      "title": "Kein Grundriss Gefunden",
-      "description": "Registrieren Sie ein tragbares Gerät, um die Innenverfolgung zu sehen"
+      "title": "Grundriss Hinzufügen",
+      "description": "Bitte fügen Sie einen Grundriss hinzu, um die Innenverfolgung zu aktivieren"
     },
     "noGpsData": {
       "title": "Keine GPS-Daten oder Geofences",

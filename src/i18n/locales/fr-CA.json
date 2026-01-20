@@ -1185,8 +1185,8 @@
     "last7Days": "7 Derniers Jours",
     "last30Days": "30 Derniers Jours",
     "noFloorPlan": {
-      "title": "Aucun Plan d'Étage Trouvé",
-      "description": "Enregistrez un appareil portable pour voir le suivi intérieur"
+      "title": "Ajouter un Plan d'Étage",
+      "description": "Veuillez ajouter un plan d'étage pour activer le suivi intérieur"
     },
     "noGpsData": {
       "title": "Aucune Donnée GPS ni Géorepérage",

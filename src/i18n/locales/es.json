@@ -1199,8 +1199,8 @@
     "last7Days": "Últimos 7 Días",
     "last30Days": "Últimos 30 Días",
     "noFloorPlan": {
-      "title": "No se Encontró Plano de Piso",
-      "description": "Registre un dispositivo portátil para ver el seguimiento interior"
+      "title": "Agregar un Plano de Piso",
+      "description": "Por favor agregue un plano de piso para habilitar el seguimiento interior"
     },
     "noGpsData": {
       "title": "Sin Datos GPS ni Geocercas",
