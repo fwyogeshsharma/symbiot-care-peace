@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Loader2, ArrowRight } from 'lucide-react';
+import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Loader2, ArrowRight, LucideIcon } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import DeviceManagement from './DeviceManagement';
@@ -34,6 +35,11 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const getIconComponent = (iconName: string | null): LucideIcon | null => {
+    if (!iconName) return null;
+    return (Icons as any)[iconName] || null;
+  };
 
   // Fetch all device types for the edit dialog
   const { data: allDeviceTypes = [] } = useAllDeviceTypes();
@@ -481,13 +487,22 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {allDeviceTypes.map((type) => (
-                      <SelectItem key={type.id} value={type.code}>
-                        {type.icon && `${type.icon} `}
-                        {type.name}
-                        {type.description && ` (${type.description})`}
-                      </SelectItem>
-                    ))}
+                    {allDeviceTypes.map((type) => {
+                      const IconComponent = getIconComponent(type.icon);
+                      return (
+                        <SelectItem key={type.id} value={type.code}>
+                          <div className="flex items-center gap-2">
+                            {IconComponent && <IconComponent className="w-4 h-4" />}
+                            <span>{type.name}</span>
+                            {type.description && (
+                              <span className="text-muted-foreground text-xs">
+                                ({type.description})
+                              </span>
+                            )}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
