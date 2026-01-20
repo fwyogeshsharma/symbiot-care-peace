@@ -385,6 +385,7 @@
     "tracking": "Verfolgung",
     "devices": "Geräte",
     "dataSharing": "Datenaustausch",
+    "caregiverDataSharingDisabled": "Pflegekräfte haben keinen Zugriff auf die Datenfreigabe",
     "movement": "Aktivität",
     "floorPlans": "Grundrisse",
     "analytics": "Analytik",

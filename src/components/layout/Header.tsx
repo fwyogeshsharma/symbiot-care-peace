@@ -9,6 +9,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText, LayoutDashboard, ChevronDown, FileBarChart, Lightbulb, Share2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -284,15 +290,25 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
               <Wifi className="w-4 h-4 mr-2" />
               {t('nav.devices')}
             </DropdownMenuItem>
-            {userRole !== 'caregiver' && (
-              <DropdownMenuItem
-                onClick={() => navigate('/data-sharing')}
-                className="cursor-pointer"
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                {t('nav.dataSharing')}
-              </DropdownMenuItem>
-            )}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuItem
+                    onClick={() => userRole !== 'caregiver' && navigate('/data-sharing')}
+                    className={userRole === 'caregiver' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
+                    disabled={userRole === 'caregiver'}
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    {t('nav.dataSharing')}
+                  </DropdownMenuItem>
+                </TooltipTrigger>
+                {userRole === 'caregiver' && (
+                  <TooltipContent>
+                    <p>{t('nav.caregiverDataSharingDisabled', { defaultValue: 'Caregivers do not have access to share data' })}</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
@@ -308,17 +324,27 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
             <Wifi className="w-4 h-4 mr-2" />
             {t('nav.devices')}
           </Button>
-          {userRole !== 'caregiver' && (
-            <Button
-              variant={isActive('/data-sharing') ? 'default' : 'ghost'}
-              size="default"
-              onClick={() => navigate('/data-sharing')}
-              className="w-full justify-start"
-            >
-              <Share2 className="w-4 h-4 mr-2" />
-              {t('nav.dataSharing')}
-            </Button>
-          )}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={isActive('/data-sharing') ? 'default' : 'ghost'}
+                  size="default"
+                  onClick={() => userRole !== 'caregiver' && navigate('/data-sharing')}
+                  className={`w-full justify-start ${userRole === 'caregiver' ? 'cursor-not-allowed opacity-50' : ''}`}
+                  disabled={userRole === 'caregiver'}
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  {t('nav.dataSharing')}
+                </Button>
+              </TooltipTrigger>
+              {userRole === 'caregiver' && (
+                <TooltipContent>
+                  <p>{t('nav.caregiverDataSharingDisabled', { defaultValue: 'Caregivers do not have access to share data' })}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         </>
       )}
       <Button

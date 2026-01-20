@@ -379,6 +379,7 @@
     "tracking": "Suivi",
     "devices": "Appareils",
     "dataSharing": "Partage de données",
+    "caregiverDataSharingDisabled": "Les soignants n'ont pas accès au partage de données",
     "movement": "Activité",
     "floorPlans": "Plans d'étage",
     "analytics": "Analytique",

@@ -361,6 +361,7 @@
     "tracking": "Tracking",
     "devices": "Devices",
     "dataSharing": "Data Sharing",
+    "caregiverDataSharingDisabled": "Caregivers do not have access to share data",
     "movement": "Activity",
     "floorPlans": "Floor Plans",
     "analytics": "Analytics",

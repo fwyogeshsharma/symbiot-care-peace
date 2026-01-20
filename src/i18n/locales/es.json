@@ -388,6 +388,7 @@
     "tracking": "Seguimiento",
     "devices": "Dispositivos",
     "dataSharing": "Compartir Datos",
+    "caregiverDataSharingDisabled": "Los cuidadores no tienen acceso para compartir datos",
     "movement": "Actividad",
     "floorPlans": "Planos",
     "analytics": "Análisis",
