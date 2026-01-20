@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Activity, Eye, EyeOff, Info, Mail } from 'lucide-react';
+import { Activity, Eye, EyeOff, Info, Mail, CheckCircle } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
@@ -66,6 +66,7 @@ const Auth = () => {
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [pendingRole, setPendingRole] = useState<string>('');
+  const [showAccountCreated, setShowAccountCreated] = useState(false);
   const { signUp, signIn, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -210,6 +211,16 @@ const Auth = () => {
 
     checkDevicesAndRedirect();
   }, [user, isResetPassword, navigate]);
+
+  // Auto-hide account created message after 5 seconds
+  useEffect(() => {
+    if (showAccountCreated) {
+      const timer = setTimeout(() => {
+        setShowAccountCreated(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showAccountCreated]);
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -447,6 +458,7 @@ const Auth = () => {
             setLatitude(null);
             setLongitude(null);
             setIsLogin(true);
+            setShowAccountCreated(true);
             setLoading(false);
             return;
           }
@@ -507,6 +519,7 @@ const Auth = () => {
           setLongitude(null);
           // Switch to login view after successful sign-up
           setIsLogin(true);
+          setShowAccountCreated(true);
         }
       }
     } catch (error) {
@@ -631,6 +644,14 @@ const Auth = () => {
           </form>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+          {isLogin && showAccountCreated && (
+            <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+              <p className="text-sm text-green-700 dark:text-green-300">
+                Account created successfully! Please check your email to verify your account.
+              </p>
+            </div>
+          )}
           {!isLogin && (
             <>
               <div className="space-y-2">
@@ -876,7 +897,10 @@ const Auth = () => {
           <div className="mt-6 text-center">
           <button
             type="button"
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setShowAccountCreated(false);
+            }}
             className="text-sm text-primary hover:underline"
           >
             {isLogin ? t('auth.noAccount') : t('auth.hasAccount')}
