@@ -16,7 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAllDeviceTypes } from '@/hooks/useDeviceTypes';
-import { useAllDeviceCompanies } from '@/hooks/useDeviceCompanies';
+import { useDeviceCompaniesByDeviceType } from '@/hooks/useDeviceCompanies';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -44,8 +44,13 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   // Fetch all device types for the edit dialog
   const { data: allDeviceTypes = [] } = useAllDeviceTypes();
 
-  // Fetch all device companies
-  const { data: deviceCompanies = [] } = useAllDeviceCompanies();
+  // Get the device type ID from the selected device type code in edit form
+  const editDeviceTypeId = editDevice
+    ? allDeviceTypes.find(t => t.code === editDevice.device_type)?.id
+    : undefined;
+
+  // Fetch companies that have models for the selected device type
+  const { data: editDeviceCompanies = [] } = useDeviceCompaniesByDeviceType(editDeviceTypeId);
   
   const { data: devices } = useQuery({
     queryKey: ['devices', selectedPersonId],
@@ -481,10 +486,22 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                 <Label htmlFor="edit-device-type">{t('devices.edit.deviceType')}</Label>
                 <Select
                   value={editDevice.device_type}
-                  onValueChange={(value) => setEditDevice({ ...editDevice, device_type: value })}
+                  onValueChange={(value) => setEditDevice({ ...editDevice, device_type: value, company_id: null })}
                 >
                   <SelectTrigger id="edit-device-type">
-                    <SelectValue />
+                    <SelectValue>
+                      {(() => {
+                        const selectedType = allDeviceTypes.find(t => t.code === editDevice.device_type);
+                        if (!selectedType) return null;
+                        const IconComponent = getIconComponent(selectedType.icon);
+                        return (
+                          <div className="flex items-center gap-2">
+                            {IconComponent && <IconComponent className="w-4 h-4" />}
+                            <span>{selectedType.name}</span>
+                          </div>
+                        );
+                      })()}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {allDeviceTypes.map((type) => {
@@ -517,25 +534,31 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="edit-company">{t('devices.edit.company')}</Label>
-                <Select
-                  value={editDevice.company_id || ''}
-                  onValueChange={(value) => setEditDevice({ ...editDevice, company_id: value || null })}
-                >
-                  <SelectTrigger id="edit-company">
-                    <SelectValue placeholder={t('devices.edit.selectCompany')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {deviceCompanies.map((company) => (
-                      <SelectItem key={company.id} value={company.id}>
-                        {company.name}
-                        {company.description && ` (${company.description})`}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {editDeviceCompanies.length > 0 && (
+                <div className="space-y-2">
+                  <Label htmlFor="edit-company">{t('devices.edit.company')}</Label>
+                  <Select
+                    value={editDevice.company_id || ''}
+                    onValueChange={(value) => setEditDevice({ ...editDevice, company_id: value || null })}
+                  >
+                    <SelectTrigger id="edit-company">
+                      <SelectValue placeholder={t('devices.edit.selectCompany')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {editDeviceCompanies.map((company) => (
+                        <SelectItem key={company.id} value={company.id}>
+                          {company.name}
+                          {company.description && (
+                            <span className="text-muted-foreground text-xs ml-2">
+                              ({company.description})
+                            </span>
+                          )}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="flex gap-2">
                 <Button type="button" variant="outline" className="flex-1" onClick={() => setEditDevice(null)}>
