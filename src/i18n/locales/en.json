@@ -1200,7 +1200,7 @@
   "tracking": {
     "title": "Mobility",
     "subtitle": "Indoor and outdoor positioning system",
-    "movementTracking": "Tracking Monitoring",
+    "movementTracking": "Movement Monitoring",
     "realTimePositioning": "Real-time indoor and outdoor positioning",
     "location": "Current Location",
     "indoor": "Indoor",

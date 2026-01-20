@@ -1163,7 +1163,7 @@
   "tracking": {
     "title": "Mobilité",
     "subtitle": "Système de positionnement intérieur et extérieur",
-    "movementTracking": "Surveillance de Suivi",
+    "movementTracking": "Surveillance de Mouvement",
     "realTimePositioning": "Positionnement intérieur et extérieur en temps réel",
     "location": "Position Actuelle",
     "indoor": "Intérieur",
