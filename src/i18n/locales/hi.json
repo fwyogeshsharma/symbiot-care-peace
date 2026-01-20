@@ -1006,9 +1006,9 @@
     }
   },
   "tracking": {
-    "title": "ट्रैकिंग",
+    "title": "गतिशीलता",
     "subtitle": "इंडोर और आउटडोर पोजिशनिंग सिस्टम",
-    "movementTracking": "मूवमेंट ट्रैकिंग",
+    "movementTracking": "ट्रैकिंग मॉनिटरिंग",
     "realTimePositioning": "रीयल-टाइम इंडोर और आउटडोर पोजिशनिंग",
     "location": "वर्तमान स्थान",
     "indoor": "इंडोर",

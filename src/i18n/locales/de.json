@@ -1167,9 +1167,9 @@
     }
   },
   "tracking": {
-    "title": "Verfolgung",
+    "title": "Mobilität",
     "subtitle": "Innen- und Außenpositionierungssystem",
-    "movementTracking": "Bewegungsverfolgung",
+    "movementTracking": "Tracking-Überwachung",
     "realTimePositioning": "Echtzeit-Innen- und Außenpositionierung",
     "location": "Aktueller Standort",
     "indoor": "Innen",

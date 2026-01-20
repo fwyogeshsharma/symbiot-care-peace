@@ -1198,9 +1198,9 @@
     }
   },
   "tracking": {
-    "title": "Tracking",
+    "title": "Mobility",
     "subtitle": "Indoor and outdoor positioning system",
-    "movementTracking": "Movement Tracking",
+    "movementTracking": "Tracking Monitoring",
     "realTimePositioning": "Real-time indoor and outdoor positioning",
     "location": "Current Location",
     "indoor": "Indoor",
@@ -1455,7 +1455,7 @@
     "description": "Comprehensive health monitoring and vital signs tracking"
   },
   "movement": {
-    "title": "Activity Dashboard",
+    "title": "Movement Monitoring",
     "subtitle": "Track activity patterns over time",
     "description": "Track and visualize activity patterns over time",
     "selectPeriod": "Select period",
