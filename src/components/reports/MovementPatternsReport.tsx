@@ -5,6 +5,12 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { format, getHours, differenceInMinutes } from 'date-fns';
 import { MapPin, Clock, TrendingUp, Activity } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import {
+  Tooltip as UITooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface MovementPatternsReportProps {
   selectedPerson: string;
@@ -39,31 +45,56 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
   // Helper to extract location from value
   const extractLocation = (value: any): string | null => {
     if (typeof value === 'object' && value !== null) {
-      return value?.location || value?.room || null;
+      return value?.zone || value?.location || value?.room || null;
     }
     return typeof value === 'string' ? value : null;
   };
 
-  // Process location transitions
+  // Helper to extract just the zone name string
+  const getZoneName = (locationValue: any): string => {
+    if (typeof locationValue === 'string') {
+      return locationValue;
+    }
+    if (typeof locationValue === 'object' && locationValue !== null) {
+      return locationValue?.zone || locationValue?.location || locationValue?.room || 'Unknown';
+    }
+    return 'Unknown';
+  };
+
+  // Process location transitions with full data
   const locationTransitions = locationData.reduce((acc: any, item, index) => {
     if (index === 0) return acc;
 
     const prevLocation = locationData[index - 1];
+    const currentValue = typeof item.value === 'object' ? item.value : { zone: item.value };
+    const prevValue = typeof prevLocation.value === 'object' ? prevLocation.value : { zone: prevLocation.value };
+
     const currentLoc = extractLocation(item.value);
     const prevLoc = extractLocation(prevLocation.value);
 
     if (currentLoc !== prevLoc && currentLoc && prevLoc) {
-      const transition = `${prevLoc} → ${currentLoc}`;
-      acc[transition] = (acc[transition] || 0) + 1;
+      const fromZoneName = getZoneName(prevValue);
+      const toZoneName = getZoneName(currentValue);
+      const transitionKey = `${fromZoneName} → ${toZoneName}`;
+
+      if (!acc[transitionKey]) {
+        acc[transitionKey] = {
+          count: 0,
+          fromZone: fromZoneName,
+          toZone: toZoneName,
+          fromData: prevValue,
+          toData: currentValue,
+        };
+      }
+      acc[transitionKey].count += 1;
     }
 
     return acc;
   }, {});
 
-  const transitionData = Object.entries(locationTransitions).map(([transition, count]) => ({
-    transition,
-    count,
-  })).sort((a: any, b: any) => b.count - a.count).slice(0, 10);
+  const transitionData = Object.values(locationTransitions)
+    .sort((a: any, b: any) => b.count - a.count)
+    .slice(0, 10);
 
   // Time of day activity distribution
   const hourlyActivity = locationData.reduce((acc: any, item) => {
@@ -121,7 +152,7 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
   }).filter(Boolean)).size;
 
   const mostVisitedLocation = dwellTimeData[0];
-  const totalTransitions = (Object.values(locationTransitions) as number[]).reduce((sum, count) => sum + count, 0);
+  const totalTransitions = (Object.values(locationTransitions) as any[]).reduce((sum, item) => sum + item.count, 0);
 
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
@@ -309,24 +340,67 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {transitionData.map((item: any, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm">
-                      {index + 1}
-                    </div>
-                    <span className="font-medium">{item.transition}</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xl font-bold">{item.count}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {t('reports.movementPatterns.transitions', { defaultValue: 'transitions' })}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TooltipProvider>
+              <div className="space-y-3">
+                {transitionData.map((item: any, index) => (
+                  <UITooltip key={index}>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-help transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm">
+                            {index + 1}
+                          </div>
+                          <span className="font-medium">
+                            zone: {item.fromZone} → zone: {item.toZone}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xl font-bold">{item.count}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {t('reports.movementPatterns.transitions', { defaultValue: 'transitions' })}
+                          </div>
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xl w-[28rem]">
+                      <div className="space-y-3 text-sm">
+                        <div className="font-semibold border-b pb-1">Transition Details</div>
+                        <div className="space-y-2">
+                          <div className="border-l-2 border-primary pl-2">
+                            <div className="font-medium text-xs text-muted-foreground mb-1">From: {item.fromZone}</div>
+                            {item.fromData.x !== undefined && (
+                              <div className="text-xs space-y-0.5">
+                                <div>Position: ({item.fromData.x?.toFixed(2)}, {item.fromData.y?.toFixed(2)})</div>
+                                {item.fromData.accuracy !== undefined && (
+                                  <div>Accuracy: {(item.fromData.accuracy * 100).toFixed(0)}%</div>
+                                )}
+                                {item.fromData.speed !== undefined && (
+                                  <div>Speed: {item.fromData.speed?.toFixed(1)} m/s</div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <div className="border-l-2 border-green-500 pl-2">
+                            <div className="font-medium text-xs text-muted-foreground mb-1">To: {item.toZone}</div>
+                            {item.toData.x !== undefined && (
+                              <div className="text-xs space-y-0.5">
+                                <div>Position: ({item.toData.x?.toFixed(2)}, {item.toData.y?.toFixed(2)})</div>
+                                {item.toData.accuracy !== undefined && (
+                                  <div>Accuracy: {(item.toData.accuracy * 100).toFixed(0)}%</div>
+                                )}
+                                {item.toData.speed !== undefined && (
+                                  <div>Speed: {item.toData.speed?.toFixed(1)} m/s</div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </TooltipContent>
+                  </UITooltip>
+                ))}
+              </div>
+            </TooltipProvider>
           </CardContent>
         </Card>
       )}
