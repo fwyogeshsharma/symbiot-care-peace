@@ -26,7 +26,8 @@
       "Bash(findstr:*)",
       "Bash(npm install:*)",
       "Bash(node scripts/check_device_data.js:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

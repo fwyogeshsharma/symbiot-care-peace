@@ -1650,7 +1650,7 @@
       },
       "indoorTracking": {
         "title": "Suivi Intérieur avec Plans d'Étage",
-        "content": "Voir la localisation en temps réel sur les plans d'étage téléchargés. Créer des zones pour définir des espaces comme chambre, cuisine, salle de bain. Suivre les trajets de mouvement et les temps de séjour dans chaque zone."
+        "content": "Voir la localisation en temps réel sur les plans d'étage téléchargés. Créer des zones pour définir des espaces comme chambre, cuisine, salle de bain. Suivre les trajets de mouvement et les temps de séjour dans chaque zone. Les bâtiments à plusieurs étages sont entièrement pris en charge - téléchargez des plans d'étage pour chaque niveau pour suivre la localisation sur plusieurs étages."
       },
       "outdoorTracking": {
         "title": "Suivi GPS Extérieur",

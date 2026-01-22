@@ -1664,7 +1664,7 @@
       },
       "indoorTracking": {
         "title": "Seguimiento Interior con Planos de Planta",
-        "content": "Ve ubicación en tiempo real en planos de planta cargados. Crea zonas para definir áreas como dormitorio, cocina, baño. Rastrea rutas de movimiento y tiempos de permanencia en cada zona."
+        "content": "Ve ubicación en tiempo real en planos de planta cargados. Crea zonas para definir áreas como dormitorio, cocina, baño. Rastrea rutas de movimiento y tiempos de permanencia en cada zona. Los edificios de varios pisos son totalmente compatibles: cargue planos de planta para cada nivel para rastrear la ubicación en múltiples pisos."
       },
       "outdoorTracking": {
         "title": "Seguimiento GPS Exterior",
@@ -2431,11 +2431,11 @@
         "questions": {
           "indoorTracking": {
             "question": "¿Cómo funciona el seguimiento en interiores?",
-            "answer": "El seguimiento en interiores utiliza planos de planta que configura en 'Gestión de Planos de Planta'. Cargue o cree un plano de planta de su hogar, coloque sensores de posicionamiento o balizas, y el sistema rastreará el movimiento entre habitaciones. Esto ayuda a monitorear patrones de actividad y detectar comportamientos inusuales."
+            "answer": "El seguimiento en interiores utiliza planos de planta que configura en 'Gestión de Planos de Planta'. Cargue o cree un plano de planta de su hogar, coloque sensores de posicionamiento o balizas, y el sistema rastreará el movimiento entre habitaciones. Los edificios de varios pisos son totalmente compatibles: simplemente cargue planos de planta para cada nivel. Esto ayuda a monitorear patrones de actividad y detectar comportamientos inusuales."
           },
           "setupFloorPlan": {
             "question": "¿Cómo configuro un plano de planta?",
-            "answer": "Navegue a 'Gestión de Planos de Planta' desde la barra lateral. Haga clic en 'Agregar Plano de Planta', cargue una imagen de su diseño de piso o dibuje uno usando nuestro editor. Luego marque habitaciones, puertas y posiciones de sensores. Guarde la configuración y asígnela al individuo monitoreado."
+            "answer": "Navegue a 'Gestión de Planos de Planta' desde la barra lateral. Haga clic en 'Agregar Plano de Planta', cargue una imagen de su diseño de piso o dibuje uno usando nuestro editor. Luego marque habitaciones, puertas y posiciones de sensores. Para edificios de varios pisos, agregue un plano de planta separado para cada nivel. Guarde la configuración y asígnela al individuo monitoreado."
           },
           "outdoorTracking": {
             "question": "¿Puedo rastrear la ubicación al aire libre?",

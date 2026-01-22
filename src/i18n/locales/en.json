@@ -1862,7 +1862,7 @@
       },
       "indoorTracking": {
         "title": "Indoor Tracking with Floor Plans",
-        "content": "View real-time location on uploaded floor plans. Create zones to define areas like bedroom, kitchen, bathroom. Track movement paths and dwell times in each zone."
+        "content": "View real-time location on uploaded floor plans. Create zones to define areas like bedroom, kitchen, bathroom. Track movement paths and dwell times in each zone. Multi-story buildings are fully supported - upload floor plans for each level to track location across multiple floors."
       },
       "outdoorTracking": {
         "title": "Outdoor GPS Tracking",
@@ -2730,11 +2730,11 @@
         "questions": {
           "indoorTracking": {
             "question": "How does indoor tracking work?",
-            "answer": "Indoor tracking uses floor plans that you configure in 'Floor Plan Management'. Upload or create a floor plan of your home, place positioning sensors or beacons, and the system will track movement between rooms. This helps monitor activity patterns and detect unusual behavior."
+            "answer": "Indoor tracking uses floor plans that you configure in 'Floor Plan Management'. Upload or create a floor plan of your home, place positioning sensors or beacons, and the system will track movement between rooms. Multi-story buildings are fully supported - simply upload floor plans for each level. This helps monitor activity patterns and detect unusual behavior."
           },
           "setupFloorPlan": {
             "question": "How do I set up a floor plan?",
-            "answer": "Navigate to 'Floor Plan Management' from the sidebar. Click 'Add Floor Plan', upload an image of your floor layout or draw one using our editor. Then mark rooms, doors, and sensor positions. Save the configuration and assign it to the monitored individual."
+            "answer": "Navigate to 'Floor Plan Management' from the sidebar. Click 'Add Floor Plan', upload an image of your floor layout or draw one using our editor. Then mark rooms, doors, and sensor positions. For multi-story buildings, add a separate floor plan for each level. Save the configuration and assign it to the monitored individual."
           },
           "outdoorTracking": {
             "question": "Can I track outdoor location?",

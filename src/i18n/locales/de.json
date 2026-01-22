@@ -1656,7 +1656,7 @@
       },
       "indoorTracking": {
         "title": "Innenverfolgung mit Grundrissen",
-        "content": "Echtzeit-Standort auf hochgeladenen Grundrissen anzeigen. Zonen erstellen, um Bereiche wie Schlafzimmer, Küche, Bad zu definieren. Bewegungspfade und Verweildauern in jeder Zone verfolgen."
+        "content": "Echtzeit-Standort auf hochgeladenen Grundrissen anzeigen. Zonen erstellen, um Bereiche wie Schlafzimmer, Küche, Bad zu definieren. Bewegungspfade und Verweildauern in jeder Zone verfolgen. Mehrstöckige Gebäude werden vollständig unterstützt - laden Sie Grundrisse für jede Etage hoch, um die Position über mehrere Stockwerke hinweg zu verfolgen."
       },
       "outdoorTracking": {
         "title": "GPS-Außenverfolgung",
