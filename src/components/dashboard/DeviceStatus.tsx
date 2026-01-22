@@ -331,6 +331,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                         e.stopPropagation();
                         setEditDevice(device);
                       }}
+                      title={t('devices.edit.title', { defaultValue: 'Edit' })}
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </Button>
@@ -342,6 +343,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                         e.stopPropagation();
                         setDeleteDevice(device);
                       }}
+                      title={t('devices.delete.title', { defaultValue: 'Delete' })}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
