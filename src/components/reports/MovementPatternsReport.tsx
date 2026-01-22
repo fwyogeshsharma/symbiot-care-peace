@@ -61,16 +61,28 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
     return 'Unknown';
   };
 
+  // Helper to parse value if it's a JSON string
+  const parseValue = (value: any): any => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return { zone: value };
+      }
+    }
+    return value;
+  };
+
   // Process location transitions with full data
   const locationTransitions = locationData.reduce((acc: any, item, index) => {
     if (index === 0) return acc;
 
     const prevLocation = locationData[index - 1];
-    const currentValue = typeof item.value === 'object' ? item.value : { zone: item.value };
-    const prevValue = typeof prevLocation.value === 'object' ? prevLocation.value : { zone: prevLocation.value };
+    const currentValue = parseValue(item.value);
+    const prevValue = parseValue(prevLocation.value);
 
-    const currentLoc = extractLocation(item.value);
-    const prevLoc = extractLocation(prevLocation.value);
+    const currentLoc = extractLocation(currentValue);
+    const prevLoc = extractLocation(prevValue);
 
     if (currentLoc !== prevLoc && currentLoc && prevLoc) {
       const fromZoneName = getZoneName(prevValue);
@@ -116,9 +128,9 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
   const dwellTimeByLocation = locationData.reduce((acc: any, item, index) => {
     if (index === 0) return acc;
 
-    const currentLoc = extractLocation(item.value);
+    const currentLoc = extractLocation(parseValue(item.value));
     const prevItem = locationData[index - 1];
-    const prevLoc = extractLocation(prevItem.value);
+    const prevLoc = extractLocation(parseValue(prevItem.value));
 
     if (currentLoc === prevLoc && currentLoc) {
       const duration = differenceInMinutes(new Date(item.recorded_at), new Date(prevItem.recorded_at));
@@ -148,7 +160,7 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
   // Calculate statistics
   const totalMovements = locationData.length;
   const totalLocations = new Set(locationData.map(item => {
-    return extractLocation(item.value);
+    return extractLocation(parseValue(item.value));
   }).filter(Boolean)).size;
 
   const mostVisitedLocation = dwellTimeData[0];
@@ -351,7 +363,7 @@ export const MovementPatternsReport = ({ selectedPerson, dateRange }: MovementPa
                             {index + 1}
                           </div>
                           <span className="font-medium">
-                            zone: {item.fromZone} → zone: {item.toZone}
+                            {item.fromZone} → {item.toZone}
                           </span>
                         </div>
                         <div className="text-right">
