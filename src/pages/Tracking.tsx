@@ -18,7 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/layout/Header';
 import ElderlyList from '@/components/dashboard/ElderlyList';
-import { Calendar, MapPin, Navigation, Camera } from 'lucide-react';
+import { Calendar, MapPin, Navigation, Camera, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
@@ -32,6 +32,7 @@ import {
 import { getDateRangePreset } from '@/lib/movementUtils';
 import { useTranslation } from 'react-i18next';
 import { Footer } from '@/components/Footer';
+import { toast } from 'sonner';
 
 export default function Tracking() {
   const { t } = useTranslation();
@@ -287,6 +288,38 @@ export default function Tracking() {
     }
   };
 
+  const handleEditFloorPlan = (floorPlanId: string) => {
+    navigate(`/floor-plan-editor/${selectedPersonId}/${floorPlanId}`);
+  };
+
+  const handleDeleteFloorPlan = async (floorPlanId: string, floorPlanName: string) => {
+    if (!confirm(`Are you sure you want to delete "${floorPlanName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('floor_plans')
+        .delete()
+        .eq('id', floorPlanId);
+
+      if (error) throw error;
+
+      // If we deleted the currently selected floor plan, clear the selection
+      if (selectedFloorPlanId === floorPlanId) {
+        setSelectedFloorPlanId(null);
+      }
+
+      // Refresh floor plans list
+      await queryClient.invalidateQueries({ queryKey: ['floor-plans', selectedPersonId] });
+
+      toast.success(`Floor plan "${floorPlanName}" deleted successfully`);
+    } catch (error: any) {
+      console.error('Error deleting floor plan:', error);
+      toast.error(error.message || 'Failed to delete floor plan');
+    }
+  };
+
   // Reset position index when data changes
   useEffect(() => {
     setCurrentPositionIndex(0);
@@ -463,20 +496,52 @@ export default function Tracking() {
                         <h3 className="text-sm font-semibold mb-3">{t('tracking.selectFloorPlan', 'Select Floor Plan')}</h3>
                         <div className="space-y-2">
                           {floorPlans.map((floorPlan) => (
-                            <button
+                            <div
                               key={floorPlan.id}
-                              onClick={() => setSelectedFloorPlanId(floorPlan.id)}
-                              className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
+                              className={`w-full px-3 py-2 rounded-md transition-colors ${
                                 selectedFloorPlanId === floorPlan.id
                                   ? 'bg-primary text-primary-foreground'
                                   : 'bg-muted hover:bg-muted/80'
                               }`}
                             >
-                              <div className="font-medium text-sm">{floorPlan.name}</div>
-                              <div className="text-xs opacity-80">
-                                {floorPlan.width}m × {floorPlan.height}m
+                              <div className="flex items-center justify-between gap-2">
+                                <button
+                                  onClick={() => setSelectedFloorPlanId(floorPlan.id)}
+                                  className="flex-1 text-left min-w-0"
+                                >
+                                  <div className="font-medium text-sm truncate">{floorPlan.name}</div>
+                                  <div className="text-xs opacity-80">
+                                    {floorPlan.width}m × {floorPlan.height}m
+                                  </div>
+                                </button>
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEditFloorPlan(floorPlan.id);
+                                    }}
+                                    title="Edit floor plan"
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7 hover:bg-destructive hover:text-destructive-foreground"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteFloorPlan(floorPlan.id, floorPlan.name);
+                                    }}
+                                    title="Delete floor plan"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
                               </div>
-                            </button>
+                            </div>
                           ))}
                         </div>
                       </div>
