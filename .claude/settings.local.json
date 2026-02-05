@@ -27,7 +27,20 @@
       "Bash(npm install:*)",
       "Bash(node scripts/check_device_data.js:*)",
       "Bash(npm uninstall:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(openclaw gateway start:*)",
+      "Bash(openclaw gateway)",
+      "Bash(timeout 3 cmd /c \"type C:\\\\Users\\\\ACSS\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\E--Projects-symbiot-care-peace\\\\tasks\\\\b851e89.output\")",
+      "Bash(start:*)",
+      "Bash(timeout 5 netstat:*)",
+      "Bash(tasklist:*)",
+      "Bash(timeout 2 cmd /c \"if exist \\\\tmp\\\\openclaw\\\\openclaw-2026-02-03.log \\(tail -n 20 \\\\tmp\\\\openclaw\\\\openclaw-2026-02-03.log\\) else \\(echo Log file not found\\)\")",
+      "Bash(timeout 3 cmd /c \"ping 127.0.0.1 -n 4 > nul && netstat -ano | findstr LISTENING | findstr 18789\")",
+      "Bash(netstat:*)",
+      "Bash(timeout:*)",
+      "Bash(head:*)",
+      "Bash(tree:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

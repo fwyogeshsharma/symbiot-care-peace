@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from 'react-i18next';
-import { geminiService, ChatMessage } from '@/services/geminiService';
+import { nvidiaService, ChatMessage } from '@/services/nvidiaService';
 import { toast } from 'sonner';
 
 export const Chatbot = () => {
@@ -64,12 +64,6 @@ export const Chatbot = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
-    // Check if API key is configured
-    if (!geminiService.isConfigured()) {
-      toast.error('Chatbot is not configured. Please add your Gemini API key to continue.');
-      return;
-    }
-
     const userMessage: ChatMessage = {
       role: 'user',
       content: inputMessage.trim(),
@@ -82,8 +76,8 @@ export const Chatbot = () => {
     setIsLoading(true);
 
     try {
-      // Get response from Gemini
-      const response = await geminiService.sendMessage(updatedMessages, i18n.language);
+      // Get response from NVIDIA AI
+      const response = await nvidiaService.sendMessage(updatedMessages, i18n.language);
 
       // Add assistant response to chat
       setMessages([
