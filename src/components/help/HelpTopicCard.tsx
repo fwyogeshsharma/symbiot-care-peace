@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Play, Image as ImageIcon, Youtube } from 'lucide-react';
 import { HelpTopic } from '@/data/help-content';
 import { cn } from '@/lib/utils';
+import { VideoDialog } from './VideoDialog';
 
 interface HelpTopicCardProps {
   topic: HelpTopic;
@@ -13,14 +14,15 @@ interface HelpTopicCardProps {
   compact?: boolean;
 }
 
-export const HelpTopicCard = ({ 
-  topic, 
-  onNavigate, 
+export const HelpTopicCard = ({
+  topic,
+  onNavigate,
   highlighted = false,
   showCategory = false,
   compact = false
 }: HelpTopicCardProps) => {
   const [mediaError, setMediaError] = useState(false);
+  const [videoDialogOpen, setVideoDialogOpen] = useState(false);
 
   return (
     <div
@@ -53,8 +55,8 @@ export const HelpTopicCard = ({
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0 shrink-0"
-              onClick={() => window.open(topic.youtubeUrl, '_blank')}
-              title="Watch on YouTube"
+              onClick={() => setVideoDialogOpen(true)}
+              title="Watch Video"
             >
               <Youtube className="w-4 h-4 text-red-600" />
             </Button>
@@ -103,6 +105,16 @@ export const HelpTopicCard = ({
         >
           Go to page <ArrowRight className="w-3 h-3 ml-1" />
         </Button>
+      )}
+
+      {/* Video Dialog */}
+      {topic.youtubeUrl && (
+        <VideoDialog
+          open={videoDialogOpen}
+          onOpenChange={setVideoDialogOpen}
+          youtubeUrl={topic.youtubeUrl}
+          title={topic.title}
+        />
       )}
     </div>
   );

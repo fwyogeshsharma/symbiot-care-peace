@@ -94,7 +94,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.alerts'),
     keywords: ['alert', 'notification', 'warning', 'emergency'],
     relatedPages: ['/alerts'],
-    youtubeUrl: 'https://youtu.be/u4jtgPbpp1k',
+    youtubeUrl: 'https://youtu.be/6EYLDBcA4p4',
   },
   {
     id: 'alert-severity',
@@ -130,7 +130,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.devices'),
     keywords: ['device', 'monitor', 'status', 'online', 'offline', 'battery'],
     relatedPages: ['/device-status'],
-    youtubeUrl: 'https://youtu.be/tfB-o3ov4RQ',
+    youtubeUrl: 'https://youtu.be/bNwm3ejlxeM',
   },
   {
     id: 'device-types',
@@ -317,7 +317,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['alert', 'notification', 'warning', 'emergency'],
     relatedPages: ['/alerts'],
-    youtubeUrl: 'https://youtu.be/uLXOgl1z6BU',
+    youtubeUrl: 'https://youtu.be/6EYLDBcA4p4',
   },
   {
     id: 'alert-severity',
@@ -354,7 +354,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Devices',
     keywords: ['device', 'monitor', 'status', 'online', 'offline', 'battery'],
     relatedPages: ['/device-status'],
-    youtubeUrl: 'https://youtu.be/tfB-o3ov4RQ',
+    youtubeUrl: 'https://youtu.be/bNwm3ejlxeM',
   },
   {
     id: 'device-types',
