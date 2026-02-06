@@ -325,10 +325,29 @@ export default function Tracking() {
     setCurrentPositionIndex(0);
   }, [positionData]);
 
+  // Filter position data by selected floor plan
+  const filteredPositionData = useMemo(() => {
+    if (!selectedFloorPlanId || !positionData.length) {
+      return positionData;
+    }
+
+    // Filter positions that match the selected floor plan
+    return positionData.filter(item => {
+      try {
+        // Parse the value JSON to get floor_plan_id
+        const value = typeof item.value === 'string' ? JSON.parse(item.value) : item.value;
+        return value.floor_plan_id === selectedFloorPlanId;
+      } catch (error) {
+        // If parsing fails or no floor_plan_id, exclude this position
+        return false;
+      }
+    });
+  }, [positionData, selectedFloorPlanId]);
+
   // Process indoor tracking data - Memoized to avoid recomputation on every render
   const processedData = useMemo(
-    () => activeTab === 'indoor' ? processPositionData(positionData) : null,
-    [positionData, activeTab]
+    () => activeTab === 'indoor' ? processPositionData(filteredPositionData) : null,
+    [filteredPositionData, activeTab]
   );
 
   const positionEvents = useMemo(
