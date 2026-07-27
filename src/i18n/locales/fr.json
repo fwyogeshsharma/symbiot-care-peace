@@ -1154,6 +1154,27 @@
       "deleteExpired": "Supprimer la Demande Expirée",
       "deleted": "Demande d'appairage supprimée",
       "deleteFailed": "Échec de la suppression de la demande d'appairage"
+    },
+    "sync": {
+      "title": "Synchroniser les Appareils",
+      "description": "Synchronisez vos appareils de fitness connectés via Bluetooth pour récupérer leurs dernières mesures.",
+      "syncAll": "Synchroniser Tous les Appareils",
+      "syncOne": "Synchroniser",
+      "statusIdle": "Pas encore synchronisé",
+      "statusScanning": "Recherche de l'appareil...",
+      "statusConnecting": "Connexion...",
+      "statusSyncing": "Synchronisation...",
+      "statusSuccess": "Synchronisé",
+      "statusUnsupported": "Aucune donnée disponible pour cet appareil",
+      "statusFailed": "Échec de la synchronisation",
+      "lastSynced": "Dernière synchronisation : {{time}}",
+      "webNotSupported": "La synchronisation Bluetooth nécessite l'application mobile installée et ne fonctionne pas dans un navigateur.",
+      "noDevices": "Aucun appareil à synchroniser pour le moment. Enregistrez d'abord un appareil.",
+      "healthConnect": {
+        "tooltip": "Synchroniser depuis Health Connect",
+        "notInstalled": "Health Connect n'est pas installé, les données d'applications comme Zepp ne peuvent donc pas encore être transmises.",
+        "installAction": "Installer Health Connect"
+      }
     }
   },
   "tracking": {

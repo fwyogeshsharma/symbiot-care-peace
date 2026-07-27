@@ -993,6 +993,27 @@
       "approveFailed": "स्वीकृति विफल",
       "rejected": "पेयरिंग अनुरोध अस्वीकृत",
       "rejectFailed": "अस्वीकृति विफल"
+    },
+    "sync": {
+      "title": "डिवाइस सिंक करें",
+      "description": "नवीनतम रीडिंग प्राप्त करने के लिए अपने कनेक्टेड फ़िटनेस डिवाइस को ब्लूटूथ पर सिंक करें।",
+      "syncAll": "सभी डिवाइस सिंक करें",
+      "syncOne": "सिंक करें",
+      "statusIdle": "अभी तक सिंक नहीं हुआ",
+      "statusScanning": "डिवाइस खोजा जा रहा है...",
+      "statusConnecting": "कनेक्ट हो रहा है...",
+      "statusSyncing": "सिंक हो रहा है...",
+      "statusSuccess": "सिंक हो गया",
+      "statusUnsupported": "इस डिवाइस से कोई डेटा उपलब्ध नहीं है",
+      "statusFailed": "सिंक विफल",
+      "lastSynced": "अंतिम सिंक: {{time}}",
+      "webNotSupported": "ब्लूटूथ सिंक के लिए इंस्टॉल किया गया मोबाइल ऐप आवश्यक है और यह ब्राउज़र में काम नहीं करेगा।",
+      "noDevices": "सिंक करने के लिए अभी कोई डिवाइस नहीं है। पहले एक डिवाइस पंजीकृत करें।",
+      "healthConnect": {
+        "tooltip": "Health Connect से सिंक करें",
+        "notInstalled": "Health Connect इंस्टॉल नहीं है, इसलिए Zepp जैसे ऐप्स का डेटा अभी नहीं आ सकता।",
+        "installAction": "Health Connect इंस्टॉल करें"
+      }
     }
   },
   "tracking": {

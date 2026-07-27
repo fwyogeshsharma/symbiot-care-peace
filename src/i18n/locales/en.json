@@ -1124,6 +1124,27 @@
       "deleteExpired": "Delete Expired Request",
       "deleted": "Pairing request deleted",
       "deleteFailed": "Failed to delete pairing request"
+    },
+    "sync": {
+      "title": "Sync Devices",
+      "description": "Sync your connected fitness devices over Bluetooth to pull in their latest readings.",
+      "syncAll": "Sync All Devices",
+      "syncOne": "Sync",
+      "statusIdle": "Not synced yet",
+      "statusScanning": "Looking for device...",
+      "statusConnecting": "Connecting...",
+      "statusSyncing": "Syncing...",
+      "statusSuccess": "Synced",
+      "statusUnsupported": "No data available from this device",
+      "statusFailed": "Sync failed",
+      "lastSynced": "Last synced {{time}}",
+      "webNotSupported": "Bluetooth sync requires the installed mobile app and won't work in a browser.",
+      "noDevices": "No devices to sync yet. Register a device first.",
+      "healthConnect": {
+        "tooltip": "Sync from Health Connect",
+        "notInstalled": "Health Connect isn't installed, so data from apps like Zepp can't come through yet.",
+        "installAction": "Install Health Connect"
+      }
     }
   },
   "tracking": {

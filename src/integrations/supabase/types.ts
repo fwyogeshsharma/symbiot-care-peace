@@ -519,6 +519,7 @@ export type Database = {
         Row: {
           api_key: string
           battery_level: number | null
+          ble_device_id: string | null
           company_id: string | null
           created_at: string
           device_id: string
@@ -535,6 +536,7 @@ export type Database = {
         Insert: {
           api_key?: string
           battery_level?: number | null
+          ble_device_id?: string | null
           company_id?: string | null
           created_at?: string
           device_id: string
@@ -551,6 +553,7 @@ export type Database = {
         Update: {
           api_key?: string
           battery_level?: number | null
+          ble_device_id?: string | null
           company_id?: string | null
           created_at?: string
           device_id?: string

@@ -1154,6 +1154,27 @@
       "deleteExpired": "Abgelaufene Anfrage löschen",
       "deleted": "Kopplungsanfrage gelöscht",
       "deleteFailed": "Löschen der Kopplungsanfrage fehlgeschlagen"
+    },
+    "sync": {
+      "title": "Geräte Synchronisieren",
+      "description": "Synchronisieren Sie Ihre verbundenen Fitnessgeräte über Bluetooth, um die neuesten Messwerte abzurufen.",
+      "syncAll": "Alle Geräte Synchronisieren",
+      "syncOne": "Synchronisieren",
+      "statusIdle": "Noch nicht synchronisiert",
+      "statusScanning": "Gerät wird gesucht...",
+      "statusConnecting": "Verbindung wird hergestellt...",
+      "statusSyncing": "Wird synchronisiert...",
+      "statusSuccess": "Synchronisiert",
+      "statusUnsupported": "Keine Daten von diesem Gerät verfügbar",
+      "statusFailed": "Synchronisierung fehlgeschlagen",
+      "lastSynced": "Zuletzt synchronisiert: {{time}}",
+      "webNotSupported": "Die Bluetooth-Synchronisierung erfordert die installierte mobile App und funktioniert nicht im Browser.",
+      "noDevices": "Noch keine Geräte zum Synchronisieren. Registrieren Sie zuerst ein Gerät.",
+      "healthConnect": {
+        "tooltip": "Von Health Connect synchronisieren",
+        "notInstalled": "Health Connect ist nicht installiert, daher können Daten von Apps wie Zepp noch nicht übertragen werden.",
+        "installAction": "Health Connect installieren"
+      }
     }
   },
   "tracking": {

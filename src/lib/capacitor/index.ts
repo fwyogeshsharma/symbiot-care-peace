@@ -35,6 +35,12 @@ export * from './network';
 // Device information services
 export * from './device';
 
+// Bluetooth Low Energy device sync services
+export * from './bluetooth';
+
+// Android Health Connect device sync services
+export * from './healthConnect';
+
 // Re-export commonly used types
 export type { Directory, Encoding } from '@capacitor/filesystem';
 export type { CameraSource, CameraResultType } from '@capacitor/camera';

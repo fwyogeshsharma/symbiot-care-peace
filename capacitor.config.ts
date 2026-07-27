@@ -34,6 +34,9 @@ const config: CapacitorConfig = {
     },
     Camera: {
       // Camera settings
+    },
+    BluetoothLe: {
+      androidNeverForLocation: true
     }
   }
 };

@@ -1154,6 +1154,27 @@
       "deleteExpired": "Eliminar Solicitud Expirada",
       "deleted": "Solicitud de emparejamiento eliminada",
       "deleteFailed": "Error al eliminar solicitud de emparejamiento"
+    },
+    "sync": {
+      "title": "Sincronizar Dispositivos",
+      "description": "Sincroniza tus dispositivos de fitness conectados por Bluetooth para obtener sus últimas lecturas.",
+      "syncAll": "Sincronizar Todos los Dispositivos",
+      "syncOne": "Sincronizar",
+      "statusIdle": "Aún no sincronizado",
+      "statusScanning": "Buscando dispositivo...",
+      "statusConnecting": "Conectando...",
+      "statusSyncing": "Sincronizando...",
+      "statusSuccess": "Sincronizado",
+      "statusUnsupported": "No hay datos disponibles de este dispositivo",
+      "statusFailed": "Error al sincronizar",
+      "lastSynced": "Última sincronización: {{time}}",
+      "webNotSupported": "La sincronización por Bluetooth requiere la app móvil instalada y no funciona en un navegador.",
+      "noDevices": "Aún no hay dispositivos para sincronizar. Registra un dispositivo primero.",
+      "healthConnect": {
+        "tooltip": "Sincronizar desde Health Connect",
+        "notInstalled": "Health Connect no está instalado, así que los datos de apps como Zepp aún no pueden llegar.",
+        "installAction": "Instalar Health Connect"
+      }
     }
   },
   "tracking": {
