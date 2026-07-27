@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Wand2, Loader2 } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Wifi, WifiOff, Battery, BatteryWarning, Copy, Check, History, Pencil, Trash2, Loader2, ArrowRight, LucideIcon } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import DeviceManagement from './DeviceManagement';
@@ -15,10 +15,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { generateSampleDataPoints, generateSampleDataFromModelSpecs } from '@/lib/sampleDataGenerator';
 import { useAllDeviceTypes } from '@/hooks/useDeviceTypes';
-import { useAllDeviceCompanies } from '@/hooks/useDeviceCompanies';
+import { useDeviceCompaniesByDeviceType } from '@/hooks/useDeviceCompanies';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 interface DeviceStatusProps {
   selectedPersonId?: string | null;
@@ -34,12 +34,23 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   const [copiedApiKey, setCopiedApiKey] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+  const navigate = useNavigate();
+
+  const getIconComponent = (iconName: string | null): LucideIcon | null => {
+    if (!iconName) return null;
+    return (Icons as any)[iconName] || null;
+  };
+
   // Fetch all device types for the edit dialog
   const { data: allDeviceTypes = [] } = useAllDeviceTypes();
 
-  // Fetch all device companies
-  const { data: deviceCompanies = [] } = useAllDeviceCompanies();
+  // Get the device type ID from the selected device type code in edit form
+  const editDeviceTypeId = editDevice
+    ? allDeviceTypes.find(t => t.code === editDevice.device_type)?.id
+    : undefined;
+
+  // Fetch companies that have models for the selected device type
+  const { data: editDeviceCompanies = [] } = useDeviceCompaniesByDeviceType(editDeviceTypeId);
   
   const { data: devices } = useQuery({
     queryKey: ['devices', selectedPersonId],
@@ -63,24 +74,24 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
   });
 
   // Fetch data counts for each device
-  const { data: dataCounts = {} } = useQuery({
+  const { data: dataCounts = {}, isLoading: isLoadingCounts } = useQuery({
     queryKey: ['device-data-counts', selectedPersonId],
     queryFn: async () => {
       if (!devices || devices.length === 0) return {};
-      
+
       const counts: Record<string, number> = {};
-      
+
       for (const device of devices) {
         const { count, error } = await supabase
           .from('device_data')
           .select('*', { count: 'exact', head: true })
           .eq('device_id', device.id);
-        
+
         if (!error) {
           counts[device.id] = count || 0;
         }
       }
-      
+
       return counts;
     },
     enabled: !!devices && devices.length > 0,
@@ -139,148 +150,6 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
     onError: (error: any) => {
       toast({
         title: t('devices.edit.updateFailed'),
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Generate fake data mutation
-  const generateDataMutation = useMutation({
-    mutationFn: async (device: any) => {
-      const now = new Date();
-      const sampleData: any[] = [];
-
-      // Fetch geofences for GPS devices
-      const { data: geofences } = await supabase
-        .from('geofence_places')
-        .select('*')
-        .eq('elderly_person_id', device.elderly_person_id)
-        .eq('is_active', true);
-
-      // Check if device has a model with specifications
-      if (device.model_id) {
-        const { data: deviceModel } = await supabase
-          .from('device_models')
-          .select('specifications, supported_data_types')
-          .eq('id', device.model_id)
-          .single();
-
-        if (deviceModel?.specifications && Object.keys(deviceModel.specifications).length > 0) {
-          console.log('Generating data from model specifications:', deviceModel.specifications);
-          const modelData = generateSampleDataFromModelSpecs(
-            deviceModel.specifications as any,
-            deviceModel.supported_data_types || [],
-            device,
-            168, // 7 days
-            2, // every 2 hours
-            geofences || []
-          );
-          sampleData.push(...modelData);
-        }
-      }
-
-      // If no model data was generated, use the default logic
-      if (sampleData.length === 0) {
-        // Special handling for worker-wearable devices with position data
-        if (device.device_type === 'worker_wearable') {
-          const { getDefaultFloorPlan, generateIndoorMovementPath } = await import('@/lib/positionUtils');
-
-          // Check if floor plan exists
-          const { data: existingFloorPlan } = await supabase
-            .from('floor_plans')
-            .select('*')
-            .eq('elderly_person_id', device.elderly_person_id)
-            .maybeSingle();
-
-          let floorPlan = existingFloorPlan;
-
-          // Create floor plan if it doesn't exist
-          if (!existingFloorPlan) {
-            const defaultFloorPlan = getDefaultFloorPlan(device.elderly_person_id);
-            const { data: newFloorPlan } = await supabase
-              .from('floor_plans')
-              .insert([{
-                ...defaultFloorPlan,
-                furniture: defaultFloorPlan.furniture as any,
-                zones: defaultFloorPlan.zones as any
-              }])
-              .select('*')
-              .single();
-
-            floorPlan = newFloorPlan;
-          }
-
-          if (floorPlan) {
-            // Generate 24 hours of indoor movement data
-            const startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-            const positions = generateIndoorMovementPath(
-              floorPlan.zones as any,
-              { width: floorPlan.width, height: floorPlan.height },
-              startTime,
-              24,
-              30 // position every 30 seconds
-            );
-
-            // Create position data records
-            positions.forEach((position, index) => {
-              const recordedAt = new Date(startTime.getTime() + index * 30 * 1000);
-              sampleData.push({
-                device_id: device.id,
-                elderly_person_id: device.elderly_person_id,
-                data_type: 'position',
-                value: position,
-                unit: 'meters',
-                recorded_at: recordedAt.toISOString(),
-              });
-            });
-          }
-        } else {
-          // Use database-driven data configs for other device types
-          const { data: deviceTypeDataConfigs } = await supabase
-            .from('device_type_data_configs')
-            .select(`
-              *,
-              device_types!inner(code)
-            `)
-            .eq('device_types.code', device.device_type);
-
-          if (deviceTypeDataConfigs && deviceTypeDataConfigs.length > 0) {
-            const generatedData = generateSampleDataPoints(
-              deviceTypeDataConfigs as any,
-              device,
-              168, // 7 days
-              2, // every 2 hours
-              geofences || []
-            );
-            sampleData.push(...generatedData);
-          }
-        }
-      }
-
-      // Insert sample data
-      if (sampleData.length > 0) {
-        const { error } = await supabase
-          .from('device_data')
-          .insert(sampleData);
-
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['devices'] });
-      queryClient.invalidateQueries({ queryKey: ['device-data'] });
-      queryClient.invalidateQueries({ queryKey: ['movement-data'] });
-      queryClient.invalidateQueries({ queryKey: ['floor-plan'] });
-      queryClient.invalidateQueries({ queryKey: ['position-data'] });
-      toast({
-        title: t('devices.dataGeneration.generated'),
-        description: t('devices.dataGeneration.generatedDesc'),
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: t('devices.dataGeneration.failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -350,6 +219,36 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
     });
   };
 
+  const handleLocateDevice = (device: any) => {
+    // Navigate to device history to see device data
+    setHistoryDevice(device);
+  };
+
+  const handleNavigateToDevicePage = (device: any) => {
+    const deviceType = device.device_type?.toLowerCase();
+
+    // Route based on device type
+    if (deviceType === 'bed_pad' || deviceType === 'sleep_monitor') {
+      // Navigate to movement dashboard for bed pad activity with hash to scroll
+      navigate('/movement-dashboard#bed-pad-activity');
+    } else if (deviceType === 'toilet_seat') {
+      // Navigate to movement dashboard for toilet seat activity with hash to scroll
+      navigate('/movement-dashboard#toilet-seat-activity');
+    } else if (deviceType === 'smart_home_hub' || deviceType === 'home_hub') {
+      // Navigate to movement dashboard for smart home hub
+      navigate('/movement-dashboard#home-hub');
+    } else if (deviceType === 'smart_phone' || deviceType === 'smartphone') {
+      // Navigate to movement dashboard for smartphone
+      navigate('/movement-dashboard#smartphone');
+    } else if (deviceType === 'gps_tracker' || deviceType === 'gps') {
+      // Navigate to tracking page for GPS devices (outdoor tracking tab)
+      navigate('/tracking');
+    } else {
+      // Default to health page for all other devices
+      navigate('/health');
+    }
+  };
+
   return (
     <Card className="p-3 sm:p-6">
       <div className="flex items-center justify-between mb-4">
@@ -368,7 +267,8 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
         <div className="space-y-3">
           {devices.map((device) => {
             const dataCount = dataCounts[device.id] || 0;
-            const hasNoData = dataCount === 0;
+            const isLoading = isLoadingCounts && dataCounts[device.id] === undefined;
+            const hasNoData = !isLoading && dataCount === 0;
 
             return (
               <div
@@ -387,10 +287,15 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                       <WifiOff className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                     )}
                     <span className="font-medium text-sm truncate">{device.device_name}</span>
-                    {hasNoData ? (
-                      <Badge variant="outline" className="text-xs border-warning text-warning flex-shrink-0">
-                        {t('devices.noData')}
-                      </Badge>
+                    {isLoading ? (
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-shrink-0">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>{t('devices.connecting', { defaultValue: 'Connecting...' })}</span>
+                      </div>
+                    ) : hasNoData ? (
+                      <span className="text-xs text-muted-foreground flex-shrink-0">
+                        {t('devices.notConnected', { defaultValue: "Device isn't connected" })}
+                      </span>
                     ) : (
                       <Badge variant="outline" className="text-xs hidden sm:inline-flex flex-shrink-0">
                         {dataCount} {t('devices.records')}
@@ -406,34 +311,18 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                     >
                       {t(`devices.${device.status}`, { defaultValue: device.status })}
                     </Badge>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant={hasNoData ? "default" : "ghost"}
-                            size="sm"
-                            className="h-7 px-2 sm:px-3"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              generateDataMutation.mutate(device);
-                            }}
-                            disabled={generateDataMutation.isPending}
-                          >
-                            {generateDataMutation.isPending ? (
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            ) : (
-                              <>
-                                <Wand2 className="w-3.5 h-3.5" />
-                                {hasNoData && <span className="ml-1 hidden sm:inline">{t('devices.generateData')}</span>}
-                              </>
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{t('devices.generateDataTooltip')}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigateToDevicePage(device);
+                      }}
+                      title={t('devices.viewDetails', { defaultValue: 'View device details' })}
+                    >
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -442,6 +331,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                         e.stopPropagation();
                         setEditDevice(device);
                       }}
+                      title={t('devices.edit.title', { defaultValue: 'Edit' })}
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </Button>
@@ -453,6 +343,7 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                         e.stopPropagation();
                         setDeleteDevice(device);
                       }}
+                      title={t('devices.delete.title', { defaultValue: 'Delete' })}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
@@ -470,8 +361,17 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                   </div>
                 </div>
 
-                {/* Show record count on mobile */}
-                {!hasNoData && (
+                {/* Show record count or connecting status on mobile */}
+                {isLoading ? (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1 sm:hidden">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>{t('devices.connecting', { defaultValue: 'Connecting...' })}</span>
+                  </div>
+                ) : hasNoData ? (
+                  <div className="text-xs text-muted-foreground mt-1 sm:hidden">
+                    {t('devices.notConnected', { defaultValue: "Device isn't connected" })}
+                  </div>
+                ) : (
                   <div className="text-xs text-muted-foreground mt-1 sm:hidden">
                     {dataCount} {t('devices.records')}
                   </div>
@@ -538,32 +438,6 @@ const DeviceStatus = ({ selectedPersonId }: DeviceStatusProps) => {
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-semibold mb-2 text-sm sm:text-base">{t('devices.apiDetails.exampleRequest')}</h4>
-                <div className="bg-muted p-3 rounded-md overflow-x-auto">
-                  <pre className="text-xs overflow-x-auto">
-{`POST /device-ingest
-Headers:
-  Content-Type: application/json
-  Authorization: Bearer ${selectedDevice.api_key}
-
-Body:
-{
-  "device_id": "${selectedDevice.device_id}",
-  "data_type": "heart_rate",
-  "value": { "bpm": 72 },
-  "unit": "bpm"
-}`}
-                  </pre>
-                </div>
-              </div>
-
-              <div className="bg-info/10 border border-info/20 p-3 rounded-md">
-                <p className="text-xs text-muted-foreground">
-                  <strong>{t('devices.apiDetails.availableDataTypes')}:</strong> {t('devices.apiDetails.dataTypesList')}
-                </p>
-              </div>
-
               <Button
                 variant="outline"
                 className="w-full"
@@ -614,19 +488,40 @@ Body:
                 <Label htmlFor="edit-device-type">{t('devices.edit.deviceType')}</Label>
                 <Select
                   value={editDevice.device_type}
-                  onValueChange={(value) => setEditDevice({ ...editDevice, device_type: value })}
+                  onValueChange={(value) => setEditDevice({ ...editDevice, device_type: value, company_id: null })}
                 >
                   <SelectTrigger id="edit-device-type">
-                    <SelectValue />
+                    <SelectValue>
+                      {(() => {
+                        const selectedType = allDeviceTypes.find(t => t.code === editDevice.device_type);
+                        if (!selectedType) return null;
+                        const IconComponent = getIconComponent(selectedType.icon);
+                        return (
+                          <div className="flex items-center gap-2">
+                            {IconComponent && <IconComponent className="w-4 h-4" />}
+                            <span>{selectedType.name}</span>
+                          </div>
+                        );
+                      })()}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {allDeviceTypes.map((type) => (
-                      <SelectItem key={type.id} value={type.code}>
-                        {type.icon && `${type.icon} `}
-                        {type.name}
-                        {type.description && ` (${type.description})`}
-                      </SelectItem>
-                    ))}
+                    {allDeviceTypes.map((type) => {
+                      const IconComponent = getIconComponent(type.icon);
+                      return (
+                        <SelectItem key={type.id} value={type.code}>
+                          <div className="flex items-center gap-2">
+                            {IconComponent && <IconComponent className="w-4 h-4" />}
+                            <span>{type.name}</span>
+                            {type.description && (
+                              <span className="text-muted-foreground text-xs">
+                                ({type.description})
+                              </span>
+                            )}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
@@ -641,25 +536,31 @@ Body:
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="edit-company">{t('devices.edit.company')}</Label>
-                <Select
-                  value={editDevice.company_id || ''}
-                  onValueChange={(value) => setEditDevice({ ...editDevice, company_id: value || null })}
-                >
-                  <SelectTrigger id="edit-company">
-                    <SelectValue placeholder={t('devices.edit.selectCompany')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {deviceCompanies.map((company) => (
-                      <SelectItem key={company.id} value={company.id}>
-                        {company.name}
-                        {company.description && ` (${company.description})`}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {editDeviceCompanies.length > 0 && (
+                <div className="space-y-2">
+                  <Label htmlFor="edit-company">{t('devices.edit.company')}</Label>
+                  <Select
+                    value={editDevice.company_id || ''}
+                    onValueChange={(value) => setEditDevice({ ...editDevice, company_id: value || null })}
+                  >
+                    <SelectTrigger id="edit-company">
+                      <SelectValue placeholder={t('devices.edit.selectCompany')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {editDeviceCompanies.map((company) => (
+                        <SelectItem key={company.id} value={company.id}>
+                          {company.name}
+                          {company.description && (
+                            <span className="text-muted-foreground text-xs ml-2">
+                              ({company.description})
+                            </span>
+                          )}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="flex gap-2">
                 <Button type="button" variant="outline" className="flex-1" onClick={() => setEditDevice(null)}>

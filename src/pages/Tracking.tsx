@@ -4,12 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { FloorPlanGrid } from '@/components/indoor-tracking/FloorPlanGrid';
 import { MovementPlayback } from '@/components/indoor-tracking/MovementPlayback';
 import { MovementMetrics } from '@/components/indoor-tracking/MovementMetrics';
+import { ZoneHistory } from '@/components/indoor-tracking/ZoneHistory';
 import { MapView } from '@/components/outdoor-tracking/MapView';
 import { GeofenceManager } from '@/components/outdoor-tracking/GeofenceManager';
 import { GeofenceEventsTimeline } from '@/components/outdoor-tracking/GeofenceEventsTimeline';
 import { GPSMetrics } from '@/components/outdoor-tracking/GPSMetrics';
 import CameraGrid from '@/components/camera/CameraGrid';
-import { processPositionData } from '@/lib/positionUtils';
+import { processPositionData, processZoneHistory } from '@/lib/positionUtils';
 import { processGPSTrail, GPSCoordinate } from '@/lib/gpsUtils';
 import { GeofencePlace } from '@/lib/geofenceUtils';
 import { detectGeofenceEvents } from '@/lib/geofenceDetectionService';
@@ -17,7 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/layout/Header';
 import ElderlyList from '@/components/dashboard/ElderlyList';
-import { Calendar, MapPin, Navigation, Camera } from 'lucide-react';
+import { Calendar, MapPin, Navigation, Camera, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
@@ -30,6 +31,8 @@ import {
 } from '@/components/ui/select';
 import { getDateRangePreset } from '@/lib/movementUtils';
 import { useTranslation } from 'react-i18next';
+import { Footer } from '@/components/Footer';
+import { toast } from 'sonner';
 
 export default function Tracking() {
   const { t } = useTranslation();
@@ -41,6 +44,7 @@ export default function Tracking() {
   const [dateRange, setDateRange] = useState(getDateRangePreset('today'));
   const [selectedPreset, setSelectedPreset] = useState<string>('today');
   const [activeTab, setActiveTab] = useState<'indoor' | 'outdoor' | 'camera'>('indoor');
+  const [selectedFloorPlanId, setSelectedFloorPlanId] = useState<string | null>(null);
 
   // Fetch current user
   const { data: user } = useQuery({
@@ -75,28 +79,51 @@ export default function Tracking() {
     }
   }, [elderlyPersons, selectedPersonId]);
 
-  // Fetch floor plan for indoor tracking
-  const { data: floorPlan, isLoading: floorPlanLoading } = useQuery({
-    queryKey: ['floor-plan', selectedPersonId],
+  // Reset selected floor plan when person changes
+  useEffect(() => {
+    setSelectedFloorPlanId(null);
+  }, [selectedPersonId]);
+
+  // Fetch all floor plans for indoor tracking
+  const { data: floorPlans = [], isLoading: floorPlanLoading } = useQuery({
+    queryKey: ['floor-plans', selectedPersonId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('floor_plans')
-        .select('id, elderly_person_id, image_url, width_meters, height_meters, furniture, zones, grid_size')
+        .select('id, elderly_person_id, name, image_url, width, height, furniture, zones, grid_size, created_at, updated_at')
         .eq('elderly_person_id', selectedPersonId)
-        .maybeSingle();
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
-      if (!data) return null;
+      if (!data) return [];
 
-      return {
-        ...data,
-        furniture: (data.furniture as any) || [],
-        zones: (data.zones as any) || []
-      };
+      return data.map(item => ({
+        id: item.id,
+        elderly_person_id: item.elderly_person_id,
+        name: item.name,
+        image_url: item.image_url || undefined,
+        width: item.width,
+        height: item.height,
+        grid_size: item.grid_size || 20,
+        furniture: (item.furniture as any) || [],
+        zones: (item.zones as any) || [],
+        created_at: item.created_at || '',
+        updated_at: item.updated_at || ''
+      }));
     },
     enabled: !!selectedPersonId && activeTab === 'indoor',
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
+
+  // Auto-select first floor plan if none selected
+  useEffect(() => {
+    if (floorPlans.length > 0 && !selectedFloorPlanId) {
+      setSelectedFloorPlanId(floorPlans[0].id);
+    }
+  }, [floorPlans, selectedFloorPlanId]);
+
+  // Get the currently selected floor plan
+  const selectedFloorPlan = floorPlans.find(fp => fp.id === selectedFloorPlanId) || null;
 
   // Fetch position data for indoor tracking
   const { data: positionData = [], isLoading: positionLoading } = useQuery({
@@ -255,38 +282,72 @@ export default function Tracking() {
 
   const handlePresetChange = (preset: string) => {
     setSelectedPreset(preset);
-    if (preset === 'today' || preset === 'last7days' || preset === 'last30days') {
-      setDateRange(getDateRangePreset(preset));
+    setCurrentPositionIndex(0); // Reset playback position when changing date range
+    if (preset === 'today' || preset === 'last7days' || preset === 'last30days' || preset === 'all') {
+      setDateRange(getDateRangePreset(preset as 'today' | 'last7days' | 'last30days' | 'all'));
     }
   };
 
-  // Only block on critical queries - user and elderly persons
-  const isCriticalLoading = elderlyLoading;
+  const handleEditFloorPlan = (floorPlanId: string) => {
+    navigate(`/floor-plan-editor/${selectedPersonId}/${floorPlanId}`);
+  };
 
-  if (isCriticalLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header showBackButton title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
-        <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
-          <div className="space-y-6">
-            <Skeleton className="h-12 w-64" />
-            <Skeleton className="h-96 w-full" />
-            <Skeleton className="h-48 w-full" />
-          </div>
-        </main>
-      </div>
-    );
-  }
+  const handleDeleteFloorPlan = async (floorPlanId: string, floorPlanName: string) => {
+    if (!confirm(`Are you sure you want to delete "${floorPlanName}"? This action cannot be undone.`)) {
+      return;
+    }
 
-  // Tab-specific loading states (non-blocking)
-  const isTabLoading =
-    (activeTab === 'indoor' && (floorPlanLoading || positionLoading)) ||
-    (activeTab === 'outdoor' && (gpsLoading || placesLoading || eventsLoading));
+    try {
+      const { error } = await supabase
+        .from('floor_plans')
+        .delete()
+        .eq('id', floorPlanId);
+
+      if (error) throw error;
+
+      // If we deleted the currently selected floor plan, clear the selection
+      if (selectedFloorPlanId === floorPlanId) {
+        setSelectedFloorPlanId(null);
+      }
+
+      // Refresh floor plans list
+      await queryClient.invalidateQueries({ queryKey: ['floor-plans', selectedPersonId] });
+
+      toast.success(`Floor plan "${floorPlanName}" deleted successfully`);
+    } catch (error: any) {
+      console.error('Error deleting floor plan:', error);
+      toast.error(error.message || 'Failed to delete floor plan');
+    }
+  };
+
+  // Reset position index when data changes
+  useEffect(() => {
+    setCurrentPositionIndex(0);
+  }, [positionData]);
+
+  // Filter position data by selected floor plan
+  const filteredPositionData = useMemo(() => {
+    if (!selectedFloorPlanId || !positionData.length) {
+      return positionData;
+    }
+
+    // Filter positions that match the selected floor plan
+    return positionData.filter(item => {
+      try {
+        // Parse the value JSON to get floor_plan_id
+        const value = typeof item.value === 'string' ? JSON.parse(item.value) : item.value;
+        return value.floor_plan_id === selectedFloorPlanId;
+      } catch (error) {
+        // If parsing fails or no floor_plan_id, exclude this position
+        return false;
+      }
+    });
+  }, [positionData, selectedFloorPlanId]);
 
   // Process indoor tracking data - Memoized to avoid recomputation on every render
   const processedData = useMemo(
-    () => activeTab === 'indoor' ? processPositionData(positionData) : null,
-    [positionData, activeTab]
+    () => activeTab === 'indoor' ? processPositionData(filteredPositionData) : null,
+    [filteredPositionData, activeTab]
   );
 
   const positionEvents = useMemo(
@@ -297,10 +358,16 @@ export default function Tracking() {
     [processedData]
   );
 
+  const zoneVisits = useMemo(
+    () => processedData ? processZoneHistory(processedData.events) : [],
+    [processedData]
+  );
+
   const currentPosition = positionEvents[currentPositionIndex]?.position;
 
+  // Trail includes positions from start up to current (inclusive), limited to last 50
   const trail = useMemo(
-    () => positionEvents.slice(Math.max(0, currentPositionIndex - 50), currentPositionIndex)
+    () => positionEvents.slice(Math.max(0, currentPositionIndex - 49), currentPositionIndex + 1)
       .map(p => p.position),
     [positionEvents, currentPositionIndex]
   );
@@ -326,14 +393,37 @@ export default function Tracking() {
     [currentGPSPosition, geofencePlaces]
   );
 
+  // Only block on critical queries - user and elderly persons
+  const isCriticalLoading = elderlyLoading;
+
+  if (isCriticalLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
+        <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
+          <div className="space-y-6">
+            <Skeleton className="h-12 w-64" />
+            <Skeleton className="h-96 w-full" />
+            <Skeleton className="h-48 w-full" />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Tab-specific loading states (non-blocking)
+  const isTabLoading =
+    (activeTab === 'indoor' && (floorPlanLoading || positionLoading)) ||
+    (activeTab === 'outdoor' && (gpsLoading || placesLoading || eventsLoading));
+
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
-      <Header showBackButton title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
+      <Header title={t('tracking.title')} subtitle={t('tracking.subtitle')} />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
-          <div className="space-y-4">
+          <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">{t('tracking.movementTracking')}</h1>
               <p className="text-muted-foreground">
@@ -361,6 +451,7 @@ export default function Tracking() {
                   <SelectItem value="today">{t('tracking.today')}</SelectItem>
                   <SelectItem value="last7days">{t('tracking.last7Days')}</SelectItem>
                   <SelectItem value="last30days">{t('tracking.last30Days')}</SelectItem>
+                  <SelectItem value="all">{t('tracking.allAvailableData', 'All Available Data')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -397,7 +488,7 @@ export default function Tracking() {
                   <Skeleton className="h-96 w-full" />
                   <Skeleton className="h-48 w-full" />
                 </div>
-              ) : !floorPlan ? (
+              ) : floorPlans.length === 0 ? (
                 <div className="text-center py-12">
                   <h2 className="text-2xl font-bold mb-4">{t('tracking.noFloorPlan.title')}</h2>
                   <p className="text-muted-foreground">
@@ -408,24 +499,87 @@ export default function Tracking() {
                 <>
                   <div className="grid gap-6 lg:grid-cols-3">
                     <div className="lg:col-span-2" data-tour="tracking-floor-plan">
-                      <FloorPlanGrid
-                        floorPlan={floorPlan}
-                        currentPosition={currentPosition}
-                        trail={trail}
-                        showGrid={true}
-                      />
+                      {selectedFloorPlan && (
+                        <FloorPlanGrid
+                          floorPlan={selectedFloorPlan}
+                          currentPosition={currentPosition}
+                          trail={trail}
+                          showGrid={true}
+                        />
+                      )}
                     </div>
 
-                    <div data-tour="tracking-playback">
-                      <MovementPlayback
-                        positions={positionEvents}
-                        onPositionChange={setCurrentPositionIndex}
-                        currentIndex={currentPositionIndex}
-                      />
+                    <div className="space-y-4">
+                      {/* Floor Plan Selector */}
+                      <div className="bg-card rounded-lg border p-4">
+                        <h3 className="text-sm font-semibold mb-3">{t('tracking.selectFloorPlan', 'Select Floor Plan')}</h3>
+                        <div className="space-y-2">
+                          {floorPlans.map((floorPlan) => (
+                            <div
+                              key={floorPlan.id}
+                              className={`w-full px-3 py-2 rounded-md transition-colors ${
+                                selectedFloorPlanId === floorPlan.id
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'bg-muted hover:bg-muted/80'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <button
+                                  onClick={() => setSelectedFloorPlanId(floorPlan.id)}
+                                  className="flex-1 text-left min-w-0"
+                                >
+                                  <div className="font-medium text-sm truncate">{floorPlan.name}</div>
+                                  <div className="text-xs opacity-80">
+                                    {floorPlan.width}m × {floorPlan.height}m
+                                  </div>
+                                </button>
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEditFloorPlan(floorPlan.id);
+                                    }}
+                                    title="Edit floor plan"
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7 hover:bg-destructive hover:text-destructive-foreground"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteFloorPlan(floorPlan.id, floorPlan.name);
+                                    }}
+                                    title="Delete floor plan"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Movement Playback */}
+                      <div data-tour="tracking-playback">
+                        <MovementPlayback
+                          positions={positionEvents}
+                          onPositionChange={setCurrentPositionIndex}
+                          currentIndex={currentPositionIndex}
+                        />
+                      </div>
                     </div>
                   </div>
 
                   {processedData && <MovementMetrics data={processedData} />}
+
+                  {/* Zone Visit History Table */}
+                  {processedData && <ZoneHistory visits={zoneVisits} />}
                 </>
               )}
             </TabsContent>
@@ -527,6 +681,7 @@ export default function Tracking() {
           </Tabs>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

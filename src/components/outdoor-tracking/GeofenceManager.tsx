@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Plus, Trash2, Edit, MapPin } from 'lucide-react';
-import { GeofencePlace, getPlaceTypeOptions, getPlaceTypeColor } from '@/lib/geofenceUtils';
+import { GeofencePlace, getPlaceTypeOptions, getPlaceTypeColor, getPlaceTypeLabel } from '@/lib/geofenceUtils';
 import { metersToFeet, feetToMeters } from '@/lib/unitConversions';
 import { useTranslation } from 'react-i18next';
 
@@ -366,7 +366,7 @@ export function GeofenceManager({ elderlyPersonId }: GeofenceManagerProps) {
                   <div>
                     <div className="font-medium">{place.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      {place.place_type} • {Math.round(metersToFeet(place.radius_meters))} {t('tracking.geofence.ftRadius')}
+                      {getPlaceTypeLabel(place.place_type)} • {Math.round(metersToFeet(place.radius_meters))} {t('tracking.geofence.ftRadius')}
                     </div>
                   </div>
                 </div>

@@ -11,6 +11,7 @@ import HealthMetricsCharts from './HealthMetricsCharts';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
 import { extractNumericValue, extractBloodPressure, extractBooleanValue, extractStringValue } from '@/lib/valueExtractor';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 // Map language codes to date-fns locales
 const getDateLocale = (language: string) => {
@@ -39,6 +40,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
   const [showCharts, setShowCharts] = useState(false);
   const { t, i18n } = useTranslation();
   const dateLocale = getDateLocale(i18n.language);
+  const navigate = useNavigate();
 
   // Function to translate device name based on device type
   const getTranslatedDeviceName = (deviceName: string | undefined) => {
@@ -306,7 +308,13 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
 
       case 'activity':
         const activity = extractStringValue(value, type);
-        return activity || 'N/A';
+        if (!activity) return 'N/A';
+        // Convert to title case (capitalize first letter of each word)
+        return String(activity)
+          .toLowerCase()
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
 
       case 'sleep_quality':
         const quality = extractNumericValue(value, type);
@@ -320,7 +328,10 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       case 'sleep_stage':
         const stage = extractStringValue(value, type);
         if (!stage) return 'N/A';
-        return String(stage).charAt(0).toUpperCase() + String(stage).slice(1);
+        // Display REM in all caps, others with first letter capitalized
+        const stageStr = String(stage).toLowerCase();
+        if (stageStr === 'rem') return 'REM';
+        return stageStr.charAt(0).toUpperCase() + stageStr.slice(1);
 
       case 'medication_taken':
         const taken = extractBooleanValue(value, type);
@@ -526,9 +537,17 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
           <CardTitle>{t('healthMetrics.title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-center py-8">
-            {t('healthMetrics.noData')}
-          </p>
+          <div className="text-center py-8">
+            <p className="text-muted-foreground mb-4">
+              {t('healthMetrics.noData')}
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/device-status')}
+            >
+              {t('healthMetrics.goToDevices')}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );

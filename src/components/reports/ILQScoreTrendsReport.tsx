@@ -237,7 +237,7 @@ export const ILQScoreTrendsReport = ({ selectedPerson, dateRange }: ILQScoreTren
       {/* Score Trends Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>ILQ Score Trends Over Time</CardTitle>
+          <CardTitle>{t('reports.content.ilqTrend')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>

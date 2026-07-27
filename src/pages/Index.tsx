@@ -6,6 +6,8 @@ import heroImage from "@/assets/hero-healthcare.jpg";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Footer } from "@/components/Footer";
+
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -29,7 +31,13 @@ const Index = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div
+              className="flex items-center gap-2 sm:gap-3 cursor-pointer"
+              onMouseEnter={() => {
+                const audio = new Audio('/symbiotVoice.mp3');
+                audio.play().catch(err => console.log('Audio play failed:', err));
+              }}
+            >
               <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               <div>
                 <h1 className="text-base sm:text-xl font-bold text-foreground">{t('common.symbiot')}</h1>
@@ -58,17 +66,19 @@ const Index = () => {
       }} />
 
         <div className="relative z-10 container mx-auto px-4 py-12 sm:py-20 lg:py-32">
-          <div className="max-w-3xl">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
-              {t('index.hero.title')}
-            </h1>
-            <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 leading-relaxed">
-              {t('index.hero.subtitle')}
-            </p>
-            <div className="flex flex-wrap gap-3 sm:gap-4">
-              <Button size="default" className="shadow-lg bg-secondary text-white hover:bg-secondary/90" onClick={handleKnowMore}>
-                {t('index.hero.knowMore')}
-              </Button>
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            <div className="max-w-3xl">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
+                {t('index.hero.title')}
+              </h1>
+              <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 leading-relaxed">
+                {t('index.hero.subtitle')}
+              </p>
+              <div className="flex flex-wrap gap-3 sm:gap-4">
+                <Button size="default" className="shadow-lg bg-secondary text-white hover:bg-secondary/90" onClick={handleKnowMore}>
+                  {t('index.hero.knowMore')}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -162,12 +172,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 sm:py-12 px-4">
-        <div className="container mx-auto text-center text-muted-foreground">
-          <p className="text-sm sm:text-base">{t('index.footer.copyright')}</p>
-          <p className="mt-2 text-sm sm:text-base">{t('index.footer.tagline')}</p>
-        </div>
-      </footer>
+      <Footer />
     </div>;
 };
 export default Index;

@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Footer } from "@/components/Footer";
 
 export default function FloorPlanManagement() {
   const { user } = useAuth();
@@ -97,6 +98,7 @@ export default function FloorPlanManagement() {
               elderlyPersons={elderlyPersons || []}
               selectedPersonId={selectedPersonId}
               onSelectPerson={setSelectedPersonId}
+              variant="list"
             />
           </div>
 
@@ -190,7 +192,7 @@ export default function FloorPlanManagement() {
                     <CardContent className="flex flex-col items-center justify-center h-64 gap-4">
                       <Map className="h-12 w-12 text-muted-foreground" />
                       <p className="text-muted-foreground">
-                        No floor plans yet
+                        Add a Floor Plan
                       </p>
                       <Button onClick={() => setShowCreateDialog(true)}>
                         <Plus className="h-4 w-4 mr-2" />
@@ -243,6 +245,7 @@ export default function FloorPlanManagement() {
           </AlertDialog>
         </>
       )}
+      <Footer />
     </div>
   );
 }

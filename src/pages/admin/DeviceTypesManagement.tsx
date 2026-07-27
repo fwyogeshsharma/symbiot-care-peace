@@ -114,14 +114,16 @@ const DeviceTypesManagement = () => {
 
   const getCategoryBadge = (category: string) => {
     const colors: Record<string, string> = {
-      health: 'bg-blue-500',
-      tracking: 'bg-purple-500',
-      environment: 'bg-green-500',
-      safety: 'bg-red-500',
-      security: 'bg-orange-500',
-      automation: 'bg-indigo-500',
+      health: 'bg-blue-500 text-white',
+      tracking: 'bg-purple-500 text-white',
+      environment: 'bg-green-500 text-white',
+      safety: 'bg-red-500 text-white',
+      security: 'bg-orange-500 text-white',
+      automation: 'bg-indigo-500 text-white',
+      position: 'bg-cyan-500 text-white',
+      activity: 'bg-yellow-500 text-white',
     };
-    return colors[category] || 'bg-gray-500';
+    return colors[category] || 'bg-gray-500 text-white';
   };
 
   return (
@@ -302,7 +304,7 @@ const DeviceTypesManagement = () => {
                         <code className="text-xs bg-muted px-2 py-1 rounded">{type.code}</code>
                       </TableCell>
                       <TableCell>
-                        <Badge className={getCategoryBadge(type.category)}>{type.category}</Badge>
+                        <Badge className={getCategoryBadge(type.category.toLowerCase())}>{type.category.toLowerCase()}</Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">{type.data_frequency_per_day}x</Badge>

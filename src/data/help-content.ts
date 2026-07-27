@@ -94,6 +94,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.alerts'),
     keywords: ['alert', 'notification', 'warning', 'emergency'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/6EYLDBcA4p4',
   },
   {
     id: 'alert-severity',
@@ -102,6 +103,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.alerts'),
     keywords: ['severity', 'critical', 'high', 'medium', 'low', 'priority'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/Dzx-AQMvgWU',
   },
   {
     id: 'alert-types',
@@ -110,6 +112,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.alerts'),
     keywords: ['type', 'vital signs', 'panic', 'sos', 'geofence', 'device', 'inactivity'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/_4rDzYjixE4',
   },
   {
     id: 'acknowledging-alerts',
@@ -127,7 +130,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.devices'),
     keywords: ['device', 'monitor', 'status', 'online', 'offline', 'battery'],
     relatedPages: ['/device-status'],
-    youtubeUrl: 'https://youtu.be/tfB-o3ov4RQ',
+    youtubeUrl: 'https://youtu.be/bNwm3ejlxeM',
   },
   {
     id: 'device-types',
@@ -143,8 +146,9 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     title: t('help.topics.indoorTracking.title'),
     content: t('help.topics.indoorTracking.content'),
     category: t('help.categories.tracking'),
-    keywords: ['indoor', 'floor plan', 'zone', 'location', 'position'],
+    keywords: ['indoor', 'floor plan', 'zone', 'location', 'position', 'multi-story', 'multiple floors', 'levels'],
     relatedPages: ['/tracking', '/indoor-tracking'],
+    youtubeUrl: 'https://youtu.be/rFLo6qCbKYo',
   },
   {
     id: 'outdoor-tracking',
@@ -170,7 +174,7 @@ export const getTranslatedHelpTopics = (t: TFunction): HelpTopic[] => [
     category: t('help.categories.dataSharing'),
     keywords: ['share', 'family', 'access', 'permission', 'invite'],
     relatedPages: ['/data-sharing'],
-    youtubeUrl: 'https://youtu.be/Kb3QtZ9t8Ds',
+    youtubeUrl: 'https://youtu.be/fFZBk7yu12I',
   },
   // Troubleshooting
   {
@@ -313,6 +317,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['alert', 'notification', 'warning', 'emergency'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/6EYLDBcA4p4',
   },
   {
     id: 'alert-severity',
@@ -321,6 +326,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['severity', 'critical', 'high', 'medium', 'low', 'priority'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/Dzx-AQMvgWU',
   },
   {
     id: 'alert-types',
@@ -329,6 +335,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Alerts',
     keywords: ['type', 'vital signs', 'panic', 'sos', 'geofence', 'device', 'inactivity'],
     relatedPages: ['/alerts'],
+    youtubeUrl: 'https://youtu.be/_4rDzYjixE4',
   },
   {
     id: 'acknowledging-alerts',
@@ -347,7 +354,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Devices',
     keywords: ['device', 'monitor', 'status', 'online', 'offline', 'battery'],
     relatedPages: ['/device-status'],
-    youtubeUrl: 'https://youtu.be/tfB-o3ov4RQ',
+    youtubeUrl: 'https://youtu.be/bNwm3ejlxeM',
   },
   {
     id: 'device-types',
@@ -362,10 +369,11 @@ export const helpTopics: HelpTopic[] = [
   {
     id: 'indoor-tracking',
     title: 'Indoor Tracking with Floor Plans',
-    content: 'View real-time location on uploaded floor plans. Create zones to define areas like bedroom, kitchen, bathroom. Track movement paths and dwell times in each zone.',
+    content: 'View real-time location on uploaded floor plans. Create zones to define areas like bedroom, kitchen, bathroom. Track movement paths and dwell times in each zone. Multi-story buildings are fully supported - upload floor plans for each level to track location across multiple floors.',
     category: 'Tracking',
-    keywords: ['indoor', 'floor plan', 'zone', 'location', 'position'],
+    keywords: ['indoor', 'floor plan', 'zone', 'location', 'position', 'multi-story', 'multiple floors', 'levels'],
     relatedPages: ['/tracking', '/indoor-tracking'],
+    youtubeUrl: 'https://youtu.be/rFLo6qCbKYo',
   },
   {
     id: 'outdoor-tracking',
@@ -392,7 +400,7 @@ export const helpTopics: HelpTopic[] = [
     category: 'Data Sharing',
     keywords: ['share', 'family', 'access', 'permission', 'invite'],
     relatedPages: ['/data-sharing'],
-    youtubeUrl: 'https://youtu.be/Kb3QtZ9t8Ds',
+    youtubeUrl: 'https://youtu.be/fFZBk7yu12I',
   },
 
   // Troubleshooting

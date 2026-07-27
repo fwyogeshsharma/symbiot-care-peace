@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from 'react-i18next';
-import { geminiService, ChatMessage } from '@/services/geminiService';
+import { nvidiaService, ChatMessage } from '@/services/nvidiaService';
 import { toast } from 'sonner';
 
 export const Chatbot = () => {
@@ -39,12 +39,12 @@ export const Chatbot = () => {
 
   const getWelcomeMessage = () => {
     const welcomeMessages: Record<string, string> = {
-      en: "Hello! I'm your SymbiotCare Peace assistant. How can I help you today?",
-      es: "¡Hola! Soy tu asistente de SymbiotCare Peace. ¿Cómo puedo ayudarte hoy?",
-      fr: "Bonjour! Je suis votre assistant SymbiotCare Peace. Comment puis-je vous aider aujourd'hui?",
-      'fr-CA': "Bonjour! Je suis votre assistant SymbiotCare Peace. Comment puis-je vous aider aujourd'hui?",
-      de: "Hallo! Ich bin Ihr SymbiotCare Peace Assistent. Wie kann ich Ihnen heute helfen?",
-      hi: "नमस्ते! मैं आपका SymbiotCare Peace सहायक हूं। आज मैं आपकी कैसे मदद कर सकता हूं?",
+      en: "Hello! I'm your SymBIoT Care Assistant. How can I help you today?",
+      es: "¡Hola! Soy tu SymBIoT Care Assistant. ¿Cómo puedo ayudarte hoy?",
+      fr: "Bonjour! Je suis votre SymBIoT Care Assistant. Comment puis-je vous aider aujourd'hui?",
+      'fr-CA': "Bonjour! Je suis votre SymBIoT Care Assistant. Comment puis-je vous aider aujourd'hui?",
+      de: "Hallo! Ich bin Ihr SymBIoT Care Assistant. Wie kann ich Ihnen heute helfen?",
+      hi: "नमस्ते! मैं आपका SymBIoT Care Assistant हूं। आज मैं आपकी कैसे मदद कर सकता हूं?",
     };
     return welcomeMessages[i18n.language] || welcomeMessages.en;
   };
@@ -64,12 +64,6 @@ export const Chatbot = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
-    // Check if API key is configured
-    if (!geminiService.isConfigured()) {
-      toast.error('Chatbot is not configured. Please add your Gemini API key to continue.');
-      return;
-    }
-
     const userMessage: ChatMessage = {
       role: 'user',
       content: inputMessage.trim(),
@@ -82,8 +76,8 @@ export const Chatbot = () => {
     setIsLoading(true);
 
     try {
-      // Get response from Gemini
-      const response = await geminiService.sendMessage(updatedMessages, i18n.language);
+      // Get response from NVIDIA AI
+      const response = await nvidiaService.sendMessage(updatedMessages, i18n.language);
 
       // Add assistant response to chat
       setMessages([
@@ -147,7 +141,7 @@ export const Chatbot = () => {
           <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5" />
-              <h3 className="font-semibold">SymbiotCare Assistant</h3>
+              <h3 className="font-semibold">SymBIoT Care Assistant</h3>
             </div>
             <Button
               variant="ghost"

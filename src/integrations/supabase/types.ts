@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_recipients: {
+        Row: {
+          alert_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_recipients_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alerts: {
         Row: {
           acknowledged_at: string | null
@@ -64,35 +93,6 @@ export type Database = {
           },
         ]
       }
-      alert_recipients: {
-        Row: {
-          alert_id: string
-          created_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          alert_id: string
-          created_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          alert_id?: string
-          created_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "alert_recipients_alert_id_fkey"
-            columns: ["alert_id"]
-            isOneToOne: false
-            referencedRelation: "alerts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       caregiver_assignments: {
         Row: {
           assignment_type: string | null
@@ -124,6 +124,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      dashboard_layouts: {
+        Row: {
+          created_at: string
+          id: string
+          layout_config: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          layout_config?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          layout_config?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       device_association_logs: {
         Row: {
@@ -519,7 +543,6 @@ export type Database = {
         Row: {
           api_key: string
           battery_level: number | null
-          ble_device_id: string | null
           company_id: string | null
           created_at: string
           device_id: string
@@ -536,7 +559,6 @@ export type Database = {
         Insert: {
           api_key?: string
           battery_level?: number | null
-          ble_device_id?: string | null
           company_id?: string | null
           created_at?: string
           device_id: string
@@ -553,7 +575,6 @@ export type Database = {
         Update: {
           api_key?: string
           battery_level?: number | null
-          ble_device_id?: string | null
           company_id?: string | null
           created_at?: string
           device_id?: string
@@ -640,6 +661,36 @@ export type Database = {
           status?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      fcm_tokens: {
+        Row: {
+          created_at: string | null
+          device_info: Json | null
+          id: string
+          last_used_at: string | null
+          token: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_info?: Json | null
+          id?: string
+          last_used_at?: string | null
+          token: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_info?: Json | null
+          id?: string
+          last_used_at?: string | null
+          token?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -948,6 +999,13 @@ export type Database = {
             columns: ["acknowledged_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ilq_alerts_acknowledged_by_fkey"
+            columns: ["acknowledged_by"]
+            isOneToOne: false
+            referencedRelation: "verified_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1408,6 +1466,7 @@ export type Database = {
           elderly_person_id: string
           id: string
           is_active: boolean
+          last_sent_at: string | null
           report_type: string
           schedule_time: string
           timezone: string
@@ -1419,6 +1478,7 @@ export type Database = {
           elderly_person_id: string
           id?: string
           is_active?: boolean
+          last_sent_at?: string | null
           report_type?: string
           schedule_time?: string
           timezone?: string
@@ -1430,6 +1490,7 @@ export type Database = {
           elderly_person_id?: string
           id?: string
           is_active?: boolean
+          last_sent_at?: string | null
           report_type?: string
           schedule_time?: string
           timezone?: string
@@ -1442,6 +1503,20 @@ export type Database = {
             columns: ["elderly_person_id"]
             isOneToOne: false
             referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "verified_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1479,6 +1554,30 @@ export type Database = {
         }
         Relationships: []
       }
+      system_config: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          key: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          key: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          key?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1502,9 +1601,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      verified_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      backfill_alert_recipients: { Args: never; Returns: undefined }
       can_access_elderly_person: {
         Args: { _elderly_person_id: string; _user_id: string }
         Returns: boolean
@@ -1517,6 +1628,18 @@ export type Database = {
           message: string
           score: number
         }[]
+      }
+      convert_local_to_utc_time: {
+        Args: { local_time: string; tz: string }
+        Returns: string
+      }
+      convert_schedule_time_to_utc: {
+        Args: { local_time: string; tz: string }
+        Returns: string
+      }
+      delete_elderly_person_data: {
+        Args: { elderly_person_ids: string[] }
+        Returns: Json
       }
       delete_user_data_by_email: {
         Args: { user_email: string }
@@ -1542,6 +1665,35 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_fcm_tokens_for_elderly_person: {
+        Args: { elderly_person_id: string }
+        Returns: {
+          device_info: Json
+          token: string
+          user_id: string
+        }[]
+      }
+      get_shared_user_profiles: {
+        Args: { _owner_user_id: string }
+        Returns: {
+          email: string
+          full_name: string
+          id: string
+        }[]
+      }
+      get_subscriptions_due_now: {
+        Args: { time_window_minutes?: number }
+        Returns: {
+          created_at: string
+          elderly_person_id: string
+          id: string
+          report_type: string
+          schedule_time: string
+          timezone: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1551,6 +1703,35 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       lookup_user_by_email: { Args: { _email: string }; Returns: string }
+      show_recent_cron_runs: {
+        Args: never
+        Returns: {
+          duration: unknown
+          message: string
+          run_time: string
+          status: string
+        }[]
+      }
+      show_upcoming_reports: {
+        Args: never
+        Returns: {
+          minutes_until_next_run: number
+          person_name: string
+          schedule_time_utc: string
+          subscription_id: string
+          user_email: string
+          user_timezone: string
+          will_trigger_soon: boolean
+        }[]
+      }
+      test_http_connection: {
+        Args: never
+        Returns: {
+          details: string
+          test_result: string
+        }[]
+      }
+      trigger_scheduled_reports: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "elderly" | "caregiver" | "relative" | "admin" | "super_admin"

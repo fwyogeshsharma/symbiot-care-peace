@@ -5,13 +5,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ElderlyProvider } from "./contexts/ElderlyContext";
-import { CapacitorProvider } from "./contexts/CapacitorContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Chatbot } from "./components/Chatbot";
 import "./i18n/config";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Health from "./pages/Health";
 import Profile from "./pages/Profile";
 import DeviceStatusPage from "./pages/DeviceStatusPage";
 import DataSharingPage from "./pages/DataSharingPage";
@@ -32,6 +32,13 @@ import ILQAnalytics from "./pages/ILQAnalytics";
 import InvestorInfo from "./pages/InvestorInfo";
 import MedicationConfig from "./pages/MedicationConfig";
 import Reports from "./pages/Reports";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import CookiePolicy from "./pages/CookiePolicy";
+import LiabilityDisclaimer from "./pages/LiabilityDisclaimer";
+import FAQ from "./pages/FAQ";
+import CustomizeDashboard from "./pages/CustomizeDashboard";
+import SupportedDevices from "./pages/SupportedDevices";
 
 const queryClient = new QueryClient();
 
@@ -41,11 +48,10 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <CapacitorProvider>
-          <AuthProvider>
-            <ElderlyProvider>
-            <Chatbot />
-            <Routes>
+        <AuthProvider>
+          <ElderlyProvider>
+          <Chatbot />
+          <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route
@@ -53,6 +59,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/health"
+              element={
+                <ProtectedRoute>
+                  <Health />
                 </ProtectedRoute>
               }
             />
@@ -194,12 +208,25 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/customize-dashboard"
+              element={
+                <ProtectedRoute>
+                  <CustomizeDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/liability-disclaimer" element={<LiabilityDisclaimer />} />
+            <Route path="/cookie-policy" element={<CookiePolicy />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/supported-devices" element={<SupportedDevices />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
           </ElderlyProvider>
         </AuthProvider>
-        </CapacitorProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

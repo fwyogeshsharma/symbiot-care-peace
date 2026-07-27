@@ -17,6 +17,7 @@ import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { EmptyState } from '@/components/help/EmptyState';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { useTranslation } from 'react-i18next';
+import { Footer } from '@/components/Footer';
 
 // Map language codes to date-fns locales
 const getDateLocale = (language: string) => {
@@ -42,9 +43,19 @@ const deviceNameMap: Record<string, string> = {
   'panic button': 'panic_button',
   'gps tracker': 'gps_tracker',
   'heart rate monitor': 'heart_rate_monitor',
-  'blood pressure monitor': 'blood_pressure_monitor',
+  'blood_pressure_monitor': 'blood_pressure_monitor',
   'smartwatch': 'smartwatch',
   'wearable': 'wearable',
+};
+
+// Function to round decimal numbers in text to 1 decimal place
+const roundNumbersInText = (text: string): string => {
+  if (!text) return text;
+  // Match decimal numbers with more than 1 decimal place (e.g., 79.39999999999999, 104.50000000000001)
+  return text.replace(/(\d+\.\d{2,})/g, (match) => {
+    const num = parseFloat(match);
+    return num.toFixed(1);
+  });
 };
 
 interface Alert {
@@ -180,9 +191,32 @@ const Alerts = () => {
       }, 0) / acknowledgedAlerts.length
     : 0;
 
+  // Normalize alert type function
+  const normalizeAlertType = (type: string): string => {
+    const normalized = type.toLowerCase().trim();
+    // Consolidate singular and plural forms
+    if (normalized === 'vital_sign' || normalized === 'vital_signs' || normalized === 'vital sign' || normalized === 'vital signs') {
+      return 'vital_signs';
+    }
+    if (normalized === 'panic_sos' || normalized === 'panic' || normalized === 'sos') {
+      return 'panic_sos';
+    }
+    if (normalized === 'device_offline' || normalized === 'device offline') {
+      return 'device_offline';
+    }
+    if (normalized === 'geofence' || normalized === 'geofence_breach') {
+      return 'geofence';
+    }
+    if (normalized === 'inactivity' || normalized === 'inactive') {
+      return 'inactivity';
+    }
+    return normalized.replace(/\s+/g, '_');
+  };
+
   // Alert type breakdown for pie chart
   const typeBreakdown = filteredAlerts.reduce((acc, alert) => {
-    acc[alert.alert_type] = (acc[alert.alert_type] || 0) + 1;
+    const normalizedType = normalizeAlertType(alert.alert_type);
+    acc[normalizedType] = (acc[normalizedType] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
   const pieData = Object.entries(typeBreakdown).map(([name, value]) => ({ name, value }));
@@ -491,7 +525,7 @@ const Alerts = () => {
                       <AlertTriangle className="w-5 h-5 text-warning mt-1 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h4 className="font-semibold">{translateDeviceNames(t(`alerts.messages.${alert.alert_type}.title`, { defaultValue: alert.title }))}</h4>
+                          <h4 className="font-semibold">{roundNumbersInText(translateDeviceNames(t(`alerts.messages.${alert.alert_type}.title`, { defaultValue: alert.title })))}</h4>
                           <Badge className={`${getSeverityColor(alert.severity)} capitalize text-xs`}>
                             {t(`alerts.${alert.severity}`, { defaultValue: alert.severity })}
                           </Badge>
@@ -500,7 +534,7 @@ const Alerts = () => {
                           </Badge>
                         </div>
                         {alert.description && (
-                          <p className="text-sm text-muted-foreground mb-2">{translateDeviceNames(t(`alerts.messages.${alert.alert_type}.description`, { defaultValue: alert.description }))}</p>
+                          <p className="text-sm text-muted-foreground mb-2">{roundNumbersInText(translateDeviceNames(t(`alerts.messages.${alert.alert_type}.description`, { defaultValue: alert.description })))}</p>
                         )}
                         <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                           <span>{alert.elderly_persons?.full_name || t('alerts.timeline.unknown')}</span>
@@ -530,6 +564,7 @@ const Alerts = () => {
           )}
         </Card>
       </main>
+      <Footer />
     </div>
   );
 };

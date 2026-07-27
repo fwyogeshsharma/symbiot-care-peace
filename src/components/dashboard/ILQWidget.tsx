@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Activity } from 'lucide-react';
+import { Activity, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ILQInfoDialog } from './ILQInfoDialog';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface ILQWidgetProps {
   elderlyPersonId: string;
@@ -13,7 +16,9 @@ interface ILQWidgetProps {
 
 export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidgetProps) {
   const { t } = useTranslation();
-  const { data: latestScore, isLoading } = useQuery({
+  const [isComputing, setIsComputing] = useState(false);
+
+  const { data: latestScore, isLoading, refetch } = useQuery({
     queryKey: ['ilq-score-latest', elderlyPersonId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -27,6 +32,32 @@ export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidge
       return data;
     },
   });
+
+  const computeILQ = async () => {
+    setIsComputing(true);
+    try {
+      toast.info(t('ilq.analytics.computingScore', { defaultValue: 'Computing ILQ score...' }));
+
+      const { data, error } = await supabase.functions.invoke('ilq-compute', {
+        body: { elderly_person_id: elderlyPersonId },
+      });
+
+      if (error) throw error;
+
+      toast.success(t('ilq.analytics.computedSuccess', {
+        defaultValue: `ILQ Score computed successfully: ${data.ilq_score}`,
+        score: data.ilq_score
+      }));
+
+      // Refetch the data to show the new score
+      refetch();
+    } catch (error: any) {
+      console.error('Error computing ILQ:', error);
+      toast.error(error.message || t('ilq.analytics.computeFailed', { defaultValue: 'Failed to compute ILQ score' }));
+    } finally {
+      setIsComputing(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -58,9 +89,19 @@ export function ILQWidget({ elderlyPersonId, hideViewDetails = false }: ILQWidge
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            <p>{t('ilq.noDataAvailable')}</p>
-            <p className="text-sm mt-2">{t('ilq.dataWillAppear')}</p>
+          <div className="text-center py-8 space-y-4">
+            <div className="text-muted-foreground">
+              <p>{t('ilq.noDataAvailable')}</p>
+              <p className="text-sm mt-2">{t('ilq.dataWillAppear')}</p>
+            </div>
+            <Button
+              onClick={computeILQ}
+              disabled={isComputing}
+              className="mx-auto"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isComputing ? 'animate-spin' : ''}`} />
+              {isComputing ? t('ilq.computing', { defaultValue: 'Computing...' }) : t('ilq.analytics.computeILQ', { defaultValue: 'Compute ILQ' })}
+            </Button>
           </div>
         </CardContent>
       </Card>

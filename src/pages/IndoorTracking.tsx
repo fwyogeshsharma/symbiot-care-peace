@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { FloorPlanGrid } from '@/components/indoor-tracking/FloorPlanGrid';
 import { MovementPlayback } from '@/components/indoor-tracking/MovementPlayback';
 import { MovementMetrics } from '@/components/indoor-tracking/MovementMetrics';
-import { processPositionData } from '@/lib/positionUtils';
+import { ZoneHistory } from '@/components/indoor-tracking/ZoneHistory';
+import { processPositionData, processZoneHistory } from '@/lib/positionUtils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import Header from '@/components/layout/Header';
@@ -154,6 +155,7 @@ export default function IndoorTracking() {
   }
 
   const processedData = processPositionData(positionData);
+  const zoneVisits = processZoneHistory(processedData.events);
   const positionEvents = processedData.events.map(event => ({
     position: event.position,
     timestamp: event.timestamp
@@ -247,6 +249,9 @@ export default function IndoorTracking() {
           </div>
 
           <MovementMetrics data={processedData} />
+
+          {/* Zone Visit History Table */}
+          <ZoneHistory visits={zoneVisits} />
         </div>
       </main>
     </div>

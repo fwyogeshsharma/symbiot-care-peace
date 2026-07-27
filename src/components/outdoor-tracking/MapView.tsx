@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { GoogleMap, LoadScript, Marker, Circle, Polyline, InfoWindow } from '@react-google-maps/api';
 import { GPSCoordinate } from '@/lib/gpsUtils';
-import { GeofencePlace } from '@/lib/geofenceUtils';
+import { GeofencePlace, getPlaceTypeLabel } from '@/lib/geofenceUtils';
 import { useTranslation } from 'react-i18next';
 
 interface MapViewProps {
@@ -111,7 +111,7 @@ export function MapView({
                     >
                       <div className="p-2">
                         <div className="font-semibold text-foreground">{place.name}</div>
-                        <div className="text-sm text-muted-foreground">{place.place_type}</div>
+                        <div className="text-sm text-muted-foreground">{getPlaceTypeLabel(place.place_type)}</div>
                         {place.address && <div className="text-xs mt-1">{place.address}</div>}
                       </div>
                     </InfoWindow>

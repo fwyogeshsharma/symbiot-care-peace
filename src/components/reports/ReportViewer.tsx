@@ -4,10 +4,14 @@ import { Download, Printer, X } from 'lucide-react';
 import { VitalSignsTrendsReport } from './VitalSignsTrendsReport';
 import { DailyActivityReport } from './DailyActivityReport';
 import { MedicationAdherenceReport } from './MedicationAdherenceReport';
+import { MedicationTimingAnalysisReport } from './MedicationTimingAnalysisReport';
 import { AlertHistoryReport } from './AlertHistoryReport';
+import { EmergencyEventsReport } from './EmergencyEventsReport';
+import { ResponseTimeAnalysisReport } from './ResponseTimeAnalysisReport';
 import { HealthAnomaliesReport } from './HealthAnomaliesReport';
 import { BloodSugarAnalysisReport } from './BloodSugarAnalysisReport';
 import { SleepQualityReport } from './SleepQualityReport';
+import { SleepPatternsReport } from './SleepPatternsReport';
 import { AirQualityReport } from './AirQualityReport';
 import { EnvironmentalComfortReport } from './EnvironmentalComfortReport';
 import { ILQScoreTrendsReport } from './ILQScoreTrendsReport';
@@ -15,9 +19,13 @@ import { ContributingFactorsReport } from './ContributingFactorsReport';
 import { WeekOverWeekReport } from './WeekOverWeekReport';
 import { MonthOverMonthReport } from './MonthOverMonthReport';
 import { EndOfDayReport } from './EndOfDayReport';
+import { FallIncidentsReport } from './FallIncidentsReport';
+import { EnvironmentalSafetyReport } from './EnvironmentalSafetyReport';
+import { MovementPatternsReport } from './MovementPatternsReport';
 import { useTranslation } from 'react-i18next';
-import { exportReport } from '@/lib/reportExport';
 import { useState } from 'react';
+import { exportReportById } from '@/lib/reportExport';
+import { toast } from 'sonner';
 
 interface ReportViewerProps {
   open: boolean;
@@ -25,8 +33,6 @@ interface ReportViewerProps {
   reportName: string;
   selectedPerson: string;
   dateRange: { from: Date; to: Date };
-  elderlyPersons?: any[];
-  reportType?: string;
 }
 
 export const ReportViewer = ({
@@ -35,27 +41,27 @@ export const ReportViewer = ({
   reportName,
   selectedPerson,
   dateRange,
-  elderlyPersons = [],
-  reportType = '',
 }: ReportViewerProps) => {
   const { t } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
-    if (isExporting) return;
-
     setIsExporting(true);
     try {
-      await exportReport({
-        reportName,
-        reportType,
-        selectedPerson,
-        dateRange,
-        elderlyPersons,
-        elementId: 'report-content',
-      });
+      toast.info(t('reports.preparingExport', { defaultValue: 'Preparing report for export...' }));
+
+      console.log('ReportViewer: Starting export for', reportName);
+
+      // Wait for report to be fully rendered with data
+      await exportReportById('report-content', reportName, 'pdf', 1500);
+
+      console.log('ReportViewer: Export completed');
+
+      toast.success(t('reports.exportSuccess', { defaultValue: 'Report exported successfully!' }));
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error('ReportViewer: Export error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(t('reports.exportError', { defaultValue: 'Failed to export report. Please try again.' }) + ` (${errorMessage})`);
     } finally {
       setIsExporting(false);
     }
@@ -66,10 +72,12 @@ export const ReportViewer = ({
   };
 
   const renderReport = () => {
+    console.log('Rendering report:', reportName);
     switch (reportName) {
       // Special Reports
       case 'End of Day Summary':
       case t('reports.special.eodSummary'):
+      case t('reports.daily.eodSummary'):
         return <EndOfDayReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Health Summary Reports
@@ -92,17 +100,11 @@ export const ReportViewer = ({
 
       case 'Movement Patterns':
       case t('reports.activity.movementPatterns'):
-        return <DailyActivityReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+        return <MovementPatternsReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       case 'Fall Incidents':
       case t('reports.activity.fallIncidents'):
-        return (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              Fall detection report - Please ensure fall detection devices are configured.
-            </p>
-          </div>
-        );
+        return <FallIncidentsReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Sleep Analysis Reports
       case 'Sleep Quality Report':
@@ -111,7 +113,7 @@ export const ReportViewer = ({
 
       case 'Sleep Patterns':
       case t('reports.sleep.patterns'):
-        return <SleepQualityReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+        return <SleepPatternsReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Medication Reports
       case 'Adherence Report':
@@ -120,7 +122,7 @@ export const ReportViewer = ({
 
       case 'Timing Analysis':
       case t('reports.medication.timing'):
-        return <MedicationAdherenceReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+        return <MedicationTimingAnalysisReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Alert Summary Reports
       case 'Alert History':
@@ -129,13 +131,17 @@ export const ReportViewer = ({
 
       case 'Emergency Events':
       case t('reports.alerts.emergency'):
-        return <AlertHistoryReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+        return <EmergencyEventsReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       case 'Response Time Analysis':
       case t('reports.alerts.responseTime'):
-        return <AlertHistoryReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+        return <ResponseTimeAnalysisReport selectedPerson={selectedPerson} dateRange={dateRange} />;
 
       // Environmental Safety Reports
+      case 'Environmental Safety Assessment':
+      case t('reports.environment.safetyAssessment'):
+        return <EnvironmentalSafetyReport selectedPerson={selectedPerson} dateRange={dateRange} />;
+
       case 'Air Quality Report':
       case t('reports.environment.airQuality'):
         return <AirQualityReport selectedPerson={selectedPerson} dateRange={dateRange} />;
@@ -166,7 +172,7 @@ export const ReportViewer = ({
         return (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              This report is under development. Please check back later.
+              {t('reports.underDevelopment', { defaultValue: 'This report is under development. Please check back later.' })}
             </p>
           </div>
         );
@@ -189,7 +195,7 @@ export const ReportViewer = ({
                 variant="outline"
                 size="sm"
                 onClick={handlePrint}
-                title="Print Report"
+                title={t('reports.printReport', { defaultValue: 'Print Report' })}
               >
                 <Printer className="w-4 h-4" />
               </Button>
@@ -198,10 +204,10 @@ export const ReportViewer = ({
                 size="sm"
                 onClick={handleExport}
                 disabled={isExporting}
-                title="Export to PDF"
+                title={t('reports.exportToPDF', { defaultValue: 'Export to PDF' })}
               >
                 <Download className="w-4 h-4" />
-                {isExporting && <span className="ml-2 text-xs">Exporting...</span>}
+                {isExporting && <span className="ml-2">{t('common.loading', { defaultValue: 'Loading...' })}</span>}
               </Button>
             </div>
           </div>

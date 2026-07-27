@@ -20,12 +20,14 @@ export const FloorPlanGrid = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
 
-  // Use full card width with square grid cells
-  const CANVAS_WIDTH = 900;
-  const CANVAS_HEIGHT = 900;
-
-  // Use same scale for both dimensions to maintain square grid cells
-  const scale = Math.min(CANVAS_WIDTH / floorPlan.width, CANVAS_HEIGHT / floorPlan.height);
+  // Calculate canvas size based on floor plan dimensions and grid
+  // Each grid cell = 60 pixels (square) - matches ZoneEditor
+  const PIXELS_PER_CELL = 60;
+  const gridCellsWidth = floorPlan.width / floorPlan.grid_size;
+  const gridCellsHeight = floorPlan.height / floorPlan.grid_size;
+  const CANVAS_WIDTH = gridCellsWidth * PIXELS_PER_CELL;
+  const CANVAS_HEIGHT = gridCellsHeight * PIXELS_PER_CELL;
+  const scale = PIXELS_PER_CELL / floorPlan.grid_size; // pixels per meter
   const scaleX = scale;
   const scaleY = scale;
 
@@ -77,18 +79,27 @@ export const FloorPlanGrid = ({
       const imgAspectRatio = backgroundImage.width / backgroundImage.height;
       const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
 
-      let scale;
+      let imgScale;
+      let left = 0;
+      let top = 0;
+
       if (imgAspectRatio > canvasAspectRatio) {
-        scale = CANVAS_WIDTH / backgroundImage.width;
+        // Image is wider than canvas - scale to canvas width and center vertically
+        imgScale = CANVAS_WIDTH / backgroundImage.width;
+        const scaledHeight = backgroundImage.height * imgScale;
+        top = (CANVAS_HEIGHT - scaledHeight) / 2;
       } else {
-        scale = CANVAS_HEIGHT / backgroundImage.height;
+        // Image is taller than canvas - scale to canvas height and center horizontally
+        imgScale = CANVAS_HEIGHT / backgroundImage.height;
+        const scaledWidth = backgroundImage.width * imgScale;
+        left = (CANVAS_WIDTH - scaledWidth) / 2;
       }
 
-      const scaledWidth = backgroundImage.width * scale;
-      const scaledHeight = backgroundImage.height * scale;
+      const scaledWidth = backgroundImage.width * imgScale;
+      const scaledHeight = backgroundImage.height * imgScale;
 
       ctx.globalAlpha = 0.7;
-      ctx.drawImage(backgroundImage, 0, 0, scaledWidth, scaledHeight);
+      ctx.drawImage(backgroundImage, left, top, scaledWidth, scaledHeight);
       ctx.globalAlpha = 1.0;
     }
 
@@ -147,14 +158,14 @@ export const FloorPlanGrid = ({
 
     // Draw furniture
     const furnitureColors: Record<string, string> = {
-      bed: '#ef4444',
-      chair: '#f59e0b',
-      table: '#84cc16',
-      sofa: '#06b6d4',
-      desk: '#8b5cf6',
-      toilet: '#ec4899',
-      sink: '#14b8a6',
-      door: '#6b7280',
+      bed: '#F4A6A6',
+      chair: '#F2C94C',
+      table: '#9CCC65',
+      sofa: '#6ED3CF',
+      desk: '#B39DDB',
+      toilet: '#FFB6B6',
+      sink: '#81D4FA',
+      door: '#6B7280',
     };
 
     if (floorPlan.furniture && floorPlan.furniture.length > 0) {
@@ -272,17 +283,26 @@ export const FloorPlanGrid = ({
         const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
 
         let imgScale;
+        let left = 0;
+        let top = 0;
+
         if (imgAspectRatio > canvasAspectRatio) {
+          // Image is wider than canvas - scale to canvas width and center vertically
           imgScale = CANVAS_WIDTH / backgroundImage.width;
+          const scaledHeight = backgroundImage.height * imgScale;
+          top = (CANVAS_HEIGHT - scaledHeight) / 2;
         } else {
+          // Image is taller than canvas - scale to canvas height and center horizontally
           imgScale = CANVAS_HEIGHT / backgroundImage.height;
+          const scaledWidth = backgroundImage.width * imgScale;
+          left = (CANVAS_WIDTH - scaledWidth) / 2;
         }
 
         const scaledWidth = backgroundImage.width * imgScale;
         const scaledHeight = backgroundImage.height * imgScale;
 
         ctx.globalAlpha = 0.7;
-        ctx.drawImage(backgroundImage, 0, 0, scaledWidth, scaledHeight);
+        ctx.drawImage(backgroundImage, left, top, scaledWidth, scaledHeight);
         ctx.globalAlpha = 1.0;
       }
 
@@ -340,14 +360,14 @@ export const FloorPlanGrid = ({
 
       // Redraw furniture with separate X and Y scaling
       const furnitureColors = {
-        bed: '#ef4444',
-        chair: '#f59e0b',
-        table: '#84cc16',
-        sofa: '#06b6d4',
-        desk: '#8b5cf6',
-        toilet: '#ec4899',
-        sink: '#14b8a6',
-        door: '#6b7280',
+        bed: '#F4A6A6',
+        chair: '#F2C94C',
+        table: '#9CCC65',
+        sofa: '#6ED3CF',
+        desk: '#B39DDB',
+        toilet: '#FFB6B6',
+        sink: '#81D4FA',
+        door: '#6B7280',
       };
 
       if (floorPlan.furniture && floorPlan.furniture.length > 0) {
@@ -456,11 +476,11 @@ export const FloorPlanGrid = ({
           </div>
         </div>
         
-        <div className="overflow-auto border rounded-lg bg-background">
+        <div className="overflow-auto border rounded-lg bg-background flex items-center justify-center">
           <canvas
             ref={canvasRef}
-            className="max-w-full"
-            style={{ imageRendering: 'crisp-edges' }}
+            className="mx-auto"
+            style={{ maxWidth: '100%', maxHeight: '70vh', width: 'auto', height: 'auto', display: 'block', imageRendering: 'crisp-edges' }}
           />
         </div>
 
@@ -469,7 +489,7 @@ export const FloorPlanGrid = ({
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
               <span className="font-medium">Current Zone:</span>
-              <span className="text-muted-foreground">{currentPosition.zone}</span>
+              <span className="text-muted-foreground">{currentPosition.zone || 'Indoor'}</span>
             </div>
             {typeof currentPosition.x === 'number' && typeof currentPosition.y === 'number' && (
               <div className="text-muted-foreground">

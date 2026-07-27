@@ -232,7 +232,7 @@ export const WeekOverWeekReport = ({ selectedPerson, dateRange }: WeekOverWeekRe
       {/* Weekly Metrics Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Weekly Metrics Comparison</CardTitle>
+          <CardTitle>{t('reports.content.weeklyComparison')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>

@@ -10,6 +10,8 @@
     "add": "Add",
     "update": "Update",
     "close": "Close",
+    "expand": "Expand",
+    "minimize": "Minimize",
     "search": "Search",
     "filter": "Filter",
     "export": "Export",
@@ -50,7 +52,9 @@
     "button_pressed": "Button Pressed",
     "oxygen_saturation": "Oxygen Saturation",
     "blood_sugar": "Blood Sugar",
-    "weight": "Weight"
+    "weight": "Weight",
+    "bed_pad": "Bed Pad",
+    "toilet_seat": "Toilet Seat"
   },
   "dataValues": {
     "online": "Online",
@@ -82,7 +86,8 @@
   "healthMetrics": {
     "title": "Health Metrics",
     "viewCharts": "View Charts",
-    "noData": "No health data available yet",
+    "noData": "Add device to get health metrics",
+    "goToDevices": "Go to Device Page",
     "types": {
       "heart_rate": "Heart Rate",
       "blood_pressure": "Blood Pressure",
@@ -119,17 +124,21 @@
       "last24Hours": "Last 24 Hours",
       "last7Days": "Last 7 Days",
       "last30Days": "Last 30 Days",
+      "allAvailableData": "All Available Data",
+      "monthlyAverages": "Showing monthly averages",
       "heartRate": "Heart Rate",
       "bloodPressure": "Blood Pressure",
       "oxygen": "Oxygen",
       "temperature": "Temperature",
       "sleep": "Sleep",
+      "humidity": "Humidity",
       "panicSos": "Panic/SOS",
       "heartRateOverTime": "Heart Rate Over Time",
       "bloodPressureOverTime": "Blood Pressure Over Time",
       "oxygenOverTime": "Oxygen Saturation Over Time",
       "temperatureOverTime": "Body Temperature Over Time",
       "sleepOverTime": "Sleep Quality Over Time",
+      "humidityOverTime": "Humidity Over Time",
       "panicSosOverTime": "Panic/SOS Events Over Time",
       "systolic": "Systolic",
       "diastolic": "Diastolic",
@@ -340,13 +349,19 @@
   "nav": {
     "home": "Home",
     "dashboard": "Dashboard",
+    "vital": "Vital",
+    "data": "Data",
     "health": "Health",
+    "insights": "Insights",
+    "assets": "Assets",
+    "reportsMenu": "Results",
     "profile": "Profile",
     "alerts": "Alerts",
     "reports": "Reports",
     "tracking": "Tracking",
     "devices": "Devices",
     "dataSharing": "Data Sharing",
+    "caregiverDataSharingDisabled": "Caregivers do not have access to share data",
     "movement": "Activity",
     "floorPlans": "Floor Plans",
     "analytics": "Analytics",
@@ -405,6 +420,12 @@
       "passwordReset": "Password reset successfully",
       "loginSuccess": "Welcome back!",
       "signupSuccess": "Account created successfully!"
+    },
+    "roleDialog": {
+      "title": "Self-Monitoring Option",
+      "message": "By selecting elderly/family member, you can monitor yourself too. If you don't want to monitor yourself, select caregiver.",
+      "selectCaregiver": "Select Caregiver",
+      "continue": "Continue with Selection"
     }
   },
   "investorInfo": {
@@ -667,6 +688,54 @@
     "vitalSigns": "Vital Signs",
     "activity": "Activity",
     "quickActions": "Quick Actions",
+    "vitalMetrics": "Vital Metrics",
+    "vitalMetricsDesc": "Heart rate, blood pressure, oxygen levels",
+    "healthCharts": "Health Metrics Charts",
+    "healthChartsDesc": "Detailed health trend charts and history",
+    "alerts": "Active Alerts",
+    "alertsDesc": "Current alerts and notifications",
+    "panicSos": "Panic/SOS Events",
+    "panicSosDesc": "Emergency button activity",
+    "environmental": "Environmental Sensors",
+    "environmentalDesc": "Temperature, humidity, air quality",
+    "medication": "Medication Management",
+    "medicationDesc": "Medication schedule and adherence",
+    "ilqScore": "ILQ Score",
+    "ilqScoreDesc": "Independent Living Quality metrics",
+    "elderlyList": "Monitored Individuals",
+    "elderlyListDesc": "List of people you are monitoring",
+    "movementSummary": "Movement Summary",
+    "movementSummaryDesc": "Activity patterns and movement statistics",
+    "movementTimeline": "Movement Timeline",
+    "movementTimelineDesc": "Daily activity timeline and patterns",
+    "movementHeatmap": "Movement Heatmap",
+    "movementHeatmapDesc": "Visual heatmap of activity by location",
+    "dwellTime": "Dwell Time Analysis",
+    "dwellTimeDesc": "Time spent in different locations",
+    "deviceStatus": "Device Status",
+    "deviceStatusDesc": "Connected devices and battery levels",
+    "homeHub": "Home Hub",
+    "homeHubDesc": "Home hub device status and info",
+    "smartphone": "Smartphone",
+    "smartphoneDesc": "Mobile device status and location",
+    "cameras": "Security Cameras",
+    "camerasDesc": "Live camera feeds and recordings",
+    "dataSharing": "Data Sharing",
+    "dataSharingDesc": "Manage data sharing with caregivers",
+    "customizeTitle": "Customize Dashboard",
+    "customizeDesc": "Add or remove components from your dashboard",
+    "availableComponents": "Available Components",
+    "preview": "Dashboard Preview",
+    "components": "components",
+    "emptyDashboard": "No Components Added",
+    "emptyDashboardDesc": "Add components from the left panel to customize your dashboard",
+    "componentPreview": "Component Preview Area",
+    "allComponentsAdded": "All components are added to your dashboard",
+    "layoutSaved": "Layout Saved",
+    "layoutSavedDesc": "Your dashboard layout has been saved successfully",
+    "saveFailed": "Save Failed",
+    "layoutReset": "Layout Reset",
+    "layoutResetDesc": "Dashboard layout has been reset to default",
     "stats": {
       "monitoredPersons": {
         "label": "Monitored Persons",
@@ -882,6 +951,7 @@
       "blood_pressure_monitor": "Blood Pressure Monitor",
       "gps_tracker": "GPS Tracker",
       "environmental_sensor": "Environmental Sensor",
+      "air_sensor": "Air Sensor",
       "wearable": "Wearable",
       "smartwatch": "Smartwatch",
       "panic_button": "Panic Button",
@@ -906,6 +976,7 @@
       "emergency_button": "Emergency Button",
       "panic_button": "Panic Button",
       "environmental_sensor": "Environmental Sensor",
+      "air_sensor": "Air Sensor",
       "home_hub": "Home Hub",
       "fall_detection": "Fall Detection",
       "wearable": "Wearable Device",
@@ -934,9 +1005,10 @@
     "location": "Location",
     "platformMetrics": "Platform Metrics",
     "deviceTypes": "Device Types",
-    "noDevices": "No devices registered yet",
+    "noDevices": "Add devices to get your health metrics",
     "noData": "No Data",
     "records": "records",
+    "viewData": "View device data",
     "generateData": "Generate Data",
     "generateDataTooltip": "Generate 7 days of sample data for testing",
     "unassigned": "Unassigned",
@@ -1124,33 +1196,12 @@
       "deleteExpired": "Delete Expired Request",
       "deleted": "Pairing request deleted",
       "deleteFailed": "Failed to delete pairing request"
-    },
-    "sync": {
-      "title": "Sync Devices",
-      "description": "Sync your connected fitness devices over Bluetooth to pull in their latest readings.",
-      "syncAll": "Sync All Devices",
-      "syncOne": "Sync",
-      "statusIdle": "Not synced yet",
-      "statusScanning": "Looking for device...",
-      "statusConnecting": "Connecting...",
-      "statusSyncing": "Syncing...",
-      "statusSuccess": "Synced",
-      "statusUnsupported": "No data available from this device",
-      "statusFailed": "Sync failed",
-      "lastSynced": "Last synced {{time}}",
-      "webNotSupported": "Bluetooth sync requires the installed mobile app and won't work in a browser.",
-      "noDevices": "No devices to sync yet. Register a device first.",
-      "healthConnect": {
-        "tooltip": "Sync from Health Connect",
-        "notInstalled": "Health Connect isn't installed, so data from apps like Zepp can't come through yet.",
-        "installAction": "Install Health Connect"
-      }
     }
   },
   "tracking": {
-    "title": "Tracking",
+    "title": "Mobility",
     "subtitle": "Indoor and outdoor positioning system",
-    "movementTracking": "Movement Tracking",
+    "movementTracking": "Movement Monitoring",
     "realTimePositioning": "Real-time indoor and outdoor positioning",
     "location": "Current Location",
     "indoor": "Indoor",
@@ -1171,8 +1222,8 @@
     "last7Days": "Last 7 Days",
     "last30Days": "Last 30 Days",
     "noFloorPlan": {
-      "title": "No Floor Plan Found",
-      "description": "Register a worker-wearable device to see indoor tracking"
+      "title": "Add a Floor Plan",
+      "description": "Please add a floor plan to enable indoor tracking"
     },
     "noGpsData": {
       "title": "No GPS Data or Geofences",
@@ -1394,10 +1445,18 @@
     "userManagement": "User Management",
     "profileUpdated": "Profile updated",
     "profileUpdatedDesc": "Your profile has been updated successfully.",
-    "updateFailed": "Failed to update profile"
+    "updateFailed": "Failed to update profile",
+    "fullNameRequired": "Full name is required (minimum 2 characters)",
+    "phoneRequired": "Phone number is required (minimum 10 digits)",
+    "postalAddressRequired": "Postal address is required (minimum 5 characters)"
+  },
+  "health": {
+    "title": "Health Dashboard",
+    "subtitle": "Monitor vital signs and health metrics",
+    "description": "Comprehensive health monitoring and vital signs tracking"
   },
   "movement": {
-    "title": "Activity Dashboard",
+    "title": "Movement Monitoring",
     "subtitle": "Track activity patterns over time",
     "description": "Track and visualize activity patterns over time",
     "selectPeriod": "Select period",
@@ -1409,6 +1468,7 @@
     "today": "Today",
     "last7days": "Last 7 Days",
     "last30days": "Last 30 Days",
+    "allData": "All Available Data",
     "week": "This Week",
     "month": "This Month",
     "summary": {
@@ -1562,18 +1622,6 @@
     "poor": "Poor",
     "critical": "Critical",
     "trend": "ILQ Trend",
-    "info": {
-      "ariaLabel": "ILQ Information",
-      "title": "Independent Living Quotient (ILQ)",
-      "description": "A score from 0-100 measuring an elderly person's ability to live independently.",
-      "components": "Components",
-      "healthVitals": "Health Vitals (30%)",
-      "physicalActivity": "Physical Activity (25%)",
-      "cognitiveFunction": "Cognitive Function (15%)",
-      "environmentalSafety": "Environmental Safety (15%)",
-      "emergencyResponse": "Emergency Response (10%)",
-      "socialEngagement": "Social Engagement (5%)"
-    },
     "loadingChart": "Loading chart...",
     "noDataPeriod": "No ILQ data available for the selected period",
     "lastDays": "Last {{days}} days",
@@ -1608,6 +1656,7 @@
       "last7Days": "Last 7 days",
       "last30Days": "Last 30 days",
       "last90Days": "Last 90 days",
+      "allTime": "All Available Data",
       "noHistoricalData": "No historical data available",
       "componentAnalysis": "Component Analysis",
       "componentAnalysisDesc": "Latest score breakdown across all dimensions",
@@ -1624,20 +1673,15 @@
       "cognitiveFunctionPercent": "Cognitive Function (15%)",
       "cognitiveFunctionDesc": "Routine adherence, medication compliance",
       "environmental": "Environmental",
-      "environmentalSafety": "Environmental Safety",
       "emergency": "Emergency",
-      "emergencyResponse": "Emergency Response",
       "social": "Social",
-      "socialEngagement": "Social Engagement",
-      "healthVitalsShort": "Health",
-      "physicalActivityShort": "Activity",
-      "cognitiveFunctionShort": "Cognitive",
-      "environmentalShort": "Environment",
-      "emergencyShort": "Emergency",
-      "socialShort": "Social",
       "computingScore": "Computing ILQ score...",
       "computedSuccess": "ILQ computed successfully: {{score}}",
       "computeFailed": "Failed to compute ILQ",
+      "computeHistorical": "Calculate Historical",
+      "computingHistorical": "Calculating historical ILQ scores for all past data...",
+      "historicalSuccess": "Successfully calculated {{count}} historical scores!",
+      "historicalFailed": "Failed to calculate historical scores",
       "generatingReport": "Generating PDF report...",
       "reportDownloaded": "Report downloaded successfully!",
       "reportFailed": "Failed to generate report"
@@ -1818,7 +1862,7 @@
       },
       "indoorTracking": {
         "title": "Indoor Tracking with Floor Plans",
-        "content": "View real-time location on uploaded floor plans. Create zones to define areas like bedroom, kitchen, bathroom. Track movement paths and dwell times in each zone."
+        "content": "View real-time location on uploaded floor plans. Create zones to define areas like bedroom, kitchen, bathroom. Track movement paths and dwell times in each zone. Multi-story buildings are fully supported - upload floor plans for each level to track location across multiple floors."
       },
       "outdoorTracking": {
         "title": "Outdoor GPS Tracking",
@@ -1893,8 +1937,9 @@
     "footer": {
       "copyright": "© 2025 SymBIoT. All rights reserved. Version: 1.0.10",
       "tagline": "Bringing families and technology together for better care."
-    },
-    "reports": {
+    }
+  },
+  "reports": {
       "title": "Reports",
       "subtitle": "Generate comprehensive reports and analytics",
       "filters": "Report Filters",
@@ -1906,9 +1951,24 @@
       "last7Days": "Last 7 Days",
       "last30Days": "Last 30 Days",
       "last3Months": "Last 3 Months",
+      "last6Months": "Last 6 Months",
       "generate": "Generate",
       "exportAll": "Export All",
+      "printReport": "Print Report",
+      "exportToPDF": "Export to PDF",
+      "preparingExport": "Preparing report for export...",
+      "exportSuccess": "Report exported successfully!",
+      "exportError": "Failed to export report. Please try again.",
+      "exportingAll": "Exporting {{count}} reports...",
+      "exportingReport": "Exporting {{current}} of {{total}}: {{name}}",
+      "exportSingleFailed": "Failed to export {{name}}",
+      "exportAllSuccess": "All reports exported successfully!",
+      "exportAllPartial": "Exported {{exported}} of {{total}} reports",
+      "exportAllError": "Failed to export all reports.",
+      "underDevelopment": "This report is under development. Please check back later.",
       "categories": {
+        "daily": "Daily Summary",
+        "dailyDesc": "End of day comprehensive overview for families",
         "health": "Health Summary",
         "healthDesc": "Vital signs and health metrics overview",
         "activity": "Activity & Mobility",
@@ -1932,7 +1992,9 @@
         "anomalies": "Health Anomalies",
         "anomaliesDesc": "Out-of-range readings and concerning patterns",
         "bloodSugar": "Blood Sugar Analysis",
-        "bloodSugarDesc": "Glucose levels and patterns"
+        "bloodSugarDesc": "Glucose levels and patterns",
+        "dataPoints": "data points",
+        "loadingHistoricalData": "Loading historical data..."
       },
       "activity": {
         "dailyActivity": "Daily Activity Summary",
@@ -1940,7 +2002,89 @@
         "movementPatterns": "Movement Patterns",
         "movementPatternsDesc": "Room transitions and mobility analysis",
         "fallIncidents": "Fall Incidents",
-        "fallIncidentsDesc": "Fall detection events and risk analysis"
+        "fallIncidentsDesc": "Fall detection events and risk analysis",
+        "bedPadActivity": "Bed Pad Activity",
+        "bedPadActivityDesc": "Sleep patterns and bed usage analysis",
+        "toiletSeatActivity": "Toilet Seat Activity",
+        "toiletSeatActivityDesc": "Toilet usage patterns and frequency"
+      },
+      "bedPadActivity": {
+        "title": "Bed Pad Activity",
+        "noData": "No bed pad data available for the selected period",
+        "totalTimeInBed": "Total Time in Bed",
+        "sleepSessions": "Sleep Sessions",
+        "sleepQuality": "Sleep Quality",
+        "dayNightRatio": "Day/Night Ratio",
+        "avgTimeInBed": "Avg",
+        "perSession": "per session",
+        "totalSessionsRecorded": "Total sessions recorded",
+        "basedOnAvgDuration": "Based on avg duration",
+        "nightVsDay": "Night vs Day sessions",
+        "dailyBedUsage": "Daily Bed Usage",
+        "dayVsNightUsage": "Day vs Night Usage",
+        "hourlyUsagePattern": "Hourly Bed Usage Pattern",
+        "recentBedActivity": "Recent Bed Activity",
+        "hoursInBed": "Hours in Bed",
+        "usageCount": "Usage Count",
+        "duration": "Duration",
+        "night": "Night",
+        "day": "Day",
+        "nightTime": "Night (8PM-6AM)",
+        "dayTime": "Day (6AM-8PM)",
+        "optimal": "Optimal",
+        "good": "Good",
+        "low": "Low",
+        "high": "High"
+      },
+      "toiletSeatActivity": {
+        "title": "Toilet Seat Activity",
+        "noData": "No toilet seat data available for the selected period",
+        "totalUsage": "Total Usage",
+        "avgDuration": "Avg Duration",
+        "usagePattern": "Usage Pattern",
+        "nightVisits": "Night Visits",
+        "avgPerDay": "Avg",
+        "perDay": "per day",
+        "perVisit": "Per visit",
+        "basedOnFrequency": "Based on frequency",
+        "extendedSessions": "extended sessions",
+        "noExtendedSessions": "No extended sessions",
+        "dailyToiletUsage": "Daily Toilet Usage",
+        "dayVsNightUsage": "Day vs Night Usage",
+        "hourlyUsagePattern": "Hourly Usage Pattern",
+        "durationDistribution": "Duration Distribution",
+        "recentToiletActivity": "Recent Toilet Activity",
+        "count": "Count",
+        "minutes": "minutes",
+        "night": "Night",
+        "day": "Day",
+        "nightTime": "Night (10PM-6AM)",
+        "dayTime": "Day (6AM-10PM)",
+        "extended": "Extended",
+        "quick": "Quick (<3 min)",
+        "normal": "Normal (3-10 min)",
+        "longDuration": "Extended (>10 min)",
+        "normal_status": "Normal",
+        "low_status": "Low",
+        "high_status": "High"
+      },
+      "movementPatterns": {
+        "noData": "No movement data available for the selected period.",
+        "noDataDesc": "Ensure location tracking devices are properly configured.",
+        "totalMovements": "Total Movements",
+        "recordedEvents": "Recorded events",
+        "locationsVisited": "Locations Visited",
+        "uniqueLocations": "Unique locations",
+        "roomTransitions": "Room Transitions",
+        "locationChanges": "Location changes",
+        "mostVisited": "Most Visited",
+        "hourlyMovement": "Movement Frequency by Hour",
+        "movements": "Movements",
+        "timeDistribution": "Activity by Time of Day",
+        "dwellTime": "Time Spent by Location",
+        "topTransitions": "Top Location Transitions",
+        "transitions": "transitions",
+        "detailedDwellTime": "Detailed Dwell Time Analysis"
       },
       "sleep": {
         "quality": "Sleep Quality Report",
@@ -1948,25 +2092,273 @@
         "patterns": "Sleep Patterns",
         "patternsDesc": "Sleep stages and cycle analysis"
       },
+      "sleepPatterns": {
+        "noData": "No Sleep Pattern Data Available",
+        "noDataDesc": "Sleep pattern analysis requires sleep quality data for the selected period.",
+        "noDataTip": "Tip: Try selecting a different date range or ensure sleep tracking devices are recording data.",
+        "percentOfSleep": "% of sleep",
+        "sleepCycles": "Sleep Cycles",
+        "minEach": "~90 min each",
+        "avgBedtime": "Avg Bedtime",
+        "typicalSleepTime": "Typical sleep time",
+        "stagesDistribution": "Sleep Stages Distribution",
+        "minutes": "Minutes",
+        "durationMin": "Duration (min)",
+        "averagePerNight": "Average per Night",
+        "min": "min",
+        "deepSleepOptimal": "Deep sleep duration is optimal (15-25% of total)",
+        "deepSleepImprove": "Deep sleep could be improved",
+        "remSleepHealthy": "REM sleep is in healthy range (20-25% of total)",
+        "remSleepConsider": "Consider factors affecting REM sleep",
+        "stagesTrends": "Sleep Stages Trends",
+        "insights": "Sleep Pattern Insights",
+        "cyclesLabel": "Cycles",
+        "cyclesDesc": "Completing {{count}} sleep cycles per night. Aim for 4-6 complete cycles (6-9 hours) for optimal rest.",
+        "consistencyLabel": "Consistency",
+        "consistencyGood": "Bedtime is consistent and within healthy range (10 PM - 11 PM).",
+        "consistencyImprove": "Consider maintaining a more consistent bedtime routine for better sleep quality.",
+        "qualityLabel": "Quality",
+        "qualityGood": "Minimal wakefulness indicates good sleep consolidation.",
+        "qualityImprove": "Frequent awakenings may indicate sleep fragmentation. Consider sleep environment factors.",
+        "pm": "PM",
+        "am": "AM"
+      },
       "medication": {
         "adherence": "Adherence Report",
         "adherenceDesc": "Doses taken vs missed",
         "timing": "Timing Analysis",
         "timingDesc": "Medication schedule compliance"
       },
+      "medicationTiming": {
+        "lateMedicationAnalysis": "Late Medication Analysis",
+        "lateMedicationDesc": "Detailed records of medications taken more than 30 minutes late to help identify patterns and improve timing",
+        "medicationsFrequentlyLate": "Medications Frequently Taken Late",
+        "avgDelay": "Avg delay",
+        "timesLate": "times late",
+        "recentLateMedications": "Recent Late Medications",
+        "medication": "Medication",
+        "scheduledTime": "Scheduled Time",
+        "takenTime": "Taken Time",
+        "delay": "Delay",
+        "showing": "Showing",
+        "of": "of",
+        "lateMedicationRecords": "late medication records",
+        "recommendationsToImprove": "Recommendations to Improve Timing",
+        "setUpReminders": "Set up medication reminders:",
+        "setUpRemindersDesc": "Use alarms or smartphone apps to notify minutes before scheduled time",
+        "focusOnFrequent": "Focus on frequently late medications:",
+        "focusOnFrequentDesc": "is taken late most often - consider rescheduling or extra reminders",
+        "pillOrganizer": "Pill organizer:",
+        "pillOrganizerDesc": "Use a weekly pill organizer to make it easier to remember what to take and when",
+        "linkToRoutine": "Link to routine:",
+        "linkToRoutineDesc": "Take medications at the same time as daily activities (e.g., with breakfast, before bedtime)",
+        "consultProvider": "Consult healthcare provider:",
+        "consultProviderDesc": "Average delay of {{delay}} minutes may indicate schedule conflicts - consider adjusting medication times",
+        "within30Min": "Within 30 min window",
+        "avgDelayLabel": "Avg Delay",
+        "earlyOnTime": "Early/On time",
+        "behindSchedule": "Behind schedule",
+        "takenLateLabel": "Taken Late",
+        "moreThan30Min": ">30 min after schedule",
+        "complianceByTimeOfDay": "Compliance by Time of Day",
+        "doses": "Doses",
+        "taken": "Taken",
+        "missedLabel": "Missed",
+        "avgDailyTimingVariance": "Average Daily Timing Variance",
+        "minutes": "Minutes",
+        "avgDelayMin": "Avg Delay (min)",
+        "maxDelayMin": "Max Delay (min)",
+        "timingDistribution": "Timing Distribution",
+        "onTimeLabel": "On Time",
+        "takenLateLabel2": "Taken Late",
+        "takenEarlyLabel": "Taken Early",
+        "timingInsights": "Timing Insights",
+        "excellentAdherence": "Excellent schedule adherence! Medications are consistently taken within the recommended time window.",
+        "goodConsistency": "Good timing consistency, but there is room for improvement in schedule adherence.",
+        "needsAttention": "Schedule adherence needs attention. Consider setting medication reminders.",
+        "systematicIssues": "suggests systematic timing issues. Review daily routine alignment with medication schedule.",
+        "minorDelays": "Minor delays detected. Medication reminders may help maintain schedule.",
+        "acceptable": "Medications are taken on time or slightly delayed, which is acceptable.",
+        "takenEarly": "Medications are often taken early. Ensure this is safe and recommended by healthcare provider.",
+        "higherMissRates": "Certain times of day show higher miss rates. Review and adjust medication schedule if needed.",
+        "goodCompliance": "Good",
+        "needsImprovement": "Needs improvement"
+      },
       "alerts": {
         "history": "Alert History",
-        "historyDesc": "All alerts with resolution status",
+        "historyDesc": "Comprehensive log of all alerts with severity distribution, status tracking, and recent alert timeline",
         "emergency": "Emergency Events",
-        "emergencyDesc": "Panic button and critical alerts",
+        "emergencyDesc": "Critical incidents including panic button activations, falls, and emergency response tracking",
         "responseTime": "Response Time Analysis",
-        "responseTimeDesc": "Average time to acknowledge and resolve"
+        "responseTimeDesc": "Detailed performance metrics showing acknowledgment times, resolution efficiency, and team responsiveness",
+        "totalEmergencies": "Total Emergencies",
+        "criticalLevel": "critical level",
+        "panicEvents": "Panic/SOS Events",
+        "requiresImmediate": "Requires immediate attention",
+        "fastestResponse": "Fastest Response",
+        "quickestReaction": "Quickest reaction time",
+        "avgCriticalResponse": "Avg Critical Response",
+        "forCriticalEvents": "For critical events",
+        "emergencyTypes": "Emergency Types",
+        "emergencyTrend": "Emergency Trend Over Time",
+        "emergencies": "Emergencies",
+        "emergencyTimeline": "Emergency Events Timeline",
+        "responded": "Responded",
+        "unresolvedEmergencies": "Unresolved Emergencies",
+        "unresolvedEmergenciesDesc": "There are {{count}} unresolved emergency events that require immediate attention",
+        "noEmergencies": "No Emergency Events",
+        "noEmergenciesDesc": "No critical or high severity emergencies during this period",
+        "totalResponded": "Total Responded",
+        "outOf": "out of",
+        "totalAlerts": "total alerts",
+        "avgAcknowledgeTime": "Avg Acknowledge Time",
+        "timeToAcknowledge": "Time to acknowledge",
+        "avgResolveTime": "Avg Resolve Time",
+        "timeToResolve": "Time to resolve",
+        "under1Minute": "Under 1 Minute",
+        "excellentResponse": "excellent response",
+        "performanceBenchmarks": "Performance Benchmarks",
+        "under1Min": "Under 1 Min",
+        "under5Min": "Under 5 Min",
+        "over10Min": "Over 10 Min",
+        "excellent": "Excellent",
+        "good": "Good",
+        "needsImprovement": "Needs Improvement",
+        "responseTimeBySeverity": "Response Time by Severity",
+        "avgResponse": "Avg Response",
+        "dailyPerformanceTrend": "Daily Performance Trend",
+        "responseTimeByType": "Response Time by Alert Type",
+        "bestResponses": "Best Responses",
+        "slowestResponses": "Slowest Responses",
+        "performanceRecommendations": "Performance Recommendations",
+        "recommendation1": "{{count}} alerts took over 10 minutes to respond. Consider adding more team members or improving notification systems.",
+        "recommendation2": "Review alert priority settings to ensure critical alerts receive immediate attention.",
+        "recommendation3": "Implement escalation policies for alerts that remain unacknowledged after a certain threshold.",
+        "noResponseData": "No Response Data Available",
+        "noResponseDataDesc": "No alerts have been acknowledged or resolved during this period to analyze response times"
       },
       "environment": {
         "airQuality": "Air Quality Report",
         "airQualityDesc": "Temperature, humidity, and air quality trends",
         "comfort": "Comfort Analysis",
         "comfortDesc": "Optimal vs actual environmental conditions"
+      },
+      "airQuality": {
+        "connectedSensors": "Connected Environmental Sensors",
+        "sensorsActive": "{{count}} sensor(s) actively monitoring",
+        "good": "Good",
+        "fair": "Fair",
+        "poor": "Poor",
+        "highCO2": "High CO2 levels detected",
+        "highVOC": "High volatile organic compounds detected",
+        "highPM25": "High PM2.5 particulate matter",
+        "highPM10": "High PM10 particulate matter",
+        "humidityOutOfRange": "Humidity outside optimal range",
+        "temperatureOutOfRange": "Temperature outside comfort range",
+        "unhealthyAQI": "Unhealthy air quality index",
+        "pm10Good": "µg/m³ (Good: <50)",
+        "pm1Good": "µg/m³ (Good: <10)",
+        "recommendations": {
+          "maintainTemp": "Maintain indoor temperature between 68-78°F for optimal comfort",
+          "keepHumidity": "Keep humidity levels between 30-60% to prevent mold and respiratory issues",
+          "ventilateCO2": "Ventilate rooms when CO₂ levels exceed 800 ppm",
+          "useAirPurifiers": "Use air purifiers to reduce particulate matter (PM2.5)",
+          "eliminateVOCs": "Identify and eliminate sources of VOCs (cleaning products, paints, etc.)",
+          "monitorRegularly": "Regularly monitor air quality, especially for elderly with respiratory conditions"
+        }
+      },
+      "fallIncidents": {
+        "noFallsDetected": "No Fall Incidents Detected",
+        "noFallsDesc": "No fall detection alerts were recorded during this period.",
+        "criticalFalls": "Critical Falls",
+        "requiringImmediate": "Requiring immediate attention",
+        "resolved": "Resolved",
+        "pending": "pending",
+        "timeToResolve": "Time to resolve incident",
+        "fallsByTimeOfDay": "Fall Incidents by Time of Day",
+        "morning": "Morning (6am-12pm)",
+        "afternoon": "Afternoon (12pm-6pm)",
+        "evening": "Evening (6pm-10pm)",
+        "night": "Night (10pm-6am)",
+        "fallIncidentDetails": "Fall Incident Details",
+        "resolvedAt": "Resolved At:",
+        "responseTime": "Response Time:",
+        "minutes": "minutes",
+        "acknowledgedAt": "Acknowledged At:",
+        "fallPreventionRecommendations": "Fall Prevention Recommendations",
+        "multipleFalls": "Multiple falls detected:",
+        "multipleFallsDesc": "Consider a comprehensive home safety assessment to identify and address fall hazards.",
+        "nightFalls": "Night-time falls detected:",
+        "nightFallsDesc": "Ensure adequate lighting and consider installing night lights along pathways to bathroom.",
+        "reviewMedications": "Regular review of medications that may cause dizziness or affect balance.",
+        "physicalTherapy": "Consider physical therapy or balance exercises to improve strength and stability."
+      },
+      "healthAnomalies": {
+        "allReadingsNormal": "All Readings Normal",
+        "noAnomaliesDetected": "No health anomalies detected in the selected period",
+        "totalAnomalies": "Total Anomalies",
+        "affectedMetrics": "Affected Metrics",
+        "dateRange": "Date Range",
+        "anomalies": "Anomalies",
+        "normalRange": "Normal range:",
+        "heartRate": "Heart Rate",
+        "oxygenSaturation": "Oxygen Saturation",
+        "bodyTemperature": "Body Temperature",
+        "bloodSugar": "Blood Sugar",
+        "bloodGlucose": "Blood Glucose",
+        "critical": "Critical",
+        "high": "High",
+        "moderate": "Moderate",
+        "belowNormal": "Below Normal",
+        "aboveNormal": "Above Normal",
+        "lowBy": "Low by",
+        "highBy": "High by",
+        "recommendations": {
+          "consultProvider": "Consult with a healthcare provider about these readings",
+          "ensureCalibration": "Ensure devices are properly calibrated and worn correctly",
+          "monitorPatterns": "Monitor for patterns or recurring anomalies",
+          "keepLog": "Keep a log of activities and medications when anomalies occur",
+          "seekAttention": "Seek immediate medical attention for critical readings"
+        }
+      },
+      "medicationAdherence": {
+        "overallAdherence": "Overall Adherence",
+        "weeklyTrend": "Weekly Adherence Trend",
+        "dailyTracking": "Daily Medication Tracking",
+        "taken": "Taken",
+        "missed": "Missed",
+        "outOf": "Out of {{total}} total doses",
+        "rate": "Rate (%)",
+        "doses": "Doses",
+        "recommendations": {
+          "setReminders": "Consider setting up medication reminders",
+          "reviewSchedule": "Review medication schedule with healthcare provider",
+          "usePillOrganizers": "Use pill organizers to track daily doses",
+          "involveCaregivers": "Involve family members or caregivers in medication management"
+        }
+      },
+      "bloodSugar": {
+        "hypoglycemic": "Hypoglycemic",
+        "normal": "Normal",
+        "elevated": "Elevated",
+        "high": "High",
+        "lowThreshold": "< 70 mg/dL",
+        "normalRange": "70-140 mg/dL",
+        "elevatedRange": "141-199 mg/dL",
+        "highThreshold": "≥ 200 mg/dL",
+        "night": "Night",
+        "morning": "Morning",
+        "afternoon": "Afternoon",
+        "evening": "Evening",
+        "readings": "readings",
+        "recommendations": {
+          "lowSugar": "Low blood sugar detected. Consult with doctor about hypoglycemia management",
+          "highSugar": "High blood sugar readings detected. Review diet, medications, and activity with healthcare provider",
+          "monitorConsistently": "Monitor blood sugar at consistent times each day",
+          "keepLog": "Keep a food and activity log to identify patterns",
+          "calibrateMeter": "Ensure glucose meter is properly calibrated",
+          "reportAbnormal": "Report consistent abnormal readings to healthcare provider"
+        }
       },
       "wellness": {
         "ilqTrends": "ILQ Score Trends",
@@ -1979,7 +2371,894 @@
         "weeklyDesc": "Weekly comparison of key metrics",
         "monthly": "Month-over-Month",
         "monthlyDesc": "Monthly trends and changes"
+      },
+      "daily": {
+        "eodSummary": "End of Day Summary",
+        "eodSummaryDesc": "Complete daily health and activity overview for family members"
+      },
+      "subscription": {
+        "title": "Daily Report Email",
+        "description": "Receive a daily summary report via email at your preferred time",
+        "selectPerson": "Please select a specific person to manage email subscriptions",
+        "enabled": "Email notifications enabled",
+        "scheduleTime": "Daily report time",
+        "selectTime": "Select delivery time",
+        "timezoneNote": "Times are shown in your local timezone",
+        "subscribe": "Subscribe to Daily Report",
+        "unsubscribe": "Unsubscribe",
+        "saved": "Subscription settings saved!",
+        "removed": "Subscription removed",
+        "saveFailed": "Failed to save subscription"
+      },
+      "content": {
+        "totalSteps": "Total Steps",
+        "avgDailySteps": "Average Daily Steps",
+        "mostActiveDay": "Most Active Day",
+        "targetSteps": "Target: 8,000 steps/day",
+        "steps": "steps",
+        "dailyStepCount": "Daily Step Count",
+        "activityLevelAnalysis": "Activity Level Analysis",
+        "good": "Good",
+        "fair": "Fair",
+        "low": "Low",
+        "notAvailable": "N/A",
+        "avgHeartRate": "Average Heart Rate",
+        "minHeartRate": "Min Heart Rate",
+        "maxHeartRate": "Max Heart Rate",
+        "avgOxygen": "Average Oxygen",
+        "minOxygen": "Min Oxygen",
+        "maxOxygen": "Max Oxygen",
+        "heartRateTrend": "Heart Rate Trend",
+        "oxygenSaturationTrend": "Oxygen Saturation Trend",
+        "insights": "Key Insights",
+        "totalAlerts": "Total Alerts",
+        "active": "Active",
+        "requireAttention": "Require attention",
+        "resolved": "Resolved",
+        "successfullyHandled": "Successfully handled",
+        "avgResponseTime": "Avg Response Time",
+        "minutesToAcknowledge": "Minutes to acknowledge",
+        "alertsBySeverity": "Alerts by Severity",
+        "alertsByType": "Alerts by Type",
+        "recentAlerts": "Recent Alerts",
+        "noTitle": "No title",
+        "severity": "Severity",
+        "type": "Type",
+        "status": "Status",
+        "time": "Time",
+        "averageLevel": "Average Level",
+        "variability": "Variability",
+        "normalReadings": "Normal Readings",
+        "totalReadings": "Total Readings",
+        "bloodSugarTrends": "Blood Sugar Trends",
+        "readingDistribution": "Reading Distribution",
+        "patternsByTimeOfDay": "Patterns by Time of Day",
+        "recommendations": "Recommendations",
+        "temperature": "Temperature",
+        "humidity": "Humidity",
+        "co2": "CO₂",
+        "voc": "VOC",
+        "pm25": "PM2.5",
+        "aqi": "AQI",
+        "temperatureHumidityTrends": "Temperature & Humidity Trends",
+        "co2Levels": "CO₂ Levels",
+        "healthFactorAnalysis": "Health Factor Analysis",
+        "factorImpact": "Factor Impact",
+        "contributingFactors": "Contributing Factors",
+        "impact": "Impact",
+        "minutes": "minutes",
+        "seconds": "seconds",
+        "high": "High",
+        "medium": "Medium",
+        "normal": "Normal",
+        "critical": "Critical",
+        "warning": "Warning",
+        "info": "Info",
+        "vitalSignsOverTime": "Vital Signs Over Time",
+        "heartRateBPM": "Heart Rate (BPM)",
+        "oxygenPercent": "Oxygen (%)",
+        "range": "Range",
+        "normalRange": "Normal range: 95-100%",
+        "requireAttention": "Require attention",
+        "successfullyHandled": "Successfully handled",
+        "minutesToAcknowledge": "Minutes to acknowledge",
+        "noTitle": "No title",
+        "standardDeviation": "Standard Deviation",
+        "normalRange70140": "70-140 mg/dL",
+        "noEnvironmentalData": "No Environmental Data",
+        "noEnvironmentalDataAvailable": "No environmental sensor data available for the selected period.",
+        "ensureSensorsConfigured": "Ensure environmental sensors are properly configured and connected.",
+        "airQualityStatus": "Air Quality Status",
+        "issuesDetected": "Issues Detected:",
+        "allParametersOptimal": "All environmental parameters are within optimal ranges.",
+        "optimal6878F": "Optimal: 68-78°F",
+        "optimal3060": "Optimal: 30-60%",
+        "ppmGood800": "ppm (Good: <800)",
+        "ppbGood500": "ppb (Good: <500)",
+        "ugm3Good12": "µg/m³ (Good: <12)",
+        "good050": "Good: 0-50",
+        "endOfDaySummary": "End of Day Summary",
+        "overallStatus": "Overall Status",
+        "everythingNormal": "Everything is normal",
+        "needsAttention": "Needs Attention",
+        "connectedDevices": "Connected Devices",
+        "vitalSignsSummary": "Vital Signs Summary",
+        "environmentalConditions": "Environmental Conditions",
+        "avgReading": "Avg",
+        "readings": "readings",
+        "noData": "No data",
+        "deviceStatus": "Status",
+        "lastSeen": "Last seen",
+        "allDevicesOnline": "All devices online and reporting normally",
+        "someDevicesOffline": "Some devices need attention",
+        "comfortable": "Comfortable",
+        "optimal": "Optimal",
+        "sleepQuality": "Sleep Quality",
+        "sleepDuration": "Sleep Duration",
+        "deepSleep": "Deep Sleep",
+        "lightSleep": "Light Sleep",
+        "remSleep": "REM Sleep",
+        "awake": "Awake",
+        "sleepEfficiency": "Sleep Efficiency",
+        "timeInBed": "Time in Bed",
+        "sleepScore": "Sleep Score",
+        "sleepAnalysis": "Sleep Analysis",
+        "sleepStages": "Sleep Stages",
+        "sleepTrends": "Sleep Trends",
+        "medicationCompliance": "Medication Compliance",
+        "dosesTaken": "Doses Taken",
+        "dosesScheduled": "Doses Scheduled",
+        "missedDoses": "Missed Doses",
+        "onTime": "On Time",
+        "late": "Late",
+        "timingAccuracy": "Timing Accuracy",
+        "adherenceRate": "Adherence Rate",
+        "scheduleCompliance": "Schedule Compliance",
+        "recentDoses": "Recent Doses",
+        "upcomingDoses": "Upcoming Doses",
+        "takenAt": "Taken at",
+        "scheduledAt": "Scheduled at",
+        "anomaliesDetected": "Anomalies Detected",
+        "outOfRange": "Out of Range",
+        "concerningPatterns": "Concerning Patterns",
+        "anomalyDetails": "Anomaly Details",
+        "fallIncidents": "Fall Incidents",
+        "totalFalls": "Total Falls",
+        "recentFalls": "Recent Falls",
+        "fallLocation": "Fall Location",
+        "impactSeverity": "Impact Severity",
+        "responseTime": "Response Time",
+        "fallRiskAssessment": "Fall Risk Assessment",
+        "ilqScore": "ILQ Score",
+        "ilqTrend": "ILQ Trend",
+        "ilqComponents": "ILQ Components",
+        "healthScore": "Health Score",
+        "activityScore": "Activity Score",
+        "cognitiveScore": "Cognitive Score",
+        "safetyScore": "Safety Score",
+        "socialScore": "Social Score",
+        "improving": "Improving",
+        "declining": "Declining",
+        "stable": "Stable",
+        "weeklyComparison": "Weekly Comparison",
+        "monthlyComparison": "Monthly Comparison",
+        "thisWeek": "This Week",
+        "lastWeek": "Last Week",
+        "thisMonth": "This Month",
+        "lastMonth": "Last Month",
+        "change": "Change",
+        "keyMetrics": "Key Metrics",
+        "comparison": "Comparison",
+        "trend": "Trend",
+        "comfortScore": "Comfort Score",
+        "optimalConditions": "Optimal Conditions",
+        "currentConditions": "Current Conditions",
+        "recommendations": "Recommendations",
+        "hours": "hours",
+        "hour": "hour",
+        "min": "min",
+        "ago": "ago",
+        "of": "of",
+        "physicalActivity": "Physical Activity",
+        "stepsToday": "steps today",
+        "goalSteps": "Goal: 5,000 steps ({{percent}}%)",
+        "dailyActivityTimeline": "Daily Activity Timeline",
+        "noTimelineEvents": "No timeline events recorded for this day",
+        "aboutThisReport": "About This Report",
+        "eodSummaryDescription": "This End of Day summary provides a comprehensive overview of health metrics, activities, and incidents for {{date}}. Family members can optionally receive this report via email each evening to stay informed about their loved one's daily well-being.",
+        "todaysHighlights": "Today's Highlights",
+        "areasOfConcern": "Areas of Concern",
+        "heartRate": "Heart Rate",
+        "oxygenSat": "Oxygen Sat",
+        "bloodSugar": "Blood Sugar",
+        "bloodPressure": "Blood Pressure",
+        "roomTemp": "Room Temp",
+        "outsideComfortZone": "Outside comfort zone",
+        "adjustNeeded": "Adjust needed",
+        "airQuality": "Air Quality",
+        "moderate": "Moderate",
+        "poor": "Poor",
+        "totalSleepDuration": "total sleep duration",
+        "sleepDataPoints": "sleep data points",
+        "recommendedSleepDuration": "Recommended sleep duration",
+        "outsideRecommendedRange": "Outside recommended range (7-9h)",
+        "medicationAdherence": "Medication Adherence",
+        "taken": "Taken",
+        "missed": "Missed",
+        "total": "Total",
+        "alertsIncidents": "Alerts & Incidents",
+        "highPriority": "High Priority",
+        "devicesMonitoring": "{{count}} device{{plural}} actively monitoring health and environment",
+        "excellentMedicationAdherence": "Excellent medication adherence",
+        "lowMedicationAdherence": "Low medication adherence - follow up needed",
+        "activityGoalAchieved": "Activity goal achieved",
+        "lowActivityLevel": "Low activity level today",
+        "criticalAlertsTriggered": "{{count}} critical alert{{plural}} triggered",
+        "heartRateOutsideRange": "Heart rate outside normal range",
+        "lowOxygenSaturation": "Low oxygen saturation detected",
+        "noAlertsToday": "No alerts today",
+        "took": "Took",
+        "scheduled": "Scheduled",
+        "achievedStepGoal": "Achieved daily step goal ({{steps}} steps)",
+        "mmHg": "mmHg",
+        "recordedToday": "recorded today",
+        "healthStatusExcellent": "Excellent",
+        "healthStatusGood": "Good",
+        "healthStatusFair": "Fair",
+        "healthStatusNeedsAttention": "Needs Attention",
+        "healthStatusUnknown": "Unknown"
       }
+  },
+  "footer": {
+    "tagline": "Peace of Mind for Your Loved Ones",
+    "quickLinks": "Quick Links",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "liabilityDisclaimer": "Liability Disclaimer",
+    "cookiePolicy": "Cookie Policy",
+    "faq": "FAQ",
+    "followUs": "Follow Us",
+    "allRightsReserved": "All rights reserved.",
+    "version": "Version: 1.0.11"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions about using Symbiot. If you can't find what you're looking for, please contact our support team at",
+    "stillHaveQuestions": "Still have questions?",
+    "contactMessage": "Our support team is here to help. Reach out to us and we'll get back to you as soon as possible.",
+    "contactSupport": "Contact Support",
+    "goToDashboard": "Go to Dashboard",
+    "categories": {
+      "gettingStarted": {
+        "title": "Getting Started",
+        "questionKeys": ["createAccount", "compatibleDevices", "addSensor"],
+        "questions": {
+          "createAccount": {
+            "question": "How do I create an account?",
+            "answer": "To create an account, click on the 'Sign Up' button on the homepage. Fill in your email, create a password, and complete your profile information. You will receive a verification email to activate your account."
+          },
+          "compatibleDevices": {
+            "question": "What devices are compatible with Symbiot?",
+            "answer": "Symbiot supports a wide range of devices including smartwatches, heart rate monitors, blood pressure monitors, GPS trackers, environmental sensors, fall detection sensors, emergency buttons, and medication dispensers. Check our supported devices list in the Devices section."
+          },
+          "addSensor": {
+            "question": "How do I add a new sensor or device?",
+            "answer": "Navigate to the Dashboard and click on 'Device Management' or go to the Devices page. Click 'Add Device' button, select your device type from the list, and follow the on-screen pairing instructions. Make sure your device is in pairing mode and within range."
+          }
+        }
+      },
+      "ilqScore": {
+        "title": "ILQ Score",
+        "questionKeys": ["whatIsIlq", "viewIlq", "devicesNeeded", "lowScore"],
+        "questions": {
+          "whatIsIlq": {
+            "question": "What is the ILQ Score?",
+            "answer": "ILQ (Independent Living Quality) Score is a comprehensive metric that evaluates overall wellbeing and independence. It combines data from health vitals (30%), physical activity (25%), cognitive function (15%), environmental safety (15%), emergency response (10%), and social engagement (5%)."
+          },
+          "viewIlq": {
+            "question": "How can I view my ILQ Score?",
+            "answer": "Your ILQ Score is displayed on the main Dashboard. For detailed analytics, navigate to 'ILQ Analytics' from the sidebar menu where you can view historical trends, component breakdowns, and insights into what affects your score."
+          },
+          "devicesNeeded": {
+            "question": "What devices do I need to get an ILQ Score?",
+            "answer": "For a complete ILQ score, you need: (1) Heart rate monitor or smartwatch, (2) Blood pressure monitor, (3) Pulse oximeter, (4) Environmental sensor for temperature and humidity, (5) GPS tracker, (6) Fall detection sensor, (7) Emergency button, and (8) Medication dispenser. However, you can get a partial score with fewer devices."
+          },
+          "lowScore": {
+            "question": "Why is my ILQ Score low?",
+            "answer": "A low ILQ score indicates areas needing attention. Check the component breakdown in ILQ Analytics to identify which areas (health vitals, activity, cognitive function, etc.) are affecting your score. The system will provide recommendations for improvement."
+          }
+        }
+      },
+      "healthMonitoring": {
+        "title": "Health Monitoring",
+        "questionKeys": ["viewMetrics", "dataUpdate", "exportData"],
+        "questions": {
+          "viewMetrics": {
+            "question": "How do I view my health metrics?",
+            "answer": "Health metrics are displayed on the Dashboard in the 'Health Metrics' card. Click 'View Charts' to see detailed historical trends for heart rate, blood pressure, oxygen levels, temperature, sleep quality, and humidity over customizable time periods."
+          },
+          "dataUpdate": {
+            "question": "How often is health data updated?",
+            "answer": "Health data is updated in real-time as your connected devices send information. Most metrics refresh every 10 seconds. You can see the last update time displayed with each metric."
+          },
+          "exportData": {
+            "question": "Can I export my health data?",
+            "answer": "Yes! Go to the Reports page, select the desired date range and person, then generate the report you need. Click the 'Export' button to download your data in PDF or CSV format."
+          }
+        }
+      },
+      "dataSharing": {
+        "title": "Data Sharing",
+        "questionKeys": ["shareWithLovedOnes", "whatToShare", "stopSharing"],
+        "questions": {
+          "shareWithLovedOnes": {
+            "question": "How can I share my data with loved ones?",
+            "answer": "Navigate to 'Data Sharing' from the sidebar menu. Click 'Add Access', enter the email address of the person you want to share with, select their relationship (family, caregiver, etc.), and choose what data they can access. They will receive an invitation email to create an account and view your shared data."
+          },
+          "whatToShare": {
+            "question": "What information can I share?",
+            "answer": "You have granular control over what data to share. You can choose to share health metrics, location tracking, alerts, activity data, medication adherence, environmental data, or all of the above. You can also set different permissions for different people."
+          },
+          "stopSharing": {
+            "question": "How do I stop sharing data with someone?",
+            "answer": "Go to 'Data Sharing', find the person in your shared access list, and click 'Revoke Access' or 'Remove'. Their access will be immediately terminated, and they will no longer be able to view your data."
+          }
+        }
+      },
+      "alertsNotifications": {
+        "title": "Alerts & Notifications",
+        "questionKeys": ["setupAlerts", "alertTypes", "acknowledgeAlert"],
+        "questions": {
+          "setupAlerts": {
+            "question": "How do I set up alerts?",
+            "answer": "Alerts are automatically configured based on your health thresholds and safety settings. You can customize alert preferences in your Profile settings under 'Alert Preferences'. Here you can set notification methods (email, SMS, in-app) and alert priorities."
+          },
+          "alertTypes": {
+            "question": "What types of alerts will I receive?",
+            "answer": "You will receive alerts for: abnormal health readings (heart rate, blood pressure, etc.), fall detection, emergency button presses, medication reminders, low ILQ scores, environmental safety concerns (temperature, humidity), and device disconnections."
+          },
+          "acknowledgeAlert": {
+            "question": "How do I acknowledge or dismiss an alert?",
+            "answer": "Go to the Alerts page from the sidebar. Click on any active alert to view details, then use the 'Acknowledge' button to mark it as seen or 'Resolve' to close it. You can also add notes about actions taken."
+          }
+        }
+      },
+      "locationTracking": {
+        "title": "Location & Tracking",
+        "questionKeys": ["indoorTracking", "setupFloorPlan", "outdoorTracking"],
+        "questions": {
+          "indoorTracking": {
+            "question": "How does indoor tracking work?",
+            "answer": "Indoor tracking uses floor plans that you configure in 'Floor Plan Management'. Upload or create a floor plan of your home, place positioning sensors or beacons, and the system will track movement between rooms. Multi-story buildings are fully supported - simply upload floor plans for each level. This helps monitor activity patterns and detect unusual behavior."
+          },
+          "setupFloorPlan": {
+            "question": "How do I set up a floor plan?",
+            "answer": "Navigate to 'Floor Plan Management' from the sidebar. Click 'Add Floor Plan', upload an image of your floor layout or draw one using our editor. Then mark rooms, doors, and sensor positions. For multi-story buildings, add a separate floor plan for each level. Save the configuration and assign it to the monitored individual."
+          },
+          "outdoorTracking": {
+            "question": "Can I track outdoor location?",
+            "answer": "Yes, if you have a GPS tracker device connected. Go to the 'Tracking' page to view real-time outdoor location on a map, see movement history, and set up geofencing alerts for when the person enters or exits designated areas."
+          }
+        }
+      },
+      "medicationManagement": {
+        "title": "Medication Management",
+        "questionKeys": ["setupReminders", "trackAdherence"],
+        "questions": {
+          "setupReminders": {
+            "question": "How do I set up medication reminders?",
+            "answer": "Navigate to 'Medication' from the sidebar. Click 'Add Medication', enter the medication name, dosage, frequency, and times. The system will send reminders at scheduled times and track adherence automatically if you have a connected medication dispenser."
+          },
+          "trackAdherence": {
+            "question": "How is medication adherence tracked?",
+            "answer": "If you have a smart medication dispenser connected, adherence is tracked automatically. Otherwise, you can manually log doses as taken, missed, or late through the Medication page. This data contributes to your Cognitive Function score in the ILQ calculation."
+          }
+        }
+      },
+      "reports": {
+        "title": "Reports",
+        "questionKeys": ["reportTypes", "scheduleReports", "customizeDateRange"],
+        "questions": {
+          "reportTypes": {
+            "question": "What types of reports can I generate?",
+            "answer": "You can generate various reports including: Daily Summary, Vital Signs Trends, Health Anomalies, Activity Summary, Sleep Analysis, Medication Adherence, Alert History, Environmental Safety, ILQ Score Trends, and Comparative Analysis (week-over-week, month-over-month)."
+          },
+          "scheduleReports": {
+            "question": "How do I schedule automatic reports?",
+            "answer": "On the Reports page, scroll down to the 'Email Report Subscriptions' section. Click 'Subscribe to Report', select the report type, frequency (daily, weekly, monthly), time, and recipients. Reports will be automatically generated and emailed on schedule."
+          },
+          "customizeDateRange": {
+            "question": "Can I customize report date ranges?",
+            "answer": "Yes! Use the date range filter at the top of the Reports page. You can select custom dates using the calendar picker or use quick select options like 'Last 7 Days', 'Last 30 Days', or 'Last 3 Months'."
+          }
+        }
+      },
+      "accountSettings": {
+        "title": "Account & Settings",
+        "questionKeys": ["changeProfile", "changeLanguage", "dataSecure"],
+        "questions": {
+          "changeProfile": {
+            "question": "How do I change my profile information?",
+            "answer": "Click on your profile icon in the top-right corner and select 'Profile'. Here you can update your name, email, phone number, emergency contacts, medical conditions, profile picture, and other personal information."
+          },
+          "changeLanguage": {
+            "question": "How do I change the language?",
+            "answer": "Click on the language selector (globe icon) in the top-right corner of the page. Select your preferred language from the dropdown menu. The interface will immediately update to display in the selected language."
+          },
+          "dataSecure": {
+            "question": "Is my data secure?",
+            "answer": "Yes, we take security seriously. All data is encrypted in transit (HTTPS) and at rest. We comply with HIPAA regulations and follow industry best practices for data protection. You have full control over who can access your data through our sharing permissions system."
+          }
+        }
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting",
+        "questionKeys": ["deviceNotConnecting", "noAlerts", "incorrectData"],
+        "questions": {
+          "deviceNotConnecting": {
+            "question": "My device is not connecting. What should I do?",
+            "answer": "First, ensure the device is powered on and in pairing mode. Check that Bluetooth is enabled on your phone/hub. Try removing the device from Device Management and re-adding it. Make sure the device firmware is up to date. If issues persist, contact support."
+          },
+          "noAlerts": {
+            "question": "Why am I not receiving alerts?",
+            "answer": "Check your notification settings in Profile > Alert Preferences. Ensure you have enabled notifications for the alert types you want to receive. Verify your email address is confirmed and check your spam folder. For in-app notifications, ensure browser notifications are allowed."
+          },
+          "incorrectData": {
+            "question": "My health data looks incorrect. What should I do?",
+            "answer": "First, check that your devices are properly calibrated and positioned correctly. Verify the device settings and ensure they match your profile (e.g., height, weight for accurate calculations). If data continues to look wrong, try re-syncing the device or contact support for device-specific troubleshooting."
+          }
+        }
+      }
+    }
+  },
+  "privacyPolicy": {
+    "lastUpdated": "Last Updated",
+    "introduction": {
+      "title": "Introduction",
+      "content": "SymBIoT (\"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our elder care monitoring platform. By using SymBIoT, you agree to the collection and use of information in accordance with this policy."
+    },
+    "informationWeCollect": {
+      "title": "Information We Collect",
+      "personalInfo": {
+        "title": "Personal Information",
+        "items": {
+          "name": "Name and contact information",
+          "email": "Email address",
+          "phone": "Phone number",
+          "address": "Postal address",
+          "birthYear": "Year of birth"
+        }
+      },
+      "healthData": {
+        "title": "Health and Monitoring Data",
+        "items": {
+          "vitals": "Vital signs (heart rate, blood pressure, temperature, oxygen levels)",
+          "activity": "Activity and movement patterns",
+          "location": "Location data (indoor and outdoor tracking)",
+          "environmental": "Environmental sensor data (temperature, humidity, air quality)",
+          "medication": "Medication adherence information"
+        }
+      },
+      "deviceData": {
+        "title": "Device and Technical Information",
+        "items": {
+          "deviceInfo": "Device identifiers and technical specifications",
+          "ipAddress": "IP address and geolocation data",
+          "browserType": "Browser type and operating system"
+        }
+      }
+    },
+    "howWeUseInfo": {
+      "title": "How We Use Your Information",
+      "items": {
+        "provideServices": "Provide and maintain our monitoring services",
+        "monitoring": "Monitor health metrics and activity patterns",
+        "alerts": "Send alerts and notifications to caregivers",
+        "analytics": "Generate analytics and reports",
+        "communication": "Communicate with you about your account and services",
+        "improvement": "Improve our services and develop new features"
+      }
+    },
+    "dataSharing": {
+      "title": "Data Sharing and Disclosure",
+      "intro": "We do not sell your personal information. We may share your data in the following circumstances:",
+      "items": {
+        "authorizedUsers": "With family members and caregivers you have authorized",
+        "serviceProviders": "With service providers who assist in operating our platform",
+        "healthcare": "With healthcare providers as authorized by you",
+        "legal": "When required by law or to protect our legal rights",
+        "emergency": "In emergency situations to protect health and safety"
+      }
+    },
+    "dataSecurity": {
+      "title": "Data Security",
+      "content": "We implement industry-standard security measures to protect your information:",
+      "items": {
+        "encryption": "End-to-end encryption for data transmission",
+        "accessControls": "Role-based access controls",
+        "regularAudits": "Regular security audits and monitoring",
+        "hipaaCompliance": "HIPAA-compliant data storage and handling"
+      }
+    },
+    "yourRights": {
+      "title": "Your Rights",
+      "items": {
+        "access": "Access your personal information",
+        "correction": "Request correction of inaccurate data",
+        "deletion": "Request deletion of your data",
+        "portability": "Export your data in a portable format",
+        "optOut": "Opt-out of non-essential data collection"
+      }
+    },
+    "dataRetention": {
+      "title": "Data Retention",
+      "content": "We retain your information for as long as your account is active or as needed to provide services. Health data may be retained longer as required by law or for legitimate business purposes."
+    },
+    "childrenPrivacy": {
+      "title": "Children's Privacy",
+      "content": "Our service is not intended for individuals under 18 years of age. We do not knowingly collect personal information from children."
+    },
+    "changes": {
+      "title": "Changes to This Policy",
+      "content": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the \"Last Updated\" date."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "If you have questions about this Privacy Policy, please contact us:",
+      "email": "Email"
+    }
+  },
+  "termsOfService": {
+    "lastUpdated": "Last Updated",
+    "acceptance": {
+      "title": "Acceptance of Terms",
+      "content": "By accessing and using SymBIoT's services, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services."
+    },
+    "description": {
+      "title": "Service Description",
+      "content": "SymBIoT provides an IoT-based health monitoring platform for elderly care. Our services include real-time health monitoring, activity tracking, location tracking, alert systems, and analytics for caregivers and family members."
+    },
+    "userAccounts": {
+      "title": "User Accounts",
+      "items": {
+        "accurate": "Provide accurate and complete information when creating your account",
+        "confidential": "Keep your account credentials confidential",
+        "responsible": "Be responsible for all activities under your account",
+        "notify": "Notify us immediately of any unauthorized access"
+      }
+    },
+    "acceptableUse": {
+      "title": "Acceptable Use",
+      "intro": "You agree not to:",
+      "items": {
+        "lawful": "Use the service for any unlawful purpose",
+        "authorized": "Access or monitor data of individuals without proper authorization",
+        "noInterference": "Interfere with or disrupt the service",
+        "noHarm": "Transmit any harmful code or malware",
+        "noImpersonation": "Impersonate any person or entity",
+        "noUnauthorizedAccess": "Attempt to gain unauthorized access to any systems or data"
+      }
+    },
+    "medicalDisclaimer": {
+      "title": "Medical Disclaimer",
+      "warning": "IMPORTANT MEDICAL DISCLAIMER",
+      "content": "SymBIoT is a monitoring tool and does not provide medical advice, diagnosis, or treatment. The information provided should not replace professional medical care. Always consult with qualified healthcare providers for medical decisions. In case of emergency, call emergency services immediately."
+    },
+    "dataAccuracy": {
+      "title": "Data Accuracy",
+      "content": "While we strive for accuracy, we cannot guarantee that all data collected from devices is completely accurate. Sensor readings may be affected by device placement, interference, or technical issues. You should not rely solely on our platform for critical health decisions."
+    },
+    "intellectualProperty": {
+      "title": "Intellectual Property",
+      "content": "All content, features, and functionality of SymBIoT are owned by us and protected by intellectual property laws. You may not copy, modify, distribute, or reverse engineer any part of our service without written permission."
+    },
+    "payment": {
+      "title": "Payment and Subscriptions",
+      "items": {
+        "fees": "Subscription fees are billed in advance based on your selected plan",
+        "billing": "You authorize us to charge your payment method automatically",
+        "refunds": "Refunds are provided according to our refund policy",
+        "cancellation": "You may cancel your subscription at any time"
+      }
+    },
+    "termination": {
+      "title": "Termination",
+      "content": "We reserve the right to suspend or terminate your account if you violate these terms or engage in fraudulent or harmful activities. Upon termination, your right to use the service will cease immediately."
+    },
+    "limitation": {
+      "title": "Limitation of Liability",
+      "content": "To the maximum extent permitted by law, SymBIoT shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the service. Our total liability shall not exceed the amount you paid for the service in the past 12 months."
+    },
+    "indemnification": {
+      "title": "Indemnification",
+      "content": "You agree to indemnify and hold SymBIoT harmless from any claims, damages, or expenses arising from your use of the service or violation of these terms."
+    },
+    "changes": {
+      "title": "Changes to Terms",
+      "content": "We may modify these terms at any time. Continued use of the service after changes constitutes acceptance of the new terms."
+    },
+    "governingLaw": {
+      "title": "Governing Law",
+      "content": "These terms are governed by the laws of the jurisdiction in which SymBIoT operates, without regard to conflict of law principles."
+    },
+    "contact": {
+      "title": "Contact Information",
+      "content": "For questions about these Terms of Service, please contact us:",
+      "email": "Email"
+    }
+  },
+  "cookiePolicy": {
+    "lastUpdated": "Last Updated",
+    "whatAreCookies": {
+      "title": "What Are Cookies",
+      "content": "Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and understanding how you use our service."
+    },
+    "howWeUseCookies": {
+      "title": "How We Use Cookies",
+      "intro": "We use cookies to enhance your experience, analyze usage, and improve our services."
+    },
+    "typesOfCookies": {
+      "title": "Types of Cookies We Use",
+      "essential": {
+        "title": "Essential Cookies",
+        "description": "These cookies are necessary for the website to function properly.",
+        "items": {
+          "authentication": "Authentication and security",
+          "security": "Session management",
+          "preferences": "User preferences and settings"
+        }
+      },
+      "functional": {
+        "title": "Functional Cookies",
+        "description": "These cookies enhance functionality and personalization.",
+        "items": {
+          "language": "Language preferences",
+          "dashboard": "Dashboard customization",
+          "accessibility": "Accessibility settings"
+        }
+      },
+      "performance": {
+        "title": "Performance Cookies",
+        "description": "These cookies help us understand how visitors use our website.",
+        "items": {
+          "analytics": "Analytics and metrics",
+          "usage": "Usage patterns and feature adoption",
+          "errors": "Error tracking and debugging"
+        }
+      },
+      "targeting": {
+        "title": "Targeting/Advertising Cookies",
+        "description": "These cookies are used to deliver relevant advertisements.",
+        "items": {
+          "marketing": "Marketing campaign tracking",
+          "social": "Social media integration"
+        }
+      }
+    },
+    "thirdPartyCookies": {
+      "title": "Third-Party Cookies",
+      "content": "We may use third-party services that set cookies on your device:",
+      "items": {
+        "analytics": "Google Analytics for usage analytics",
+        "maps": "Google Maps for location services",
+        "payments": "Payment processors for subscription management"
+      }
+    },
+    "manageCookies": {
+      "title": "Managing Cookies",
+      "content": "You can control and manage cookies through your browser settings. Most browsers allow you to:",
+      "warning": "Please note that disabling certain cookies may affect the functionality of our service."
+    },
+    "doNotTrack": {
+      "title": "Do Not Track Signals",
+      "content": "Some browsers include a \"Do Not Track\" feature. Currently, there is no industry standard for how to respond to these signals. We will update this policy if a standard is established."
+    },
+    "changes": {
+      "title": "Changes to This Policy",
+      "content": "We may update this Cookie Policy from time to time. Any changes will be posted on this page with an updated revision date."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "If you have questions about our use of cookies, please contact us:",
+      "email": "Email"
+    }
+  },
+  "liabilityDisclaimer": {
+    "title": "Liability Disclaimer",
+    "acknowledgment": "BY USING THE SYMBIOT PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THIS LIABILITY DISCLAIMER.",
+    "generalDisclaimer": {
+      "title": "1. General Disclaimer",
+      "notSubstitute": {
+        "title": "1.1 Not a Substitute for Professional Care",
+        "intro": "SymBIoT is a monitoring and tracking platform designed to assist caregivers and family members. It is NOT a replacement for:",
+        "items": {
+          "medical": "Professional medical care or supervision",
+          "caregiving": "In-person caregiving",
+          "emergency": "Emergency medical services",
+          "advice": "Professional medical advice, diagnosis, or treatment",
+          "healthcare": "Licensed healthcare providers"
+        }
+      },
+      "supplementary": {
+        "title": "1.2 Supplementary Tool",
+        "content": "This platform should be used as a supplementary monitoring tool only. Users must continue to provide appropriate levels of direct care, supervision, and professional medical oversight as required by the individual's condition."
+      }
+    },
+    "medicalDisclaimer": {
+      "title": "2. Medical Disclaimer",
+      "notMedicalDevice": {
+        "title": "2.1 Not a Medical Device",
+        "content": "SymBIoT and its associated devices are NOT medical-grade equipment and have not been evaluated or approved by regulatory bodies (FDA, CE, etc.) for medical diagnosis or treatment purposes."
+      },
+      "vitalSignsLimitations": {
+        "title": "2.2 Vital Signs Monitoring Limitations",
+        "intro": "Vital signs data (heart rate, blood pressure, oxygen saturation, temperature, glucose levels, etc.) displayed on the platform:",
+        "items": {
+          "accuracy": "May not be medically accurate",
+          "decisions": "Should not be used for medical decision-making without professional verification",
+          "informational": "Are for informational and monitoring purposes only",
+          "variance": "May vary significantly from medical-grade equipment readings",
+          "confirmation": "Should be confirmed by medical-grade equipment before any medical action is taken"
+        }
+      },
+      "seekAdvice": {
+        "title": "2.3 Seek Professional Medical Advice",
+        "intro": "Users must:",
+        "items": {
+          "consult": "Consult with qualified healthcare providers for all medical decisions",
+          "emergency": "Seek immediate emergency medical attention (call 911 or local emergency services) in case of any medical emergency",
+          "noDelay": "Not delay seeking medical care based on information from this platform"
+        }
+      }
+    },
+    "deviceLimitations": {
+      "title": "3. Device and Equipment Limitations",
+      "intro": "Connected devices (wearables, sensors, trackers, panic buttons, etc.) may:",
+      "items": {
+        "hardware": "Fail to capture data due to hardware malfunctions",
+        "stopFunctioning": "Stop functioning without warning",
+        "inaccurate": "Provide inaccurate readings due to calibration issues",
+        "battery": "Lose power due to battery depletion",
+        "disconnect": "Disconnect from the network unexpectedly",
+        "damage": "Experience physical damage affecting functionality"
+      },
+      "liability": "The Company is NOT liable for any consequences resulting from device failures, malfunctions, or inaccurate readings."
+    },
+    "dataAccuracy": {
+      "title": "4. Data Accuracy and Reliability",
+      "intro": "The Company makes NO WARRANTIES OR GUARANTEES regarding:",
+      "items": {
+        "accuracy": "Accuracy of any data displayed on the platform",
+        "completeness": "Completeness of data collection",
+        "timeliness": "Timeliness of data transmission",
+        "reliability": "Reliability of data storage"
+      }
+    },
+    "alertSystems": {
+      "title": "5. Alert and Notification Systems",
+      "intro": "The alert system may:",
+      "items": {
+        "failToTrigger": "Fail to trigger when conditions warrant an alert",
+        "falsePositive": "Generate false positive alerts (alerts when no actual issue exists)",
+        "falseNegative": "Generate false negative alerts (fail to alert when issues exist)",
+        "delayed": "Be delayed in notification delivery",
+        "failToDeliver": "Fail to deliver notifications due to device settings, network issues, or app permissions"
+      },
+      "noGuarantee": "The Company does NOT guarantee any specific response time for alerts, real-time delivery, or that alerts will reach all designated recipients."
+    },
+    "networkConnectivity": {
+      "title": "6. Network and Connectivity",
+      "intro": "The platform requires active internet connection and stable network connectivity. Data transmission and platform functionality may be interrupted by:",
+      "items": {
+        "isp": "Internet service provider (ISP) outages",
+        "wifi": "Wi-Fi router failures or configuration issues",
+        "cellular": "Cellular network outages or poor signal strength",
+        "cloud": "Cloud service outages or maintenance downtime",
+        "server": "Server failures or network congestion"
+      },
+      "responsibility": "Users are responsible for maintaining reliable internet connectivity and ensuring devices remain connected."
+    },
+    "locationTracking": {
+      "title": "7. Location Tracking Services",
+      "intro": "GPS tracking may be:",
+      "items": {
+        "inaccurate": "Inaccurate by several meters to hundreds of meters",
+        "affected": "Affected by atmospheric conditions, building structures, or tree cover",
+        "unavailable": "Unavailable in indoor environments",
+        "satellite": "Subject to satellite availability and signal quality"
+      },
+      "liability": "The Company is NOT liable for inaccurate location information or failure to detect geofence violations."
+    },
+    "emergencyResponse": {
+      "title": "8. Emergency Response",
+      "notEmergencyService": {
+        "title": "Not an Emergency Response Service",
+        "intro": "SymBIoT is NOT an emergency response system. The platform:",
+        "items": {
+          "noContact": "Does NOT automatically contact emergency services (911, police, ambulance)",
+          "noDispatch": "Does NOT provide emergency dispatch services",
+          "noGuarantee": "Does NOT guarantee that emergency situations will be detected",
+          "noReplace": "Does NOT replace the need to call emergency services directly"
+        }
+      },
+      "protocol": {
+        "title": "Emergency Protocol:",
+        "step1": "CALL 911 OR LOCAL EMERGENCY SERVICES IMMEDIATELY",
+        "step2": "Do not rely solely on the SymBIoT platform for emergency response",
+        "step3": "Alert notifications are for informational purposes only"
+      }
+    },
+    "userResponsibilities": {
+      "title": "9. User Responsibilities",
+      "intro": "Users are responsible for:",
+      "items": {
+        "setup": "Properly setting up and configuring devices",
+        "placement": "Ensuring devices are worn or placed correctly",
+        "charging": "Charging devices regularly and monitoring battery levels",
+        "alertSettings": "Regularly reviewing and updating alert settings",
+        "testing": "Testing the system regularly to ensure it is functioning",
+        "directCare": "Providing appropriate levels of direct care and supervision",
+        "responding": "Responding appropriately to alerts and unusual data patterns",
+        "security": "Maintaining account security with strong passwords"
+      },
+      "failure": "Failure to fulfill these responsibilities may result in system malfunction, inaccurate data, or missed alerts."
+    },
+    "limitationOfLiability": {
+      "title": "10. Limitation of Liability",
+      "maxLiability": {
+        "title": "Maximum Liability",
+        "content": "To the fullest extent permitted by law, the Company's total liability for any claims arising from or related to the use of the SymBIoT platform shall not exceed the total amount paid by the user for the service in the twelve (12) months preceding the claim."
+      },
+      "exclusionDamages": {
+        "title": "Exclusion of Consequential Damages",
+        "intro": "The Company shall NOT be liable for:",
+        "items": {
+          "indirect": "Indirect, incidental, special, or consequential damages",
+          "profits": "Loss of profits or revenue",
+          "data": "Loss of data or information",
+          "business": "Business interruption",
+          "injury": "Personal injury or death",
+          "emotional": "Emotional distress"
+        }
+      },
+      "noWarranty": {
+        "title": "No Warranty",
+        "intro": "THE PLATFORM IS PROVIDED \"AS IS\" AND \"AS AVAILABLE\" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:",
+        "items": {
+          "merchantability": "Warranties of merchantability",
+          "fitness": "Fitness for a particular purpose",
+          "nonInfringement": "Non-infringement",
+          "accuracy": "Accuracy or reliability",
+          "continuous": "Continuous, uninterrupted, or secure access"
+        }
+      },
+      "assumptionOfRisk": {
+        "title": "User Assumption of Risk",
+        "intro": "By using the SymBIoT platform, users ACKNOWLEDGE AND ASSUME ALL RISKS associated with:",
+        "items": {
+          "limitations": "Remote monitoring technology limitations",
+          "deviceFailure": "Potential for device failure or inaccurate data",
+          "alerts": "Delayed or missed alerts",
+          "outages": "System outages or downtime",
+          "security": "Data security and privacy risks"
+        }
+      }
+    },
+    "importantNotice": {
+      "title": "Important Notice",
+      "intro": "You understand that:",
+      "items": {
+        "notMedical": "This is NOT a medical device or emergency response system",
+        "limitations": "The platform has significant limitations that may result in missed emergencies, inaccurate data, or system failures",
+        "directCare": "You must continue to provide appropriate direct care and medical oversight",
+        "call911": "You should call emergency services (911) immediately in any emergency situation"
+      }
+    },
+    "contactInfo": {
+      "title": "Contact Information",
+      "intro": "If you have questions about this liability disclaimer, please contact us:",
+      "email": "Email"
     }
   }
 }

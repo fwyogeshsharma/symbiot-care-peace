@@ -10,7 +10,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { CalendarIcon, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
 import { useTranslation } from 'react-i18next';
@@ -43,10 +43,6 @@ interface HealthMetricsChartsProps {
 const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMetricsChartsProps) => {
   const { t, i18n } = useTranslation();
   const dateLocale = getDateLocale(i18n.language);
-  const [dateRange, setDateRange] = useState({
-    from: subDays(new Date(), 7),
-    to: new Date(),
-  });
 
   // Query to get the earliest data point to determine available data range
   const { data: earliestDataPoint } = useQuery({
@@ -58,6 +54,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
         .from('device_data')
         .select('recorded_at')
         .eq('elderly_person_id', selectedPersonId)
+        .in('data_type', ['heart_rate', 'blood_pressure', 'oxygen_saturation', 'temperature', 'sleep_quality'])
         .order('recorded_at', { ascending: true })
         .limit(1);
 
@@ -67,10 +64,24 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
     enabled: !!selectedPersonId && open,
   });
 
+  // Default to showing last 7 days
+  const [dateRange, setDateRange] = useState({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  });
+
+  // Calculate if we should use monthly aggregation based on date range
+  const daysDifference = Math.floor(
+    (dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const shouldUseMonthlyAggregation = daysDifference > 90; // More than 90 days = monthly view
+
   const { data: historicalData, isLoading } = useQuery({
     queryKey: ['health-metrics-history', selectedPersonId, dateRange],
     queryFn: async () => {
       if (!selectedPersonId) return [];
+
+      console.log('Fetching health metrics data from', dateRange.from.toISOString(), 'to', dateRange.to.toISOString());
 
       const { data, error } = await supabase
         .from('device_data')
@@ -79,22 +90,61 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           devices!inner(device_name, device_type, device_types!inner(category))
         `)
         .eq('elderly_person_id', selectedPersonId)
+        .in('data_type', [
+          'heart_rate',
+          'blood_pressure',
+          'oxygen_saturation',
+          'temperature',
+          'sleep_quality',
+          'humidity',
+          'button_pressed'
+        ])
         .gte('recorded_at', dateRange.from.toISOString())
         .lte('recorded_at', dateRange.to.toISOString())
         .order('recorded_at', { ascending: true });
 
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching health metrics:', error);
+        throw error;
+      }
+
+      console.log(`Fetched ${data?.length || 0} health metric data points`);
+      return data || [];
     },
     enabled: !!selectedPersonId && open,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
-  // Calculate how many days of data are available
-  const daysOfDataAvailable = earliestDataPoint
-    ? Math.floor((new Date().getTime() - earliestDataPoint.getTime()) / (1000 * 60 * 60 * 24))
-    : 0;
+  // Note: earliestDataPoint is used for "All Available Data" button
 
-  const hasMoreThan30Days = daysOfDataAvailable > 30;
+  // Helper function to generate all periods from start to end date
+  const generateAllPeriods = () => {
+    const periods: { groupKey: string; displayLabel: string; date: Date }[] = [];
+    const current = new Date(dateRange.from);
+    const end = new Date(dateRange.to);
+
+    if (shouldUseMonthlyAggregation) {
+      // Generate all months
+      while (current <= end) {
+        const groupKey = format(current, 'yyyy-MM');
+        const displayLabel = format(current, 'MMM yyyy', { locale: dateLocale });
+        periods.push({ groupKey, displayLabel, date: new Date(current) });
+        // Move to next month
+        current.setMonth(current.getMonth() + 1);
+      }
+    } else {
+      // Generate all days
+      while (current <= end) {
+        const groupKey = format(current, 'yyyy-MM-dd');
+        const displayLabel = format(current, 'dMMM', { locale: dateLocale });
+        periods.push({ groupKey, displayLabel, date: new Date(current) });
+        // Move to next day
+        current.setDate(current.getDate() + 1);
+      }
+    }
+
+    return periods;
+  };
 
   const processChartData = (dataType: string) => {
     if (!historicalData) return [];
@@ -121,7 +171,23 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
       return true;
     });
 
-    return filtered.map((item: any) => {
+    // Determine grouping key format based on date range duration
+    const getGroupKey = (date: Date) => {
+      if (shouldUseMonthlyAggregation) {
+        return format(date, 'yyyy-MM'); // Monthly grouping
+      }
+      return format(date, 'yyyy-MM-dd'); // Daily grouping
+    };
+
+    const getDisplayFormat = (date: Date) => {
+      if (shouldUseMonthlyAggregation) {
+        return format(date, 'MMM yyyy', { locale: dateLocale }); // "Jan 2025"
+      }
+      return format(date, 'dMMM', { locale: dateLocale }); // "1 Jan"
+    };
+
+    // Group by day or month and calculate average
+    const grouped = filtered.reduce((acc: any, item: any) => {
       let value = item.value;
 
       // Extract numeric value from different formats
@@ -146,11 +212,45 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
         numericValue = celsiusToFahrenheit(numericValue);
       }
 
-      return {
-        timestamp: format(new Date(item.recorded_at), 'MMM dd HH:mm', { locale: dateLocale }),
-        value: numericValue,
-        fullDate: new Date(item.recorded_at),
-      };
+      const recordedDate = new Date(item.recorded_at);
+      const groupKey = getGroupKey(recordedDate);
+
+      if (!acc[groupKey]) {
+        acc[groupKey] = {
+          values: [],
+          date: recordedDate,
+        };
+      }
+
+      acc[groupKey].values.push(numericValue);
+
+      return acc;
+    }, {});
+
+    // Generate all periods in the date range
+    const allPeriods = generateAllPeriods();
+
+    // Map periods to chart data, filling in actual values where they exist
+    return allPeriods.map(period => {
+      const groupData = grouped[period.groupKey];
+
+      if (groupData && groupData.values.length > 0) {
+        const avgValue = groupData.values.reduce((sum: number, val: number) => sum + val, 0) / groupData.values.length;
+        return {
+          timestamp: period.displayLabel,
+          value: Math.round(avgValue * 10) / 10, // Round to 1 decimal
+          fullDate: period.date,
+          sortKey: period.groupKey,
+        };
+      } else {
+        // No data for this period - return null value
+        return {
+          timestamp: period.displayLabel,
+          value: null,
+          fullDate: period.date,
+          sortKey: period.groupKey,
+        };
+      }
     });
   };
 
@@ -159,14 +259,68 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
 
     const filtered = historicalData.filter((item: any) => item.data_type === 'blood_pressure');
 
-    return filtered.map((item: any) => {
+    // Determine grouping key format based on date range duration
+    const getGroupKey = (date: Date) => {
+      if (shouldUseMonthlyAggregation) {
+        return format(date, 'yyyy-MM'); // Monthly grouping
+      }
+      return format(date, 'yyyy-MM-dd'); // Daily grouping
+    };
+
+    const getDisplayFormat = (date: Date) => {
+      if (shouldUseMonthlyAggregation) {
+        return format(date, 'MMM yyyy', { locale: dateLocale }); // "Jan 2025"
+      }
+      return format(date, 'dMMM', { locale: dateLocale }); // "1 Jan"
+    };
+
+    // Group by day or month and calculate average
+    const grouped = filtered.reduce((acc: any, item: any) => {
       const value = item.value as any;
-      return {
-        timestamp: format(new Date(item.recorded_at), 'MMM dd HH:mm', { locale: dateLocale }),
-        systolic: value?.systolic || value?.value?.systolic || 0,
-        diastolic: value?.diastolic || value?.value?.diastolic || 0,
-        fullDate: new Date(item.recorded_at),
-      };
+      const recordedDate = new Date(item.recorded_at);
+      const groupKey = getGroupKey(recordedDate);
+
+      if (!acc[groupKey]) {
+        acc[groupKey] = {
+          systolicValues: [],
+          diastolicValues: [],
+          date: recordedDate,
+        };
+      }
+
+      acc[groupKey].systolicValues.push(value?.systolic || value?.value?.systolic || 0);
+      acc[groupKey].diastolicValues.push(value?.diastolic || value?.value?.diastolic || 0);
+
+      return acc;
+    }, {});
+
+    // Generate all periods in the date range
+    const allPeriods = generateAllPeriods();
+
+    // Map periods to chart data, filling in actual values where they exist
+    return allPeriods.map(period => {
+      const groupData = grouped[period.groupKey];
+
+      if (groupData && groupData.systolicValues.length > 0) {
+        const avgSystolic = groupData.systolicValues.reduce((sum: number, val: number) => sum + val, 0) / groupData.systolicValues.length;
+        const avgDiastolic = groupData.diastolicValues.reduce((sum: number, val: number) => sum + val, 0) / groupData.diastolicValues.length;
+        return {
+          timestamp: period.displayLabel,
+          systolic: Math.round(avgSystolic),
+          diastolic: Math.round(avgDiastolic),
+          fullDate: period.date,
+          sortKey: period.groupKey,
+        };
+      } else {
+        // No data for this period - return null values
+        return {
+          timestamp: period.displayLabel,
+          systolic: null,
+          diastolic: null,
+          fullDate: period.date,
+          sortKey: period.groupKey,
+        };
+      }
     });
   };
 
@@ -178,25 +332,57 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
       item.devices?.device_type === 'emergency_button'
     );
 
+    // Determine grouping key format based on date range duration
+    const getGroupKey = (date: Date) => {
+      if (shouldUseMonthlyAggregation) {
+        return format(date, 'yyyy-MM'); // Monthly grouping
+      }
+      return format(date, 'yyyy-MM-dd'); // Daily grouping
+    };
+
+    const getDisplayFormat = (date: Date) => {
+      if (shouldUseMonthlyAggregation) {
+        return format(date, 'MMM yyyy', { locale: dateLocale }); // "Jan 2025"
+      }
+      return format(date, 'dMMM', { locale: dateLocale }); // "1 Jan"
+    };
+
     // Group by date
     const grouped = filtered.reduce((acc: any, item: any) => {
-      const date = format(new Date(item.recorded_at), 'MMM dd', { locale: dateLocale });
-      if (!acc[date]) {
-        acc[date] = { date, total: 0 };
+      const recordedDate = new Date(item.recorded_at);
+      const groupKey = getGroupKey(recordedDate);
+
+      if (!acc[groupKey]) {
+        acc[groupKey] = { total: 0 };
       }
-      
-      acc[date].total += 1;
-      
+
+      acc[groupKey].total += 1;
+
       return acc;
     }, {});
 
-    return Object.values(grouped);
+    // Generate all periods in the date range
+    const allPeriods = generateAllPeriods();
+
+    // Map periods to chart data, filling in actual values where they exist
+    return allPeriods.map(period => {
+      const groupData = grouped[period.groupKey];
+
+      return {
+        date: period.displayLabel,
+        total: groupData ? groupData.total : 0,
+        sortKey: period.groupKey,
+      };
+    });
   };
 
   const renderChart = (dataType: string, label: string, color: string, unit?: string) => {
     const data = processChartData(dataType);
 
-    if (data.length === 0) {
+    // Check if there's any actual data (non-null values)
+    const hasData = data.some(item => item.value !== null);
+
+    if (!hasData) {
       return (
         <div className="flex items-center justify-center h-64 text-muted-foreground">
           {t(`healthMetrics.charts.no${dataType.charAt(0).toUpperCase() + dataType.slice(1).replace(/_([a-z])/g, (_, c) => c.toUpperCase())}Data`, { defaultValue: `No ${label.toLowerCase()} data available for this period` })}
@@ -208,31 +394,37 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="timestamp" 
+          <XAxis
+            dataKey="timestamp"
             stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
+            fontSize={11}
+            angle={-15}
+            textAnchor="end"
+            height={50}
+            interval={data.length > 8 ? Math.floor(data.length / 8) : 0}
           />
-          <YAxis 
+          <YAxis
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             label={{ value: unit, angle: -90, position: 'insideLeft' }}
           />
-          <Tooltip 
-            contentStyle={{ 
+          <Tooltip
+            contentStyle={{
               backgroundColor: 'hsl(var(--popover))',
               border: '1px solid hsl(var(--border))',
               borderRadius: '6px',
             }}
           />
           <Legend />
-          <Line 
-            type="monotone" 
-            dataKey="value" 
-            stroke={color} 
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={color}
             strokeWidth={2}
             name={label}
-            dot={{ fill: color }}
+            dot={{ fill: color, r: 3 }}
+            activeDot={{ r: 5 }}
+            connectNulls={false}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -242,7 +434,10 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
   const renderBloodPressureChart = () => {
     const data = processBloodPressureData();
 
-    if (data.length === 0) {
+    // Check if there's any actual data (non-null values)
+    const hasData = data.some(item => item.systolic !== null || item.diastolic !== null);
+
+    if (!hasData) {
       return (
         <div className="flex items-center justify-center h-64 text-muted-foreground">
           {t('healthMetrics.charts.noBloodPressureData')}
@@ -254,39 +449,47 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="timestamp" 
+          <XAxis
+            dataKey="timestamp"
             stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
+            fontSize={11}
+            angle={-15}
+            textAnchor="end"
+            height={50}
+            interval={data.length > 8 ? Math.floor(data.length / 8) : 0}
           />
-          <YAxis 
+          <YAxis
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             label={{ value: 'mmHg', angle: -90, position: 'insideLeft' }}
           />
-          <Tooltip 
-            contentStyle={{ 
+          <Tooltip
+            contentStyle={{
               backgroundColor: 'hsl(var(--popover))',
               border: '1px solid hsl(var(--border))',
               borderRadius: '6px',
             }}
           />
           <Legend />
-          <Line 
-            type="monotone" 
-            dataKey="systolic" 
-            stroke="hsl(var(--destructive))" 
+          <Line
+            type="monotone"
+            dataKey="systolic"
+            stroke="hsl(var(--destructive))"
             strokeWidth={2}
             name={t('healthMetrics.charts.systolic')}
-            dot={{ fill: 'hsl(var(--destructive))' }}
+            dot={{ fill: 'hsl(var(--destructive))', r: 3 }}
+            activeDot={{ r: 5 }}
+            connectNulls={false}
           />
-          <Line 
-            type="monotone" 
-            dataKey="diastolic" 
-            stroke="hsl(var(--primary))" 
+          <Line
+            type="monotone"
+            dataKey="diastolic"
+            stroke="hsl(var(--primary))"
             strokeWidth={2}
             name={t('healthMetrics.charts.diastolic')}
-            dot={{ fill: 'hsl(var(--primary))' }}
+            dot={{ fill: 'hsl(var(--primary))', r: 3 }}
+            activeDot={{ r: 5 }}
+            connectNulls={false}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -296,7 +499,10 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
   const renderPanicSosChart = () => {
     const data = processPanicSosData();
 
-    if (data.length === 0) {
+    // Check if there's any actual data (non-zero values)
+    const hasData = data.some(item => item.total > 0);
+
+    if (!hasData) {
       return (
         <div className="flex items-center justify-center h-64 text-muted-foreground">
           {t('healthMetrics.charts.noPanicData')}
@@ -308,18 +514,22 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="date" 
+          <XAxis
+            dataKey="date"
             stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
+            fontSize={11}
+            angle={-15}
+            textAnchor="end"
+            height={50}
+            interval={data.length > 8 ? Math.floor(data.length / 8) : 0}
           />
-          <YAxis 
+          <YAxis
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             label={{ value: t('healthMetrics.charts.buttonPresses'), angle: -90, position: 'insideLeft' }}
           />
-          <Tooltip 
-            contentStyle={{ 
+          <Tooltip
+            contentStyle={{
               backgroundColor: 'hsl(var(--popover))',
               border: '1px solid hsl(var(--border))',
               borderRadius: '6px',
@@ -337,24 +547,40 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle>{t('healthMetrics.charts.historyTitle')}</DialogTitle>
+            <div>
+              <DialogTitle>{t('healthMetrics.charts.historyTitle')}</DialogTitle>
+              <div className="flex items-center gap-2 mt-1">
+                {shouldUseMonthlyAggregation && (
+                  <p className="text-sm text-muted-foreground">
+                    {t('healthMetrics.charts.monthlyAverages')}
+                  </p>
+                )}
+                {historicalData && historicalData.length > 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    • {historicalData.length.toLocaleString()} {t('healthMetrics.charts.dataPoints', { defaultValue: 'data points' })}
+                  </p>
+                )}
+              </div>
+            </div>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {format(dateRange.from, 'MMM dd', { locale: dateLocale })} - {format(dateRange.to, 'MMM dd', { locale: dateLocale })}
+                  {format(dateRange.from, 'MMM dd yyyy', { locale: dateLocale })} - {format(dateRange.to, 'MMM dd yyyy', { locale: dateLocale })}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
+              <PopoverContent className="w-48 p-0" align="end">
                 <div className="p-3 space-y-2">
                   <Button
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => setDateRange({
-                      from: subDays(new Date(), 1),
-                      to: new Date(),
-                    })}
+                    onClick={() => {
+                      setDateRange({
+                        from: subDays(new Date(), 1),
+                        to: new Date(),
+                      });
+                    }}
                   >
                     {t('healthMetrics.charts.last24Hours')}
                   </Button>
@@ -362,39 +588,41 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => setDateRange({
-                      from: subDays(new Date(), 7),
-                      to: new Date(),
-                    })}
+                    onClick={() => {
+                      setDateRange({
+                        from: subDays(new Date(), 7),
+                        to: new Date(),
+                      });
+                    }}
                   >
                     {t('healthMetrics.charts.last7Days')}
                   </Button>
-                  {daysOfDataAvailable >= 30 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => setDateRange({
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      setDateRange({
                         from: subDays(new Date(), 30),
                         to: new Date(),
-                      })}
-                    >
-                      {t('healthMetrics.charts.last30Days')}
-                    </Button>
-                  )}
-                  {hasMoreThan30Days && earliestDataPoint && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => setDateRange({
-                        from: earliestDataPoint,
+                      });
+                    }}
+                  >
+                    {t('healthMetrics.charts.last30Days')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      setDateRange({
+                        from: earliestDataPoint || subDays(new Date(), 365),
                         to: new Date(),
-                      })}
-                    >
-                      {t('healthMetrics.charts.allAvailableData', { defaultValue: 'All Available Data' })}
-                    </Button>
-                  )}
+                      });
+                    }}
+                  >
+                    {t('healthMetrics.charts.allAvailableData')}
+                  </Button>
                 </div>
               </PopoverContent>
             </Popover>
@@ -407,13 +635,14 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           </div>
         ) : (
           <Tabs defaultValue="heart_rate" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto gap-1 p-1">
-              <TabsTrigger value="heart_rate" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.heartRate')}</TabsTrigger>
-              <TabsTrigger value="blood_pressure" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.bloodPressure')}</TabsTrigger>
-              <TabsTrigger value="oxygen" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.oxygen')}</TabsTrigger>
-              <TabsTrigger value="temperature" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.temperature')}</TabsTrigger>
-              <TabsTrigger value="sleep_quality" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.sleep')}</TabsTrigger>
-              <TabsTrigger value="panic_sos" className="text-xs sm:text-sm px-1.5 sm:px-3 py-2">{t('healthMetrics.charts.panicSos')}</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7">
+              <TabsTrigger value="heart_rate">{t('healthMetrics.charts.heartRate')}</TabsTrigger>
+              <TabsTrigger value="blood_pressure">{t('healthMetrics.charts.bloodPressure')}</TabsTrigger>
+              <TabsTrigger value="oxygen">{t('healthMetrics.charts.oxygen')}</TabsTrigger>
+              <TabsTrigger value="temperature">{t('healthMetrics.charts.temperature')}</TabsTrigger>
+              <TabsTrigger value="sleep_quality">{t('healthMetrics.charts.sleep')}</TabsTrigger>
+              <TabsTrigger value="humidity">{t('healthMetrics.charts.humidity')}</TabsTrigger>
+              <TabsTrigger value="panic_sos">{t('healthMetrics.charts.panicSos')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="heart_rate" className="mt-4">
@@ -448,6 +677,13 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
               <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-4">{t('healthMetrics.charts.sleepOverTime')}</h3>
                 {renderChart('sleep_quality', t('healthMetrics.charts.sleepQuality'), 'hsl(var(--info))', '%')}
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="humidity" className="mt-4">
+              <Card className="p-4">
+                <h3 className="text-lg font-semibold mb-4">{t('healthMetrics.charts.humidityOverTime')}</h3>
+                {renderChart('humidity', t('healthMetrics.charts.humidity'), 'hsl(var(--info))', '%')}
               </Card>
             </TabsContent>
 

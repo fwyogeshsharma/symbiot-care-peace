@@ -13,6 +13,13 @@ interface DwellTimeAnalysisProps {
   } | null;
 }
 
+const toTitleCase = (str: string): string => {
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps) => {
   const { t } = useTranslation();
   const dwellTimes = calculateDwellTimes(data.events);
@@ -40,7 +47,7 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
     }
 
     return {
-      location,
+      location: toTitleCase(location),
       actual: Math.round(actualMinutes),
       ideal: idealMinutes,
       min: minMinutes,
@@ -141,13 +148,13 @@ export const DwellTimeAnalysis = ({ data, idealProfile }: DwellTimeAnalysisProps
           <div>
             <h4 className="text-sm font-semibold mb-3">{t('movement.dwellTime.actualVsIdeal')}</h4>
             <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
+              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 120 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="location"
-                  angle={0}
-                  textAnchor="middle"
-                  height={80}
+                  angle={-45}
+                  textAnchor="end"
+                  height={100}
                   interval={0}
                   tick={{ fontSize: 11 }}
                 />

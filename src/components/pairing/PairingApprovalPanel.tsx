@@ -71,8 +71,12 @@ export const PairingApprovalPanel = ({ selectedPersonId }: PairingApprovalPanelP
           schema: 'public',
           table: 'device_pairing_requests',
         },
-        (payload) => {
-          toast.info(t('devices.pairing.newRequestReceived'));
+        async (payload) => {
+          // Only show toast if this request is for the selected person or no filter is applied
+          const newRequest = payload.new as any;
+          if (!selectedPersonId || newRequest.elderly_person_id === selectedPersonId) {
+            toast.info(t('devices.pairing.newRequestReceived'));
+          }
           refetch();
         }
       )
@@ -92,7 +96,7 @@ export const PairingApprovalPanel = ({ selectedPersonId }: PairingApprovalPanelP
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [refetch]);
+  }, [refetch, selectedPersonId]);
 
   const handleApprove = async () => {
     if (!selectedRequest) return;

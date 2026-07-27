@@ -8,6 +8,8 @@
     "edit": "Bearbeiten",
     "add": "Hinzufügen",
     "close": "Schließen",
+    "expand": "Erweitern",
+    "minimize": "Minimieren",
     "search": "Suchen",
     "filter": "Filtern",
     "export": "Exportieren",
@@ -363,18 +365,27 @@
       "nameMin": "Der Name muss mindestens 2 Zeichen haben",
       "phoneMin": "Die Telefonnummer muss mindestens 10 Ziffern haben",
       "phoneInvalid": "Ungültiges Telefonnummernformat"
+    },
+    "roleDialog": {
+      "title": "Selbstüberwachungsoption",
+      "message": "Durch die Auswahl von älterer Person/Familienmitglied können Sie sich auch selbst überwachen. Wenn Sie sich nicht selbst überwachen möchten, wählen Sie Pflegekraft.",
+      "selectCaregiver": "Pflegekraft Auswählen",
+      "continue": "Mit Auswahl Fortfahren"
     }
   },
   "nav": {
     "home": "Startseite",
     "dashboard": "Dashboard",
+    "vital": "Vital",
     "health": "Gesundheit",
+    "insights": "Einblicke",
     "profile": "Profil",
     "alerts": "Warnungen",
     "reports": "Berichte",
     "tracking": "Verfolgung",
     "devices": "Geräte",
     "dataSharing": "Datenaustausch",
+    "caregiverDataSharingDisabled": "Pflegekräfte haben keinen Zugriff auf die Datenfreigabe",
     "movement": "Aktivität",
     "floorPlans": "Grundrisse",
     "analytics": "Analytik",
@@ -1154,33 +1165,12 @@
       "deleteExpired": "Abgelaufene Anfrage löschen",
       "deleted": "Kopplungsanfrage gelöscht",
       "deleteFailed": "Löschen der Kopplungsanfrage fehlgeschlagen"
-    },
-    "sync": {
-      "title": "Geräte Synchronisieren",
-      "description": "Synchronisieren Sie Ihre verbundenen Fitnessgeräte über Bluetooth, um die neuesten Messwerte abzurufen.",
-      "syncAll": "Alle Geräte Synchronisieren",
-      "syncOne": "Synchronisieren",
-      "statusIdle": "Noch nicht synchronisiert",
-      "statusScanning": "Gerät wird gesucht...",
-      "statusConnecting": "Verbindung wird hergestellt...",
-      "statusSyncing": "Wird synchronisiert...",
-      "statusSuccess": "Synchronisiert",
-      "statusUnsupported": "Keine Daten von diesem Gerät verfügbar",
-      "statusFailed": "Synchronisierung fehlgeschlagen",
-      "lastSynced": "Zuletzt synchronisiert: {{time}}",
-      "webNotSupported": "Die Bluetooth-Synchronisierung erfordert die installierte mobile App und funktioniert nicht im Browser.",
-      "noDevices": "Noch keine Geräte zum Synchronisieren. Registrieren Sie zuerst ein Gerät.",
-      "healthConnect": {
-        "tooltip": "Von Health Connect synchronisieren",
-        "notInstalled": "Health Connect ist nicht installiert, daher können Daten von Apps wie Zepp noch nicht übertragen werden.",
-        "installAction": "Health Connect installieren"
-      }
     }
   },
   "tracking": {
-    "title": "Verfolgung",
+    "title": "Mobilität",
     "subtitle": "Innen- und Außenpositionierungssystem",
-    "movementTracking": "Bewegungsverfolgung",
+    "movementTracking": "Bewegungsüberwachung",
     "realTimePositioning": "Echtzeit-Innen- und Außenpositionierung",
     "location": "Aktueller Standort",
     "indoor": "Innen",
@@ -1201,8 +1191,8 @@
     "last7Days": "Letzte 7 Tage",
     "last30Days": "Letzte 30 Tage",
     "noFloorPlan": {
-      "title": "Kein Grundriss Gefunden",
-      "description": "Registrieren Sie ein tragbares Gerät, um die Innenverfolgung zu sehen"
+      "title": "Grundriss Hinzufügen",
+      "description": "Bitte fügen Sie einen Grundriss hinzu, um die Innenverfolgung zu aktivieren"
     },
     "noGpsData": {
       "title": "Keine GPS-Daten oder Geofences",
@@ -1666,7 +1656,7 @@
       },
       "indoorTracking": {
         "title": "Innenverfolgung mit Grundrissen",
-        "content": "Echtzeit-Standort auf hochgeladenen Grundrissen anzeigen. Zonen erstellen, um Bereiche wie Schlafzimmer, Küche, Bad zu definieren. Bewegungspfade und Verweildauern in jeder Zone verfolgen."
+        "content": "Echtzeit-Standort auf hochgeladenen Grundrissen anzeigen. Zonen erstellen, um Bereiche wie Schlafzimmer, Küche, Bad zu definieren. Bewegungspfade und Verweildauern in jeder Zone verfolgen. Mehrstöckige Gebäude werden vollständig unterstützt - laden Sie Grundrisse für jede Etage hoch, um die Position über mehrere Stockwerke hinweg zu verfolgen."
       },
       "outdoorTracking": {
         "title": "GPS-Außenverfolgung",
@@ -1713,18 +1703,6 @@
     "poor": "Schlecht",
     "critical": "Kritisch",
     "trend": "ILQ-Trend",
-    "info": {
-      "ariaLabel": "ILQ-Informationen",
-      "title": "Unabhängiger Lebensquotient (ILQ)",
-      "description": "Eine Punktzahl von 0-100, die die Fähigkeit einer älteren Person misst, unabhängig zu leben.",
-      "components": "Komponenten",
-      "healthVitals": "Gesundheitswerte (30%)",
-      "physicalActivity": "Körperliche Aktivität (25%)",
-      "cognitiveFunction": "Kognitive Funktion (15%)",
-      "environmentalSafety": "Umweltsicherheit (15%)",
-      "emergencyResponse": "Notfallreaktion (10%)",
-      "socialEngagement": "Soziales Engagement (5%)"
-    },
     "loadingChart": "Diagramm wird geladen...",
     "noDataPeriod": "Keine ILQ-Daten für den ausgewählten Zeitraum verfügbar",
     "lastDays": "Letzte {{days}} Tage",
@@ -1759,6 +1737,7 @@
       "last7Days": "Letzte 7 Tage",
       "last30Days": "Letzte 30 Tage",
       "last90Days": "Letzte 90 Tage",
+      "allTime": "Alle verfügbaren Daten",
       "noHistoricalData": "Keine historischen Daten verfügbar",
       "componentAnalysis": "Komponentenanalyse",
       "componentAnalysisDesc": "Punktzahlaufschlüsselung über alle Dimensionen",
@@ -1775,20 +1754,15 @@
       "cognitiveFunctionPercent": "Kognitive Funktion (15%)",
       "cognitiveFunctionDesc": "Routineeinhaltung, Medikamentencompliance",
       "environmental": "Umwelt",
-      "environmentalSafety": "Umweltsicherheit",
       "emergency": "Notfall",
-      "emergencyResponse": "Notfallreaktion",
       "social": "Sozial",
-      "socialEngagement": "Soziales Engagement",
-      "healthVitalsShort": "Gesundheit",
-      "physicalActivityShort": "Aktivität",
-      "cognitiveFunctionShort": "Kognitiv",
-      "environmentalShort": "Umwelt",
-      "emergencyShort": "Notfall",
-      "socialShort": "Sozial",
       "computingScore": "ILQ-Punktzahl wird berechnet...",
       "computedSuccess": "ILQ erfolgreich berechnet: {{score}}",
       "computeFailed": "ILQ-Berechnung fehlgeschlagen",
+      "computeHistorical": "Historische Berechnen",
+      "computingHistorical": "Berechnung historischer ILQ-Werte für alle vergangenen Daten...",
+      "historicalSuccess": "{{count}} historische Werte erfolgreich berechnet!",
+      "historicalFailed": "Fehler bei der Berechnung historischer Werte",
       "generatingReport": "PDF-Bericht wird generiert...",
       "reportDownloaded": "Bericht erfolgreich heruntergeladen!",
       "reportFailed": "Berichterstellung fehlgeschlagen"
@@ -1828,5 +1802,987 @@
     "offline": "Getrennt",
     "idle": "Inaktiv",
     "value": "Wert"
+  },
+  "reports": {
+    "title": "Berichte",
+    "subtitle": "Umfassende Berichte und Analysen erstellen",
+    "filters": "Berichtsfilter",
+    "selectPerson": "Person Auswählen",
+    "allPersons": "Alle Personen",
+    "dateRange": "Zeitraum",
+    "pickDate": "Zeitraum auswählen",
+    "quickSelect": "Schnellauswahl",
+    "last7Days": "Letzte 7 Tage",
+    "last30Days": "Letzte 30 Tage",
+    "last3Months": "Letzte 3 Monate",
+    "last6Months": "Letzte 6 Monate",
+    "generate": "Generieren",
+    "exportAll": "Alles Exportieren",
+    "printReport": "Bericht Drucken",
+    "exportToPDF": "Als PDF Exportieren",
+    "underDevelopment": "Dieser Bericht befindet sich in der Entwicklung. Bitte schauen Sie später noch einmal vorbei.",
+    "categories": {
+      "daily": "Tageszusammenfassung",
+      "dailyDesc": "Umfassende Tagesübersicht für Familien",
+      "health": "Gesundheitszusammenfassung",
+      "healthDesc": "Übersicht der Vitalwerte und Gesundheitsmetriken",
+      "activity": "Aktivität und Mobilität",
+      "activityDesc": "Bewegungsmuster und körperliche Aktivität",
+      "sleep": "Schlafanalyse",
+      "sleepDesc": "Schlafqualität und -muster",
+      "medication": "Medikamenteneinhaltung",
+      "medicationDesc": "Verfolgung der Medikamentencompliance",
+      "alerts": "Alarmmeldungen",
+      "alertsDesc": "Verlauf der Alarme und Reaktionszeiten",
+      "environment": "Umweltsicherheit",
+      "environmentDesc": "Umgebungsbedingungen im Zuhause",
+      "wellness": "Wohlbefindenswert",
+      "wellnessDesc": "Bewertung der unabhängigen Lebensqualität",
+      "comparative": "Vergleichsanalyse",
+      "comparativeDesc": "Vergleiche von Zeitraum zu Zeitraum"
+    },
+    "health": {
+      "vitalTrends": "Vitalwert-Trends",
+      "vitalTrendsDesc": "Herzfrequenz, Blutdruck, Sauerstoffgehalt im Zeitverlauf",
+      "anomalies": "Gesundheitsanomalien",
+      "anomaliesDesc": "Messwerte außerhalb des Normalbereichs und besorgniserregende Muster",
+      "bloodSugar": "Blutzuckeranalyse",
+      "bloodSugarDesc": "Glukosewerte und -muster",
+      "dataPoints": "Datenpunkte",
+      "loadingHistoricalData": "Lade historische Daten..."
+    },
+    "activity": {
+      "dailyActivity": "Tagesaktivitäts-Zusammenfassung",
+      "dailyActivityDesc": "Schritte, aktive Zeit und sitzende Phasen",
+      "movementPatterns": "Bewegungsmuster",
+      "movementPatternsDesc": "Raumwechsel und Mobilitätsanalyse",
+      "fallIncidents": "Sturzereignisse",
+      "fallIncidentsDesc": "Sturzerkennungsereignisse und Risikoanalyse"
+    },
+    "sleep": {
+      "quality": "Schlafqualitätsbericht",
+      "qualityDesc": "Dauer, Qualitätswerte und Störungen",
+      "patterns": "Schlafmuster",
+      "patternsDesc": "Analyse der Schlafphasen und -zyklen"
+    },
+    "sleepPatterns": {
+      "noData": "Keine Schlafmusterdaten Verfügbar",
+      "noDataDesc": "Die Schlafmusteranalyse erfordert Schlafqualitätsdaten für den ausgewählten Zeitraum.",
+      "noDataTip": "Tipp: Versuchen Sie, einen anderen Datumsbereich auszuwählen oder stellen Sie sicher, dass Schlafüberwachungsgeräte Daten aufzeichnen.",
+      "percentOfSleep": "% des Schlafs",
+      "sleepCycles": "Schlafzyklen",
+      "minEach": "~90 Min. jeweils",
+      "avgBedtime": "Durchschn. Schlafenszeit",
+      "typicalSleepTime": "Typische Schlafenszeit",
+      "stagesDistribution": "Schlafphasen-Verteilung",
+      "minutes": "Minuten",
+      "durationMin": "Dauer (Min.)",
+      "averagePerNight": "Durchschnitt pro Nacht",
+      "min": "Min.",
+      "deepSleepOptimal": "Tiefschlafdauer ist optimal (15-25% der Gesamtzeit)",
+      "deepSleepImprove": "Tiefschlaf könnte verbessert werden",
+      "remSleepHealthy": "REM-Schlaf liegt im gesunden Bereich (20-25% der Gesamtzeit)",
+      "remSleepConsider": "Berücksichtigen Sie Faktoren, die den REM-Schlaf beeinflussen",
+      "stagesTrends": "Schlafphasen-Trends",
+      "insights": "Schlafmuster-Einblicke",
+      "cyclesLabel": "Zyklen",
+      "cyclesDesc": "{{count}} Schlafzyklen pro Nacht werden abgeschlossen. Streben Sie 4-6 vollständige Zyklen (6-9 Stunden) für optimale Erholung an.",
+      "consistencyLabel": "Konsistenz",
+      "consistencyGood": "Schlafenszeit ist konsistent und liegt im gesunden Bereich (22-23 Uhr).",
+      "consistencyImprove": "Erwägen Sie, eine konsistentere Schlafroutine für bessere Schlafqualität beizubehalten.",
+      "qualityLabel": "Qualität",
+      "qualityGood": "Minimale Wachzeiten deuten auf eine gute Schlafkonsolidierung hin.",
+      "qualityImprove": "Häufiges Aufwachen kann auf Schlaffragmentierung hindeuten. Berücksichtigen Sie Faktoren der Schlafumgebung.",
+      "pm": "Uhr",
+      "am": "Uhr"
+    },
+    "medication": {
+      "adherence": "Compliance-Bericht",
+      "adherenceDesc": "Eingenommene vs. ausgelassene Dosen",
+      "timing": "Timing-Analyse",
+      "timingDesc": "Einhaltung des Medikamentenplans"
+    },
+    "medicationTiming": {
+      "lateMedicationAnalysis": "Analyse Verspäteter Medikamente",
+      "lateMedicationDesc": "Detaillierte Aufzeichnungen von Medikamenten, die mehr als 30 Minuten zu spät eingenommen wurden, um Muster zu erkennen und das Timing zu verbessern",
+      "medicationsFrequentlyLate": "Häufig Verspätet Eingenommene Medikamente",
+      "avgDelay": "Durchschn. Verspätung",
+      "timesLate": "mal zu spät",
+      "recentLateMedications": "Kürzlich Verspätete Medikamente",
+      "medication": "Medikament",
+      "scheduledTime": "Geplante Zeit",
+      "takenTime": "Einnahmezeit",
+      "delay": "Verspätung",
+      "showing": "Zeigt",
+      "of": "von",
+      "lateMedicationRecords": "verspätete Medikamenteneinträge",
+      "recommendationsToImprove": "Empfehlungen zur Verbesserung des Timings",
+      "setUpReminders": "Medikamentenerinnerungen einrichten:",
+      "setUpRemindersDesc": "Verwenden Sie Alarme oder Smartphone-Apps zur Benachrichtigung Minuten vor der geplanten Zeit",
+      "focusOnFrequent": "Fokus auf häufig verspätete Medikamente:",
+      "focusOnFrequentDesc": "wird am häufigsten zu spät eingenommen - erwägen Sie Umplanung oder zusätzliche Erinnerungen",
+      "pillOrganizer": "Pillenorganizer:",
+      "pillOrganizerDesc": "Verwenden Sie einen wöchentlichen Pillenorganizer, um das Erinnern zu erleichtern, was wann einzunehmen ist",
+      "linkToRoutine": "Mit Routine verknüpfen:",
+      "linkToRoutineDesc": "Nehmen Sie Medikamente zur gleichen Zeit wie tägliche Aktivitäten (z.B. beim Frühstück, vor dem Schlafengehen)",
+      "consultProvider": "Gesundheitsdienstleister konsultieren:",
+      "consultProviderDesc": "Durchschnittliche Verspätung von {{delay}} Minuten kann auf Zeitplankonflikte hinweisen - erwägen Sie Anpassung der Medikamentenzeiten",
+      "within30Min": "Innerhalb 30 Min. Fenster",
+      "avgDelayLabel": "Durchschn. Verspätung",
+      "earlyOnTime": "Früh/Pünktlich",
+      "behindSchedule": "Hinter dem Zeitplan",
+      "takenLateLabel": "Zu Spät Eingenommen",
+      "moreThan30Min": ">30 Min. nach Plan",
+      "complianceByTimeOfDay": "Einhaltung nach Tageszeit",
+      "doses": "Dosen",
+      "taken": "Eingenommen",
+      "missedLabel": "Versäumt",
+      "avgDailyTimingVariance": "Durchschnittliche Tägliche Zeitabweichung",
+      "minutes": "Minuten",
+      "avgDelayMin": "Durchschn. Verspätung (Min.)",
+      "maxDelayMin": "Max. Verspätung (Min.)",
+      "timingDistribution": "Zeitverteilung",
+      "onTimeLabel": "Pünktlich",
+      "takenLateLabel2": "Zu Spät Eingenommen",
+      "takenEarlyLabel": "Früh Eingenommen",
+      "timingInsights": "Timing-Einblicke",
+      "excellentAdherence": "Ausgezeichnete Zeiteinhaltung! Medikamente werden konsistent innerhalb des empfohlenen Zeitfensters eingenommen.",
+      "goodConsistency": "Gute Zeitkonsistenz, aber es gibt Raum für Verbesserung bei der Zeiteinhaltung.",
+      "needsAttention": "Zeiteinhaltung erfordert Aufmerksamkeit. Erwägen Sie das Einstellen von Medikamentenerinnerungen.",
+      "systematicIssues": "deutet auf systematische Timing-Probleme hin. Überprüfen Sie die Abstimmung der täglichen Routine mit dem Medikamentenplan.",
+      "minorDelays": "Geringfügige Verzögerungen erkannt. Medikamentenerinnerungen können helfen, den Zeitplan einzuhalten.",
+      "acceptable": "Medikamente werden pünktlich oder leicht verzögert eingenommen, was akzeptabel ist.",
+      "takenEarly": "Medikamente werden oft früh eingenommen. Stellen Sie sicher, dass dies sicher und vom Gesundheitsdienstleister empfohlen ist.",
+      "higherMissRates": "Bestimmte Tageszeiten zeigen höhere Versäumnisraten. Überprüfen und passen Sie den Medikamentenplan bei Bedarf an.",
+      "goodCompliance": "Gut",
+      "needsImprovement": "Verbesserungsbedarf"
+    },
+    "alerts": {
+      "history": "Alarmverlauf",
+      "historyDesc": "Umfassendes Protokoll aller Alarme mit Schweregradverteilung, Statusverfolgung und aktueller Alarmzeitleiste",
+      "emergency": "Notfallereignisse",
+      "emergencyDesc": "Kritische Vorfälle einschließlich Panikknopf-Aktivierungen, Stürze und Notfallreaktionsverfolgung",
+      "responseTime": "Reaktionszeit-Analyse",
+      "responseTimeDesc": "Detaillierte Leistungsmetriken zeigen Bestätigungszeiten, Lösungseffizienz und Teamreaktionsfähigkeit",
+      "totalEmergencies": "Notfälle gesamt",
+      "criticalLevel": "kritisches Level",
+      "panicEvents": "Panik/SOS-Ereignisse",
+      "requiresImmediate": "Erfordert sofortige Aufmerksamkeit",
+      "fastestResponse": "Schnellste Reaktion",
+      "quickestReaction": "Schnellste Reaktionszeit",
+      "avgCriticalResponse": "Durchschn. kritische Reaktion",
+      "forCriticalEvents": "Für kritische Ereignisse",
+      "emergencyTypes": "Notfallarten",
+      "emergencyTrend": "Notfall-Trend über Zeit",
+      "emergencies": "Notfälle",
+      "emergencyTimeline": "Notfallereignisse Zeitleiste",
+      "responded": "Beantwortet",
+      "unresolvedEmergencies": "Ungelöste Notfälle",
+      "unresolvedEmergenciesDesc": "Es gibt {{count}} ungelöste Notfallereignisse, die sofortige Aufmerksamkeit erfordern",
+      "noEmergencies": "Keine Notfallereignisse",
+      "noEmergenciesDesc": "Keine kritischen oder hohen Schweregrade in diesem Zeitraum",
+      "totalResponded": "Gesamt beantwortet",
+      "outOf": "von",
+      "totalAlerts": "Alarme gesamt",
+      "avgAcknowledgeTime": "Durchschn. Bestätigungszeit",
+      "timeToAcknowledge": "Zeit zur Bestätigung",
+      "avgResolveTime": "Durchschn. Lösungszeit",
+      "timeToResolve": "Zeit zur Lösung",
+      "under1Minute": "Unter 1 Minute",
+      "excellentResponse": "exzellente Reaktion",
+      "performanceBenchmarks": "Leistungs-Benchmarks",
+      "under1Min": "Unter 1 Min",
+      "under5Min": "Unter 5 Min",
+      "over10Min": "Über 10 Min",
+      "excellent": "Exzellent",
+      "good": "Gut",
+      "needsImprovement": "Verbesserungsbedarf",
+      "responseTimeBySeverity": "Reaktionszeit nach Schweregrad",
+      "avgResponse": "Durchschn. Reaktion",
+      "dailyPerformanceTrend": "Täglicher Leistungstrend",
+      "responseTimeByType": "Reaktionszeit nach Alarmtyp",
+      "bestResponses": "Beste Reaktionen",
+      "slowestResponses": "Langsamste Reaktionen",
+      "performanceRecommendations": "Leistungsempfehlungen",
+      "recommendation1": "{{count}} Alarme dauerten über 10 Minuten zur Reaktion. Erwägen Sie, mehr Teammitglieder hinzuzufügen oder Benachrichtigungssysteme zu verbessern.",
+      "recommendation2": "Überprüfen Sie die Alarmpriorität-Einstellungen, um sicherzustellen, dass kritische Alarme sofortige Aufmerksamkeit erhalten.",
+      "recommendation3": "Implementieren Sie Eskalationsrichtlinien für Alarme, die nach einer bestimmten Schwelle unbestätigt bleiben.",
+      "noResponseData": "Keine Reaktionsdaten verfügbar",
+      "noResponseDataDesc": "Keine Alarme wurden in diesem Zeitraum bestätigt oder gelöst, um Reaktionszeiten zu analysieren"
+    },
+    "environment": {
+      "airQuality": "Luftqualitätsbericht",
+      "airQualityDesc": "Temperatur-, Feuchtigkeits- und Luftqualitätstrends",
+      "comfort": "Komfortanalyse",
+      "comfortDesc": "Optimale vs. tatsächliche Umgebungsbedingungen"
+    },
+    "airQuality": {
+      "connectedSensors": "Verbundene Umweltsensoren",
+      "sensorsActive": "{{count}} Sensor(en) aktiv überwachend",
+      "good": "Gut",
+      "fair": "Akzeptabel",
+      "poor": "Schlecht",
+      "highCO2": "Hohe CO2-Werte erkannt",
+      "highVOC": "Hohe flüchtige organische Verbindungen erkannt",
+      "highPM25": "Hohe PM2.5-Partikel",
+      "highPM10": "Hohe PM10-Partikel",
+      "humidityOutOfRange": "Luftfeuchtigkeit außerhalb des optimalen Bereichs",
+      "temperatureOutOfRange": "Temperatur außerhalb des Komfortbereichs",
+      "unhealthyAQI": "Ungesunder Luftqualitätsindex",
+      "pm10Good": "µg/m³ (Gut: <50)",
+      "pm1Good": "µg/m³ (Gut: <10)",
+      "recommendations": {
+        "maintainTemp": "Halten Sie die Innentemperatur zwischen 20-26°C für optimalen Komfort",
+        "keepHumidity": "Halten Sie die Luftfeuchtigkeit zwischen 30-60%, um Schimmel und Atemprobleme zu vermeiden",
+        "ventilateCO2": "Lüften Sie Räume, wenn die CO₂-Werte 800 ppm überschreiten",
+        "useAirPurifiers": "Verwenden Sie Luftreiniger, um Partikel (PM2.5) zu reduzieren",
+        "eliminateVOCs": "Identifizieren und beseitigen Sie Quellen von VOCs (Reinigungsmittel, Farben usw.)",
+        "monitorRegularly": "Überwachen Sie regelmäßig die Luftqualität, insbesondere bei älteren Menschen mit Atemwegserkrankungen"
+      }
+    },
+    "fallIncidents": {
+      "noFallsDetected": "Keine Sturzvorfälle Erkannt",
+      "noFallsDesc": "In diesem Zeitraum wurden keine Sturzerkennungsalarme aufgezeichnet.",
+      "criticalFalls": "Kritische Stürze",
+      "requiringImmediate": "Erfordert sofortige Aufmerksamkeit",
+      "resolved": "Gelöst",
+      "pending": "ausstehend",
+      "timeToResolve": "Zeit zur Lösung des Vorfalls",
+      "fallsByTimeOfDay": "Sturzvorfälle nach Tageszeit",
+      "morning": "Morgen (6-12 Uhr)",
+      "afternoon": "Nachmittag (12-18 Uhr)",
+      "evening": "Abend (18-22 Uhr)",
+      "night": "Nacht (22-6 Uhr)",
+      "fallIncidentDetails": "Details zu Sturzvorfällen",
+      "resolvedAt": "Gelöst um:",
+      "responseTime": "Reaktionszeit:",
+      "minutes": "Minuten",
+      "acknowledgedAt": "Bestätigt um:",
+      "fallPreventionRecommendations": "Empfehlungen zur Sturzprävention",
+      "multipleFalls": "Mehrere Stürze erkannt:",
+      "multipleFallsDesc": "Erwägen Sie eine umfassende Sicherheitsbewertung des Hauses, um Sturzgefahren zu identifizieren und zu beseitigen.",
+      "nightFalls": "Nächtliche Stürze erkannt:",
+      "nightFallsDesc": "Sorgen Sie für ausreichende Beleuchtung und erwägen Sie die Installation von Nachtlichtern entlang der Wege zum Badezimmer.",
+      "reviewMedications": "Regelmäßige Überprüfung von Medikamenten, die Schwindel verursachen oder das Gleichgewicht beeinträchtigen können.",
+      "physicalTherapy": "Erwägen Sie Physiotherapie oder Gleichgewichtsübungen zur Verbesserung von Kraft und Stabilität."
+    },
+    "movementPatterns": {
+      "noData": "Für den ausgewählten Zeitraum sind keine Bewegungsdaten verfügbar.",
+      "noDataDesc": "Stellen Sie sicher, dass die Standortverfolgungsgeräte ordnungsgemäß konfiguriert sind.",
+      "totalMovements": "Gesamtbewegungen",
+      "recordedEvents": "Aufgezeichnete Ereignisse",
+      "locationsVisited": "Besuchte Orte",
+      "uniqueLocations": "Einzigartige Orte",
+      "roomTransitions": "Raumübergänge",
+      "locationChanges": "Standortwechsel",
+      "mostVisited": "Am Meisten Besucht",
+      "hourlyMovement": "Bewegungshäufigkeit nach Stunde",
+      "movements": "Bewegungen",
+      "timeDistribution": "Aktivität nach Tageszeit",
+      "dwellTime": "Nach Standort verbrachte Zeit",
+      "topTransitions": "Häufigste Standortübergänge",
+      "transitions": "Übergänge",
+      "detailedDwellTime": "Detaillierte Verweilzeitanalyse"
+    },
+    "healthAnomalies": {
+      "allReadingsNormal": "Alle Messwerte Normal",
+      "noAnomaliesDetected": "Im ausgewählten Zeitraum wurden keine Gesundheitsanomalien festgestellt",
+      "totalAnomalies": "Gesamtanomalien",
+      "affectedMetrics": "Betroffene Metriken",
+      "dateRange": "Datumsbereich",
+      "anomalies": "Anomalien",
+      "normalRange": "Normalbereich:",
+      "heartRate": "Herzfrequenz",
+      "oxygenSaturation": "Sauerstoffsättigung",
+      "bodyTemperature": "Körpertemperatur",
+      "bloodSugar": "Blutzucker",
+      "bloodGlucose": "Blutzucker",
+      "critical": "Kritisch",
+      "high": "Hoch",
+      "moderate": "Moderat",
+      "belowNormal": "Unter Normal",
+      "aboveNormal": "Über Normal",
+      "lowBy": "Niedrig um",
+      "highBy": "Hoch um",
+      "recommendations": {
+        "consultProvider": "Konsultieren Sie einen Gesundheitsdienstleister bezüglich dieser Messwerte",
+        "ensureCalibration": "Stellen Sie sicher, dass Geräte ordnungsgemäß kalibriert und korrekt getragen werden",
+        "monitorPatterns": "Überwachen Sie Muster oder wiederkehrende Anomalien",
+        "keepLog": "Führen Sie ein Protokoll über Aktivitäten und Medikamente, wenn Anomalien auftreten",
+        "seekAttention": "Suchen Sie bei kritischen Messwerten sofort medizinische Hilfe"
+      }
+    },
+    "medicationAdherence": {
+      "overallAdherence": "Gesamtadhärenz",
+      "weeklyTrend": "Wöchentlicher Adhärenztrend",
+      "dailyTracking": "Tägliche Medikamentenverfolgung",
+      "taken": "Eingenommen",
+      "missed": "Versäumt",
+      "outOf": "Von {{total}} Gesamtdosen",
+      "rate": "Rate (%)",
+      "doses": "Dosen",
+      "recommendations": {
+        "setReminders": "Erwägen Sie die Einrichtung von Medikamentenerinnerungen",
+        "reviewSchedule": "Überprüfen Sie den Medikamentenplan mit dem Gesundheitsdienstleister",
+        "usePillOrganizers": "Verwenden Sie Pillendosen zur Verfolgung der täglichen Dosen",
+        "involveCaregivers": "Beziehen Sie Familienmitglieder oder Pflegekräfte in die Medikamentenverwaltung ein"
+      }
+    },
+    "bloodSugar": {
+      "hypoglycemic": "Hypoglykämisch",
+      "normal": "Normal",
+      "elevated": "Erhöht",
+      "high": "Hoch",
+      "lowThreshold": "< 70 mg/dL",
+      "normalRange": "70-140 mg/dL",
+      "elevatedRange": "141-199 mg/dL",
+      "highThreshold": "≥ 200 mg/dL",
+      "night": "Nacht",
+      "morning": "Morgen",
+      "afternoon": "Nachmittag",
+      "evening": "Abend",
+      "readings": "Messwerte",
+      "recommendations": {
+        "lowSugar": "Niedriger Blutzucker erkannt. Konsultieren Sie den Arzt bezüglich Hypoglykämie-Management",
+        "highSugar": "Hohe Blutzuckerwerte erkannt. Überprüfen Sie Ernährung, Medikamente und Aktivität mit dem Gesundheitsdienstleister",
+        "monitorConsistently": "Überwachen Sie den Blutzucker täglich zu konsistenten Zeiten",
+        "keepLog": "Führen Sie ein Ernährungs- und Aktivitätstagebuch zur Identifizierung von Mustern",
+        "calibrateMeter": "Stellen Sie sicher, dass das Glukosemessgerät ordnungsgemäß kalibriert ist",
+        "reportAbnormal": "Melden Sie konsistent abnorme Messwerte dem Gesundheitsdienstleister"
+      }
+    },
+    "wellness": {
+      "ilqTrends": "ILQ-Wert-Trends",
+      "ilqTrendsDesc": "Unabhängigkeitsqualität im Zeitverlauf",
+      "factors": "Beitragende Faktoren",
+      "factorsDesc": "Schlüsselmetriken, die den Wohlbefindenswert beeinflussen"
+    },
+    "comparative": {
+      "weekly": "Woche für Woche",
+      "weeklyDesc": "Wöchentlicher Vergleich der Schlüsselmetriken",
+      "monthly": "Monat für Monat",
+      "monthlyDesc": "Monatliche Trends und Veränderungen"
+    },
+    "daily": {
+      "eodSummary": "Tageszusammenfassung",
+      "eodSummaryDesc": "Vollständige tägliche Gesundheits- und Aktivitätsübersicht für Familienmitglieder"
+    },
+    "subscription": {
+      "title": "Täglicher Bericht per E-Mail",
+      "description": "Erhalten Sie täglich eine Zusammenfassung per E-Mail zu Ihrer bevorzugten Zeit",
+      "selectPerson": "Bitte wählen Sie eine bestimmte Person aus, um E-Mail-Abonnements zu verwalten",
+      "enabled": "E-Mail-Benachrichtigungen aktiviert",
+      "scheduleTime": "Zeit für täglichen Bericht",
+      "selectTime": "Zustellungszeit auswählen",
+      "timezoneNote": "Zeiten werden in Ihrer lokalen Zeitzone angezeigt",
+      "subscribe": "Täglichen Bericht Abonnieren",
+      "unsubscribe": "Abbestellen",
+      "saved": "Abonnementeinstellungen gespeichert!",
+      "removed": "Abonnement entfernt",
+      "saveFailed": "Fehler beim Speichern des Abonnements"
+    },
+    "content": {
+      "totalSteps": "Gesamte Schritte",
+      "avgDailySteps": "Durchschnittliche Tägliche Schritte",
+      "mostActiveDay": "Aktivster Tag",
+      "targetSteps": "Ziel: 8.000 Schritte/Tag",
+      "steps": "Schritte",
+      "dailyStepCount": "Tägliche Schrittzahl",
+      "activityLevelAnalysis": "Aktivitätsniveau-Analyse",
+      "good": "Gut",
+      "fair": "Ausreichend",
+      "low": "Niedrig",
+      "notAvailable": "N/V",
+      "avgHeartRate": "Durchschnittliche Herzfrequenz",
+      "minHeartRate": "Min. Herzfrequenz",
+      "maxHeartRate": "Max. Herzfrequenz",
+      "avgOxygen": "Durchschnittlicher Sauerstoff",
+      "minOxygen": "Min. Sauerstoff",
+      "maxOxygen": "Max. Sauerstoff",
+      "heartRateTrend": "Herzfrequenz-Trend",
+      "oxygenSaturationTrend": "Sauerstoffsättigung-Trend",
+      "insights": "Wichtige Erkenntnisse",
+      "totalAlerts": "Gesamt-Alarme",
+      "active": "Aktiv",
+      "requireAttention": "Aufmerksamkeit erforderlich",
+      "resolved": "Gelöst",
+      "successfullyHandled": "Erfolgreich bearbeitet",
+      "avgResponseTime": "Durchschn. Reaktionszeit",
+      "minutesToAcknowledge": "Minuten bis zur Bestätigung",
+      "alertsBySeverity": "Alarme nach Schweregrad",
+      "alertsByType": "Alarme nach Typ",
+      "recentAlerts": "Aktuelle Alarme",
+      "noTitle": "Kein Titel",
+      "severity": "Schweregrad",
+      "type": "Typ",
+      "status": "Status",
+      "time": "Zeit",
+      "averageLevel": "Durchschnittliches Niveau",
+      "variability": "Variabilität",
+      "normalReadings": "Normale Messwerte",
+      "totalReadings": "Gesamte Messwerte",
+      "bloodSugarTrends": "Blutzucker-Trends",
+      "readingDistribution": "Messwerteverteilung",
+      "patternsByTimeOfDay": "Muster nach Tageszeit",
+      "recommendations": "Empfehlungen",
+      "temperature": "Temperatur",
+      "humidity": "Luftfeuchtigkeit",
+      "co2": "CO₂",
+      "voc": "VOC",
+      "pm25": "PM2.5",
+      "aqi": "AQI",
+      "temperatureHumidityTrends": "Temperatur- und Feuchtigkeitstrends",
+      "co2Levels": "CO₂-Werte",
+      "healthFactorAnalysis": "Gesundheitsfaktoren-Analyse",
+      "factorImpact": "Faktoren-Einfluss",
+      "contributingFactors": "Beitragende Faktoren",
+      "impact": "Einfluss",
+      "minutes": "Minuten",
+      "seconds": "Sekunden",
+      "high": "Hoch",
+      "medium": "Mittel",
+      "normal": "Normal",
+      "critical": "Kritisch",
+      "warning": "Warnung",
+      "info": "Info",
+      "vitalSignsOverTime": "Vitalwerte im Zeitverlauf",
+      "heartRateBPM": "Herzfrequenz (BPM)",
+      "oxygenPercent": "Sauerstoff (%)",
+      "range": "Bereich",
+      "normalRange": "Normalbereich: 95-100%",
+      "requireAttention": "Erfordern Aufmerksamkeit",
+      "successfullyHandled": "Erfolgreich behandelt",
+      "minutesToAcknowledge": "Minuten bis zur Bestätigung",
+      "noTitle": "Kein Titel",
+      "standardDeviation": "Standardabweichung",
+      "normalRange70140": "70-140 mg/dL",
+      "noEnvironmentalData": "Keine Umweltdaten",
+      "noEnvironmentalDataAvailable": "Für den ausgewählten Zeitraum sind keine Umweltsensordaten verfügbar.",
+      "ensureSensorsConfigured": "Stellen Sie sicher, dass Umweltsensoren ordnungsgemäß konfiguriert und verbunden sind.",
+      "airQualityStatus": "Luftqualitätsstatus",
+      "issuesDetected": "Erkannte Probleme:",
+      "allParametersOptimal": "Alle Umgebungsparameter liegen in optimalen Bereichen.",
+      "optimal6878F": "Optimal: 68-78°F",
+      "optimal3060": "Optimal: 30-60%",
+      "ppmGood800": "ppm (Gut: <800)",
+      "ppbGood500": "ppb (Gut: <500)",
+      "ugm3Good12": "µg/m³ (Gut: <12)",
+      "good050": "Gut: 0-50",
+      "endOfDaySummary": "Tageszusammenfassung",
+      "overallStatus": "Gesamtstatus",
+      "everythingNormal": "Alles ist normal",
+      "needsAttention": "Erfordert Aufmerksamkeit",
+      "connectedDevices": "Verbundene Geräte",
+      "vitalSignsSummary": "Vitalwerte-Zusammenfassung",
+      "environmentalConditions": "Umweltbedingungen",
+      "avgReading": "Durchschn.",
+      "readings": "Messungen",
+      "noData": "Keine Daten",
+      "deviceStatus": "Status",
+      "lastSeen": "Zuletzt gesehen",
+      "allDevicesOnline": "Alle Geräte online und melden ordnungsgemäß",
+      "someDevicesOffline": "Einige Geräte benötigen Aufmerksamkeit",
+      "comfortable": "Komfortabel",
+      "optimal": "Optimal",
+      "sleepQuality": "Schlafqualität",
+      "sleepDuration": "Schlafdauer",
+      "deepSleep": "Tiefschlaf",
+      "lightSleep": "Leichtschlaf",
+      "remSleep": "REM-Schlaf",
+      "awake": "Wach",
+      "sleepEfficiency": "Schlafeffizienz",
+      "timeInBed": "Zeit im Bett",
+      "sleepScore": "Schlafwert",
+      "sleepAnalysis": "Schlafanalyse",
+      "sleepStages": "Schlafphasen",
+      "sleepTrends": "Schlaf-Trends",
+      "medicationCompliance": "Medikamenten-Compliance",
+      "dosesTaken": "Eingenommene Dosen",
+      "dosesScheduled": "Geplante Dosen",
+      "missedDoses": "Verpasste Dosen",
+      "onTime": "Pünktlich",
+      "late": "Verspätet",
+      "timingAccuracy": "Zeitgenauigkeit",
+      "adherenceRate": "Einhaltungsrate",
+      "scheduleCompliance": "Planeinhaltung",
+      "recentDoses": "Aktuelle Dosen",
+      "upcomingDoses": "Bevorstehende Dosen",
+      "takenAt": "Eingenommen um",
+      "scheduledAt": "Geplant für",
+      "anomaliesDetected": "Erkannte Anomalien",
+      "outOfRange": "Außerhalb des Bereichs",
+      "concerningPatterns": "Besorgniserregende Muster",
+      "anomalyDetails": "Anomalie-Details",
+      "fallIncidents": "Sturzereignisse",
+      "totalFalls": "Gesamte Stürze",
+      "recentFalls": "Aktuelle Stürze",
+      "fallLocation": "Sturzort",
+      "impactSeverity": "Aufprallschwere",
+      "responseTime": "Reaktionszeit",
+      "fallRiskAssessment": "Sturzrisikobewertung",
+      "ilqScore": "ILQ-Wert",
+      "ilqTrend": "ILQ-Trend",
+      "ilqComponents": "ILQ-Komponenten",
+      "healthScore": "Gesundheitswert",
+      "activityScore": "Aktivitätswert",
+      "cognitiveScore": "Kognitiver Wert",
+      "safetyScore": "Sicherheitswert",
+      "socialScore": "Sozialwert",
+      "improving": "Verbessernd",
+      "declining": "Rückläufig",
+      "stable": "Stabil",
+      "weeklyComparison": "Wöchentlicher Vergleich",
+      "monthlyComparison": "Monatlicher Vergleich",
+      "thisWeek": "Diese Woche",
+      "lastWeek": "Letzte Woche",
+      "thisMonth": "Dieser Monat",
+      "lastMonth": "Letzter Monat",
+      "change": "Änderung",
+      "keyMetrics": "Schlüsselmetriken",
+      "comparison": "Vergleich",
+      "trend": "Trend",
+      "comfortScore": "Komfortwert",
+      "optimalConditions": "Optimale Bedingungen",
+      "currentConditions": "Aktuelle Bedingungen",
+      "recommendations": "Empfehlungen",
+      "hours": "Stunden",
+      "hour": "Stunde",
+      "min": "Min.",
+      "ago": "vor",
+      "of": "von",
+      "physicalActivity": "Körperliche Aktivität",
+      "stepsToday": "Schritte heute",
+      "goalSteps": "Ziel: 5.000 Schritte ({{percent}}%)",
+      "dailyActivityTimeline": "Tagesaktivitäts-Zeitleiste",
+      "noTimelineEvents": "Für diesen Tag wurden keine Zeitleistenereignisse aufgezeichnet",
+      "aboutThisReport": "Über Diesen Bericht",
+      "eodSummaryDescription": "Diese Tageszusammenfassung bietet einen umfassenden Überblick über Gesundheitsmetriken, Aktivitäten und Vorfälle für {{date}}. Familienmitglieder können diesen Bericht optional jeden Abend per E-Mail erhalten, um über das tägliche Wohlbefinden ihrer Angehörigen informiert zu bleiben.",
+      "todaysHighlights": "Heutige Highlights",
+      "areasOfConcern": "Besorgniserregende Bereiche",
+      "heartRate": "Herzfrequenz",
+      "oxygenSat": "Sauerstoffsättigung",
+      "bloodSugar": "Blutzucker",
+      "bloodPressure": "Blutdruck",
+      "roomTemp": "Raumtemperatur",
+      "outsideComfortZone": "Außerhalb der Komfortzone",
+      "adjustNeeded": "Anpassung erforderlich",
+      "airQuality": "Luftqualität",
+      "moderate": "Mäßig",
+      "poor": "Schlecht",
+      "totalSleepDuration": "Gesamtschlafdauer",
+      "sleepDataPoints": "Schlafdatenpunkte",
+      "recommendedSleepDuration": "Empfohlene Schlafdauer",
+      "outsideRecommendedRange": "Außerhalb des empfohlenen Bereichs (7-9h)",
+      "medicationAdherence": "Medikamenteneinhaltung",
+      "taken": "Eingenommen",
+      "missed": "Versäumt",
+      "total": "Gesamt",
+      "alertsIncidents": "Alarme & Vorfälle",
+      "highPriority": "Hohe Priorität",
+      "devicesMonitoring": "{{count}} Gerät{{plural}} überwacht aktiv Gesundheit und Umgebung",
+      "excellentMedicationAdherence": "Ausgezeichnete Medikamenteneinhaltung",
+      "lowMedicationAdherence": "Niedrige Medikamenteneinhaltung - Nachverfolgung erforderlich",
+      "activityGoalAchieved": "Aktivitätsziel erreicht",
+      "lowActivityLevel": "Niedriges Aktivitätsniveau heute",
+      "criticalAlertsTriggered": "{{count}} kritische{{plural}} Alarm{{plural}} ausgelöst",
+      "heartRateOutsideRange": "Herzfrequenz außerhalb des Normalbereichs",
+      "lowOxygenSaturation": "Niedrige Sauerstoffsättigung erkannt",
+      "noAlertsToday": "Keine Alarme heute",
+      "took": "Eingenommen",
+      "scheduled": "Geplant",
+      "achievedStepGoal": "Tägliches Schrittziel erreicht ({{steps}} Schritte)",
+      "mmHg": "mmHg",
+      "recordedToday": "heute aufgezeichnet",
+      "healthStatusExcellent": "Ausgezeichnet",
+      "healthStatusGood": "Gut",
+      "healthStatusFair": "Ausreichend",
+      "healthStatusNeedsAttention": "Erfordert Aufmerksamkeit",
+      "healthStatusUnknown": "Unbekannt"
+    }
+  },
+  "footer": {
+    "tagline": "Seelenfrieden für Ihre Lieben",
+    "quickLinks": "Schnellzugriff",
+    "legal": "Rechtliches",
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "termsOfService": "Nutzungsbedingungen",
+    "liabilityDisclaimer": "Haftungsausschluss",
+    "cookiePolicy": "Cookie-Richtlinie",
+    "followUs": "Folgen Sie uns",
+    "allRightsReserved": "Alle Rechte vorbehalten.",
+    "version": "Version: 1.0.11"
+  },
+  "privacyPolicy": {
+    "lastUpdated": "Zuletzt Aktualisiert",
+    "introduction": {
+      "title": "Einleitung",
+      "content": "SymBIoT (\"wir\", \"unser\" oder \"uns\") verpflichtet sich, Ihre Privatsphäre zu schützen. Diese Datenschutzrichtlinie erläutert, wie wir Ihre Informationen erfassen, verwenden, offenlegen und schützen, wenn Sie unsere Pflegeüberwachungsplattform für ältere Menschen nutzen. Durch die Nutzung von SymBIoT stimmen Sie der Erfassung und Verwendung von Informationen gemäß dieser Richtlinie zu."
+    },
+    "informationWeCollect": {
+      "title": "Von Uns Erfasste Informationen",
+      "personalInfo": {
+        "title": "Persönliche Informationen",
+        "items": {
+          "name": "Name und Kontaktinformationen",
+          "email": "E-Mail-Adresse",
+          "phone": "Telefonnummer",
+          "address": "Postanschrift",
+          "birthYear": "Geburtsjahr"
+        }
+      },
+      "healthData": {
+        "title": "Gesundheits- und Überwachungsdaten",
+        "items": {
+          "vitals": "Vitalparameter (Herzfrequenz, Blutdruck, Temperatur, Sauerstoffgehalt)",
+          "activity": "Aktivitäts- und Bewegungsmuster",
+          "location": "Standortdaten (Innen- und Außenverfolgung)",
+          "environmental": "Umgebungssensordaten (Temperatur, Luftfeuchtigkeit, Luftqualität)",
+          "medication": "Informationen zur Medikamenteneinhaltung"
+        }
+      },
+      "deviceData": {
+        "title": "Geräte- und Technische Informationen",
+        "items": {
+          "deviceInfo": "Geräteidentifikatoren und technische Spezifikationen",
+          "ipAddress": "IP-Adresse und Geolokalisierungsdaten",
+          "browserType": "Browsertyp und Betriebssystem"
+        }
+      }
+    },
+    "howWeUseInfo": {
+      "title": "Wie Wir Ihre Informationen Verwenden",
+      "items": {
+        "provideServices": "Bereitstellung und Wartung unserer Überwachungsdienste",
+        "monitoring": "Überwachung von Gesundheitsmetriken und Aktivitätsmustern",
+        "alerts": "Versand von Warnmeldungen und Benachrichtigungen an Pflegekräfte",
+        "analytics": "Erstellung von Analysen und Berichten",
+        "communication": "Kommunikation mit Ihnen über Ihr Konto und Ihre Dienste",
+        "improvement": "Verbesserung unserer Dienste und Entwicklung neuer Funktionen"
+      }
+    },
+    "dataSharing": {
+      "title": "Datenweitergabe und Offenlegung",
+      "intro": "Wir verkaufen Ihre persönlichen Daten nicht. Wir können Ihre Daten unter folgenden Umständen weitergeben:",
+      "items": {
+        "authorizedUsers": "Mit Familienmitgliedern und Pflegekräften, die Sie autorisiert haben",
+        "serviceProviders": "Mit Dienstleistern, die beim Betrieb unserer Plattform helfen",
+        "healthcare": "Mit Gesundheitsdienstleistern gemäß Ihrer Autorisierung",
+        "legal": "Wenn gesetzlich vorgeschrieben oder zum Schutz unserer Rechte erforderlich",
+        "emergency": "In Notfallsituationen zum Schutz von Gesundheit und Sicherheit"
+      }
+    },
+    "dataSecurity": {
+      "title": "Datensicherheit",
+      "content": "Wir implementieren branchenübliche Sicherheitsmaßnahmen zum Schutz Ihrer Informationen:",
+      "items": {
+        "encryption": "Ende-zu-Ende-Verschlüsselung für Datenübertragung",
+        "accessControls": "Rollenbasierte Zugriffskontrollen",
+        "regularAudits": "Regelmäßige Sicherheitsaudits und Überwachung",
+        "hipaaCompliance": "HIPAA-konforme Datenspeicherung und -verarbeitung"
+      }
+    },
+    "yourRights": {
+      "title": "Ihre Rechte",
+      "items": {
+        "access": "Zugriff auf Ihre persönlichen Informationen",
+        "correction": "Beantragung der Korrektur ungenauer Daten",
+        "deletion": "Beantragung der Löschung Ihrer Daten",
+        "portability": "Export Ihrer Daten in einem portablen Format",
+        "optOut": "Ablehnung der Erfassung nicht wesentlicher Daten"
+      }
+    },
+    "dataRetention": {
+      "title": "Datenspeicherung",
+      "content": "Wir bewahren Ihre Informationen auf, solange Ihr Konto aktiv ist oder soweit erforderlich, um Dienste bereitzustellen. Gesundheitsdaten können länger aufbewahrt werden, wie gesetzlich vorgeschrieben oder für legitime Geschäftszwecke erforderlich."
+    },
+    "childrenPrivacy": {
+      "title": "Datenschutz für Kinder",
+      "content": "Unser Dienst ist nicht für Personen unter 18 Jahren bestimmt. Wir erfassen wissentlich keine persönlichen Informationen von Kindern."
+    },
+    "changes": {
+      "title": "Änderungen an Dieser Richtlinie",
+      "content": "Wir können diese Datenschutzrichtlinie von Zeit zu Zeit aktualisieren. Wir werden Sie über alle Änderungen informieren, indem wir die neue Richtlinie auf dieser Seite veröffentlichen und das Datum \"Zuletzt Aktualisiert\" aktualisieren."
+    },
+    "contact": {
+      "title": "Kontaktieren Sie Uns",
+      "content": "Wenn Sie Fragen zu dieser Datenschutzrichtlinie haben, kontaktieren Sie uns bitte:",
+      "email": "E-Mail"
+    }
+  },
+  "termsOfService": {
+    "lastUpdated": "Zuletzt Aktualisiert",
+    "acceptance": {
+      "title": "Annahme der Bedingungen",
+      "content": "Durch den Zugriff auf und die Nutzung der Dienste von SymBIoT akzeptieren und stimmen Sie zu, an diese Nutzungsbedingungen gebunden zu sein. Wenn Sie diesen Bedingungen nicht zustimmen, nutzen Sie bitte unsere Dienste nicht."
+    },
+    "description": {
+      "title": "Dienstbeschreibung",
+      "content": "SymBIoT bietet eine IoT-basierte Gesundheitsüberwachungsplattform für die Altenpflege. Unsere Dienste umfassen Echtzeit-Gesundheitsüberwachung, Aktivitätsverfolgung, Standortverfolgung, Alarmsysteme und Analysen für Pflegekräfte und Familienmitglieder."
+    },
+    "userAccounts": {
+      "title": "Benutzerkonten",
+      "items": {
+        "accurate": "Geben Sie genaue und vollständige Informationen bei der Erstellung Ihres Kontos an",
+        "confidential": "Halten Sie Ihre Kontoanmeldedaten vertraulich",
+        "responsible": "Seien Sie verantwortlich für alle Aktivitäten unter Ihrem Konto",
+        "notify": "Benachrichtigen Sie uns unverzüglich bei unbefugtem Zugriff"
+      }
+    },
+    "acceptableUse": {
+      "title": "Akzeptable Nutzung",
+      "intro": "Sie verpflichten sich, Folgendes nicht zu tun:",
+      "items": {
+        "lawful": "Den Dienst für rechtswidrige Zwecke nutzen",
+        "authorized": "Auf Daten von Personen ohne ordnungsgemäße Autorisierung zugreifen oder diese überwachen",
+        "noInterference": "Den Dienst stören oder unterbrechen",
+        "noHarm": "Schädlichen Code oder Malware übertragen",
+        "noImpersonation": "Sich als eine Person oder Entität ausgeben",
+        "noUnauthorizedAccess": "Versuchen, unbefugten Zugriff auf Systeme oder Daten zu erlangen"
+      }
+    },
+    "medicalDisclaimer": {
+      "title": "Medizinischer Haftungsausschluss",
+      "warning": "WICHTIGER MEDIZINISCHER HAFTUNGSAUSSCHLUSS",
+      "content": "SymBIoT ist ein Überwachungstool und bietet keine medizinische Beratung, Diagnose oder Behandlung. Die bereitgestellten Informationen sollten keine professionelle medizinische Versorgung ersetzen. Konsultieren Sie immer qualifizierte Gesundheitsdienstleister für medizinische Entscheidungen. Im Notfall rufen Sie sofort den Notdienst an."
+    },
+    "dataAccuracy": {
+      "title": "Datengenauigkeit",
+      "content": "Obwohl wir uns um Genauigkeit bemühen, können wir nicht garantieren, dass alle von Geräten erfassten Daten vollständig genau sind. Sensorwerte können durch Geräteplatzierung, Störungen oder technische Probleme beeinträchtigt werden. Sie sollten sich nicht ausschließlich auf unsere Plattform für kritische Gesundheitsentscheidungen verlassen."
+    },
+    "intellectualProperty": {
+      "title": "Geistiges Eigentum",
+      "content": "Alle Inhalte, Funktionen und Funktionalitäten von SymBIoT sind unser Eigentum und durch Gesetze zum Schutz des geistigen Eigentums geschützt. Sie dürfen ohne schriftliche Genehmigung keinen Teil unseres Dienstes kopieren, modifizieren, verteilen oder zurückentwickeln."
+    },
+    "payment": {
+      "title": "Zahlung und Abonnements",
+      "items": {
+        "fees": "Abonnementgebühren werden im Voraus auf Basis Ihres gewählten Plans berechnet",
+        "billing": "Sie autorisieren uns, Ihre Zahlungsmethode automatisch zu belasten",
+        "refunds": "Rückerstattungen erfolgen gemäß unserer Rückerstattungsrichtlinie",
+        "cancellation": "Sie können Ihr Abonnement jederzeit kündigen"
+      }
+    },
+    "termination": {
+      "title": "Kündigung",
+      "content": "Wir behalten uns das Recht vor, Ihr Konto zu sperren oder zu kündigen, wenn Sie gegen diese Bedingungen verstoßen oder betrügerische oder schädliche Aktivitäten ausüben. Bei Kündigung erlischt Ihr Recht zur Nutzung des Dienstes sofort."
+    },
+    "limitation": {
+      "title": "Haftungsbeschränkung",
+      "content": "Im größtmöglichen gesetzlich zulässigen Umfang haftet SymBIoT nicht für indirekte, zufällige, besondere, Folge- oder Strafschäden, die sich aus Ihrer Nutzung des Dienstes ergeben. Unsere Gesamthaftung übersteigt nicht den Betrag, den Sie in den letzten 12 Monaten für den Dienst bezahlt haben."
+    },
+    "indemnification": {
+      "title": "Schadloshaltung",
+      "content": "Sie verpflichten sich, SymBIoT von allen Ansprüchen, Schäden oder Kosten freizustellen, die sich aus Ihrer Nutzung des Dienstes oder der Verletzung dieser Bedingungen ergeben."
+    },
+    "changes": {
+      "title": "Änderungen der Bedingungen",
+      "content": "Wir können diese Bedingungen jederzeit ändern. Die fortgesetzte Nutzung des Dienstes nach Änderungen stellt die Annahme der neuen Bedingungen dar."
+    },
+    "governingLaw": {
+      "title": "Anwendbares Recht",
+      "content": "Diese Bedingungen unterliegen den Gesetzen der Gerichtsbarkeit, in der SymBIoT tätig ist, ohne Rücksicht auf Kollisionsnormen."
+    },
+    "contact": {
+      "title": "Kontaktinformationen",
+      "content": "Bei Fragen zu diesen Nutzungsbedingungen kontaktieren Sie uns bitte:",
+      "email": "E-Mail"
+    }
+  },
+  "liabilityDisclaimer": {
+    "title": "Haftungsausschluss",
+    "acknowledgment": "DURCH DIE NUTZUNG DER SYMBIOT-PLATTFORM BESTÄTIGEN SIE, DASS SIE DIESEN HAFTUNGSAUSSCHLUSS GELESEN, VERSTANDEN HABEN UND ZUSTIMMEN, DARAN GEBUNDEN ZU SEIN.",
+    "generalDisclaimer": {
+      "title": "1. Allgemeiner Haftungsausschluss",
+      "notSubstitute": {
+        "title": "1.1 Kein Ersatz für professionelle Betreuung",
+        "intro": "SymBIoT ist eine Überwachungs- und Verfolgungsplattform, die Betreuer und Familienmitglieder unterstützen soll. Sie ist KEIN Ersatz für:",
+        "items": {
+          "medical": "Professionelle medizinische Versorgung oder Überwachung",
+          "caregiving": "Persönliche Betreuung vor Ort",
+          "emergency": "Notfalldienste",
+          "advice": "Professionelle medizinische Beratung, Diagnose oder Behandlung",
+          "healthcare": "Lizenzierte Gesundheitsdienstleister"
+        }
+      },
+      "supplementary": {
+        "title": "1.2 Ergänzendes Werkzeug",
+        "content": "Diese Plattform sollte nur als ergänzendes Überwachungswerkzeug verwendet werden. Benutzer müssen weiterhin angemessene Ebenen der direkten Betreuung, Überwachung und professionellen medizinischen Überwachung entsprechend dem Zustand der Person gewährleisten."
+      }
+    },
+    "medicalDisclaimer": {
+      "title": "2. Medizinischer Haftungsausschluss",
+      "notMedicalDevice": {
+        "title": "2.1 Keine medizinische Vorrichtung",
+        "content": "SymBIoT und seine zugehörigen Geräte sind KEINE medizinischen Geräte und wurden von Regulierungsbehörden (FDA, CE usw.) nicht für medizinische Diagnose- oder Behandlungszwecke bewertet oder genehmigt."
+      },
+      "vitalSignsLimitations": {
+        "title": "2.2 Einschränkungen bei der Überwachung von Vitalzeichen",
+        "intro": "Die auf der Plattform angezeigten Vitalzeichendaten (Herzfrequenz, Blutdruck, Sauerstoffsättigung, Temperatur, Blutzuckerwerte usw.):",
+        "items": {
+          "accuracy": "Sind möglicherweise medizinisch nicht genau",
+          "decisions": "Sollten nicht zur Entscheidungsfindung im Bereich der Medizin ohne professionelle Überprüfung verwendet werden",
+          "informational": "Dienen nur zu Informations- und Überwachungszwecken",
+          "variance": "Können erheblich von Messwerten medizinischer Geräte abweichen",
+          "confirmation": "Sollten vor medizinischen Maßnahmen durch medizinische Geräte bestätigt werden"
+        }
+      },
+      "seekAdvice": {
+        "title": "2.3 Professionelle medizinische Beratung einholen",
+        "intro": "Benutzer müssen:",
+        "items": {
+          "consult": "Sich an qualifizierte Gesundheitsdienstleister für alle medizinischen Entscheidungen wenden",
+          "emergency": "Unverzüglich notfallmedizinische Versorgung einholen (911 oder lokale Notfalldienste anrufen) im Falle eines medizinischen Notfalls",
+          "noDelay": "Medizinische Versorgung nicht verzögern, basierend auf Informationen von dieser Plattform"
+        }
+      }
+    },
+    "deviceLimitations": {
+      "title": "3. Einschränkungen bei Geräten und Ausrüstung",
+      "intro": "Verbundene Geräte (tragbare Geräte, Sensoren, Tracker, Panikknöpfe usw.) können:",
+      "items": {
+        "hardware": "Keine Daten erfassen, da Hardwarefehler auftreten",
+        "stopFunctioning": "Ohne Vorwarnung nicht mehr funktionieren",
+        "inaccurate": "Ungenaue Messwerte aufgrund von Kalibrierungsproblemen liefern",
+        "battery": "Aufgrund von Batterieentladung den Strom verlieren",
+        "disconnect": "Unerwartet die Verbindung zum Netzwerk unterbrechen",
+        "damage": "Physische Schäden erleiden, die die Funktionalität beeinträchtigen"
+      },
+      "liability": "Das Unternehmen ist NICHT haftbar für Folgen von Gerätefehlern, Funktionsstörungen oder ungenauen Messwerten."
+    },
+    "dataAccuracy": {
+      "title": "4. Datengenauigkeit und Zuverlässigkeit",
+      "intro": "Das Unternehmen gibt KEINE GARANTIEN oder ZUSICHERUNGEN in Bezug auf:",
+      "items": {
+        "accuracy": "Genauigkeit von auf der Plattform angezeigten Daten",
+        "completeness": "Vollständigkeit der Datenerfassung",
+        "timeliness": "Rechtzeitigkeit der Datenübertragung",
+        "reliability": "Zuverlässigkeit der Datenspeicherung"
+      }
+    },
+    "alertSystems": {
+      "title": "5. Alarm- und Benachrichtigungssysteme",
+      "intro": "Das Alarmsystem kann:",
+      "items": {
+        "failToTrigger": "Auslösen fehlschlagen, wenn Bedingungen einen Alarm rechtfertigen",
+        "falsePositive": "Falsch positive Alarme erzeugen (Alarme wenn kein tatsächliches Problem besteht)",
+        "falseNegative": "Falsch negative Alarme erzeugen (nicht alarmieren wenn Probleme bestehen)",
+        "delayed": "Verzögert bei der Benachrichtigungsübermittlung sein",
+        "failToDeliver": "Benachrichtigungen nicht liefern, da Geräteeinstellungen, Netzwerkprobleme oder App-Berechtigungen"
+      },
+      "noGuarantee": "Das Unternehmen garantiert KEINE spezifische Antwortzeit für Alarme, Echtzeit-Zustellung oder dass Alarme alle benannten Empfänger erreichen."
+    },
+    "networkConnectivity": {
+      "title": "6. Netzwerk und Konnektivität",
+      "intro": "Die Plattform erfordert eine aktive Internetverbindung und stabile Netzwerkkonnektivität. Die Datenübertragung und Plattformfunktionalität können unterbrochen werden durch:",
+      "items": {
+        "isp": "Ausfälle des Internetdienstanbieters (ISP)",
+        "wifi": "Wi-Fi-Router-Fehler oder Konfigurationsprobleme",
+        "cellular": "Ausfälle oder schwache Signalstärke des Mobilfunknetzes",
+        "cloud": "Ausfälle oder Wartungsausfallzeiten von Cloud-Diensten",
+        "server": "Serverausfälle oder Netzwerküberlastung"
+      },
+      "responsibility": "Benutzer sind verantwortlich für die Aufrechterhaltung einer zuverlässigen Internetverbindung und dafür, dass Geräte verbunden bleiben."
+    },
+    "locationTracking": {
+      "title": "7. Standortverfolgungsdienste",
+      "intro": "Die GPS-Verfolgung kann:",
+      "items": {
+        "inaccurate": "Um mehrere Meter bis hunderte Meter ungenau sein",
+        "affected": "Durch atmosphärische Bedingungen, Gebäudestrukturen oder Baumbestand beeinflusst werden",
+        "unavailable": "In Innenumgebungen nicht verfügbar sein",
+        "satellite": "Je nach Satellitenverfügbarkeit und Signalqualität unterliegen"
+      },
+      "liability": "Das Unternehmen ist NICHT haftbar für ungenaue Standortinformationen oder das Nichterfassen von Geofence-Verstößen."
+    },
+    "emergencyResponse": {
+      "title": "8. Notfallreaktion",
+      "notEmergencyService": {
+        "title": "Kein Notfallreaktionsdienst",
+        "intro": "SymBIoT ist KEIN Notfallreaktionssystem. Die Plattform:",
+        "items": {
+          "noContact": "Kontaktiert NICHT automatisch Notfalldienste (911, Polizei, Krankenwagen)",
+          "noDispatch": "Bietet KEINE Notfalleinsatzdienste",
+          "noGuarantee": "Garantiert NICHT, dass Notfallsituationen erkannt werden",
+          "noReplace": "Ersetzt NICHT die Notwendigkeit, Notfalldienste direkt anzurufen"
+        }
+      },
+      "protocol": {
+        "title": "Notfallprotokoll:",
+        "step1": "RUFEN SIE SOFORT 911 ODER LOKALE NOTFALLDIENSTE AN",
+        "step2": "Verlassen Sie sich nicht nur auf die SymBIoT-Plattform für die Notfallreaktion",
+        "step3": "Benachrichtigungen dienen nur zu Informationszwecken"
+      }
+    },
+    "userResponsibilities": {
+      "title": "9. Benutzerverantwortungen",
+      "intro": "Benutzer sind verantwortlich für:",
+      "items": {
+        "setup": "Ordnungsgemäße Einrichtung und Konfiguration von Geräten",
+        "placement": "Sicherstellen, dass Geräte korrekt getragen oder positioniert sind",
+        "charging": "Regelmäßiges Laden von Geräten und Überwachung der Batteriestand",
+        "alertSettings": "Regelmäßige Überprüfung und Aktualisierung der Alarmeinstellungen",
+        "testing": "Regelmäßiges Testen des Systems, um sicherzustellen, dass es funktioniert",
+        "directCare": "Bereitstellung angemessener Ebenen der direkten Betreuung und Überwachung",
+        "responding": "Angemessene Reaktion auf Alarme und ungewöhnliche Datenmuster",
+        "security": "Aufrechterhaltung der Kontosicherheit mit starken Passwörtern"
+      },
+      "failure": "Die Nichteinhaltung dieser Verantwortungen kann zu Funktionsstörungen, ungenauen Daten oder verpassten Alarmen führen."
+    },
+    "limitationOfLiability": {
+      "title": "10. Haftungsbeschränkung",
+      "maxLiability": {
+        "title": "Maximale Haftung",
+        "content": "Im größtmöglichen Umfang, der durch das Gesetz zulässig ist, soll die Gesamthaftung des Unternehmens für alle Ansprüche, die sich aus der Nutzung der SymBIoT-Plattform ergeben oder damit zusammenhängen, den Gesamtbetrag nicht überschreiten, den der Benutzer in den zwölf (12) Monaten vor dem Anspruch für den Dienst bezahlt hat."
+      },
+      "exclusionDamages": {
+        "title": "Ausschluss von Folgeschäden",
+        "intro": "Das Unternehmen haftet NICHT für:",
+        "items": {
+          "indirect": "Indirekte, zufällige, besondere oder Folgeschäden",
+          "profits": "Entgangene Gewinne oder Einnahmen",
+          "data": "Datenverlust oder Informationsverlust",
+          "business": "Geschäftsunterbrechung",
+          "injury": "Körperverletzung oder Tod",
+          "emotional": "Emotionalen Schaden"
+        }
+      },
+      "noWarranty": {
+        "title": "Keine Gewährleistung",
+        "intro": "DIE PLATTFORM WIRD \"WIE BESEHEN\" UND \"WIE VERFÜGBAR\" OHNE GARANTIEN JEGLICHER ART, WEDER AUSDRÜCKLICH NOCH KONKLUDENT, BEREITGESTELLT, EINSCHLIESSLICH, ABER NICHT BESCHRÄNKT AUF:",
+        "items": {
+          "merchantability": "Gewährleistung der Handelsüblichkeit",
+          "fitness": "Eignung für einen bestimmten Zweck",
+          "nonInfringement": "Nichteingriff in Rechte Dritter",
+          "accuracy": "Genauigkeit oder Zuverlässigkeit",
+          "continuous": "Kontinuierlicher, ununterbrochener oder sicherer Zugang"
+        }
+      },
+      "assumptionOfRisk": {
+        "title": "Übernahme von Risiken durch Benutzer",
+        "intro": "Durch die Nutzung der SymBIoT-Plattform BESTÄTIGEN UND ÜBERNEHMEN Benutzer ALLE RISIKEN, die mit Folgendem verbunden sind:",
+        "items": {
+          "limitations": "Einschränkungen der Fernüberwachungstechnologie",
+          "deviceFailure": "Mögliches Geräteversagen oder ungenaue Daten",
+          "alerts": "Verzögerte oder verpasste Alarme",
+          "outages": "Systemausfälle oder Ausfallzeiten",
+          "security": "Datensicherheits- und Datenschutzrisiken"
+        }
+      }
+    },
+    "importantNotice": {
+      "title": "Wichtiger Hinweis",
+      "intro": "Sie verstehen, dass:",
+      "items": {
+        "notMedical": "Dies ist KEINE medizinische Vorrichtung oder ein Notfallreaktionssystem",
+        "limitations": "Die Plattform weist erhebliche Einschränkungen auf, die zu verpassten Notfällen, ungenauen Daten oder Systemausfällen führen können",
+        "directCare": "Sie müssen weiterhin angemessene direkte Betreuung und medizinische Überwachung gewährleisten",
+        "call911": "Sie sollten Notfalldienste (911) sofort in jeder Notfallsituation anrufen"
+      }
+    },
+    "contactInfo": {
+      "title": "Kontaktinformationen",
+      "intro": "Wenn Sie Fragen zu diesem Haftungsausschluss haben, kontaktieren Sie uns bitte:",
+      "email": "E-Mail"
+    }
   }
 }

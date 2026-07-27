@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldAlert } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 const DataSharingPage = () => {
   const { user, userRole } = useAuth();
@@ -51,6 +52,7 @@ const DataSharingPage = () => {
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         {user && <DataSharing userId={user.id} />}
       </main>
+      <Footer />
     </div>
   );
 };

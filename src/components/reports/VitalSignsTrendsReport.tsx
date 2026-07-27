@@ -35,9 +35,9 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
     },
   });
 
-  // Process data for charts
+  // Process data for charts - group by day and average values
   const chartData = vitalData.reduce((acc: any[], item) => {
-    const date = format(new Date(item.recorded_at), 'MMM dd HH:mm');
+    const date = format(new Date(item.recorded_at), 'dMMM'); // Format as "2Dec"
     const existingEntry = acc.find(entry => entry.date === date);
 
     let value = item.value;
@@ -47,21 +47,35 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
     }
 
     if (existingEntry) {
-      if (item.data_type === 'heart_rate') existingEntry.heartRate = Number(value);
+      if (item.data_type === 'heart_rate') {
+        if (!existingEntry.heartRateValues) existingEntry.heartRateValues = [];
+        existingEntry.heartRateValues.push(Number(value));
+      }
       if (item.data_type === 'oxygen_saturation' || item.data_type === 'spo2') {
-        existingEntry.oxygen = Number(value);
+        if (!existingEntry.oxygenValues) existingEntry.oxygenValues = [];
+        existingEntry.oxygenValues.push(Number(value));
       }
     } else {
       const entry: any = { date };
-      if (item.data_type === 'heart_rate') entry.heartRate = Number(value);
+      if (item.data_type === 'heart_rate') {
+        entry.heartRateValues = [Number(value)];
+      }
       if (item.data_type === 'oxygen_saturation' || item.data_type === 'spo2') {
-        entry.oxygen = Number(value);
+        entry.oxygenValues = [Number(value)];
       }
       acc.push(entry);
     }
 
     return acc;
-  }, []);
+  }, []).map(entry => ({
+    date: entry.date,
+    heartRate: entry.heartRateValues
+      ? Math.round(entry.heartRateValues.reduce((a: number, b: number) => a + b, 0) / entry.heartRateValues.length)
+      : undefined,
+    oxygen: entry.oxygenValues
+      ? Math.round(entry.oxygenValues.reduce((a: number, b: number) => a + b, 0) / entry.oxygenValues.length)
+      : undefined,
+  }));
 
   // Calculate statistics
   const heartRateData = vitalData.filter(v => v.data_type === 'heart_rate');
@@ -69,34 +83,34 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
 
   const avgHeartRate = heartRateData.length > 0
     ? Math.round(heartRateData.reduce((sum, v) => {
-        let val = v.value;
-        if (typeof val === 'object') val = val.bpm || val.value;
+        let val = v.value as any;
+        if (typeof val === 'object' && val !== null && !Array.isArray(val)) val = val.bpm || val.value;
         return sum + Number(val);
       }, 0) / heartRateData.length)
     : 0;
 
   const avgOxygen = oxygenData.length > 0
     ? Math.round(oxygenData.reduce((sum, v) => {
-        let val = v.value;
-        if (typeof val === 'object') val = val.value;
+        let val = v.value as any;
+        if (typeof val === 'object' && val !== null && !Array.isArray(val)) val = val.value;
         return sum + Number(val);
       }, 0) / oxygenData.length)
     : 0;
 
   const minHeartRate = heartRateData.length > 0
-    ? Math.min(...heartRateData.map(v => {
-        let val = v.value;
-        if (typeof val === 'object') val = val.bpm || val.value;
+    ? Math.round(Math.min(...heartRateData.map(v => {
+        let val = v.value as any;
+        if (typeof val === 'object' && val !== null && !Array.isArray(val)) val = val.bpm || val.value;
         return Number(val);
-      }))
+      })))
     : 0;
 
   const maxHeartRate = heartRateData.length > 0
-    ? Math.max(...heartRateData.map(v => {
-        let val = v.value;
-        if (typeof val === 'object') val = val.bpm || val.value;
+    ? Math.round(Math.max(...heartRateData.map(v => {
+        let val = v.value as any;
+        if (typeof val === 'object' && val !== null && !Array.isArray(val)) val = val.bpm || val.value;
         return Number(val);
-      }))
+      })))
     : 0;
 
   if (isLoading) {
@@ -119,33 +133,33 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Average Heart Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.avgHeartRate')}</CardTitle>
             <Heart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgHeartRate} BPM</div>
             <p className="text-xs text-muted-foreground">
-              Range: {minHeartRate} - {maxHeartRate} BPM
+              {t('reports.content.range')}: {minHeartRate.toFixed(1)} - {maxHeartRate.toFixed(1)} BPM
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Average Oxygen</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.avgOxygen')}</CardTitle>
             <Wind className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgOxygen}%</div>
             <p className="text-xs text-muted-foreground">
-              Normal range: 95-100%
+              {t('reports.content.normalRange')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Readings</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('reports.content.totalReadings')}</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -160,7 +174,7 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
       {/* Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Vital Signs Over Time</CardTitle>
+          <CardTitle>{t('reports.content.vitalSignsOverTime')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
@@ -168,9 +182,10 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
-                angle={-45}
+                angle={-30}
                 textAnchor="end"
-                height={80}
+                height={60}
+                interval="preserveStartEnd"
               />
               <YAxis yAxisId="left" />
               <YAxis yAxisId="right" orientation="right" />
@@ -181,7 +196,7 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
                 type="monotone"
                 dataKey="heartRate"
                 stroke="#ef4444"
-                name="Heart Rate (BPM)"
+                name={t('reports.content.heartRateBPM')}
                 strokeWidth={2}
               />
               <Line
@@ -189,7 +204,7 @@ export const VitalSignsTrendsReport = ({ selectedPerson, dateRange }: VitalSigns
                 type="monotone"
                 dataKey="oxygen"
                 stroke="#3b82f6"
-                name="Oxygen (%)"
+                name={t('reports.content.oxygenPercent')}
                 strokeWidth={2}
               />
             </LineChart>

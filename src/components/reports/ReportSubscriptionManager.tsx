@@ -1,15 +1,64 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Bell, Clock, Mail, Loader2 } from 'lucide-react';
+import { TimePicker } from '@/components/ui/time-picker';
+import { Bell, Clock, Mail, Loader2, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+
+// Helper function to convert local time to UTC
+const convertLocalTimeToUTC = (localTime: string): string => {
+  try {
+    // Create a date object for today with the local time in the user's timezone
+    const today = new Date();
+    const [hours, minutes] = localTime.split(':').map(Number);
+
+    // Set the local time
+    const localDateTime = new Date(today);
+    localDateTime.setHours(hours, minutes, 0, 0);
+
+    // Get UTC hours and minutes
+    const utcHours = localDateTime.getUTCHours().toString().padStart(2, '0');
+    const utcMinutes = localDateTime.getUTCMinutes().toString().padStart(2, '0');
+    const utcSeconds = '00';
+
+    console.log(`Converting local time ${localTime} to UTC: ${utcHours}:${utcMinutes}:${utcSeconds}`);
+    return `${utcHours}:${utcMinutes}:${utcSeconds}`;
+  } catch (error) {
+    console.error('Error converting local time to UTC:', error);
+    // Fallback: return the original time with seconds
+    return `${localTime}:00`;
+  }
+};
+
+// Helper function to convert UTC time to local time
+const convertUTCToLocalTime = (utcTime: string): string => {
+  try {
+    // Create a date object for today
+    const today = new Date();
+    const [hours, minutes] = utcTime.split(':').map(Number);
+
+    // Set UTC time
+    const utcDateTime = new Date(today);
+    utcDateTime.setUTCHours(hours, minutes, 0, 0);
+
+    // Get local hours and minutes
+    const localHours = utcDateTime.getHours().toString().padStart(2, '0');
+    const localMinutes = utcDateTime.getMinutes().toString().padStart(2, '0');
+
+    console.log(`Converting UTC time ${utcTime} to local: ${localHours}:${localMinutes}`);
+    return `${localHours}:${localMinutes}`;
+  } catch (error) {
+    console.error('Error converting UTC to local time:', error);
+    // Fallback: return the time without seconds
+    return utcTime.slice(0, 5);
+  }
+};
 
 interface ReportSubscriptionManagerProps {
   selectedPerson: string;
@@ -20,13 +69,15 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [scheduleTime, setScheduleTime] = useState('21:00');
+  const [isSendingTest, setIsSendingTest] = useState(false);
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Fetch existing subscription
   const { data: subscription, isLoading } = useQuery({
     queryKey: ['report-subscription', user?.id, selectedPerson],
     queryFn: async () => {
       if (!user?.id || selectedPerson === 'all') return null;
-      
+
       const { data, error } = await supabase
         .from('report_subscriptions')
         .select('*')
@@ -41,26 +92,40 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
     enabled: !!user?.id && selectedPerson !== 'all',
   });
 
+  // Convert UTC time from subscription to local time for display
+  useEffect(() => {
+    if (subscription?.schedule_time) {
+      const localTime = convertUTCToLocalTime(subscription.schedule_time);
+      setScheduleTime(localTime);
+    }
+  }, [subscription]);
+
   // Create or update subscription
   const upsertMutation = useMutation({
     mutationFn: async ({ isActive, time }: { isActive: boolean; time: string }) => {
       if (!user?.id || selectedPerson === 'all') throw new Error('Invalid selection');
 
+      // Convert local time to UTC for storage
+      const utcTime = convertLocalTimeToUTC(time);
+
+      console.log(`Saving schedule: local time ${time} -> UTC ${utcTime}, timezone: ${userTimezone}`);
+
       const subscriptionData = {
         user_id: user.id,
         elderly_person_id: selectedPerson,
         report_type: 'daily_summary',
-        schedule_time: time + ':00',
+        schedule_time: utcTime,
         is_active: isActive,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timezone: userTimezone, // Store timezone for reference
       };
 
       if (subscription?.id) {
         const { error } = await supabase
           .from('report_subscriptions')
           .update({
-            schedule_time: time + ':00',
+            schedule_time: utcTime,
             is_active: isActive,
+            timezone: userTimezone,
             updated_at: new Date().toISOString(),
           })
           .eq('id', subscription.id);
@@ -79,7 +144,7 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
       toast.success(t('reports.subscription.saved', { defaultValue: 'Subscription settings saved!' }));
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to save subscription');
+      toast.error(error.message || t('reports.subscription.saveFailed', { defaultValue: 'Failed to save subscription' }));
     },
   });
 
@@ -104,7 +169,7 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
   const handleToggle = (checked: boolean) => {
     upsertMutation.mutate({
       isActive: checked,
-      time: subscription?.schedule_time?.slice(0, 5) || scheduleTime,
+      time: scheduleTime, // Use the local time from state (already converted from UTC)
     });
   };
 
@@ -117,6 +182,35 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
 
   const handleSubscribe = () => {
     upsertMutation.mutate({ isActive: true, time: scheduleTime });
+  };
+
+  const handleSendTestReport = async () => {
+    if (!user?.id) return;
+    
+    setIsSendingTest(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-scheduled-report', {
+        body: { test: true, userId: user.id },
+      });
+
+      if (error) throw error;
+
+      if (data?.results?.length > 0) {
+        const result = data.results[0];
+        if (result.success) {
+          toast.success(`Test report sent to ${result.email}!`);
+        } else {
+          toast.error(`Failed to send: ${result.error}`);
+        }
+      } else {
+        toast.info('No subscriptions found to send reports for.');
+      }
+    } catch (error: any) {
+      console.error('Error sending test report:', error);
+      toast.error(error.message || 'Failed to send test report');
+    } finally {
+      setIsSendingTest(false);
+    }
   };
 
   if (selectedPerson === 'all') {
@@ -138,17 +232,6 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
         </CardContent>
       </Card>
     );
-  }
-
-  const timeOptions = [];
-  for (let hour = 0; hour < 24; hour++) {
-    const time = `${hour.toString().padStart(2, '0')}:00`;
-    const label = new Date(`2000-01-01T${time}`).toLocaleTimeString([], { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
-    });
-    timeOptions.push({ value: time, label });
   }
 
   return (
@@ -184,41 +267,47 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
                 <Clock className="w-4 h-4" />
                 {t('reports.subscription.scheduleTime', { defaultValue: 'Daily report time' })}
               </Label>
-              <Select
-                value={subscription.schedule_time?.slice(0, 5) || scheduleTime}
-                onValueChange={handleTimeChange}
+              <TimePicker
+                value={scheduleTime}
+                onChange={handleTimeChange}
                 disabled={upsertMutation.isPending}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                className="w-full"
+              />
               <p className="text-xs text-muted-foreground">
-                {t('reports.subscription.timezoneNote', { 
-                  defaultValue: 'Times are shown in your local timezone' 
+                {t('reports.subscription.timezoneNote', {
+                  defaultValue: 'Times are shown in your local timezone (stored as UTC)'
                 })}
               </p>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => deleteMutation.mutate()}
-              disabled={deleteMutation.isPending}
-              className="w-full"
-            >
-              {deleteMutation.isPending ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : null}
-              {t('reports.subscription.unsubscribe', { defaultValue: 'Unsubscribe' })}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSendTestReport}
+                disabled={isSendingTest}
+                className="flex-1"
+              >
+                {isSendingTest ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4 mr-2" />
+                )}
+                {t('reports.subscription.sendTest', { defaultValue: 'Send Test Now' })}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending}
+                className="flex-1"
+              >
+                {deleteMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : null}
+                {t('reports.subscription.unsubscribe', { defaultValue: 'Unsubscribe' })}
+              </Button>
+            </div>
           </>
         ) : (
           <div className="space-y-4">
@@ -227,18 +316,11 @@ export const ReportSubscriptionManager = ({ selectedPerson }: ReportSubscription
                 <Clock className="w-4 h-4" />
                 {t('reports.subscription.selectTime', { defaultValue: 'Select delivery time' })}
               </Label>
-              <Select value={scheduleTime} onValueChange={setScheduleTime}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <TimePicker
+                value={scheduleTime}
+                onChange={setScheduleTime}
+                className="w-full"
+              />
             </div>
 
             <Button

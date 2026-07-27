@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -17,9 +17,6 @@ import {
   Download,
   FileText,
   BarChart3,
-  Droplets,
-  Wind,
-  Home,
   Clock,
   Target
 } from 'lucide-react';
@@ -31,8 +28,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { ReportViewer } from '@/components/reports/ReportViewer';
 import { ReportSubscriptionManager } from '@/components/reports/ReportSubscriptionManager';
-import { exportReport, exportAllReports } from '@/lib/reportExport';
-import { useState as useStateHook } from 'react';
+import { Footer } from '@/components/Footer';
+import { toast } from 'sonner';
 
 const Reports = () => {
   const { t } = useTranslation();
@@ -43,7 +40,6 @@ const Reports = () => {
   });
   const [selectedPerson, setSelectedPerson] = useState<string>('all');
   const [currentReport, setCurrentReport] = useState<string | null>(null);
-  const [currentReportType, setCurrentReportType] = useState<string>('');
   const [reportViewerOpen, setReportViewerOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -59,6 +55,25 @@ const Reports = () => {
     },
     enabled: !!user?.id,
   });
+
+  // Auto-select person when data loads
+  useEffect(() => {
+    if (elderlyPersons.length > 0 && selectedPerson === 'all') {
+      // Check if logged-in user is in the list
+      const loggedInPerson = elderlyPersons.find((person: any) => person.id === user?.id);
+
+      if (loggedInPerson) {
+        // Select the logged-in user if they're in the list
+        setSelectedPerson(loggedInPerson.id);
+      } else if (elderlyPersons.length === 1) {
+        // If only one person, select them
+        setSelectedPerson(elderlyPersons[0].id);
+      } else {
+        // Otherwise select the first person in the list
+        setSelectedPerson(elderlyPersons[0].id);
+      }
+    }
+  }, [elderlyPersons, user?.id]);
 
   const reportCategories = [
     {
@@ -166,22 +181,6 @@ const Reports = () => {
       ]
     },
     {
-      id: 'environment',
-      title: t('reports.categories.environment', { defaultValue: 'Environmental Safety' }),
-      icon: Home,
-      description: t('reports.categories.environmentDesc', { defaultValue: 'Home environment conditions' }),
-      reports: [
-        {
-          name: t('reports.environment.airQuality', { defaultValue: 'Air Quality Report' }),
-          description: t('reports.environment.airQualityDesc', { defaultValue: 'Temperature, humidity, and air quality trends' })
-        },
-        {
-          name: t('reports.environment.comfort', { defaultValue: 'Comfort Analysis' }),
-          description: t('reports.environment.comfortDesc', { defaultValue: 'Optimal vs actual environmental conditions' })
-        },
-      ]
-    },
-    {
       id: 'wellness',
       title: t('reports.categories.wellness', { defaultValue: 'Wellness Score' }),
       icon: Target,
@@ -215,48 +214,126 @@ const Reports = () => {
     },
   ];
 
-  const handleExport = async (reportName: string, reportType: string) => {
-    if (isExporting) return;
-
+  const handleExport = async (reportName: string) => {
     setIsExporting(true);
     try {
-      await exportReport({
-        reportName,
-        reportType,
-        selectedPerson,
-        dateRange,
-        elderlyPersons,
-      });
+      // Show loading message
+      toast.info(t('reports.preparingExport', { defaultValue: 'Preparing report for export...' }));
+
+      // Open the report viewer temporarily to render the report
+      setCurrentReport(reportName);
+      setReportViewerOpen(true);
+
+      // Wait for the report to render completely with data
+      // This gives time for database queries to complete and charts to render
+      await new Promise(resolve => setTimeout(resolve, 2500));
+
+      // Import the export function dynamically
+      const { exportReportById } = await import('@/lib/reportExport');
+
+      console.log('Starting export for:', reportName);
+
+      // Export with additional wait time for charts/async content
+      await exportReportById('report-content', reportName, 'pdf', 1500);
+
+      console.log('Export completed for:', reportName);
+
+      toast.success(t('reports.exportSuccess', { defaultValue: 'Report exported successfully!' }));
+
+      // Close the viewer after export completes
+      setTimeout(() => setReportViewerOpen(false), 1000);
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error('Export error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(t('reports.exportError', { defaultValue: 'Failed to export report. Please try again.' }) + ` (${errorMessage})`);
+      // Close viewer on error too
+      setReportViewerOpen(false);
     } finally {
       setIsExporting(false);
     }
   };
 
-  const handleExportAll = async (categoryId: string, reports: any[]) => {
-    if (isExporting) return;
+  const handleExportAll = async (categoryId: string) => {
+    const category = reportCategories.find(cat => cat.id === categoryId);
+    if (!category) return;
 
     setIsExporting(true);
+    let exportedCount = 0;
+
     try {
-      await exportAllReports(
-        categoryId,
-        reports,
-        selectedPerson,
-        dateRange,
-        elderlyPersons
-      );
+      toast.info(t('reports.exportingAll', {
+        defaultValue: `Exporting ${category.reports.length} reports...`,
+        count: category.reports.length
+      }));
+
+      for (let i = 0; i < category.reports.length; i++) {
+        const report = category.reports[i];
+
+        toast.info(t('reports.exportingReport', {
+          defaultValue: `Exporting ${i + 1} of ${category.reports.length}: ${report.name}`,
+          current: i + 1,
+          total: category.reports.length,
+          name: report.name
+        }));
+
+        try {
+          await handleExport(report.name);
+          exportedCount++;
+          // Longer delay between exports to ensure proper cleanup
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error(`Failed to export ${report.name}:`, error);
+          toast.error(t('reports.exportSingleFailed', {
+            defaultValue: `Failed to export ${report.name}`,
+            name: report.name
+          }));
+        }
+      }
+
+      if (exportedCount === category.reports.length) {
+        toast.success(t('reports.exportAllSuccess', {
+          defaultValue: 'All reports exported successfully!',
+          count: category.reports.length
+        }));
+      } else {
+        toast.warning(t('reports.exportAllPartial', {
+          defaultValue: `Exported ${exportedCount} of ${category.reports.length} reports`,
+          exported: exportedCount,
+          total: category.reports.length
+        }));
+      }
     } catch (error) {
-      console.error('Export all failed:', error);
+      console.error('Export all error:', error);
+      toast.error(t('reports.exportAllError', { defaultValue: 'Failed to export all reports.' }));
     } finally {
       setIsExporting(false);
     }
   };
 
-  const handleGenerate = (reportName: string, reportType: string) => {
+  const handleGenerate = (reportName: string) => {
     setCurrentReport(reportName);
-    setCurrentReportType(reportType);
     setReportViewerOpen(true);
+  };
+
+  // Helper function to check if current date range matches a preset
+  const isDateRangeActive = (days: number) => {
+    const now = new Date();
+    const expectedFrom = new Date();
+    if (days === 90) {
+      // For 3 months, use setMonth
+      expectedFrom.setMonth(now.getMonth() - 3);
+    } else if (days === 180) {
+      // For 6 months, use setMonth
+      expectedFrom.setMonth(now.getMonth() - 6);
+    } else {
+      expectedFrom.setDate(now.getDate() - days);
+    }
+
+    // Compare dates (ignoring time)
+    const fromMatch = dateRange.from.toDateString() === expectedFrom.toDateString();
+    const toMatch = dateRange.to.toDateString() === now.toDateString();
+
+    return fromMatch && toMatch;
   };
 
   return (
@@ -270,16 +347,14 @@ const Reports = () => {
         reportName={currentReport || ''}
         selectedPerson={selectedPerson}
         dateRange={dateRange}
-        elderlyPersons={elderlyPersons}
-        reportType={currentReportType}
       />
 
-      <main className="container mx-auto px-4 py-4 sm:py-6">
-        <div className="mb-4 sm:mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+      <main className="container mx-auto px-4 py-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">
             {t('reports.title', { defaultValue: 'Reports' })}
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
+          <p className="text-muted-foreground">
             {t('reports.subtitle', { defaultValue: 'Generate comprehensive reports and analytics' })}
           </p>
         </div>
@@ -294,7 +369,7 @@ const Reports = () => {
           <CardContent>
             <div className="flex flex-col md:flex-row gap-4">
               {/* Person Selection */}
-              <div className="flex-1">
+              <div className="w-full md:w-1/4">
                 <label className="text-sm font-medium mb-2 block">
                   {t('reports.selectPerson', { defaultValue: 'Select Person' })}
                 </label>
@@ -316,7 +391,7 @@ const Reports = () => {
               </div>
 
               {/* Date Range */}
-              <div className="flex-1">
+              <div className="w-full md:w-1/4">
                 <label className="text-sm font-medium mb-2 block">
                   {t('reports.dateRange', { defaultValue: 'Date Range' })}
                 </label>
@@ -355,61 +430,57 @@ const Reports = () => {
                           setDateRange({ from: range.from, to: range.to });
                         }
                       }}
-                      numberOfMonths={1}
-                      className="sm:hidden"
-                    />
-                    <Calendar
-                      initialFocus
-                      mode="range"
-                      defaultMonth={dateRange?.from}
-                      selected={{ from: dateRange?.from, to: dateRange?.to }}
-                      onSelect={(range: any) => {
-                        if (range?.from && range?.to) {
-                          setDateRange({ from: range.from, to: range.to });
-                        }
-                      }}
                       numberOfMonths={2}
-                      className="hidden sm:block"
                     />
                   </PopoverContent>
                 </Popover>
               </div>
 
               {/* Quick Ranges */}
-              <div className="flex-1">
+              <div className="w-full md:w-1/2">
                 <label className="text-sm font-medium mb-2 block">
                   {t('reports.quickSelect', { defaultValue: 'Quick Select' })}
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
-                    variant="outline"
+                    variant={isDateRangeActive(7) ? "default" : "outline"}
                     size="sm"
                     onClick={() => setDateRange({
                       from: new Date(new Date().setDate(new Date().getDate() - 7)),
                       to: new Date(),
                     })}
                   >
-                    {t('reports.last7Days', { defaultValue: '7 Days' })}
+                    {t('reports.last7Days', { defaultValue: 'Last 7 Days' })}
                   </Button>
                   <Button
-                    variant="outline"
+                    variant={isDateRangeActive(30) ? "default" : "outline"}
                     size="sm"
                     onClick={() => setDateRange({
                       from: new Date(new Date().setDate(new Date().getDate() - 30)),
                       to: new Date(),
                     })}
                   >
-                    {t('reports.last30Days', { defaultValue: '30 Days' })}
+                    {t('reports.last30Days', { defaultValue: 'Last 30 Days' })}
                   </Button>
                   <Button
-                    variant="outline"
+                    variant={isDateRangeActive(90) ? "default" : "outline"}
                     size="sm"
                     onClick={() => setDateRange({
                       from: new Date(new Date().setMonth(new Date().getMonth() - 3)),
                       to: new Date(),
                     })}
                   >
-                    {t('reports.last3Months', { defaultValue: '3 Months' })}
+                    {t('reports.last3Months', { defaultValue: 'Last 3 Months' })}
+                  </Button>
+                  <Button
+                    variant={isDateRangeActive(180) ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDateRange({
+                      from: new Date(new Date().setMonth(new Date().getMonth() - 6)),
+                      to: new Date(),
+                    })}
+                  >
+                    {t('reports.last6Months', { defaultValue: 'Last 6 Months' })}
                   </Button>
                 </div>
               </div>
@@ -417,48 +488,15 @@ const Reports = () => {
           </CardContent>
         </Card>
 
-        {/* Email Subscription for Daily Reports */}
-        <ReportSubscriptionManager selectedPerson={selectedPerson} />
-
         {/* Report Categories */}
         <Tabs defaultValue="daily" className="space-y-6">
-          {/* Mobile: Dropdown Select */}
-          <div className="block lg:hidden mb-4">
-            <Select
-              defaultValue="daily"
-              onValueChange={(value) => {
-                const tabsList = document.querySelector('[role="tablist"]');
-                const trigger = tabsList?.querySelector(`[value="${value}"]`) as HTMLElement;
-                trigger?.click();
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select report category" />
-              </SelectTrigger>
-              <SelectContent>
-                {reportCategories.map((category) => {
-                  const Icon = category.icon;
-                  return (
-                    <SelectItem key={category.id} value={category.id}>
-                      <div className="flex items-center gap-2">
-                        <Icon className="w-4 h-4" />
-                        {category.title}
-                      </div>
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Desktop: Tabs */}
-          <TabsList className="hidden lg:grid w-full lg:grid-cols-3 xl:grid-cols-5">
+          <TabsList className="grid grid-cols-4 grid-rows-2 w-full h-auto gap-2 p-2">
             {reportCategories.map((category) => {
               const Icon = category.icon;
               return (
                 <TabsTrigger key={category.id} value={category.id} className="gap-2">
                   <Icon className="w-4 h-4" />
-                  <span>{category.title}</span>
+                  <span className="hidden sm:inline">{category.title}</span>
                 </TabsTrigger>
               );
             })}
@@ -468,8 +506,8 @@ const Reports = () => {
             <TabsContent key={category.id} value={category.id}>
               <Card>
                 <CardHeader>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div className="flex-1">
+                  <div className="flex items-start justify-between">
+                    <div>
                       <CardTitle className="flex items-center gap-2">
                         {React.createElement(category.icon, { className: 'w-5 h-5' })}
                         {category.title}
@@ -481,44 +519,43 @@ const Reports = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full sm:w-auto"
-                      onClick={() => handleExportAll(category.id, category.reports)}
+                      onClick={() => handleExportAll(category.id)}
                       disabled={isExporting}
                     >
                       <Download className="w-4 h-4 mr-2" />
-                      {isExporting ? t('reports.exporting', { defaultValue: 'Exporting...' }) : t('reports.exportAll', { defaultValue: 'Export All' })}
+                      {t('reports.exportAll', { defaultValue: 'Export All' })}
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {category.reports.map((report, index) => (
                       <Card key={index} className="hover:shadow-lg transition-shadow">
-                        <CardHeader className="pb-3">
+                        <CardHeader>
                           <CardTitle className="text-base flex items-center gap-2">
                             <FileText className="w-4 h-4" />
                             {report.name}
                           </CardTitle>
-                          <CardDescription className="text-sm line-clamp-2">
+                          <CardDescription className="text-sm">
                             {report.description}
                           </CardDescription>
                         </CardHeader>
-                        <CardContent className="pt-0">
+                        <CardContent>
                           <div className="flex gap-2">
                             <Button
                               size="sm"
                               className="flex-1"
-                              onClick={() => handleGenerate(report.name, category.id)}
+                              onClick={() => handleGenerate(report.name)}
                             >
-                              <BarChart3 className="w-4 h-4 mr-1 sm:mr-2" />
-                              <span className="hidden sm:inline">{t('reports.generate', { defaultValue: 'Generate' })}</span>
-                              <span className="sm:hidden">View</span>
+                              <BarChart3 className="w-4 h-4 mr-2" />
+                              {t('reports.generate', { defaultValue: 'Generate' })}
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleExport(report.name, category.id)}
+                              onClick={() => handleExport(report.name)}
                               disabled={isExporting}
+                              title={t('reports.exportToPDF', { defaultValue: 'Export to PDF' })}
                             >
                               <Download className="w-4 h-4" />
                             </Button>
@@ -532,7 +569,13 @@ const Reports = () => {
             </TabsContent>
           ))}
         </Tabs>
+
+        {/* Email Subscription for Daily Reports */}
+        <div className="max-w-3xl mt-6">
+          <ReportSubscriptionManager selectedPerson={selectedPerson} />
+        </div>
       </main>
+      <Footer />
     </div>
   );
 };

@@ -140,7 +140,7 @@ export const MovementPlayback = ({
         <div className="grid grid-cols-3 gap-4 pt-2 border-t text-sm">
           <div>
             <div className="text-muted-foreground">{t('tracking.playback.zone')}</div>
-            <div className="font-medium">{currentPosition.position.zone}</div>
+            <div className="font-medium">{currentPosition.position.zone || 'Indoor'}</div>
           </div>
           <div>
             <div className="text-muted-foreground">{t('tracking.playback.speed')}</div>

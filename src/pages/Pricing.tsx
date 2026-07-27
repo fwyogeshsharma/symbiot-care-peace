@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Check, Activity, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Footer } from "@/components/Footer";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -326,13 +327,7 @@ const Pricing = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t py-8 sm:py-12 px-4">
-        <div className="container mx-auto text-center text-muted-foreground">
-          <p className="text-sm sm:text-base">
-            {t('pricing.footer')}
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

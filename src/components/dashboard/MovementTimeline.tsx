@@ -33,7 +33,7 @@ export const MovementTimeline = ({ events }: MovementTimelineProps) => {
         <CardTitle>{t('movement.timeline.title')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[300px] pr-4">
+        <ScrollArea className="h-[450px] pr-4">
           <div className="space-y-4">
             {events.map((event, index) => {
               const isLastInLocation =

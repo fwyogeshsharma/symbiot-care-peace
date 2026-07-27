@@ -2,14 +2,13 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { alertNotificationService } from '@/lib/alertNotificationService';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   userRole: string | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, phone: string, role: string, yearOfBirth?: number, postalAddress?: string) => Promise<{ error: any; isDuplicate?: boolean }>;
+  signUp: (email: string, password: string, fullName: string, phone: string, role: string, yearOfBirth?: number, postalAddress?: string, city?: string, state?: string, zone?: string, country?: string, latitude?: number, longitude?: number) => Promise<{ error: any; isDuplicate?: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -29,7 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-
+        
         // Fetch user role and check if blocked when session changes
         if (session?.user) {
           setTimeout(async () => {
@@ -39,12 +38,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .select('blocked_at')
               .eq('id', session.user.id)
               .single();
-
+            
             if (profileData?.blocked_at) {
               // User is blocked, sign them out
               await supabase.auth.signOut();
               setUserRole(null);
-              alertNotificationService.cleanup();
               return;
             }
 
@@ -52,23 +50,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .from('user_roles')
               .select('role')
               .eq('user_id', session.user.id);
-
+            
             // Check if user has super_admin role, otherwise use first role
             const roles = data?.map(r => r.role) ?? [];
-            const role = roles.includes('super_admin') ? 'super_admin'
+            const role = roles.includes('super_admin') ? 'super_admin' 
                        : roles.includes('admin') ? 'admin'
                        : roles[0] ?? null;
             setUserRole(role);
-
-            // Initialize alert notifications for logged-in user
-            await alertNotificationService.initialize(session.user.id);
           }, 0);
         } else {
           setUserRole(null);
-          // Cleanup alert notifications on sign out
-          alertNotificationService.cleanup();
         }
-
+        
         setLoading(false);
       }
     );
@@ -77,22 +70,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-
+      
       if (session?.user) {
         supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', session.user.id)
-          .then(async ({ data }) => {
+          .then(({ data }) => {
             const roles = data?.map(r => r.role) ?? [];
-            const role = roles.includes('super_admin') ? 'super_admin'
+            const role = roles.includes('super_admin') ? 'super_admin' 
                        : roles.includes('admin') ? 'admin'
                        : roles[0] ?? null;
             setUserRole(role);
-
-            // Initialize alert notifications for existing session
-            await alertNotificationService.initialize(session.user.id);
-
             setLoading(false);
           });
       } else {
@@ -100,13 +89,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    return () => {
-      subscription.unsubscribe();
-      alertNotificationService.cleanup();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, phone: string, role: string, yearOfBirth?: number, postalAddress?: string) => {
+  const signUp = async (email: string, password: string, fullName: string, phone: string, role: string, yearOfBirth?: number, postalAddress?: string, city?: string, state?: string, zone?: string, country?: string, latitude?: number, longitude?: number) => {
     const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
     const redirectUrl = `${baseUrl}/dashboard`;
 
@@ -120,7 +106,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           phone: phone,
           role: role,
           year_of_birth: yearOfBirth,
-          postal_address: postalAddress
+          postal_address: postalAddress,
+          city: city,
+          state: state,
+          zone: zone,
+          country: country,
+          latitude: latitude,
+          longitude: longitude
         }
       }
     });
@@ -143,7 +135,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user_id: data.user.id,
         login_at: new Date().toISOString(),
       });
-      navigate('/dashboard');
+
+      // Check if user has access to any elderly persons and devices
+      const { data: elderlyPersons, error: elderlyError } = await supabase
+        .rpc('get_accessible_elderly_persons', { _user_id: data.user.id });
+
+      if (!elderlyError && elderlyPersons && elderlyPersons.length > 0) {
+        // Check if any of these elderly persons have devices
+        const elderlyIds = elderlyPersons.map((person: any) => person.id);
+        const { data: devices, error: devicesError } = await supabase
+          .from('devices')
+          .select('id')
+          .in('elderly_person_id', elderlyIds)
+          .limit(1);
+
+        // If no devices exist, redirect to device status page, otherwise go to dashboard
+        if (!devicesError && devices && devices.length > 0) {
+          navigate('/dashboard');
+        } else {
+          navigate('/device-status');
+        }
+      } else {
+        // No elderly persons accessible, go to device status to set things up
+        navigate('/device-status');
+      }
     }
 
     return { error };

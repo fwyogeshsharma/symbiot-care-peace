@@ -1,41 +1,45 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
-import { Heart, Activity, AlertTriangle, Users } from 'lucide-react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import VitalMetrics from '@/components/dashboard/VitalMetrics';
 import AlertsList from '@/components/dashboard/AlertsList';
 import ElderlyList from '@/components/dashboard/ElderlyList';
 import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
 import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
-import { ToiletActivity } from '@/components/dashboard/ToiletActivity';
+import { ILQWidget } from '@/components/dashboard/ILQWidget';
+import HealthMetricsCharts from '@/components/dashboard/HealthMetricsCharts';
+import { MovementSummary } from '@/components/dashboard/MovementSummary';
+import { MovementTimeline } from '@/components/dashboard/MovementTimeline';
+import { MovementHeatmap } from '@/components/dashboard/MovementHeatmap';
+import { DwellTimeAnalysis } from '@/components/dashboard/DwellTimeAnalysis';
 import Header from '@/components/layout/Header';
-import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
-import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { useTranslation } from 'react-i18next';
-import { AlertNotificationDialog } from '@/components/dashboard/AlertNotificationDialog';
-import { toast } from 'sonner';
+import { Footer } from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import { LayoutDashboard } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { processMovementData, getDateRangePreset } from '@/lib/movementUtils';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const [realtimeData, setRealtimeData] = useState<any[]>([]);
+  const navigate = useNavigate();
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
-  const [newAlert, setNewAlert] = useState<any>(null);
-  const shouldShowTour = useShouldShowTour();
+  const [dateRange] = useState(getDateRangePreset('today'));
+  const [healthChartsOpen, setHealthChartsOpen] = useState(false);
 
   // Fetch elderly persons based on role
   const { data: elderlyPersons, isLoading: elderlyLoading } = useQuery({
     queryKey: ['elderly-persons', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      
+
       const { data, error } = await supabase
         .rpc('get_accessible_elderly_persons', { _user_id: user.id });
-      
+
       if (error) throw error;
       return data || [];
     },
@@ -43,7 +47,7 @@ const Dashboard = () => {
   });
 
   // Fetch active alerts
-  const { data: alerts, refetch: refetchAlerts } = useQuery({
+  const { data: alerts } = useQuery({
     queryKey: ['alerts', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -52,195 +56,94 @@ const Dashboard = () => {
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(10);
-      
+
       if (error) throw error;
       return data;
     },
     enabled: !!user,
   });
 
-  // Fetch heart rate data for average calculation
-  const { data: heartRateData } = useQuery({
-    queryKey: ['heart-rate-avg', user?.id, elderlyPersons],
+  // Fetch user's dashboard layout
+  const { data: dashboardLayout } = useQuery({
+    queryKey: ['dashboard-layout', user?.id],
     queryFn: async () => {
-      if (!elderlyPersons || elderlyPersons.length === 0) return [];
-      
-      const elderlyIds = elderlyPersons.map(p => p.id);
-      
-      const { data, error } = await supabase
-        .from('device_data')
-        .select('value')
-        .eq('data_type', 'heart_rate')
-        .in('elderly_person_id', elderlyIds)
-        .order('recorded_at', { ascending: false })
-        .limit(10);
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user && !!elderlyPersons && elderlyPersons.length > 0,
-  });
-
-  // Fetch activity/steps data
-  const { data: activityData } = useQuery({
-    queryKey: ['activity-level', user?.id, elderlyPersons],
-    queryFn: async () => {
-      if (!elderlyPersons || elderlyPersons.length === 0) return [];
-
-      const elderlyIds = elderlyPersons.map(p => p.id);
+      if (!user?.id) return null;
 
       const { data, error } = await supabase
-        .from('device_data')
-        .select('value, data_type')
-        .in('data_type', ['steps', 'activity'])
-        .in('elderly_person_id', elderlyIds)
-        .gte('recorded_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-        .order('recorded_at', { ascending: false });
+        .from('dashboard_layouts')
+        .select('layout_config')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') throw error;
       return data;
     },
-    enabled: !!user && !!elderlyPersons && elderlyPersons.length > 0,
+    enabled: !!user?.id,
   });
 
-  // Fetch toilet activity data
-  const { data: toiletActivityData = [] } = useQuery({
-    queryKey: ['toilet-activity', selectedPersonId],
+  // Fetch movement data for activity components
+  const { data: rawMovementData = [] } = useQuery({
+    queryKey: ['movement-data', selectedPersonId, dateRange],
     queryFn: async () => {
       if (!selectedPersonId) return [];
 
       const { data, error } = await supabase
         .from('device_data')
-        .select('recorded_at, data_type, value, devices(location, device_name)')
+        .select(`
+          *,
+          devices!inner(location, device_name, device_type, device_types!inner(category))
+        `)
         .eq('elderly_person_id', selectedPersonId)
-        .or('data_type.eq.toilet_usage,data_type.eq.toilet_occupancy')
-        .gte('recorded_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-        .order('recorded_at', { ascending: false });
+        .gte('recorded_at', dateRange.start)
+        .lte('recorded_at', dateRange.end)
+        .order('recorded_at', { ascending: true });
 
       if (error) throw error;
-
-      return (data || []).map(item => ({
-        timestamp: item.recorded_at,
-        location: item.devices?.location || 'Toilet',
-        dataType: item.data_type,
-        value: item.value,
-        deviceName: item.devices?.device_name || 'Toilet Sensor',
-      }));
+      return data || [];
     },
     enabled: !!selectedPersonId,
   });
 
-  // Calculate average heart rate
-  const calculateAvgHeartRate = () => {
-    if (!heartRateData || heartRateData.length === 0) return null;
-    
-    const values = heartRateData.map(d => {
-      if (typeof d.value === 'object' && d.value !== null && 'bpm' in d.value) {
-        return Number(d.value.bpm);
-      }
-      return Number(d.value);
-    }).filter(v => !isNaN(v));
-    
-    if (values.length === 0) return null;
-    
-    const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
-    return Math.round(avg);
-  };
+  const processedMovementData = processMovementData(rawMovementData || []);
 
-  // Calculate activity level
-  const calculateActivityLevel = () => {
-    if (!activityData || activityData.length === 0) return null;
-
-    const totalSteps = activityData
-      .filter(d => d.data_type === 'steps')
-      .reduce((sum, d) => {
-        const steps = typeof d.value === 'object' && d.value !== null && 'count' in d.value
-          ? Number(d.value.count)
-          : Number(d.value);
-        return sum + (isNaN(steps) ? 0 : steps);
-      }, 0);
-
-    if (totalSteps > 8000) return t('dashboard.stats.activityLevel.good');
-    if (totalSteps > 4000) return t('dashboard.stats.activityLevel.fair');
-    if (totalSteps > 0) return t('dashboard.stats.activityLevel.low');
-    return null;
-  };
-
-  const avgHeartRate = calculateAvgHeartRate();
-  const activityLevel = calculateActivityLevel();
-
-  // Subscribe to real-time updates
+  // Auto-select first person when dashboard loads
   useEffect(() => {
-    if (!user) return;
+    if (elderlyPersons && elderlyPersons.length > 0 && !selectedPersonId) {
+      setSelectedPersonId(elderlyPersons[0].id);
+    }
+  }, [elderlyPersons, selectedPersonId]);
 
-    const channel = supabase
-      .channel('dashboard-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'device_data'
-        },
-        async (payload) => {
-          console.log('New device data:', payload);
-          setRealtimeData(prev => [payload.new, ...prev.slice(0, 9)]);
+  // Check if a component is enabled
+  const isComponentEnabled = (componentId: string) => {
+    if (!dashboardLayout?.layout_config) {
+      // No custom layout saved - show default components
+      const defaultEnabled = ['elderly-list', 'vital-metrics', 'health-charts', 'environmental'];
+      console.log('No dashboard layout, using defaults for:', componentId, defaultEnabled.includes(componentId));
+      return defaultEnabled.includes(componentId);
+    }
 
-          // Check if this is a panic SOS event (emergency_button)
-          const newData = payload.new as any;
-          if (newData.device_id) {
-            // Fetch device info to check if it's an emergency button
-            const { data: device } = await supabase
-              .from('devices')
-              .select('device_type, elderly_person_id, elderly_persons(full_name)')
-              .eq('id', newData.device_id)
-              .single();
+    // Handle both old format (array) and new format (object with components property)
+    const layoutConfig = dashboardLayout.layout_config as any;
+    const components = Array.isArray(layoutConfig) ? layoutConfig : (layoutConfig.components || []);
+    const component = components.find((c: any) => c.id === componentId);
 
-            if (device?.device_type === 'emergency_button') {
-              const elderlyPerson = device.elderly_persons as any;
-              // Show toast notification for panic SOS
-              toast.error(t('panicSos.notifications.emergencyAlert'), {
-                description: `${t('panicSos.notifications.sosActivated')} ${elderlyPerson?.full_name || t('panicSos.unknown')}`,
-                duration: 10000,
-              });
+    console.log('Checking component:', componentId, 'Found:', !!component, 'Enabled:', component?.enabled);
 
-              // Refetch panic events
-              queryClient.invalidateQueries({ queryKey: ['panic-sos-events'] });
-            }
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'alert_recipients',
-          filter: `user_id=eq.${user.id}`
-        },
-        async (payload) => {
-          console.log('New alert for user:', payload);
-          refetchAlerts();
+    // If component not found in saved config (new component added later), don't show it by default
+    if (!component) return false;
 
-          // Fetch full alert details with elderly person info
-          const recipientData = payload.new as any;
-          const { data: fullAlert } = await supabase
-            .from('alerts')
-            .select('*, elderly_persons(full_name)')
-            .eq('id', recipientData.alert_id)
-            .single();
+    return component.enabled;
+  };
 
-          if (fullAlert) {
-            setNewAlert(fullAlert);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user, refetchAlerts, queryClient, t]);
+  // Debug: Log the dashboard layout when it changes
+  useEffect(() => {
+    if (dashboardLayout?.layout_config) {
+      console.log('Dashboard layout loaded:', dashboardLayout.layout_config);
+      const layoutConfig = dashboardLayout.layout_config as any;
+      const components = Array.isArray(layoutConfig) ? layoutConfig : (layoutConfig.components || []);
+      console.log('Enabled components:', components.filter((c: any) => c.enabled).map((c: any) => c.id));
+    }
+  }, [dashboardLayout]);
 
   if (elderlyLoading) {
     return (
@@ -253,156 +156,112 @@ const Dashboard = () => {
     );
   }
 
-  const handleAlertClose = () => {
-    setNewAlert(null);
-  };
-
-  const handleAlertAcknowledge = async (alertId: string) => {
-    try {
-      await supabase
-        .from('alerts')
-        .update({ status: 'acknowledged' })
-        .eq('id', alertId);
-
-      refetchAlerts();
-      setNewAlert(null);
-    } catch (error) {
-      console.error('Error acknowledging alert:', error);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
-      <OnboardingTour runTour={shouldShowTour} />
       <Header />
 
-      {/* Alert Notification Dialog */}
-      <AlertNotificationDialog
-        newAlert={newAlert}
-        onClose={handleAlertClose}
-        onAcknowledge={handleAlertAcknowledge}
-      />
-
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
-        {/* Stats Overview */}
-        <div data-tour="stats-overview" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <Card className="p-4 sm:p-6">
-            <div className="flex items-center justify-between gap-3 min-h-[80px]">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1 mb-2">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.monitoredPersons.label')}</p>
-                  <HelpTooltip content={t('dashboard.stats.monitoredPersons.tooltip')} />
-                </div>
-                <p className="text-2xl sm:text-3xl font-bold">{elderlyPersons?.length || 0}</p>
-              </div>
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Users className="w-6 h-6 text-primary" />
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4 sm:p-6">
-            <div className="flex items-center justify-between gap-3 min-h-[80px]">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1 mb-2">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.activeAlerts.label')}</p>
-                  <HelpTooltip content={t('dashboard.stats.activeAlerts.tooltip')} />
-                </div>
-                <p className="text-2xl sm:text-3xl font-bold">{alerts?.length || 0}</p>
-              </div>
-              <div className="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-6 h-6 text-warning" />
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4 sm:p-6">
-            <div className="flex items-center justify-between gap-3 min-h-[80px]">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1 mb-2">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.avgHeartRate.label')}</p>
-                  <HelpTooltip
-                    title={t('dashboard.stats.avgHeartRate.title')}
-                    content={t('dashboard.stats.avgHeartRate.tooltip')}
-                  />
-                </div>
-                <p className="text-2xl sm:text-3xl font-bold">
-                  {avgHeartRate !== null ? avgHeartRate : '—'}
-                </p>
-                {avgHeartRate !== null ? (
-                  <p className="text-xs text-muted-foreground">{t('dashboard.stats.avgHeartRate.bpm')}</p>
-                ) : (
-                  <p className="text-xs text-muted-foreground">{t('dashboard.stats.avgHeartRate.noData')}</p>
-                )}
-              </div>
-              <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
-                <Heart className="w-6 h-6 text-success" />
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4 sm:p-6">
-            <div className="flex items-center justify-between gap-3 min-h-[80px]">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1 mb-2">
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('dashboard.stats.activityLevel.label')}</p>
-                  <HelpTooltip
-                    title={t('dashboard.stats.activityLevel.title')}
-                    content={
-                      <div className="space-y-1">
-                        <div><strong>{t('dashboard.stats.activityLevel.good')}:</strong> {t('dashboard.stats.activityLevel.goodDesc')}</div>
-                        <div><strong>{t('dashboard.stats.activityLevel.fair')}:</strong> {t('dashboard.stats.activityLevel.fairDesc')}</div>
-                        <div><strong>{t('dashboard.stats.activityLevel.low')}:</strong> {t('dashboard.stats.activityLevel.lowDesc')}</div>
-                      </div>
-                    }
-                  />
-                </div>
-                <p className="text-2xl sm:text-3xl font-bold">
-                  {activityLevel !== null ? activityLevel : '—'}
-                </p>
-                {activityLevel === null && (
-                  <p className="text-xs text-muted-foreground">{t('dashboard.stats.activityLevel.noData')}</p>
-                )}
-              </div>
-              <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
-                <Activity className="w-6 h-6 text-secondary" />
-              </div>
-            </div>
-          </Card>
+        {/* Page Heading */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title', { defaultValue: 'Dashboard' })}</h1>
+            <p className="text-muted-foreground mt-1">
+              {t('dashboard.subtitle', { defaultValue: 'Monitor and manage elderly care' })}
+            </p>
+          </div>
+          <Button onClick={() => navigate('/customize-dashboard')} variant="outline">
+            <LayoutDashboard className="w-4 h-4 mr-2" />
+            {t('profile.customizeDashboard', { defaultValue: 'Customize Dashboard' })}
+          </Button>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Left Column - Elderly Persons & Devices */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            <div data-tour="elderly-list">
-              <ElderlyList
-                elderlyPersons={elderlyPersons || []}
-                selectedPersonId={selectedPersonId}
-                onSelectPerson={setSelectedPersonId}
-              />
+        <div className="space-y-4 sm:space-y-6">
+          {/* Elderly List */}
+          {isComponentEnabled('elderly-list') && (
+            <ElderlyList
+              elderlyPersons={elderlyPersons || []}
+              selectedPersonId={selectedPersonId}
+              onSelectPerson={setSelectedPersonId}
+            />
+          )}
+
+          {/* Grid Layout for Side-by-Side Components */}
+          <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+            {/* Left Column - Health & Monitoring */}
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+              {isComponentEnabled('vital-metrics') && (
+                <VitalMetrics selectedPersonId={selectedPersonId} />
+              )}
+              {isComponentEnabled('health-charts') && (
+                <HealthMetricsCharts 
+                  open={healthChartsOpen} 
+                  onOpenChange={setHealthChartsOpen} 
+                  selectedPersonId={selectedPersonId} 
+                />
+              )}
+              {isComponentEnabled('movement-summary') && (
+                <MovementSummary data={processedMovementData} />
+              )}
+              {isComponentEnabled('movement-timeline') && (
+                <MovementTimeline events={processedMovementData.events} />
+              )}
+              {isComponentEnabled('movement-heatmap') && (
+                <MovementHeatmap data={processedMovementData} />
+              )}
+              {isComponentEnabled('dwell-time') && (
+                <DwellTimeAnalysis data={processedMovementData} idealProfile={null} />
+              )}
             </div>
-            <div data-tour="vital-metrics">
-              <VitalMetrics selectedPersonId={selectedPersonId} />
+
+            {/* Right Column - Widgets & Quick Info */}
+            <div className="space-y-4 sm:space-y-6">
+              {isComponentEnabled('ilq-score') && (
+                <ILQWidget elderlyPersonId={selectedPersonId || ''} />
+              )}
+              {isComponentEnabled('medication') && (
+                <MedicationManagement selectedPersonId={selectedPersonId} />
+              )}
+              {isComponentEnabled('environmental') && (
+                <EnvironmentalSensors selectedPersonId={selectedPersonId} />
+              )}
+              {isComponentEnabled('panic-sos') && (
+                <PanicSosEvents selectedPersonId={selectedPersonId} />
+              )}
+              {isComponentEnabled('alerts') && (
+                <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
+              )}
             </div>
-            {selectedPersonId && toiletActivityData.length > 0 && (
-              <div data-tour="toilet-activity">
-                <ToiletActivity events={toiletActivityData} />
-              </div>
-            )}
           </div>
 
-          {/* Right Column - Medication, Environmental, Emergency Events & Alerts */}
-          <div className="space-y-4 sm:space-y-6">
-            <MedicationManagement selectedPersonId={selectedPersonId} />
-            <EnvironmentalSensors selectedPersonId={selectedPersonId} />
-            <PanicSosEvents selectedPersonId={selectedPersonId} />
-            <div data-tour="alerts-list">
-              <AlertsList alerts={alerts || []} selectedPersonId={selectedPersonId} />
-            </div>
-          </div>
         </div>
+
+        {/* Empty State */}
+        {dashboardLayout?.layout_config &&
+         (() => {
+           const layoutConfig = dashboardLayout.layout_config as any;
+           const components = Array.isArray(layoutConfig) ? layoutConfig : (layoutConfig.components || []);
+           return components.filter((c: any) => c.enabled).length === 0;
+         })() && (
+          <Card className="p-12 text-center">
+            <div className="max-w-md mx-auto">
+              <LayoutDashboard className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-semibold mb-2">
+                {t('dashboard.emptyDashboard', { defaultValue: 'No Components Added' })}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                {t('dashboard.emptyDashboardDesc', { defaultValue: 'Customize your dashboard to add components' })}
+              </p>
+              <Button onClick={() => navigate('/customize-dashboard')}>
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                {t('profile.customizeDashboard', { defaultValue: 'Customize Dashboard' })}
+              </Button>
+            </div>
+          </Card>
+        )}
       </main>
+
+      <Footer />
     </div>
   );
 };

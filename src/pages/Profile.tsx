@@ -7,16 +7,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Globe, Share2, MapPin, Calendar } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Save, Shield, LogOut, HelpCircle, Globe, MapPin, Calendar, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { restartTour } from '@/components/help/OnboardingTour';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import DataSharing from '@/components/dashboard/DataSharing';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
+import { Footer } from '@/components/Footer';
 
 const Profile = () => {
   const { user, userRole, signOut } = useAuth();
@@ -91,6 +90,35 @@ const Profile = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate required fields
+    if (!formData.full_name || formData.full_name.trim().length < 2) {
+      toast({
+        title: t('profile.updateFailed'),
+        description: t('profile.fullNameRequired') || 'Full name is required (minimum 2 characters)',
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.phone || formData.phone.trim().length < 10) {
+      toast({
+        title: t('profile.updateFailed'),
+        description: t('profile.phoneRequired') || 'Phone number is required (minimum 10 digits)',
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.postal_address || formData.postal_address.trim().length < 5) {
+      toast({
+        title: t('profile.updateFailed'),
+        description: t('profile.postalAddressRequired') || 'Postal address is required (minimum 5 characters)',
+        variant: "destructive",
+      });
+      return;
+    }
+
     updateProfileMutation.mutate(formData);
   };
 
@@ -146,23 +174,7 @@ const Profile = () => {
       </header>
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-2xl">
-        <Tabs defaultValue="profile" className="w-full">
-          <TabsList className={`grid w-full mb-6 ${userRole === 'caregiver' ? 'grid-cols-1' : 'grid-cols-2'}`}>
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <User className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('profile.title')}</span>
-              <span className="sm:hidden">{t('profile.title')}</span>
-            </TabsTrigger>
-            {userRole !== 'caregiver' && (
-              <TabsTrigger value="data-sharing" className="flex items-center gap-2">
-                <Share2 className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('nav.dataSharing')}</span>
-                <span className="sm:hidden">{t('nav.dataSharing')}</span>
-              </TabsTrigger>
-            )}
-          </TabsList>
-
-          <TabsContent value="profile" className="space-y-6">
+        <div className="space-y-6">
             <Card className="p-4 sm:p-6 overflow-visible">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3 sm:gap-4">
@@ -217,6 +229,7 @@ const Profile = () => {
                     <Label htmlFor="full_name" className="flex items-center gap-2">
                       <User className="w-4 h-4" />
                       {t('auth.fullName')}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="full_name"
@@ -225,6 +238,7 @@ const Profile = () => {
                       onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                       disabled={!isEditing}
                       placeholder={t('profile.enterFullName')}
+                      required
                     />
                   </div>
 
@@ -232,6 +246,7 @@ const Profile = () => {
                     <Label htmlFor="phone" className="flex items-center gap-2">
                       <Phone className="w-4 h-4" />
                       {t('auth.phone')}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="phone"
@@ -240,6 +255,7 @@ const Profile = () => {
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       disabled={!isEditing}
                       placeholder={t('profile.enterPhone')}
+                      required
                     />
                   </div>
 
@@ -268,6 +284,7 @@ const Profile = () => {
                     <Label htmlFor="postal_address" className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
                       {t('profile.postalAddress') || 'Postal Address'}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="postal_address"
@@ -277,6 +294,7 @@ const Profile = () => {
                       disabled={!isEditing}
                       placeholder={t('profile.enterPostalAddress') || 'Enter your postal address'}
                       className={!isEditing ? 'bg-muted' : ''}
+                      required
                     />
                   </div>
                 </div>
@@ -327,6 +345,15 @@ const Profile = () => {
                 <Button
                   variant="outline"
                   className="w-full justify-start"
+                  onClick={() => navigate('/customize-dashboard')}
+                >
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  {t('profile.customizeDashboard', { defaultValue: 'Customize Dashboard' })}
+                </Button>
+                <Separator />
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
                   onClick={restartTour}
                 >
                   <HelpCircle className="w-4 h-4 mr-2" />
@@ -356,15 +383,9 @@ const Profile = () => {
                 </Button>
               </div>
             </Card>
-          </TabsContent>
-
-          {userRole !== 'caregiver' && (
-            <TabsContent value="data-sharing">
-              {user && <DataSharing userId={user.id} />}
-            </TabsContent>
-          )}
-        </Tabs>
+        </div>
       </main>
+      <Footer />
     </div>
   );
 };

@@ -50,6 +50,15 @@ export interface ProcessedPositionData {
   averageSpeed: number;
 }
 
+export interface ZoneVisit {
+  id: string;
+  zoneName: string;
+  entryTime: Date;
+  exitTime: Date;
+  duration: number; // in seconds
+  eventCount: number;
+}
+
 // Generate realistic indoor movement path using random walk
 export const generateIndoorMovementPath = (
   zones: Zone[],
@@ -232,6 +241,71 @@ export const calculateTotalDistance = (positions: Position[]): number => {
   return total;
 };
 
+// Helper function to extract position from various data formats
+const extractPosition = (value: any): Position | null => {
+  if (!value) return null;
+  
+  // Direct Position object: { x: number, y: number, zone: string }
+  if (typeof value.x === 'number' && typeof value.y === 'number') {
+    return {
+      x: value.x,
+      y: value.y,
+      zone: value.zone || 'Unknown',
+      accuracy: value.accuracy,
+      speed: value.speed
+    };
+  }
+  
+  // Nested position object: { position: { x, y }, zone }
+  if (value.position && typeof value.position.x === 'number' && typeof value.position.y === 'number') {
+    return {
+      x: value.position.x,
+      y: value.position.y,
+      zone: value.zone || value.position.zone || 'Unknown',
+      accuracy: value.accuracy || value.position.accuracy,
+      speed: value.speed || value.position.speed
+    };
+  }
+  
+  // Coordinate format: { coordinates: { x, y } }
+  if (value.coordinates && typeof value.coordinates.x === 'number' && typeof value.coordinates.y === 'number') {
+    return {
+      x: value.coordinates.x,
+      y: value.coordinates.y,
+      zone: value.zone || 'Unknown',
+      accuracy: value.accuracy,
+      speed: value.speed
+    };
+  }
+  
+  // Array format: [x, y]
+  if (Array.isArray(value) && value.length >= 2 && typeof value[0] === 'number' && typeof value[1] === 'number') {
+    return {
+      x: value[0],
+      y: value[1],
+      zone: 'Unknown',
+      accuracy: undefined,
+      speed: undefined
+    };
+  }
+  
+  // String coordinates: "x,y"
+  if (typeof value === 'string' && value.includes(',')) {
+    const parts = value.split(',').map(s => parseFloat(s.trim()));
+    if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+      return {
+        x: parts[0],
+        y: parts[1],
+        zone: 'Unknown',
+        accuracy: undefined,
+        speed: undefined
+      };
+    }
+  }
+  
+  return null;
+};
+
 // Process position data for analytics
 export const processPositionData = (
   rawData: any[],
@@ -242,11 +316,17 @@ export const processPositionData = (
   let totalDistance = 0;
   let totalSpeed = 0;
   let speedCount = 0;
+  let prevPosition: Position | null = null;
   
   rawData.forEach((item, index) => {
     if (item.data_type !== 'position') return;
     
-    const position = item.value as Position;
+    const position = extractPosition(item.value);
+    if (!position) {
+      console.warn('Could not extract position from data:', item.value);
+      return;
+    }
+    
     const timestamp = new Date(item.recorded_at);
     
     events.push({
@@ -262,27 +342,25 @@ export const processPositionData = (
     } else {
       zoneStats[position.zone].duration += intervalSeconds;
       // Count a new visit if we left and came back
-      if (index > 0 && rawData[index - 1].value.zone !== position.zone) {
+      if (prevPosition && prevPosition.zone !== position.zone) {
         zoneStats[position.zone].visits++;
       }
     }
     
     // Calculate distance
-    if (index > 0) {
-      const prev = rawData[index - 1].value as Position;
-      // Validate that coordinates are valid numbers
+    if (prevPosition) {
       if (
         typeof position.x === 'number' &&
         typeof position.y === 'number' &&
-        typeof prev.x === 'number' &&
-        typeof prev.y === 'number' &&
+        typeof prevPosition.x === 'number' &&
+        typeof prevPosition.y === 'number' &&
         !isNaN(position.x) &&
         !isNaN(position.y) &&
-        !isNaN(prev.x) &&
-        !isNaN(prev.y)
+        !isNaN(prevPosition.x) &&
+        !isNaN(prevPosition.y)
       ) {
-        const dx = position.x - prev.x;
-        const dy = position.y - prev.y;
+        const dx = position.x - prevPosition.x;
+        const dy = position.y - prevPosition.y;
         totalDistance += Math.sqrt(dx * dx + dy * dy);
       }
     }
@@ -292,6 +370,8 @@ export const processPositionData = (
       totalSpeed += position.speed;
       speedCount++;
     }
+    
+    prevPosition = position;
   });
   
   return {
@@ -302,65 +382,55 @@ export const processPositionData = (
   };
 };
 
-// Get default floor plan for demos
-export const getDefaultFloorPlan = (elderlyPersonId: string): Omit<FloorPlan, 'id' | 'created_at' | 'updated_at'> => {
-  return {
-    elderly_person_id: elderlyPersonId,
-    name: 'Main House Floor Plan',
-    width: 15,
-    height: 12,
-    grid_size: 1.0,
-    zones: [
-      {
-        name: 'Living Room',
-        coordinates: [
-          { x: 1, y: 1 },
-          { x: 7, y: 1 },
-          { x: 7, y: 6 },
-          { x: 1, y: 6 }
-        ],
-        color: '#3b82f6'
-      },
-      {
-        name: 'Kitchen',
-        coordinates: [
-          { x: 7, y: 1 },
-          { x: 14, y: 1 },
-          { x: 14, y: 5 },
-          { x: 7, y: 5 }
-        ],
-        color: '#10b981'
-      },
-      {
-        name: 'Bedroom',
-        coordinates: [
-          { x: 1, y: 6 },
-          { x: 6, y: 6 },
-          { x: 6, y: 11 },
-          { x: 1, y: 11 }
-        ],
-        color: '#8b5cf6'
-      },
-      {
-        name: 'Bathroom',
-        coordinates: [
-          { x: 6, y: 6 },
-          { x: 9, y: 6 },
-          { x: 9, y: 9 },
-          { x: 6, y: 9 }
-        ],
-        color: '#06b6d4'
-      },
-      {
-        name: 'Hallway',
-        coordinates: [
-          { x: 9, y: 5 },
-          { x: 14, y: 5 },
-          { x: 14, y: 11 },
-          { x: 9, y: 11 }
-        ],
-        color: '#64748b'
-      }
-    ]
-  };
+// Process zone history from position events to get detailed zone visit records
+export const processZoneHistory = (events: PositionEvent[]): ZoneVisit[] => {
+  if (events.length === 0) return [];
+
+  const visits: ZoneVisit[] = [];
+  let currentZone = events[0].position.zone || 'Indoor';
+  let entryTime = events[0].timestamp;
+  let eventCount = 1;
+
+  for (let i = 1; i < events.length; i++) {
+    const event = events[i];
+    const zone = event.position.zone || 'Indoor';
+
+    if (zone !== currentZone) {
+      // Zone changed - record the visit
+      const exitTime = events[i - 1].timestamp;
+      const duration = (exitTime.getTime() - entryTime.getTime()) / 1000;
+
+      visits.push({
+        id: `${entryTime.getTime()}-${currentZone}`,
+        zoneName: currentZone,
+        entryTime,
+        exitTime,
+        duration,
+        eventCount
+      });
+
+      // Start new zone visit
+      currentZone = zone;
+      entryTime = event.timestamp;
+      eventCount = 1;
+    } else {
+      eventCount++;
+    }
+  }
+
+  // Record the last visit
+  const lastEvent = events[events.length - 1];
+  const duration = (lastEvent.timestamp.getTime() - entryTime.getTime()) / 1000;
+
+  visits.push({
+    id: `${entryTime.getTime()}-${currentZone}`,
+    zoneName: currentZone,
+    entryTime,
+    exitTime: lastEvent.timestamp,
+    duration,
+    eventCount
+  });
+
+  // Sort by entry time descending (most recent first)
+  return visits.sort((a, b) => b.entryTime.getTime() - a.entryTime.getTime());
 };

@@ -5,33 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Activity, TrendingUp, AlertCircle, BarChart3, RefreshCw, Download, Mail, Share2 } from 'lucide-react';
+import { Activity, TrendingUp, AlertCircle, BarChart3, RefreshCw, Download, Mail } from 'lucide-react';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { useElderly } from '@/contexts/ElderlyContext';
 import Header from '@/components/layout/Header';
 import { useTranslation } from 'react-i18next';
-import { useFileSystem } from '@/hooks/useFileSystem';
-import { isNative } from '@/lib/capacitor/platform';
-
-// Custom hook to detect mobile screen size
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  return isMobile;
-};
+import { Footer } from '@/components/Footer';
 
 export default function ILQAnalytics() {
   const { t } = useTranslation();
@@ -40,55 +21,25 @@ export default function ILQAnalytics() {
   const [timeRange, setTimeRange] = useState<string>('30');
   const [isAutoRefreshing, setIsAutoRefreshing] = useState(true);
   const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const { writeFile, shareText, downloadCSV } = useFileSystem();
-  const isMobile = useIsMobile();
-
-  // Helper function for web download fallback
-  const downloadFallback = (content: string, filename: string) => {
-    const blob = new Blob([content], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  // Export ILQ data as CSV
-  const exportCSVData = async () => {
-    if (!ilqHistory || ilqHistory.length === 0) {
-      toast.error(t('ilq.analytics.noDataToExport', 'No data to export'));
-      return;
-    }
-
-    const csvData = ilqHistory.map(score => ({
-      date: new Date(score.computation_timestamp).toLocaleDateString(),
-      overall_score: score.score,
-      health_vitals: score.health_vitals_score,
-      physical_activity: score.physical_activity_score,
-      cognitive_function: score.cognitive_function_score,
-      environmental_safety: score.environmental_safety_score,
-    }));
-
-    const filename = `ILQ-Data-${new Date().toISOString().split('T')[0]}.csv`;
-    await downloadCSV(filename, csvData);
-    toast.success(t('ilq.analytics.csvExported', 'CSV data exported'));
-  };
 
   const { data: ilqHistory, isLoading: historyLoading, refetch } = useQuery({
     queryKey: ['ilq-history', selectedPersonId, timeRange],
     queryFn: async () => {
       if (!selectedPersonId) return null;
 
-      const daysAgo = new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString();
-      const { data, error } = await supabase
+      let query = supabase
         .from('ilq_scores')
         .select('*')
         .eq('elderly_person_id', selectedPersonId)
-        .gte('computation_timestamp', daysAgo)
         .order('computation_timestamp', { ascending: true });
+
+      // Only apply date filter if not "All Time"
+      if (timeRange !== 'all') {
+        const daysAgo = new Date(Date.now() - parseInt(timeRange) * 24 * 60 * 60 * 1000).toISOString();
+        query = query.gte('computation_timestamp', daysAgo);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data;
@@ -243,6 +194,35 @@ export default function ILQAnalytics() {
     }
   };
 
+  const computeHistoricalILQ = async () => {
+    if (!selectedPersonId) return;
+
+    try {
+      toast.info(t('ilq.analytics.computingHistorical', { defaultValue: 'Calculating historical ILQ scores for all past data...' }));
+
+      const { data, error } = await supabase.functions.invoke('ilq-compute', {
+        body: {
+          elderly_person_id: selectedPersonId,
+          calculate_historical: true,
+          force_recompute: false,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success(
+        t('ilq.analytics.historicalSuccess', {
+          defaultValue: `Successfully calculated ${data.scores_inserted} historical scores!`,
+          count: data.scores_inserted
+        })
+      );
+      refetch();
+    } catch (error: any) {
+      console.error('Error computing historical ILQ:', error);
+      toast.error(error.message || t('ilq.analytics.historicalFailed', { defaultValue: 'Failed to calculate historical scores' }));
+    }
+  };
+
   const downloadReport = async () => {
     if (!selectedPersonId) return;
 
@@ -258,21 +238,16 @@ export default function ILQAnalytics() {
 
       if (error) throw error;
 
-      const filename = `ILQ-Report-${new Date().toISOString().split('T')[0]}.html`;
-
-      // On native platforms, save to filesystem
-      if (isNative()) {
-        const filePath = await writeFile(filename, data.html);
-        if (filePath) {
-          toast.success(t('ilq.analytics.reportSaved', { path: filename }));
-        } else {
-          // Fallback if file system fails
-          downloadFallback(data.html, filename);
-        }
-      } else {
-        // Web fallback - download directly
-        downloadFallback(data.html, filename);
-      }
+      // Convert HTML to downloadable file
+      const blob = new Blob([data.html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ILQ-Report-${new Date().toISOString().split('T')[0]}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
       toast.success(t('ilq.analytics.reportDownloaded'));
     } catch (error: any) {
@@ -295,32 +270,13 @@ export default function ILQAnalytics() {
 
   const latestScore = ilqHistory && ilqHistory.length > 0 ? ilqHistory[ilqHistory.length - 1] : null;
 
-  // Use shorter labels on mobile for better fit
   const radarData = latestScore ? [
-    {
-      component: isMobile ? t('ilq.analytics.healthVitalsShort') : t('ilq.analytics.healthVitals'),
-      value: latestScore.health_vitals_score ? (typeof latestScore.health_vitals_score === 'string' ? parseFloat(latestScore.health_vitals_score) : latestScore.health_vitals_score) : 0
-    },
-    {
-      component: isMobile ? t('ilq.analytics.physicalActivityShort') : t('ilq.analytics.physicalActivity'),
-      value: latestScore.physical_activity_score ? (typeof latestScore.physical_activity_score === 'string' ? parseFloat(latestScore.physical_activity_score) : latestScore.physical_activity_score) : 0
-    },
-    {
-      component: isMobile ? t('ilq.analytics.cognitiveFunctionShort') : t('ilq.analytics.cognitiveFunction'),
-      value: latestScore.cognitive_function_score ? (typeof latestScore.cognitive_function_score === 'string' ? parseFloat(latestScore.cognitive_function_score) : latestScore.cognitive_function_score) : 0
-    },
-    {
-      component: isMobile ? t('ilq.analytics.environmentalShort') : t('ilq.analytics.environmentalSafety'),
-      value: latestScore.environmental_safety_score ? (typeof latestScore.environmental_safety_score === 'string' ? parseFloat(latestScore.environmental_safety_score) : latestScore.environmental_safety_score) : 0
-    },
-    {
-      component: isMobile ? t('ilq.analytics.emergencyShort') : t('ilq.analytics.emergencyResponse'),
-      value: latestScore.emergency_response_score ? (typeof latestScore.emergency_response_score === 'string' ? parseFloat(latestScore.emergency_response_score) : latestScore.emergency_response_score) : 0
-    },
-    {
-      component: isMobile ? t('ilq.analytics.socialShort') : t('ilq.analytics.socialEngagement'),
-      value: latestScore.social_engagement_score ? (typeof latestScore.social_engagement_score === 'string' ? parseFloat(latestScore.social_engagement_score) : latestScore.social_engagement_score) : 0
-    },
+    { component: t('ilq.analytics.healthVitals'), value: latestScore.health_vitals_score ? (typeof latestScore.health_vitals_score === 'string' ? parseFloat(latestScore.health_vitals_score) : latestScore.health_vitals_score) : 0 },
+    { component: t('ilq.analytics.physicalActivity'), value: latestScore.physical_activity_score ? (typeof latestScore.physical_activity_score === 'string' ? parseFloat(latestScore.physical_activity_score) : latestScore.physical_activity_score) : 0 },
+    { component: t('ilq.cognitive'), value: latestScore.cognitive_function_score ? (typeof latestScore.cognitive_function_score === 'string' ? parseFloat(latestScore.cognitive_function_score) : latestScore.cognitive_function_score) : 0 },
+    { component: t('ilq.analytics.environmental'), value: latestScore.environmental_safety_score ? (typeof latestScore.environmental_safety_score === 'string' ? parseFloat(latestScore.environmental_safety_score) : latestScore.environmental_safety_score) : 0 },
+    { component: t('ilq.analytics.emergency'), value: latestScore.emergency_response_score ? (typeof latestScore.emergency_response_score === 'string' ? parseFloat(latestScore.emergency_response_score) : latestScore.emergency_response_score) : 0 },
+    { component: t('ilq.analytics.social'), value: latestScore.social_engagement_score ? (typeof latestScore.social_engagement_score === 'string' ? parseFloat(latestScore.social_engagement_score) : latestScore.social_engagement_score) : 0 },
   ] : [];
 
   return (
@@ -355,6 +311,11 @@ export default function ILQAnalytics() {
             <Button onClick={() => computeILQ(false)} disabled={!selectedPersonId}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isAutoRefreshing ? 'animate-spin' : ''}`} />
               {t('ilq.analytics.computeILQ')}
+            </Button>
+
+            <Button onClick={computeHistoricalILQ} disabled={!selectedPersonId} variant="secondary">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              {t('ilq.analytics.computeHistorical', { defaultValue: 'Calculate Historical' })}
             </Button>
 
             <Button
@@ -431,28 +392,29 @@ export default function ILQAnalytics() {
 
         {selectedPersonId && (
           <Tabs defaultValue="history" className="space-y-4">
-          <TabsList className="flex flex-wrap h-auto gap-1 p-1">
-            <TabsTrigger value="history" className="text-xs sm:text-sm">{t('ilq.analytics.historicalTrends')}</TabsTrigger>
-            <TabsTrigger value="components" className="text-xs sm:text-sm">{t('ilq.analytics.componentBreakdown')}</TabsTrigger>
-            <TabsTrigger value="alerts" className="text-xs sm:text-sm">{t('ilq.analytics.alertsHistory')}</TabsTrigger>
+          <TabsList>
+            <TabsTrigger value="history">{t('ilq.analytics.historicalTrends')}</TabsTrigger>
+            <TabsTrigger value="components">{t('ilq.analytics.componentBreakdown')}</TabsTrigger>
+            <TabsTrigger value="alerts">{t('ilq.analytics.alertsHistory')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="history" className="space-y-4">
             <Card>
               <CardHeader>
-                <div className="space-y-4">
+                <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>{t('ilq.analytics.scoreHistory')}</CardTitle>
                     <CardDescription>{t('ilq.analytics.trackIndependence')}</CardDescription>
                   </div>
                   <Select value={timeRange} onValueChange={setTimeRange}>
-                    <SelectTrigger className="w-[150px]">
+                    <SelectTrigger className="w-[180px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="7">{t('ilq.analytics.last7Days')}</SelectItem>
                       <SelectItem value="30">{t('ilq.analytics.last30Days')}</SelectItem>
                       <SelectItem value="90">{t('ilq.analytics.last90Days')}</SelectItem>
+                      <SelectItem value="all">{t('ilq.analytics.allTime', { defaultValue: 'All Available Data' })}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -550,30 +512,12 @@ export default function ILQAnalytics() {
                 </CardHeader>
                 <CardContent>
                   {radarData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={isMobile ? 400 : 500}>
-                      <RadarChart
-                        data={radarData}
-                        margin={isMobile ? { top: 40, right: 30, bottom: 40, left: 30 } : { top: 20, right: 80, bottom: 20, left: 80 }}
-                      >
+                    <ResponsiveContainer width="100%" height={400}>
+                      <RadarChart data={radarData}>
                         <PolarGrid />
-                        <PolarAngleAxis
-                          dataKey="component"
-                          tick={{ fill: 'hsl(var(--foreground))', fontSize: isMobile ? 10 : 12 }}
-                          tickLine={false}
-                        />
-                        <PolarRadiusAxis
-                          domain={[0, 100]}
-                          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: isMobile ? 8 : 10 }}
-                          axisLine={false}
-                        />
+                        <PolarAngleAxis dataKey="component" />
+                        <PolarRadiusAxis domain={[0, 100]} />
                         <Radar name={t('ilq.score')} dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: 'hsl(var(--card))',
-                            border: '1px solid hsl(var(--border))',
-                            borderRadius: '8px',
-                          }}
-                        />
                       </RadarChart>
                     </ResponsiveContainer>
                   ) : (
@@ -657,6 +601,7 @@ export default function ILQAnalytics() {
           </Tabs>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

@@ -39,7 +39,6 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
   const [modelId, setModelId] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
-  const [generateFakeData, setGenerateFakeData] = useState(false);
   const [showGeofenceAlert, setShowGeofenceAlert] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -94,20 +93,13 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
       return data;
     },
     onSuccess: async (device) => {
-      // Generate sample data only if checkbox is checked
-      if (generateFakeData) {
-        await generateSampleData(device);
-      }
-      
       queryClient.invalidateQueries({ queryKey: ['devices'] });
       queryClient.invalidateQueries({ queryKey: ['device-data'] });
       queryClient.invalidateQueries({ queryKey: ['floor-plan'] });
       queryClient.invalidateQueries({ queryKey: ['position-data'] });
       toast({
         title: t('devices.register.success'),
-        description: generateFakeData
-          ? t('devices.register.successWithData')
-          : t('devices.register.successNoData'),
+        description: t('devices.register.successNoData'),
       });
       // Generate API key for display
       generateApiKey();
@@ -166,38 +158,14 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
         // Special handling for worker-wearable devices
         if (device.device_type === 'worker_wearable') {
           // Import position utilities
-          const { getDefaultFloorPlan, generateIndoorMovementPath } = await import('@/lib/positionUtils');
+          const { generateIndoorMovementPath } = await import('@/lib/positionUtils');
 
-          // Create floor plan if it doesn't exist
-          const { data: existingFloorPlan } = await supabase
-            .from('floor_plans')
-            .select('id')
-            .eq('elderly_person_id', device.elderly_person_id)
-            .maybeSingle();
-
-          let floorPlanId = existingFloorPlan?.id;
-
-          if (!existingFloorPlan) {
-            const defaultFloorPlan = getDefaultFloorPlan(device.elderly_person_id);
-            const { data: newFloorPlan } = await supabase
-              .from('floor_plans')
-              .insert([{
-                ...defaultFloorPlan,
-                furniture: defaultFloorPlan.furniture as any,
-                zones: defaultFloorPlan.zones as any
-              }])
-              .select('*')
-              .single();
-
-            floorPlanId = newFloorPlan?.id;
-          }
-
-          // Fetch the floor plan to generate movement
+          // Check if floor plan exists (required for position data)
           const { data: floorPlan } = await supabase
             .from('floor_plans')
             .select('*')
-            .eq('id', floorPlanId)
-            .single();
+            .eq('elderly_person_id', device.elderly_person_id)
+            .maybeSingle();
 
           if (floorPlan) {
             // Generate 24 hours of indoor movement data
@@ -371,11 +339,29 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
     }
   }, [open]);
 
-  // Reset company and model when device type changes
+  // Reset company and model when device type changes, and auto-populate device name
   useEffect(() => {
     setCompanyId('');
     setModelId('');
-  }, [deviceType]);
+
+    // Auto-populate device name when device type is selected
+    if (deviceType && userElderlyPerson?.full_name) {
+      const selectedType = deviceTypes.find(t => t.code === deviceType);
+      if (selectedType) {
+        // Get device type name (translated if available, otherwise use default name)
+        const deviceTypeName = t(`devices.types.${selectedType.code}`, { defaultValue: '' }) || selectedType.name;
+
+        // Generate initials from device type name
+        const initials = deviceTypeName
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase())
+          .join('');
+
+        // Set device name as "User Name - (INITIALS)"
+        setDeviceName(`${userElderlyPerson.full_name} - (${initials})`);
+      }
+    }
+  }, [deviceType, userElderlyPerson?.full_name, deviceTypes, t]);
 
   // Reset model when company changes
   useEffect(() => {
@@ -391,7 +377,10 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
     setModelId('');
     setApiKey('');
     setShowApiKey(false);
-    setGenerateFakeData(false);
+  };
+
+  const closeDialog = () => {
+    resetForm();
     setOpen(false);
   };
 
@@ -443,17 +432,6 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
         {!showApiKey ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="device-name">{t('devices.register.deviceName')} *</Label>
-              <Input
-                id="device-name"
-                value={deviceName}
-                onChange={(e) => setDeviceName(e.target.value)}
-                placeholder={t('devices.register.deviceNamePlaceholder')}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="device-type">{t('devices.register.deviceType')} *</Label>
               <Select value={deviceType} onValueChange={setDeviceType} required>
                 <SelectTrigger id="device-type">
@@ -474,6 +452,17 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
                   })}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="device-name">{t('devices.register.deviceName')} *</Label>
+              <Input
+                id="device-name"
+                value={deviceName}
+                onChange={(e) => setDeviceName(e.target.value)}
+                placeholder={t('devices.register.deviceNamePlaceholder')}
+                required
+              />
             </div>
 
             {deviceType && deviceCompanies.length > 0 && (
@@ -549,23 +538,6 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
               />
             </div>
 
-            <div className="flex items-center space-x-2 py-2">
-              <Checkbox
-                id="generate-fake-data"
-                checked={generateFakeData}
-                onCheckedChange={(checked) => setGenerateFakeData(checked === true)}
-              />
-              <Label
-                htmlFor="generate-fake-data"
-                className="text-sm font-normal cursor-pointer"
-              >
-                {t('devices.register.generateSampleData')}
-              </Label>
-            </div>
-            <p className="text-xs text-muted-foreground -mt-2">
-              {t('devices.register.generateSampleDataDesc')}
-            </p>
-
             <Button type="submit" className="w-full" disabled={addDeviceMutation.isPending}>
               {addDeviceMutation.isPending ? t('devices.register.registering') : t('devices.register.registerDevice')}
             </Button>
@@ -609,27 +581,14 @@ const DeviceManagement = ({ selectedPersonId }: DeviceManagementProps) => {
               </code>
             </div>
 
-            <div className="space-y-2 text-sm">
-              <p className="font-medium">{t('devices.register.exampleRequest')}</p>
-              <pre className="p-2 bg-muted rounded text-xs overflow-x-auto">
-{`POST /device-ingest
-Headers:
-  Content-Type: application/json
-  Authorization: Bearer ${apiKey}
-
-Body:
-{
-  "device_id": "${deviceId}",
-  "data_type": "heart_rate",
-  "value": { "bpm": 72 },
-  "unit": "bpm"
-}`}
-              </pre>
+            <div className="flex gap-2">
+              <Button onClick={resetForm} className="flex-1">
+                {t('devices.register.registerAnother')}
+              </Button>
+              <Button onClick={closeDialog} variant="outline" className="flex-1">
+                {t('common.close', { defaultValue: 'Close' })}
+              </Button>
             </div>
-
-            <Button onClick={resetForm} className="w-full">
-              {t('devices.register.registerAnother')}
-            </Button>
           </div>
         )}
           </TabsContent>

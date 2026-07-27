@@ -665,7 +665,12 @@ async function handleDeviceDataIngestion(
   if (insertError) {
     console.error('Error inserting device data:', insertError);
     return new Response(
-      JSON.stringify({ error: 'Failed to store device data' }),
+      JSON.stringify({
+        error: 'Failed to store device data',
+        details: insertError.message,
+        code: insertError.code,
+        hint: insertError.hint
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

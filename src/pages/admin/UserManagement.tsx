@@ -8,8 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { UserX, UserCheck, Trash2, Shield } from 'lucide-react';
+import { UserX, UserCheck, Trash2, Shield, Key, Copy, RefreshCw, Database } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface UserProfile {
@@ -27,12 +30,21 @@ export default function UserManagement() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [actionDialog, setActionDialog] = useState<{ open: boolean; action: 'block' | 'unblock' | 'delete' | null; userId: string | null; userName: string | null }>({
+  const [actionDialog, setActionDialog] = useState<{ open: boolean; action: 'block' | 'unblock' | 'delete' | 'delete-data' | null; userId: string | null; userName: string | null }>({
     open: false,
     action: null,
     userId: null,
     userName: null,
   });
+
+  const [passwordDialog, setPasswordDialog] = useState<{ open: boolean; userId: string | null; userName: string | null; email: string | null }>({
+    open: false,
+    userId: null,
+    userName: null,
+    email: null,
+  });
+
+  const [newPassword, setNewPassword] = useState('');
 
   // Redirect if not super admin
   useEffect(() => {
@@ -70,7 +82,7 @@ export default function UserManagement() {
   });
 
   const manageUserMutation = useMutation({
-    mutationFn: async ({ action, userId }: { action: 'block' | 'unblock' | 'delete'; userId: string }) => {
+    mutationFn: async ({ action, userId }: { action: 'block' | 'unblock' | 'delete' | 'delete-data'; userId: string }) => {
       const { data, error } = await supabase.functions.invoke('manage-users', {
         body: { action, userId },
       });
@@ -80,7 +92,7 @@ export default function UserManagement() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['all-users'] });
-      const actionText = variables.action === 'delete' ? 'deleted' : variables.action === 'block' ? 'blocked' : 'unblocked';
+      const actionText = variables.action === 'delete' ? 'deleted' : variables.action === 'block' ? 'blocked' : variables.action === 'unblock' ? 'unblocked' : 'data deleted';
       toast({
         title: 'Success',
         description: `User ${actionText} successfully`,
@@ -96,13 +108,76 @@ export default function UserManagement() {
     },
   });
 
-  const handleAction = (action: 'block' | 'unblock' | 'delete', userId: string, userName: string) => {
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
+      const { data, error } = await supabase.functions.invoke('manage-users', {
+        body: { action: 'reset-password', userId, password },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Success',
+        description: 'Password reset successfully',
+      });
+      setPasswordDialog({ open: false, userId: null, userName: null, email: null });
+      setNewPassword('');
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to reset password',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleAction = (action: 'block' | 'unblock' | 'delete' | 'delete-data', userId: string, userName: string) => {
     setActionDialog({ open: true, action, userId, userName });
   };
 
   const confirmAction = () => {
     if (actionDialog.action && actionDialog.userId) {
       manageUserMutation.mutate({ action: actionDialog.action, userId: actionDialog.userId });
+    }
+  };
+
+  const generatePassword = () => {
+    const length = 12;
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    setNewPassword(password);
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(newPassword);
+      toast({
+        title: 'Copied',
+        description: 'Password copied to clipboard',
+      });
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Failed to copy password',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleResetPassword = (userId: string, userName: string, email: string) => {
+    setPasswordDialog({ open: true, userId, userName, email });
+    generatePassword(); // Auto-generate a password when dialog opens
+  };
+
+  const confirmPasswordReset = () => {
+    if (passwordDialog.userId && newPassword) {
+      resetPasswordMutation.mutate({ userId: passwordDialog.userId, password: newPassword });
     }
   };
 
@@ -125,6 +200,12 @@ export default function UserManagement() {
           title: 'Delete User',
           description: `Are you sure you want to permanently delete ${actionDialog.userName}? This will remove all their data and cannot be undone.`,
           actionText: 'Delete Permanently',
+        };
+      case 'delete-data':
+        return {
+          title: 'Delete User Data',
+          description: `Are you sure you want to delete all device data for ${actionDialog.userName}? This will permanently remove data from device_data, medication_adherence_logs, geofence_events, geofence_places, ilq_alerts, ilq_trends, ilq_scores, and other related tables. This action cannot be undone.`,
+          actionText: 'Delete All Data',
         };
       default:
         return { title: '', description: '', actionText: '' };
@@ -188,9 +269,18 @@ export default function UserManagement() {
                           {new Date(user.created_at).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-wrap">
                             {!isSuperAdmin && (
                               <>
+                                <Button
+                                  size="icon"
+                                  variant="outline"
+                                  onClick={() => handleResetPassword(user.id, user.full_name || user.email, user.email)}
+                                  title="Reset Password"
+                                  className="h-8 w-8"
+                                >
+                                  <Key className="h-4 w-4" />
+                                </Button>
                                 {isBlocked ? (
                                   <Button
                                     size="sm"
@@ -210,6 +300,16 @@ export default function UserManagement() {
                                     Block
                                   </Button>
                                 )}
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleAction('delete-data', user.id, user.full_name || user.email)}
+                                  className="text-orange-600 hover:text-orange-700 border-orange-300 hover:bg-orange-50"
+                                  title="Delete all device data for this user"
+                                >
+                                  <Database className="h-4 w-4 mr-1" />
+                                  Delete Data
+                                </Button>
                                 <Button
                                   size="sm"
                                   variant="destructive"
@@ -242,13 +342,81 @@ export default function UserManagement() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmAction}
-              className={actionDialog.action === 'delete' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
+              className={
+                actionDialog.action === 'delete'
+                  ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                  : actionDialog.action === 'delete-data'
+                  ? 'bg-orange-600 text-white hover:bg-orange-700'
+                  : ''
+              }
             >
               {dialogContent.actionText}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={passwordDialog.open} onOpenChange={(open) => !open && setPasswordDialog({ open: false, userId: null, userName: null, email: null })}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogDescription>
+              Reset password for <strong>{passwordDialog.userName}</strong> ({passwordDialog.email})
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-password">New Password</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="new-password"
+                  type="text"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={generatePassword}
+                  title="Generate Password"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={copyToClipboard}
+                  title="Copy Password"
+                  disabled={!newPassword}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Click the refresh icon to generate a secure password, or enter your own.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setPasswordDialog({ open: false, userId: null, userName: null, email: null })}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmPasswordReset}
+              disabled={!newPassword || resetPasswordMutation.isPending}
+            >
+              {resetPasswordMutation.isPending ? 'Resetting...' : 'Reset Password'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

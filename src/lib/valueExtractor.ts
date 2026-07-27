@@ -102,6 +102,11 @@ export const extractNumericValue = (value: any, dataType?: string): number | nul
       case 'fall_detected':
         if ('detected' in value) return value.detected ? 1 : 0;
         break;
+      case 'bed_pad':
+        // Bed pad can have both pressure and occupancy
+        // Return pressure as the primary numeric value
+        if ('pressure' in value) return value.pressure;
+        break;
     }
   }
 
@@ -198,4 +203,39 @@ export const extractLocation = (value: any): { latitude: number; longitude: numb
   }
 
   return null;
+};
+
+/**
+ * Extracts bed pad values (duration, pressure and occupancy)
+ */
+export const extractBedPadData = (value: any): { duration: number | null; pressure: number | null; occupancy: boolean | null } | null => {
+  if (!value || typeof value !== 'object') return null;
+
+  const result: { duration: number | null; pressure: number | null; occupancy: boolean | null } = {
+    duration: null,
+    pressure: null,
+    occupancy: null,
+  };
+
+  // Extract duration (in minutes)
+  if ('duration' in value && typeof value.duration === 'number') {
+    result.duration = value.duration;
+  }
+
+  // Extract pressure
+  if ('pressure' in value && typeof value.pressure === 'number') {
+    result.pressure = value.pressure;
+  }
+
+  // Extract occupancy
+  if ('occupancy' in value && typeof value.occupancy === 'boolean') {
+    result.occupancy = value.occupancy;
+  }
+
+  // Return null if all fields are missing
+  if (result.duration === null && result.pressure === null && result.occupancy === null) {
+    return null;
+  }
+
+  return result;
 };

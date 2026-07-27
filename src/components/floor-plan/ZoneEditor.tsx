@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas as FabricCanvas, Polygon, Rect, FabricObject, util as fabricUtil, Image as FabricImage } from "fabric";
 import { ZoneDrawingTools, DrawingTool } from "./ZoneDrawingTools";
 import { ZonePropertiesPanel } from "./ZonePropertiesPanel";
 import { FurniturePalette } from "./FurniturePalette";
 import { toast } from "sonner";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Sofa, Layers } from "lucide-react";
+import { Upload, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface Zone {
   id: string;
@@ -33,6 +33,9 @@ interface ZoneEditorProps {
   initialZones?: Zone[];
   initialFurniture?: FurnitureItem[];
   onSave: (zones: Zone[], furniture: FurnitureItem[]) => Promise<void>;
+  onUploadImage?: (file: File) => Promise<void>;
+  onRemoveImage?: () => Promise<void>;
+  isUploadingImage?: boolean;
 }
 
 export function ZoneEditor({
@@ -43,8 +46,12 @@ export function ZoneEditor({
   initialZones = [],
   initialFurniture = [],
   onSave,
+  onUploadImage,
+  onRemoveImage,
+  isUploadingImage = false,
 }: ZoneEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
   const [activeTool, setActiveTool] = useState<DrawingTool>("select");
   const [zones, setZones] = useState<Zone[]>(initialZones);
@@ -55,43 +62,19 @@ export function ZoneEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [history, setHistory] = useState<{ zones: Zone[], furniture: FurnitureItem[] }[]>([{ zones: initialZones, furniture: initialFurniture }]);
   const [historyIndex, setHistoryIndex] = useState(0);
-  const [showFurniturePalette, setShowFurniturePalette] = useState(false);
-  const [showZonesPanel, setShowZonesPanel] = useState(false);
-  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
   const zoneObjectsRef = useRef<Map<string, Polygon>>(new Map());
   const furnitureObjectsRef = useRef<Map<string, FabricObject>>(new Map());
   const isModifyingRef = useRef(false);
   const backgroundImageRef = useRef<FabricImage | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Calculate responsive canvas size
-  useEffect(() => {
-    const updateCanvasSize = () => {
-      if (containerRef.current) {
-        const containerWidth = containerRef.current.clientWidth - 32; // padding
-        const isMobile = window.innerWidth < 768;
-
-        if (isMobile) {
-          // On mobile, fit to container width
-          const aspectRatio = floorPlanHeight / floorPlanWidth;
-          const width = Math.min(containerWidth, 600);
-          const height = width * aspectRatio;
-          setCanvasSize({ width: Math.floor(width), height: Math.floor(Math.min(height, 400)) });
-        } else {
-          // On desktop, use larger fixed size
-          setCanvasSize({ width: 800, height: 600 });
-        }
-      }
-    };
-
-    updateCanvasSize();
-    window.addEventListener('resize', updateCanvasSize);
-    return () => window.removeEventListener('resize', updateCanvasSize);
-  }, [floorPlanWidth, floorPlanHeight]);
-
-  const CANVAS_WIDTH = canvasSize.width;
-  const CANVAS_HEIGHT = canvasSize.height;
-  const SCALE = Math.min(CANVAS_WIDTH / floorPlanWidth, CANVAS_HEIGHT / floorPlanHeight);
+  // Calculate canvas size based on floor plan dimensions and grid
+  // Each grid cell = 60 pixels (square)
+  const PIXELS_PER_CELL = 60;
+  const gridCellsWidth = floorPlanWidth / gridSize;
+  const gridCellsHeight = floorPlanHeight / gridSize;
+  const CANVAS_WIDTH = gridCellsWidth * PIXELS_PER_CELL;
+  const CANVAS_HEIGHT = gridCellsHeight * PIXELS_PER_CELL;
+  const SCALE = PIXELS_PER_CELL / gridSize; // pixels per meter
 
   // Sync state with initialZones/initialFurniture when they change (e.g., after save/reload)
   useEffect(() => {
@@ -106,13 +89,6 @@ export function ZoneEditor({
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    // Dispose existing canvas if any
-    if (fabricCanvas) {
-      fabricCanvas.dispose();
-      zoneObjectsRef.current.clear();
-      furnitureObjectsRef.current.clear();
-    }
-
     const canvas = new FabricCanvas(canvasRef.current, {
       width: CANVAS_WIDTH,
       height: CANVAS_HEIGHT,
@@ -125,7 +101,7 @@ export function ZoneEditor({
     return () => {
       canvas.dispose();
     };
-  }, [CANVAS_WIDTH, CANVAS_HEIGHT]);
+  }, []);
 
   // Load background image
   useEffect(() => {
@@ -151,25 +127,32 @@ export function ZoneEditor({
       .then((img) => {
         if (!fabricCanvas || !img) return;
 
-        // Calculate scale to fit image within canvas while maintaining aspect ratio
+        // Scale image to cover the entire canvas (fill) while maintaining aspect ratio
         const imgAspectRatio = (img.width || 1) / (img.height || 1);
         const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
 
-        let scale;
+        let imgScale;
+        let left = 0;
+        let top = 0;
+
         if (imgAspectRatio > canvasAspectRatio) {
-          // Image is wider than canvas
-          scale = CANVAS_WIDTH / (img.width || 1);
+          // Image is wider than canvas - scale to canvas width and center vertically
+          imgScale = CANVAS_WIDTH / (img.width || 1);
+          const scaledHeight = (img.height || 1) * imgScale;
+          top = (CANVAS_HEIGHT - scaledHeight) / 2;
         } else {
-          // Image is taller than canvas
-          scale = CANVAS_HEIGHT / (img.height || 1);
+          // Image is taller than canvas - scale to canvas height and center horizontally
+          imgScale = CANVAS_HEIGHT / (img.height || 1);
+          const scaledWidth = (img.width || 1) * imgScale;
+          left = (CANVAS_WIDTH - scaledWidth) / 2;
         }
 
         // Set image properties
         img.set({
-          scaleX: scale,
-          scaleY: scale,
-          left: 0,
-          top: 0,
+          scaleX: imgScale,
+          scaleY: imgScale,
+          left: left,
+          top: top,
           selectable: false,
           evented: false,
           opacity: 0.7,
@@ -200,11 +183,9 @@ export function ZoneEditor({
     if (!fabricCanvas) return;
 
     const gridSpacing = gridSize * SCALE;
-
-    const handleAfterRender = () => {
-      const ctx = fabricCanvas.getContext();
-      if (!ctx) return;
-
+    const ctx = fabricCanvas.getContext();
+    
+    fabricCanvas.on('after:render', () => {
       ctx.strokeStyle = '#e0e0e0';
       ctx.lineWidth = 1;
 
@@ -223,15 +204,10 @@ export function ZoneEditor({
         ctx.lineTo(CANVAS_WIDTH, y);
         ctx.stroke();
       }
-    };
+    });
 
-    fabricCanvas.on('after:render', handleAfterRender);
     fabricCanvas.renderAll();
-
-    return () => {
-      fabricCanvas.off('after:render', handleAfterRender);
-    };
-  }, [fabricCanvas, gridSize, SCALE, CANVAS_WIDTH, CANVAS_HEIGHT]);
+  }, [fabricCanvas, gridSize]);
 
   // Render zones and furniture on canvas - smart update instead of full recreate
   useEffect(() => {
@@ -328,21 +304,22 @@ export function ZoneEditor({
       const existingFurniture = furnitureObjectsRef.current.get(item.id);
 
       const colors = {
-        bed: '#ef4444',
-        chair: '#f59e0b',
-        table: '#84cc16',
-        sofa: '#06b6d4',
-        desk: '#8b5cf6',
-        toilet: '#ec4899',
-        sink: '#14b8a6',
-        door: '#6b7280',
+        bed: '#F4A6A6',
+        chair: '#F2C94C',
+        table: '#9CCC65',
+        sofa: '#6ED3CF',
+        desk: '#B39DDB',
+        toilet: '#FFB6B6',
+        sink: '#81D4FA',
+        door: '#6B7280',
       };
 
       if (!existingFurniture) {
         // Create new furniture with exact coordinates
+        // Use center origin for consistent rotation handling (like zones)
         const furnitureObj = new Rect({
-          left: item.x * SCALE,
-          top: item.y * SCALE,
+          left: (item.x + item.width / 2) * SCALE,
+          top: (item.y + item.height / 2) * SCALE,
           width: item.width * SCALE,
           height: item.height * SCALE,
           fill: colors[item.type] + '80',
@@ -356,6 +333,8 @@ export function ZoneEditor({
           ry: 4,
           scaleX: 1,
           scaleY: 1,
+          originX: 'center',
+          originY: 'center',
         });
 
         furnitureObj.set('data', { furnitureId: item.id, type: 'furniture', furnitureType: item.type });
@@ -393,11 +372,12 @@ export function ZoneEditor({
         };
 
         const dim = dimensions[selectedFurnitureType];
+        // Store as top-left coordinates, but place centered at click position
         const newFurniture: FurnitureItem = {
           id: `furniture_${Date.now()}`,
           type: selectedFurnitureType,
-          x: pointer.x / SCALE,
-          y: pointer.y / SCALE,
+          x: pointer.x / SCALE - dim.width / 2,
+          y: pointer.y / SCALE - dim.height / 2,
           width: dim.width,
           height: dim.height,
           rotation: 0,
@@ -406,6 +386,8 @@ export function ZoneEditor({
         const newState = { zones, furniture: [...furniture, newFurniture] };
         addToHistory(newState);
         setFurniture(newState.furniture);
+        setActiveTool("select");
+        setSelectedFurnitureType(null);
         toast.success(`${selectedFurnitureType} placed`);
       } else if (activeTool === "rectangle") {
         const pointer = fabricCanvas.getPointer(e.e);
@@ -532,15 +514,20 @@ export function ZoneEditor({
       } else if (target.data.type === 'furniture' && target.data.furnitureId) {
         const furnitureId = target.data.furnitureId;
 
+        // Calculate width and height accounting for scaling
+        const actualWidth = ((target.width || 0) * (target.scaleX || 1)) / SCALE;
+        const actualHeight = ((target.height || 0) * (target.scaleY || 1)) / SCALE;
+
         // Extract new position, dimensions, and rotation
+        // Convert from center origin (Fabric.js) to top-left origin (database storage)
         const updatedFurniture = furniture.map(item =>
           item.id === furnitureId
             ? {
                 ...item,
-                x: (target.left || 0) / SCALE,
-                y: (target.top || 0) / SCALE,
-                width: ((target.width || 0) * (target.scaleX || 1)) / SCALE,
-                height: ((target.height || 0) * (target.scaleY || 1)) / SCALE,
+                x: (target.left || 0) / SCALE - actualWidth / 2,
+                y: (target.top || 0) / SCALE - actualHeight / 2,
+                width: actualWidth,
+                height: actualHeight,
                 rotation: target.angle || 0,
               }
             : item
@@ -666,6 +653,28 @@ export function ZoneEditor({
     }
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onUploadImage) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error("Please select a valid image file");
+        return;
+      }
+      onUploadImage(file);
+    }
+    // Reset input so the same file can be selected again if needed
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveClick = () => {
+    if (onRemoveImage && confirm("Are you sure you want to remove the background image?")) {
+      onRemoveImage();
+    }
+  };
+
   return (
     <div className="flex flex-col h-full">
       <ZoneDrawingTools
@@ -680,84 +689,67 @@ export function ZoneEditor({
         isSaving={isSaving}
       />
 
-      {/* Mobile toggle buttons */}
-      <div className="flex md:hidden items-center gap-2 p-2 border-b bg-card">
-        <Sheet open={showFurniturePalette} onOpenChange={setShowFurniturePalette}>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="flex-1">
-              <Sofa className="h-4 w-4 mr-2" />
-              Furniture
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[280px] p-0">
-            <SheetHeader className="p-4 border-b">
-              <SheetTitle>Furniture</SheetTitle>
-            </SheetHeader>
-            <FurniturePalette
-              selectedType={selectedFurnitureType}
-              onSelectType={(type) => {
-                setSelectedFurnitureType(type);
-                setActiveTool("furniture");
-                setShowFurniturePalette(false);
-              }}
-              isActive={activeTool === "furniture"}
-              isMobile={true}
-            />
-          </SheetContent>
-        </Sheet>
-
-        <Sheet open={showZonesPanel} onOpenChange={setShowZonesPanel}>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="flex-1">
-              <Layers className="h-4 w-4 mr-2" />
-              Zones ({zones.length})
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] p-0">
-            <ZonePropertiesPanel
-              zones={zones}
-              selectedZoneId={selectedZoneId}
-              onZoneSelect={(id) => {
-                setSelectedZoneId(id);
-                setShowZonesPanel(false);
-              }}
-              onZoneUpdate={handleZoneUpdate}
-              onZoneDelete={handleZoneDelete}
-              isMobile={true}
-            />
-          </SheetContent>
-        </Sheet>
-      </div>
-
       <div className="flex flex-1 overflow-hidden">
-        {/* Desktop furniture palette */}
-        <div className="hidden md:block">
-          <FurniturePalette
-            selectedType={selectedFurnitureType}
-            onSelectType={(type) => {
-              setSelectedFurnitureType(type);
-              setActiveTool("furniture");
-            }}
-            isActive={activeTool === "furniture"}
-          />
-        </div>
+        <FurniturePalette
+          selectedType={selectedFurnitureType}
+          onSelectType={(type) => {
+            setSelectedFurnitureType(type);
+            setActiveTool("furniture");
+          }}
+          isActive={activeTool === "furniture"}
+        />
 
-        <div ref={containerRef} className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-auto">
-          <div className="border rounded-lg shadow-lg overflow-hidden">
-            <canvas ref={canvasRef} />
+        <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
+          <div className="relative max-w-full">
+            <div className="border rounded-lg shadow-lg overflow-hidden" style={{ maxWidth: '100%', maxHeight: '70vh' }}>
+              <canvas ref={canvasRef} style={{ maxWidth: '100%', maxHeight: '70vh', width: 'auto', height: 'auto', display: 'block' }} />
+            </div>
+
+            {/* Image controls */}
+            <div className="absolute top-4 right-4 flex gap-2">
+              {imageUrl ? (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={handleRemoveClick}
+                  disabled={isUploadingImage}
+                  title="Remove background image"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Remove Image
+                </Button>
+              ) : (
+                <>
+                  <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingImage}
+                    title="Add background image"
+                  >
+                    <Upload className="h-4 w-4 mr-1" />
+                    {isUploadingImage ? "Uploading..." : "Add Image"}
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Desktop zones panel */}
-        <div className="hidden md:block">
-          <ZonePropertiesPanel
-            zones={zones}
-            selectedZoneId={selectedZoneId}
-            onZoneSelect={setSelectedZoneId}
-            onZoneUpdate={handleZoneUpdate}
-            onZoneDelete={handleZoneDelete}
-          />
-        </div>
+        <ZonePropertiesPanel
+          zones={zones}
+          selectedZoneId={selectedZoneId}
+          onZoneSelect={setSelectedZoneId}
+          onZoneUpdate={handleZoneUpdate}
+          onZoneDelete={handleZoneDelete}
+        />
       </div>
     </div>
   );

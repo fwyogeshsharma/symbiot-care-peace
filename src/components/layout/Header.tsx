@@ -1,13 +1,28 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Activity, LogOut, User, Wifi, Menu, ArrowLeft, MapPin, Settings, Shield, AlertTriangle, HelpCircle, HeartPulse, FileText, LayoutDashboard, ChevronDown, FileBarChart, Lightbulb, Share2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { HelpPanel } from '@/components/help/HelpPanel';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -16,11 +31,39 @@ interface HeaderProps {
 }
 
 const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
-  const { userRole, signOut } = useAuth();
+  const { user, userRole, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [helpPanelOpen, setHelpPanelOpen] = useState(false);
   const { t } = useTranslation();
+
+  // Fetch user profile data
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   // Keyboard shortcut to open help panel (F1)
   useEffect(() => {
@@ -66,77 +109,276 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const isVitalMenuActive = () => {
+    return isActive('/health') || isActive('/movement-dashboard');
+  };
+
+  const isInsightMenuActive = () => {
+    return isActive('/tracking') || isActive('/reports') || isActive('/alerts');
+  };
+
+  const isSettingsMenuActive = () => {
+    return isActive('/device-status') || isActive('/profile') || isActive('/data-sharing');
+  };
+
   const NavButtons = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
       <Button
-        data-tour="nav-health"
+        data-tour="nav-dashboard"
         variant={isActive('/dashboard') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/dashboard')}
         className={cn(isMobile && 'w-full justify-start')}
       >
-        <HeartPulse className="w-4 h-4 mr-2" />
-        {t('nav.health')}
+        <LayoutDashboard className="w-4 h-4 mr-2" />
+        {t('nav.dashboard')}
       </Button>
+
+      {/* Vital Dropdown - Desktop Only */}
+      {!isMobile ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              data-tour="nav-vital"
+              variant={isVitalMenuActive() ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-1"
+            >
+              <HeartPulse className="w-4 h-4 mr-2" />
+              {t('nav.vital', { defaultValue: 'Vital' })}
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem
+              onClick={() => navigate('/health')}
+              className="cursor-pointer"
+            >
+              <HeartPulse className="w-4 h-4 mr-2" />
+              {t('nav.health')}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => navigate('/movement-dashboard')}
+              className="cursor-pointer"
+            >
+              <Activity className="w-4 h-4 mr-2" />
+              {t('nav.movement')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        /* Mobile - Show items separately */
+        <>
+          <Button
+            data-tour="nav-health"
+            variant={isActive('/health') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/health')}
+            className="w-full justify-start"
+          >
+            <HeartPulse className="w-4 h-4 mr-2" />
+            {t('nav.health')}
+          </Button>
+          <Button
+            data-tour="nav-activity"
+            variant={isActive('/movement-dashboard') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/movement-dashboard')}
+            className="w-full justify-start"
+          >
+            <Activity className="w-4 h-4 mr-2" />
+            {t('nav.movement')}
+          </Button>
+        </>
+      )}
+
+      {/* Insight Dropdown - Desktop Only */}
+      {!isMobile ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              data-tour="nav-insight"
+              variant={isInsightMenuActive() ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-1"
+            >
+              <Lightbulb className="w-4 h-4 mr-2" />
+              {t('nav.insights', { defaultValue: 'Insights' })}
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem
+              onClick={() => navigate('/tracking')}
+              className="cursor-pointer"
+            >
+              <MapPin className="w-4 h-4 mr-2" />
+              {t('nav.mobility', { defaultValue: 'Mobility' })}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => navigate('/reports')}
+              className="cursor-pointer"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              {t('nav.reports')}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => navigate('/alerts')}
+              className="cursor-pointer"
+            >
+              <AlertTriangle className="w-4 h-4 mr-2" />
+              {t('nav.alerts')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        /* Mobile - Show items separately */
+        <>
+          <Button
+            data-tour="nav-tracking"
+            variant={isActive('/tracking') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/tracking')}
+            className="w-full justify-start"
+          >
+            <MapPin className="w-4 h-4 mr-2" />
+            {t('nav.mobility', { defaultValue: 'Mobility' })}
+          </Button>
+          <Button
+            data-tour="nav-reports"
+            variant={isActive('/reports') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/reports')}
+            className="w-full justify-start"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            {t('nav.reports')}
+          </Button>
+          <Button
+            data-tour="nav-alerts"
+            variant={isActive('/alerts') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/alerts')}
+            className="w-full justify-start"
+          >
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            {t('nav.alerts')}
+          </Button>
+        </>
+      )}
+
+      {/* Settings Dropdown - Desktop Only */}
+      {!isMobile ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              data-tour="nav-settings"
+              variant={isSettingsMenuActive() ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-1"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              {t('nav.settings', { defaultValue: 'Settings' })}
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem
+              onClick={() => navigate('/device-status')}
+              className="cursor-pointer"
+            >
+              <Wifi className="w-4 h-4 mr-2" />
+              {t('nav.devices')}
+            </DropdownMenuItem>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuItem
+                    onClick={() => userRole !== 'caregiver' && navigate('/data-sharing')}
+                    className={userRole === 'caregiver' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
+                    disabled={userRole === 'caregiver'}
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    {t('nav.dataSharing')}
+                  </DropdownMenuItem>
+                </TooltipTrigger>
+                {userRole === 'caregiver' && (
+                  <TooltipContent>
+                    <p>{t('nav.caregiverDataSharingDisabled', { defaultValue: 'Caregivers do not have access to share data' })}</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        /* Mobile - Show items separately */
+        <>
+          <Button
+            data-tour="nav-devices"
+            variant={isActive('/device-status') ? 'default' : 'ghost'}
+            size="default"
+            onClick={() => navigate('/device-status')}
+            className="w-full justify-start"
+          >
+            <Wifi className="w-4 h-4 mr-2" />
+            {t('nav.devices')}
+          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={isActive('/data-sharing') ? 'default' : 'ghost'}
+                  size="default"
+                  onClick={() => userRole !== 'caregiver' && navigate('/data-sharing')}
+                  className={`w-full justify-start ${userRole === 'caregiver' ? 'cursor-not-allowed opacity-50' : ''}`}
+                  disabled={userRole === 'caregiver'}
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  {t('nav.dataSharing')}
+                </Button>
+              </TooltipTrigger>
+              {userRole === 'caregiver' && (
+                <TooltipContent>
+                  <p>{t('nav.caregiverDataSharingDisabled', { defaultValue: 'Caregivers do not have access to share data' })}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+        </>
+      )}
       <Button
-        data-tour="nav-activity"
-        variant={isActive('/movement-dashboard') ? 'default' : 'ghost'}
+        variant="ghost"
         size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/movement-dashboard')}
-        className={cn(isMobile && 'w-full justify-start')}
+        onClick={() => setHelpPanelOpen(true)}
+        className={cn(isMobile ? 'w-full justify-start' : 'gap-2')}
+        title="Help & Support (F1)"
       >
-        <Activity className="w-4 h-4 mr-2" />
-        {t('nav.movement')}
-      </Button>
-      <Button
-        data-tour="nav-tracking"
-        variant={isActive('/tracking') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/tracking')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <MapPin className="w-4 h-4 mr-2" />
-        {t('nav.tracking')}
-      </Button>
-      <Button
-        data-tour="nav-devices"
-        variant={isActive('/device-status') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/device-status')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <Wifi className="w-4 h-4 mr-2" />
-        {t('nav.devices')}
-      </Button>
-      <Button
-        data-tour="nav-reports"
-        variant={isActive('/reports') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/reports')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <FileText className="w-4 h-4 mr-2" />
-        {t('nav.reports')}
-      </Button>
-      <Button
-        data-tour="nav-alerts"
-        variant={isActive('/alerts') ? 'default' : 'ghost'}
-        size={isMobile ? 'default' : 'sm'}
-        onClick={() => navigate('/alerts')}
-        className={cn(isMobile && 'w-full justify-start')}
-      >
-        <AlertTriangle className="w-4 h-4 mr-2" />
-        {t('nav.alerts')}
+        <HelpCircle className="w-4 h-4 mr-2" />
+        {isMobile ? (
+          <span>{t('nav.help')}</span>
+        ) : (
+          <span className="hidden xl:inline">{t('nav.help')}</span>
+        )}
       </Button>
       <Button
         data-tour="user-menu"
         variant={isActive('/profile') ? 'default' : 'ghost'}
         size={isMobile ? 'default' : 'sm'}
         onClick={() => navigate('/profile')}
-        className={cn(isMobile && 'w-full justify-start')}
+        className={cn(isMobile ? 'w-full justify-start' : 'gap-2')}
       >
-        <User className="w-4 h-4 mr-2" />
-        {t('nav.profile')}
+        <Avatar className={cn("w-6 h-6 bg-white", isMobile && "mr-2")}>
+          <AvatarImage src={userProfile?.avatar_url || undefined} alt={userProfile?.full_name || 'User'} className="bg-white" />
+          <AvatarFallback className="bg-primary/10 text-primary text-xs">
+            {getInitials(userProfile?.full_name)}
+          </AvatarFallback>
+        </Avatar>
+        {isMobile ? (
+          <span>{userProfile?.full_name || t('nav.profile')}</span>
+        ) : (
+          <span className="hidden xl:inline">{userProfile?.full_name || t('nav.profile')}</span>
+        )}
       </Button>
     </>
   );
@@ -159,7 +401,13 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
                 <span className="hidden sm:inline ml-2">{t('profile.back')}</span>
               </Button>
             )}
-            <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
+            <Activity
+              className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0 cursor-pointer"
+              onMouseEnter={() => {
+                const audio = new Audio('/symbiotVoice.mp3');
+                audio.play().catch(err => console.log('Audio play failed:', err));
+              }}
+            />
             <Button
               data-tour="nav-dashboard"
               variant="ghost"
@@ -186,16 +434,6 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
               </Badge>
             )}
             <NavButtons />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setHelpPanelOpen(true)}
-              className="gap-2"
-              title="Help & Support (F1)"
-            >
-              <HelpCircle className="w-4 h-4" />
-              <span className="hidden xl:inline">{t('nav.help')}</span>
-            </Button>
           </div>
 
           {/* Right side - Mobile/Tablet */}
@@ -205,14 +443,6 @@ const Header = ({ showBackButton = false, title, subtitle }: HeaderProps) => {
                 {t(`auth.roles.${userRole}`, { defaultValue: userRole })}
               </Badge>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setHelpPanelOpen(true)}
-              title="Help & Support"
-            >
-              <HelpCircle className="w-5 h-5" />
-            </Button>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm">
