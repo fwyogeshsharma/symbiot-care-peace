@@ -14,7 +14,8 @@
     "cap:android": "npx cap open android",
     "cap:ios": "npx cap open ios",
     "cap:run:android": "npx cap run android",
-    "cap:run:ios": "npx cap run ios"
+    "cap:run:ios": "npx cap run ios",
+    "android": "npm run build && npx cap sync android && node scripts/run-android.mjs"
   },
   "dependencies": {
     "@capacitor-community/bluetooth-le": "^7.3.2",
