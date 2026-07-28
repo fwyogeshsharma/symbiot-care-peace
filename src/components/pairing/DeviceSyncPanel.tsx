@@ -16,6 +16,9 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { usePlatform } from '@/hooks/usePlatform';
 import { useDeviceSync, type DeviceSyncStatus } from '@/hooks/useDeviceSync';
+import { BackgroundSyncSettings } from './BackgroundSyncSettings';
+import { HealthSourcePicker } from './HealthSourcePicker';
+import { HealthPermissionsPanel } from './HealthPermissionsPanel';
 
 const HEALTH_CONNECT_PLAY_STORE_URL = 'market://details?id=com.google.android.apps.healthdata';
 
@@ -47,6 +50,7 @@ export const DeviceSyncPanel = ({ selectedPersonId }: DeviceSyncPanelProps) => {
     statusByDevice,
     healthConnectStatusByDevice,
     isSyncingAll,
+    lastSyncedAt,
     syncOne,
     syncAll,
     syncOneViaHealthConnect,
@@ -59,7 +63,7 @@ export const DeviceSyncPanel = ({ selectedPersonId }: DeviceSyncPanelProps) => {
 
       const { data, error } = await supabase
         .from('devices')
-        .select('id, device_name, elderly_person_id, ble_device_id, last_sync')
+        .select('id, device_name, elderly_person_id, ble_device_id, last_sync, health_source')
         .eq('elderly_person_id', selectedPersonId)
         .order('created_at', { ascending: false });
 
@@ -68,6 +72,14 @@ export const DeviceSyncPanel = ({ selectedPersonId }: DeviceSyncPanelProps) => {
     },
     enabled: !!selectedPersonId,
   });
+
+  // Which device owns each Health Connect source, so the picker can mark the rest taken.
+  // A source feeds exactly one device — sharing it is what duplicated the readings.
+  const takenBy = Object.fromEntries(
+    devices
+      .filter((device) => device.health_source)
+      .map((device) => [device.health_source as string, device.device_name])
+  );
 
   const statusLabel = (status: DeviceSyncStatus | undefined) => {
     switch (status) {
@@ -97,10 +109,26 @@ export const DeviceSyncPanel = ({ selectedPersonId }: DeviceSyncPanelProps) => {
           </div>
         )}
 
+        {lastSyncedAt && (
+          <div className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/10 p-3 text-sm">
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
+            <span className="text-muted-foreground">
+              {t('devices.sync.showingDataSince', {
+                time: lastSyncedAt.toLocaleString(),
+                defaultValue: 'Showing data synced at {{time}}',
+              })}
+            </span>
+          </div>
+        )}
+
         {devices.length === 0 ? (
           <p className="text-sm text-muted-foreground py-4 text-center">{t('devices.sync.noDevices')}</p>
         ) : (
           <>
+            <HealthPermissionsPanel />
+
+            <BackgroundSyncSettings devices={devices} />
+
             <Button
               className="w-full"
               disabled={!isNative || isSyncingAll}
@@ -156,23 +184,45 @@ export const DeviceSyncPanel = ({ selectedPersonId }: DeviceSyncPanelProps) => {
                             </TooltipContent>
                           </Tooltip>
                           <Tooltip>
+                            {/* span wrapper: a disabled button fires no pointer events, so
+                                Radix would never show the tooltip explaining why. */}
                             <TooltipTrigger asChild>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                disabled={!isNative || isBusy || isSyncingAll}
-                                onClick={() => syncOneViaHealthConnect(device)}
-                              >
-                                {isBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <HeartPulse className="h-4 w-4" />}
-                              </Button>
+                              <span>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  disabled={!isNative || isBusy || isSyncingAll || !device.health_source}
+                                  onClick={() => syncOneViaHealthConnect(device)}
+                                >
+                                  {isBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <HeartPulse className="h-4 w-4" />}
+                                </Button>
+                              </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>{t('devices.sync.healthConnect.tooltip')}</p>
+                              <p>
+                                {device.health_source
+                                  ? t('devices.sync.healthConnect.tooltip')
+                                  : t(
+                                      'devices.sync.healthSource.unmappedWarning',
+                                      'Pick the app that publishes this device to sync it from Health Connect.'
+                                    )}
+                              </p>
                             </TooltipContent>
                           </Tooltip>
                         </div>
                       </TooltipProvider>
                     </div>
+
+                    {isNative && !hcNotInstalled && (
+                      <HealthSourcePicker
+                        deviceId={device.id}
+                        deviceName={device.device_name}
+                        value={device.health_source}
+                        takenBy={takenBy}
+                        personId={selectedPersonId}
+                        disabled={isBusy || isSyncingAll}
+                      />
+                    )}
 
                     {hcNotInstalled && (
                       <div className="flex items-center justify-between gap-2 rounded-md bg-warning/10 border border-warning/30 p-2 text-xs">

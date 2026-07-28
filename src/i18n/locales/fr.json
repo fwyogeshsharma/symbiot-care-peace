@@ -8,8 +8,6 @@
     "edit": "Modifier",
     "add": "Ajouter",
     "close": "Fermer",
-    "expand": "Agrandir",
-    "minimize": "Réduire",
     "search": "Rechercher",
     "filter": "Filtrer",
     "export": "Exporter",
@@ -21,7 +19,9 @@
     "confirm": "Confirmer",
     "yes": "Oui",
     "no": "Non",
-    "copyright": "© 2025 SymBIoT. Tous droits réservés. Tranquillité d'esprit pour vos proches."
+    "copyright": "© 2025 SymBIoT. Tous droits réservés. Tranquillité d'esprit pour vos proches.",
+    "expand": "Agrandir",
+    "minimize": "Réduire"
   },
   "dataTypes": {
     "power_consumption": "Consommation d'Énergie",
@@ -291,6 +291,17 @@
         "Missed morning dose": "Dose du matin manquée",
         "Missed afternoon dose": "Dose de l'après-midi manquée"
       }
+    },
+    "notifications": {
+      "enableReminders": "Activer les rappels",
+      "disableReminders": "Désactiver les rappels",
+      "reminderTitle": "Rappel de médicament",
+      "reminderBody": "Il est temps de prendre {{name}} {{dosage}}",
+      "scheduled": "Rappels de médicaments programmés",
+      "cancelled": "Rappels de médicaments annulés",
+      "notEnabled": "Les notifications ne sont pas activées",
+      "noSchedules": "Aucun horaire de médicament actif à rappeler",
+      "error": "Échec de la programmation des rappels"
     }
   },
   "dataSharing": {
@@ -376,16 +387,13 @@
   "nav": {
     "home": "Accueil",
     "dashboard": "Tableau de bord",
-    "vital": "Vital",
     "health": "Santé",
-    "insights": "Informations",
     "profile": "Profil",
     "alerts": "Alertes",
     "reports": "Rapports",
     "tracking": "Suivi",
     "devices": "Appareils",
     "dataSharing": "Partage de données",
-    "caregiverDataSharingDisabled": "Les soignants n'ont pas accès au partage de données",
     "movement": "Activité",
     "floorPlans": "Plans d'étage",
     "analytics": "Analytique",
@@ -398,7 +406,10 @@
     "signOut": "Déconnexion",
     "signIn": "Connexion",
     "getStarted": "Commencer",
-    "help": "Aide"
+    "help": "Aide",
+    "vital": "Vital",
+    "insights": "Informations",
+    "caregiverDataSharingDisabled": "Les soignants n'ont pas accès au partage de données"
   },
   "index": {
     "tagline": "Tranquillité d'esprit",
@@ -1165,12 +1176,66 @@
       "deleteExpired": "Supprimer la Demande Expirée",
       "deleted": "Demande d'appairage supprimée",
       "deleteFailed": "Échec de la suppression de la demande d'appairage"
+    },
+    "sync": {
+      "title": "Synchroniser les Appareils",
+      "description": "Synchronisez vos appareils de fitness connectés via Bluetooth pour récupérer leurs dernières mesures.",
+      "syncAll": "Synchroniser Tous les Appareils",
+      "syncOne": "Synchroniser",
+      "statusIdle": "Pas encore synchronisé",
+      "statusScanning": "Recherche de l'appareil...",
+      "statusConnecting": "Connexion...",
+      "statusSyncing": "Synchronisation...",
+      "statusSuccess": "Synchronisé",
+      "statusUnsupported": "Aucune donnée disponible pour cet appareil",
+      "statusFailed": "Échec de la synchronisation",
+      "lastSynced": "Dernière synchronisation : {{time}}",
+      "webNotSupported": "La synchronisation Bluetooth nécessite l'application mobile installée et ne fonctionne pas dans un navigateur.",
+      "noDevices": "Aucun appareil à synchroniser pour le moment. Enregistrez d'abord un appareil.",
+      "healthConnect": {
+        "tooltip": "Synchroniser depuis Health Connect",
+        "notInstalled": "Health Connect n'est pas installé, les données d'applications comme Zepp ne peuvent donc pas encore être transmises.",
+        "installAction": "Installer Health Connect"
+      },
+      "healthSource": {
+        "label": "Source Health Connect",
+        "none": "Non défini",
+        "recordCount": "{{count}} relevés",
+        "takenBy": "utilisée par {{device}}",
+        "saved": "{{device}} se synchronise désormais depuis {{source}}",
+        "cleared": "{{device}} ne se synchronise plus depuis Health Connect",
+        "alreadyTaken": "{{source}} est déjà attribuée à un autre appareil. Libérez-la d'abord.",
+        "unmappedWarning": "Choisissez l'application qui publie cet appareil pour le synchroniser depuis Health Connect.",
+        "noSources": "Aucune application n'a encore écrit de données de santé. Ouvrez l'application de la montre et laissez-la se synchroniser avec Health Connect."
+      },
+      "permissions": {
+        "title": "Mesures Health Connect",
+        "summary": "{{granted}} mesures autorisées sur {{total}}",
+        "granted": "{{granted}} mesures autorisées sur {{total}}",
+        "blocked": "Pas encore autorisées :",
+        "andMore": " et {{count}} de plus",
+        "allowAll": "Autoriser toutes les mesures",
+        "failed": "Impossible d'ouvrir l'écran des autorisations Health Connect"
+      },
+      "background": {
+        "title": "Synchronisation en arrière-plan",
+        "description": "Synchronise environ toutes les {{minutes}} minutes lorsque l'application est fermée. Android n'autorise pas d'intervalle plus court.",
+        "enabled": "La synchronisation en arrière-plan s'exécute environ toutes les {{minutes}} minutes",
+        "disabled": "Synchronisation en arrière-plan désactivée",
+        "configureFailed": "Impossible de configurer la synchronisation en arrière-plan",
+        "enableFailed": "Impossible d'activer la synchronisation en arrière-plan",
+        "queued": "Synchronisation en arrière-plan en file d'attente",
+        "runNow": "Exécuter maintenant",
+        "lastRun": "Dernière synchronisation en arrière-plan {{time}}",
+        "notRunYet": "Pas encore exécutée",
+        "needsBackgroundPermission": "Autorisez Health Connect à lire les données en arrière-plan, sinon la synchronisation ne fonctionnera que lorsque l'application est ouverte."
+      }
     }
   },
   "tracking": {
-    "title": "Mobilité",
+    "title": "Suivi",
     "subtitle": "Système de positionnement intérieur et extérieur",
-    "movementTracking": "Surveillance de Mouvement",
+    "movementTracking": "Suivi des Mouvements",
     "realTimePositioning": "Positionnement intérieur et extérieur en temps réel",
     "location": "Position Actuelle",
     "indoor": "Intérieur",
@@ -1191,8 +1256,8 @@
     "last7Days": "7 Derniers Jours",
     "last30Days": "30 Derniers Jours",
     "noFloorPlan": {
-      "title": "Ajouter un Plan d'Étage",
-      "description": "Veuillez ajouter un plan d'étage pour activer le suivi intérieur"
+      "title": "Aucun Plan d'Étage Trouvé",
+      "description": "Enregistrez un appareil portable pour voir le suivi intérieur"
     },
     "noGpsData": {
       "title": "Aucune Donnée GPS ni Géorepérage",
@@ -1367,6 +1432,16 @@
         "lowDesc": "<4 000 pas/jour",
         "noData": "Aucune donnée"
       }
+    },
+    "allMetrics": {
+      "title": "Toutes les mesures de santé",
+      "description": "{{recorded}} mesures sur {{total}} enregistrées par les appareils connectés",
+      "empty": "Aucun relevé d'appareil sur cette période. Synchronisez un appareil pour voir ses mesures ici.",
+      "notRecorded": "Non enregistrée",
+      "showAll": "Afficher toutes les mesures",
+      "hideEmpty": "Masquer les non enregistrées",
+      "permissionNeeded": "Autorisation requise",
+      "blockedCount": "{{count}} bloquées par les autorisations"
     }
   },
   "alerts": {
@@ -1656,7 +1731,7 @@
       },
       "indoorTracking": {
         "title": "Suivi Intérieur avec Plans d'Étage",
-        "content": "Voir la localisation en temps réel sur les plans d'étage téléchargés. Créer des zones pour définir des espaces comme chambre, cuisine, salle de bain. Suivre les trajets de mouvement et les temps de séjour dans chaque zone. Les bâtiments à plusieurs étages sont entièrement pris en charge - téléchargez des plans d'étage pour chaque niveau pour suivre la localisation sur plusieurs étages."
+        "content": "Voir la localisation en temps réel sur les plans d'étage téléchargés. Créer des zones pour définir des espaces comme chambre, cuisine, salle de bain. Suivre les trajets de mouvement et les temps de séjour dans chaque zone."
       },
       "outdoorTracking": {
         "title": "Suivi GPS Extérieur",
@@ -1703,6 +1778,18 @@
     "poor": "Faible",
     "critical": "Critique",
     "trend": "Tendance ILQ",
+    "info": {
+      "ariaLabel": "Informations ILQ",
+      "title": "Quotient de Vie Indépendante (ILQ)",
+      "description": "Un score de 0 à 100 mesurant la capacité d'une personne âgée à vivre de manière indépendante.",
+      "components": "Composants",
+      "healthVitals": "Signes Vitaux (30%)",
+      "physicalActivity": "Activité Physique (25%)",
+      "cognitiveFunction": "Fonction Cognitive (15%)",
+      "environmentalSafety": "Sécurité Environnementale (15%)",
+      "emergencyResponse": "Réponse d'Urgence (10%)",
+      "socialEngagement": "Engagement Social (5%)"
+    },
     "loadingChart": "Chargement du graphique...",
     "noDataPeriod": "Aucune donnée ILQ disponible pour la période sélectionnée",
     "lastDays": "{{days}} derniers jours",
@@ -1753,8 +1840,17 @@
       "cognitiveFunctionPercent": "Fonction Cognitive (15%)",
       "cognitiveFunctionDesc": "Adhésion à la routine, observance médicamenteuse",
       "environmental": "Environnemental",
+      "environmentalSafety": "Sécurité Environnementale",
       "emergency": "Urgence",
+      "emergencyResponse": "Réponse d'Urgence",
       "social": "Social",
+      "socialEngagement": "Engagement Social",
+      "healthVitalsShort": "Santé",
+      "physicalActivityShort": "Activité",
+      "cognitiveFunctionShort": "Cognitif",
+      "environmentalShort": "Environnement",
+      "emergencyShort": "Urgence",
+      "socialShort": "Social",
       "computingScore": "Calcul du score ILQ...",
       "computedSuccess": "ILQ calculé avec succès: {{score}}",
       "computeFailed": "Échec du calcul ILQ",
@@ -2112,9 +2208,9 @@
       "insights": "Informations Clés",
       "totalAlerts": "Total des Alertes",
       "active": "Actif",
-      "requireAttention": "Nécessitent une attention",
+      "requireAttention": "Nécessitent attention",
       "resolved": "Résolu",
-      "successfullyHandled": "Traité avec succès",
+      "successfullyHandled": "Gérées avec succès",
       "avgResponseTime": "Temps de Réponse Moyen",
       "minutesToAcknowledge": "Minutes pour reconnaître",
       "alertsBySeverity": "Alertes par Gravité",
@@ -2158,10 +2254,6 @@
       "oxygenPercent": "Oxygène (%)",
       "range": "Plage",
       "normalRange": "Plage normale: 95-100%",
-      "requireAttention": "Nécessitent attention",
-      "successfullyHandled": "Gérées avec succès",
-      "minutesToAcknowledge": "Minutes pour reconnaître",
-      "noTitle": "Sans titre",
       "standardDeviation": "Écart-type",
       "normalRange70140": "70-140 mg/dL",
       "noEnvironmentalData": "Aucune Donnée Environnementale",
@@ -2252,7 +2344,6 @@
       "comfortScore": "Score de Confort",
       "optimalConditions": "Conditions Optimales",
       "currentConditions": "Conditions Actuelles",
-      "recommendations": "Recommandations",
       "hours": "heures",
       "hour": "heure",
       "min": "min",

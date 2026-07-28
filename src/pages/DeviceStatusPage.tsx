@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { HelpTooltip } from '@/components/help/HelpTooltip';
 import { OnboardingTour, useShouldShowTour } from '@/components/help/OnboardingTour';
 import { PairingApprovalPanel } from '@/components/pairing/PairingApprovalPanel';
+import { DeviceSyncPanel } from '@/components/pairing/DeviceSyncPanel';
 import { useTranslation } from 'react-i18next';
 import { Footer } from '@/components/Footer';
 
@@ -35,6 +36,24 @@ const DeviceStatusPage = () => {
     enabled: !!user?.id
   });
 
+  // Own elderly_person profile, if this user has one, to distinguish self-view from caregiver-view
+  const { data: userElderlyPerson } = useQuery({
+    queryKey: ['user-elderly-person', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('elderly_persons')
+        .select('id')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const isOwnProfile = !!selectedPersonId && selectedPersonId === userElderlyPerson?.id;
+
   useEffect(() => {
     if (elderlyPersons.length > 0 && !selectedPersonId) {
       setSelectedPersonId(elderlyPersons[0].id);
@@ -44,7 +63,7 @@ const DeviceStatusPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour runTour={shouldShowTour} />
-      <Header title={t('devices.title')} subtitle={t('devices.subtitle')} />
+      <Header showBackButton title={t('devices.title')} subtitle={t('devices.subtitle')} />
 
       <main className="container mx-auto px-4 py-4 sm:py-6 lg:py-8">
         <div className="space-y-6">
@@ -101,7 +120,11 @@ const DeviceStatusPage = () => {
           </div>
 
           <div className="mb-6">
-            <PairingApprovalPanel selectedPersonId={selectedPersonId} />
+            {isOwnProfile ? (
+              <DeviceSyncPanel selectedPersonId={selectedPersonId} />
+            ) : (
+              <PairingApprovalPanel selectedPersonId={selectedPersonId} />
+            )}
           </div>
 
           <div data-tour="device-status-cards">

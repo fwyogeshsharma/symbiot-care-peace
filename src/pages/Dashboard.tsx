@@ -11,6 +11,7 @@ import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
 import HealthMetricsCharts from '@/components/dashboard/HealthMetricsCharts';
+import AllHealthMetrics from '@/components/dashboard/AllHealthMetrics';
 import { MovementSummary } from '@/components/dashboard/MovementSummary';
 import { MovementTimeline } from '@/components/dashboard/MovementTimeline';
 import { MovementHeatmap } from '@/components/dashboard/MovementHeatmap';
@@ -193,6 +194,7 @@ const Dashboard = () => {
               {isComponentEnabled('vital-metrics') && (
                 <VitalMetrics selectedPersonId={selectedPersonId} />
               )}
+              <AllHealthMetrics selectedPersonId={selectedPersonId} />
               {isComponentEnabled('health-charts') && (
                 <HealthMetricsCharts 
                   open={healthChartsOpen} 

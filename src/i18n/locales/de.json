@@ -291,6 +291,17 @@
         "Missed morning dose": "Morgendosis verpasst",
         "Missed afternoon dose": "Nachmittagsdosis verpasst"
       }
+    },
+    "notifications": {
+      "enableReminders": "Erinnerungen aktivieren",
+      "disableReminders": "Erinnerungen deaktivieren",
+      "reminderTitle": "Medikamenten-Erinnerung",
+      "reminderBody": "Zeit für {{name}} {{dosage}}",
+      "scheduled": "Medikamenten-Erinnerungen geplant",
+      "cancelled": "Medikamenten-Erinnerungen abgebrochen",
+      "notEnabled": "Benachrichtigungen sind nicht aktiviert",
+      "noSchedules": "Keine aktiven Medikamentenpläne für Erinnerungen",
+      "error": "Erinnerungen konnten nicht geplant werden"
     }
   },
   "dataSharing": {
@@ -1165,6 +1176,60 @@
       "deleteExpired": "Abgelaufene Anfrage löschen",
       "deleted": "Kopplungsanfrage gelöscht",
       "deleteFailed": "Löschen der Kopplungsanfrage fehlgeschlagen"
+    },
+    "sync": {
+      "title": "Geräte Synchronisieren",
+      "description": "Synchronisieren Sie Ihre verbundenen Fitnessgeräte über Bluetooth, um die neuesten Messwerte abzurufen.",
+      "syncAll": "Alle Geräte Synchronisieren",
+      "syncOne": "Synchronisieren",
+      "statusIdle": "Noch nicht synchronisiert",
+      "statusScanning": "Gerät wird gesucht...",
+      "statusConnecting": "Verbindung wird hergestellt...",
+      "statusSyncing": "Wird synchronisiert...",
+      "statusSuccess": "Synchronisiert",
+      "statusUnsupported": "Keine Daten von diesem Gerät verfügbar",
+      "statusFailed": "Synchronisierung fehlgeschlagen",
+      "lastSynced": "Zuletzt synchronisiert: {{time}}",
+      "webNotSupported": "Die Bluetooth-Synchronisierung erfordert die installierte mobile App und funktioniert nicht im Browser.",
+      "noDevices": "Noch keine Geräte zum Synchronisieren. Registrieren Sie zuerst ein Gerät.",
+      "healthConnect": {
+        "tooltip": "Von Health Connect synchronisieren",
+        "notInstalled": "Health Connect ist nicht installiert, daher können Daten von Apps wie Zepp noch nicht übertragen werden.",
+        "installAction": "Health Connect installieren"
+      },
+      "healthSource": {
+        "label": "Health-Connect-Quelle",
+        "none": "Nicht festgelegt",
+        "recordCount": "{{count}} Messwerte",
+        "takenBy": "verwendet von {{device}}",
+        "saved": "{{device}} synchronisiert jetzt aus {{source}}",
+        "cleared": "{{device}} synchronisiert nicht mehr aus Health Connect",
+        "alreadyTaken": "{{source}} ist bereits einem anderen Gerät zugewiesen. Entfernen Sie sie dort zuerst.",
+        "unmappedWarning": "Wählen Sie die App, die dieses Gerät veröffentlicht, um es aus Health Connect zu synchronisieren.",
+        "noSources": "Noch keine App hat Gesundheitsdaten geschrieben. Öffnen Sie die Uhren-App und lassen Sie sie mit Health Connect synchronisieren."
+      },
+      "permissions": {
+        "title": "Health-Connect-Messwerte",
+        "summary": "{{granted}} von {{total}} Messwerten erlaubt",
+        "granted": "{{granted}} von {{total}} Messwerten erlaubt",
+        "blocked": "Noch nicht erlaubt:",
+        "andMore": " und {{count}} weitere",
+        "allowAll": "Alle Messwerte erlauben",
+        "failed": "Der Health-Connect-Berechtigungsbildschirm konnte nicht geöffnet werden"
+      },
+      "background": {
+        "title": "Hintergrund-Synchronisierung",
+        "description": "Alle etwa {{minutes}} Minuten synchronisieren, während die App geschlossen ist. Android erlaubt kein kürzeres Intervall.",
+        "enabled": "Hintergrund-Synchronisierung läuft etwa alle {{minutes}} Minuten",
+        "disabled": "Hintergrund-Synchronisierung deaktiviert",
+        "configureFailed": "Hintergrund-Synchronisierung konnte nicht eingerichtet werden",
+        "enableFailed": "Hintergrund-Synchronisierung konnte nicht aktiviert werden",
+        "queued": "Hintergrund-Synchronisierung eingeplant",
+        "runNow": "Jetzt ausführen",
+        "lastRun": "Letzte Hintergrund-Synchronisierung {{time}}",
+        "notRunYet": "Noch nicht ausgeführt",
+        "needsBackgroundPermission": "Erlauben Sie Health Connect das Lesen im Hintergrund, sonst funktioniert die Synchronisierung nur bei geöffneter App."
+      }
     }
   },
   "tracking": {
@@ -1367,6 +1432,16 @@
         "lowDesc": "<4.000 Schritte/Tag",
         "noData": "Keine Daten"
       }
+    },
+    "allMetrics": {
+      "title": "Alle Gesundheitswerte",
+      "description": "{{recorded}} von {{total}} Messwerten von verbundenen Geräten erfasst",
+      "empty": "In diesem Zeitraum keine Gerätemesswerte. Synchronisieren Sie ein Gerät, um seine Werte hier zu sehen.",
+      "notRecorded": "Nicht erfasst",
+      "showAll": "Alle Messwerte anzeigen",
+      "hideEmpty": "Nicht erfasste ausblenden",
+      "permissionNeeded": "Berechtigung erforderlich",
+      "blockedCount": "{{count}} durch Berechtigungen blockiert"
     }
   },
   "alerts": {
@@ -2204,9 +2279,9 @@
       "insights": "Wichtige Erkenntnisse",
       "totalAlerts": "Gesamt-Alarme",
       "active": "Aktiv",
-      "requireAttention": "Aufmerksamkeit erforderlich",
+      "requireAttention": "Erfordern Aufmerksamkeit",
       "resolved": "Gelöst",
-      "successfullyHandled": "Erfolgreich bearbeitet",
+      "successfullyHandled": "Erfolgreich behandelt",
       "avgResponseTime": "Durchschn. Reaktionszeit",
       "minutesToAcknowledge": "Minuten bis zur Bestätigung",
       "alertsBySeverity": "Alarme nach Schweregrad",
@@ -2250,10 +2325,6 @@
       "oxygenPercent": "Sauerstoff (%)",
       "range": "Bereich",
       "normalRange": "Normalbereich: 95-100%",
-      "requireAttention": "Erfordern Aufmerksamkeit",
-      "successfullyHandled": "Erfolgreich behandelt",
-      "minutesToAcknowledge": "Minuten bis zur Bestätigung",
-      "noTitle": "Kein Titel",
       "standardDeviation": "Standardabweichung",
       "normalRange70140": "70-140 mg/dL",
       "noEnvironmentalData": "Keine Umweltdaten",
@@ -2344,7 +2415,6 @@
       "comfortScore": "Komfortwert",
       "optimalConditions": "Optimale Bedingungen",
       "currentConditions": "Aktuelle Bedingungen",
-      "recommendations": "Empfehlungen",
       "hours": "Stunden",
       "hour": "Stunde",
       "min": "Min.",

@@ -41,6 +41,9 @@ export * from './bluetooth';
 // Android Health Connect device sync services
 export * from './healthConnect';
 
+// Periodic background device sync (Android WorkManager)
+export * from './backgroundSync';
+
 // Re-export commonly used types
 export type { Directory, Encoding } from '@capacitor/filesystem';
 export type { CameraSource, CameraResultType } from '@capacitor/camera';

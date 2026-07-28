@@ -8,8 +8,6 @@
     "edit": "Editar",
     "add": "Agregar",
     "close": "Cerrar",
-    "expand": "Expandir",
-    "minimize": "Minimizar",
     "search": "Buscar",
     "filter": "Filtrar",
     "export": "Exportar",
@@ -21,7 +19,9 @@
     "confirm": "Confirmar",
     "yes": "Sí",
     "no": "No",
-    "copyright": "© 2025 SymBIoT. Todos los derechos reservados. Tranquilidad para sus seres queridos."
+    "copyright": "© 2025 SymBIoT. Todos los derechos reservados. Tranquilidad para sus seres queridos.",
+    "expand": "Expandir",
+    "minimize": "Minimizar"
   },
   "dataTypes": {
     "power_consumption": "Consumo de Energía",
@@ -291,6 +291,17 @@
         "Missed morning dose": "Dosis de la mañana perdida",
         "Missed afternoon dose": "Dosis de la tarde perdida"
       }
+    },
+    "notifications": {
+      "enableReminders": "Activar recordatorios",
+      "disableReminders": "Desactivar recordatorios",
+      "reminderTitle": "Recordatorio de medicación",
+      "reminderBody": "Es hora de tomar {{name}} {{dosage}}",
+      "scheduled": "Recordatorios de medicación programados",
+      "cancelled": "Recordatorios de medicación cancelados",
+      "notEnabled": "Las notificaciones no están activadas",
+      "noSchedules": "No hay horarios de medicación activos para recordar",
+      "error": "No se pudieron programar los recordatorios"
     }
   },
   "dataSharing": {
@@ -376,19 +387,13 @@
   "nav": {
     "home": "Inicio",
     "dashboard": "Panel",
-    "vital": "Vital",
-    "data": "Datos",
     "health": "Salud",
-    "insights": "Información",
-    "assets": "Activos",
-    "reportsMenu": "Resultados",
     "profile": "Perfil",
     "alerts": "Alertas",
     "reports": "Reportes",
     "tracking": "Seguimiento",
     "devices": "Dispositivos",
     "dataSharing": "Compartir Datos",
-    "caregiverDataSharingDisabled": "Los cuidadores no tienen acceso para compartir datos",
     "movement": "Actividad",
     "floorPlans": "Planos",
     "analytics": "Análisis",
@@ -401,7 +406,13 @@
     "signOut": "Cerrar Sesión",
     "signIn": "Iniciar Sesión",
     "getStarted": "Comenzar",
-    "help": "Ayuda"
+    "help": "Ayuda",
+    "vital": "Vital",
+    "data": "Datos",
+    "insights": "Información",
+    "assets": "Activos",
+    "reportsMenu": "Resultados",
+    "caregiverDataSharingDisabled": "Los cuidadores no tienen acceso para compartir datos"
   },
   "index": {
     "tagline": "Tranquilidad",
@@ -451,11 +462,6 @@
       "copyright": "© 2025 SymBIoT. Todos los derechos reservados. Versión: 1.0,9",
       "tagline": "Uniendo familias y tecnología para un mejor cuidado."
     }
-  },
-  "health": {
-    "title": "Panel de Salud",
-    "subtitle": "Monitoreo de signos vitales y métricas de salud",
-    "description": "Monitoreo integral de salud y seguimiento de signos vitales"
   },
   "movement": {
     "title": "Panel de Actividad",
@@ -1173,12 +1179,66 @@
       "deleteExpired": "Eliminar Solicitud Expirada",
       "deleted": "Solicitud de emparejamiento eliminada",
       "deleteFailed": "Error al eliminar solicitud de emparejamiento"
+    },
+    "sync": {
+      "title": "Sincronizar Dispositivos",
+      "description": "Sincroniza tus dispositivos de fitness conectados por Bluetooth para obtener sus últimas lecturas.",
+      "syncAll": "Sincronizar Todos los Dispositivos",
+      "syncOne": "Sincronizar",
+      "statusIdle": "Aún no sincronizado",
+      "statusScanning": "Buscando dispositivo...",
+      "statusConnecting": "Conectando...",
+      "statusSyncing": "Sincronizando...",
+      "statusSuccess": "Sincronizado",
+      "statusUnsupported": "No hay datos disponibles de este dispositivo",
+      "statusFailed": "Error al sincronizar",
+      "lastSynced": "Última sincronización: {{time}}",
+      "webNotSupported": "La sincronización por Bluetooth requiere la app móvil instalada y no funciona en un navegador.",
+      "noDevices": "Aún no hay dispositivos para sincronizar. Registra un dispositivo primero.",
+      "healthConnect": {
+        "tooltip": "Sincronizar desde Health Connect",
+        "notInstalled": "Health Connect no está instalado, así que los datos de apps como Zepp aún no pueden llegar.",
+        "installAction": "Instalar Health Connect"
+      },
+      "healthSource": {
+        "label": "Fuente de Health Connect",
+        "none": "Sin definir",
+        "recordCount": "{{count}} lecturas",
+        "takenBy": "usada por {{device}}",
+        "saved": "{{device}} ahora se sincroniza desde {{source}}",
+        "cleared": "{{device}} ya no se sincroniza desde Health Connect",
+        "alreadyTaken": "{{source}} ya está asignada a otro dispositivo. Quítala allí primero.",
+        "unmappedWarning": "Elige la aplicación que publica este dispositivo para sincronizarlo desde Health Connect.",
+        "noSources": "Ninguna aplicación ha escrito datos de salud todavía. Abre la aplicación del reloj y deja que se sincronice con Health Connect."
+      },
+      "permissions": {
+        "title": "Métricas de Health Connect",
+        "summary": "{{granted}} de {{total}} métricas permitidas",
+        "granted": "{{granted}} de {{total}} métricas permitidas",
+        "blocked": "Aún no permitidas:",
+        "andMore": " y {{count}} más",
+        "allowAll": "Permitir todas las métricas",
+        "failed": "No se pudo abrir la pantalla de permisos de Health Connect"
+      },
+      "background": {
+        "title": "Sincronización en segundo plano",
+        "description": "Sincroniza cada {{minutes}} minutos aproximadamente mientras la app está cerrada. Android no permite un intervalo menor.",
+        "enabled": "La sincronización en segundo plano se ejecuta cada {{minutes}} minutos aproximadamente",
+        "disabled": "Sincronización en segundo plano desactivada",
+        "configureFailed": "No se pudo configurar la sincronización en segundo plano",
+        "enableFailed": "No se pudo activar la sincronización en segundo plano",
+        "queued": "Sincronización en segundo plano en cola",
+        "runNow": "Ejecutar ahora",
+        "lastRun": "Última sincronización en segundo plano {{time}}",
+        "notRunYet": "Aún no se ha ejecutado",
+        "needsBackgroundPermission": "Permite que Health Connect lea datos en segundo plano, o la sincronización solo funcionará con la app abierta."
+      }
     }
   },
   "tracking": {
-    "title": "Movilidad",
+    "title": "Seguimiento",
     "subtitle": "Sistema de posicionamiento interior y exterior",
-    "movementTracking": "Monitoreo de Movimiento",
+    "movementTracking": "Seguimiento de Movimiento",
     "realTimePositioning": "Posicionamiento interior y exterior en tiempo real",
     "location": "Ubicación Actual",
     "indoor": "Interior",
@@ -1199,8 +1259,8 @@
     "last7Days": "Últimos 7 Días",
     "last30Days": "Últimos 30 Días",
     "noFloorPlan": {
-      "title": "Agregar un Plano de Piso",
-      "description": "Por favor agregue un plano de piso para habilitar el seguimiento interior"
+      "title": "No se Encontró Plano de Piso",
+      "description": "Registre un dispositivo portátil para ver el seguimiento interior"
     },
     "noGpsData": {
       "title": "Sin Datos GPS ni Geocercas",
@@ -1375,6 +1435,16 @@
         "lowDesc": "<4,000 pasos/día",
         "noData": "Sin datos"
       }
+    },
+    "allMetrics": {
+      "title": "Todas las métricas de salud",
+      "description": "{{recorded}} de {{total}} métricas registradas por los dispositivos conectados",
+      "empty": "No hay lecturas de dispositivos en este periodo. Sincroniza un dispositivo para ver sus métricas aquí.",
+      "notRecorded": "Sin registrar",
+      "showAll": "Mostrar todas las métricas",
+      "hideEmpty": "Ocultar sin registrar",
+      "permissionNeeded": "Falta permiso",
+      "blockedCount": "{{count}} bloqueadas por permisos"
     }
   },
   "alerts": {
@@ -1664,7 +1734,7 @@
       },
       "indoorTracking": {
         "title": "Seguimiento Interior con Planos de Planta",
-        "content": "Ve ubicación en tiempo real en planos de planta cargados. Crea zonas para definir áreas como dormitorio, cocina, baño. Rastrea rutas de movimiento y tiempos de permanencia en cada zona. Los edificios de varios pisos son totalmente compatibles: cargue planos de planta para cada nivel para rastrear la ubicación en múltiples pisos."
+        "content": "Ve ubicación en tiempo real en planos de planta cargados. Crea zonas para definir áreas como dormitorio, cocina, baño. Rastrea rutas de movimiento y tiempos de permanencia en cada zona."
       },
       "outdoorTracking": {
         "title": "Seguimiento GPS Exterior",
@@ -1711,6 +1781,18 @@
     "poor": "Deficiente",
     "critical": "Crítico",
     "trend": "Tendencia ILQ",
+    "info": {
+      "ariaLabel": "Información de ILQ",
+      "title": "Cociente de Vida Independiente (ILQ)",
+      "description": "Una puntuación de 0-100 que mide la capacidad de una persona mayor para vivir de forma independiente.",
+      "components": "Componentes",
+      "healthVitals": "Signos Vitales de Salud (30%)",
+      "physicalActivity": "Actividad Física (25%)",
+      "cognitiveFunction": "Función Cognitiva (15%)",
+      "environmentalSafety": "Seguridad Ambiental (15%)",
+      "emergencyResponse": "Respuesta de Emergencia (10%)",
+      "socialEngagement": "Compromiso Social (5%)"
+    },
     "loadingChart": "Cargando gráfico...",
     "noDataPeriod": "No hay datos de ILQ disponibles para el período seleccionado",
     "lastDays": "Últimos {{days}} días",
@@ -1761,8 +1843,17 @@
       "cognitiveFunctionPercent": "Función Cognitiva (15%)",
       "cognitiveFunctionDesc": "Adherencia a rutina, cumplimiento de medicación",
       "environmental": "Ambiental",
+      "environmentalSafety": "Seguridad Ambiental",
       "emergency": "Emergencia",
+      "emergencyResponse": "Respuesta de Emergencia",
       "social": "Social",
+      "socialEngagement": "Compromiso Social",
+      "healthVitalsShort": "Salud",
+      "physicalActivityShort": "Actividad",
+      "cognitiveFunctionShort": "Cognitivo",
+      "environmentalShort": "Ambiente",
+      "emergencyShort": "Emergencia",
+      "socialShort": "Social",
       "computingScore": "Calculando puntuación ILQ...",
       "computedSuccess": "ILQ calculado exitosamente: {{score}}",
       "computeFailed": "Error al calcular ILQ",
@@ -1805,6 +1896,11 @@
     "offline": "Desconectado",
     "idle": "Inactivo",
     "value": "Valor"
+  },
+  "health": {
+    "title": "Panel de Salud",
+    "subtitle": "Monitoreo de signos vitales y métricas de salud",
+    "description": "Monitoreo integral de salud y seguimiento de signos vitales"
   },
   "reports": {
     "title": "Informes",
@@ -2122,7 +2218,7 @@
       "active": "Activo",
       "requireAttention": "Requieren atención",
       "resolved": "Resuelto",
-      "successfullyHandled": "Manejado exitosamente",
+      "successfullyHandled": "Manejadas exitosamente",
       "avgResponseTime": "Tiempo de Respuesta Promedio",
       "minutesToAcknowledge": "Minutos para reconocer",
       "alertsBySeverity": "Alertas por Severidad",
@@ -2166,10 +2262,6 @@
       "oxygenPercent": "Oxígeno (%)",
       "range": "Rango",
       "normalRange": "Rango normal: 95-100%",
-      "requireAttention": "Requieren atención",
-      "successfullyHandled": "Manejadas exitosamente",
-      "minutesToAcknowledge": "Minutos para reconocer",
-      "noTitle": "Sin título",
       "standardDeviation": "Desviación Estándar",
       "normalRange70140": "70-140 mg/dL",
       "noEnvironmentalData": "Sin Datos Ambientales",
@@ -2260,7 +2352,6 @@
       "comfortScore": "Puntuación de Confort",
       "optimalConditions": "Condiciones Óptimas",
       "currentConditions": "Condiciones Actuales",
-      "recommendations": "Recomendaciones",
       "hours": "horas",
       "hour": "hora",
       "min": "min",
@@ -2333,7 +2424,11 @@
     "categories": {
       "gettingStarted": {
         "title": "Primeros Pasos",
-        "questionKeys": ["createAccount", "compatibleDevices", "addSensor"],
+        "questionKeys": [
+          "createAccount",
+          "compatibleDevices",
+          "addSensor"
+        ],
         "questions": {
           "createAccount": {
             "question": "¿Cómo creo una cuenta?",
@@ -2351,7 +2446,12 @@
       },
       "ilqScore": {
         "title": "Puntuación ILQ",
-        "questionKeys": ["whatIsIlq", "viewIlq", "devicesNeeded", "lowScore"],
+        "questionKeys": [
+          "whatIsIlq",
+          "viewIlq",
+          "devicesNeeded",
+          "lowScore"
+        ],
         "questions": {
           "whatIsIlq": {
             "question": "¿Qué es la Puntuación ILQ?",
@@ -2373,7 +2473,11 @@
       },
       "healthMonitoring": {
         "title": "Monitoreo de Salud",
-        "questionKeys": ["viewMetrics", "dataUpdate", "exportData"],
+        "questionKeys": [
+          "viewMetrics",
+          "dataUpdate",
+          "exportData"
+        ],
         "questions": {
           "viewMetrics": {
             "question": "¿Cómo veo mis métricas de salud?",
@@ -2391,7 +2495,11 @@
       },
       "dataSharing": {
         "title": "Compartir Datos",
-        "questionKeys": ["shareWithLovedOnes", "whatToShare", "stopSharing"],
+        "questionKeys": [
+          "shareWithLovedOnes",
+          "whatToShare",
+          "stopSharing"
+        ],
         "questions": {
           "shareWithLovedOnes": {
             "question": "¿Cómo puedo compartir mis datos con seres queridos?",
@@ -2409,7 +2517,11 @@
       },
       "alertsNotifications": {
         "title": "Alertas y Notificaciones",
-        "questionKeys": ["setupAlerts", "alertTypes", "acknowledgeAlert"],
+        "questionKeys": [
+          "setupAlerts",
+          "alertTypes",
+          "acknowledgeAlert"
+        ],
         "questions": {
           "setupAlerts": {
             "question": "¿Cómo configuro alertas?",
@@ -2427,7 +2539,11 @@
       },
       "locationTracking": {
         "title": "Ubicación y Seguimiento",
-        "questionKeys": ["indoorTracking", "setupFloorPlan", "outdoorTracking"],
+        "questionKeys": [
+          "indoorTracking",
+          "setupFloorPlan",
+          "outdoorTracking"
+        ],
         "questions": {
           "indoorTracking": {
             "question": "¿Cómo funciona el seguimiento en interiores?",
@@ -2445,7 +2561,10 @@
       },
       "medicationManagement": {
         "title": "Gestión de Medicamentos",
-        "questionKeys": ["setupReminders", "trackAdherence"],
+        "questionKeys": [
+          "setupReminders",
+          "trackAdherence"
+        ],
         "questions": {
           "setupReminders": {
             "question": "¿Cómo configuro recordatorios de medicamentos?",
@@ -2459,7 +2578,11 @@
       },
       "reports": {
         "title": "Informes",
-        "questionKeys": ["reportTypes", "scheduleReports", "customizeDateRange"],
+        "questionKeys": [
+          "reportTypes",
+          "scheduleReports",
+          "customizeDateRange"
+        ],
         "questions": {
           "reportTypes": {
             "question": "¿Qué tipos de informes puedo generar?",
@@ -2477,7 +2600,11 @@
       },
       "accountSettings": {
         "title": "Cuenta y Configuración",
-        "questionKeys": ["changeProfile", "changeLanguage", "dataSecure"],
+        "questionKeys": [
+          "changeProfile",
+          "changeLanguage",
+          "dataSecure"
+        ],
         "questions": {
           "changeProfile": {
             "question": "¿Cómo cambio mi información de perfil?",
@@ -2495,7 +2622,11 @@
       },
       "troubleshooting": {
         "title": "Solución de Problemas",
-        "questionKeys": ["deviceNotConnecting", "noAlerts", "incorrectData"],
+        "questionKeys": [
+          "deviceNotConnecting",
+          "noAlerts",
+          "incorrectData"
+        ],
         "questions": {
           "deviceNotConnecting": {
             "question": "Mi dispositivo no se conecta. ¿Qué debo hacer?",

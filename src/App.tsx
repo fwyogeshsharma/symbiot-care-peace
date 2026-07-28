@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ElderlyProvider } from "./contexts/ElderlyContext";
+import { CapacitorProvider } from "./contexts/CapacitorContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Chatbot } from "./components/Chatbot";
 import "./i18n/config";
@@ -48,6 +49,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <CapacitorProvider>
         <AuthProvider>
           <ElderlyProvider>
           <Chatbot />
@@ -227,6 +229,7 @@ const App = () => (
           </Routes>
           </ElderlyProvider>
         </AuthProvider>
+        </CapacitorProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

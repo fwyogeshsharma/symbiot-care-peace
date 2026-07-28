@@ -143,6 +143,9 @@ export const StorageKeys = {
 
   // Cache
   LAST_SYNC: 'last_sync',
+  // Per-device Health Connect read watermark. Kept on the phone (not in devices.last_sync)
+  // because Health Connect is per-phone, and because BLE syncs must not advance it.
+  HEALTH_CONNECT_WATERMARK: 'health_connect_watermark',
   CACHED_ELDERLY_PERSONS: 'cached_elderly_persons',
   CACHED_DEVICES: 'cached_devices',
   CACHED_ALERTS: 'cached_alerts',

@@ -1,11 +1,48 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { isNative } from '@/lib/capacitor/platform';
+import { writeBase64File, shareFile } from '@/lib/capacitor/filesystem';
 
 interface ExportOptions {
   filename?: string;
   format?: 'pdf' | 'png';
   quality?: number;
 }
+
+/**
+ * Persist an exported report.
+ *
+ * A WebView has no Downloads folder, so jsPDF's save() and the blob-anchor
+ * trick both silently do nothing on Android. On native we write the file to
+ * Documents and open the share sheet so the user can file it wherever they
+ * want; on web the ordinary download path is still the right one.
+ */
+const saveExportedFile = async (blob: Blob, filename: string): Promise<void> => {
+  if (!isNative()) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    return;
+  }
+
+  const base64 = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    // readAsDataURL yields "data:<mime>;base64,<payload>"; Filesystem wants only the payload.
+    reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+    reader.onerror = () => reject(reader.error ?? new Error('Failed to read exported file'));
+    reader.readAsDataURL(blob);
+  });
+
+  const uri = await writeBase64File(filename, base64);
+  if (!uri) throw new Error('Failed to save the report to device storage');
+
+  await shareFile(filename, uri, 'Save report');
+};
 
 /**
  * Apply PDF-optimized styles to the element before capture
@@ -295,7 +332,7 @@ export const exportToPDF = async (
     }
 
     console.log(`Saving PDF as: ${filename}`);
-    pdf.save(filename);
+    await saveExportedFile(pdf.output('blob'), filename);
     console.log('PDF saved successfully');
   } catch (error) {
     console.error('Error exporting to PDF:', error);
@@ -330,16 +367,12 @@ export const exportToPNG = async (
       backgroundColor: '#ffffff',
     });
 
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        link.click();
-        URL.revokeObjectURL(url);
-      }
-    }, 'image/png', quality);
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, 'image/png', quality);
+    });
+    if (!blob) throw new Error('Failed to render the report image');
+
+    await saveExportedFile(blob, filename);
   } catch (error) {
     console.error('Error exporting to PNG:', error);
     throw new Error('Failed to export report to PNG');

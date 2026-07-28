@@ -13,6 +13,8 @@ import { useElderly } from '@/contexts/ElderlyContext';
 import Header from '@/components/layout/Header';
 import { useTranslation } from 'react-i18next';
 import { Footer } from '@/components/Footer';
+import { isNative } from '@/lib/capacitor/platform';
+import { writeTextFile, shareFile } from '@/lib/capacitor/filesystem';
 
 export default function ILQAnalytics() {
   const { t } = useTranslation();
@@ -238,18 +240,28 @@ export default function ILQAnalytics() {
 
       if (error) throw error;
 
-      // Convert HTML to downloadable file
-      const blob = new Blob([data.html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ILQ-Report-${new Date().toISOString().split('T')[0]}.html`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const filename = `ILQ-Report-${new Date().toISOString().split('T')[0]}.html`;
 
-      toast.success(t('ilq.analytics.reportDownloaded'));
+      if (isNative()) {
+        // A WebView can't perform a blob download, so write the report to Documents
+        // and hand it to the share sheet for the user to file or open.
+        const uri = await writeTextFile(filename, data.html);
+        if (!uri) throw new Error('Failed to save the report to device storage');
+        await shareFile(filename, uri, t('ilq.analytics.downloadReport'));
+        toast.success(t('ilq.analytics.reportSaved', { path: filename, defaultValue: 'Report saved as {{path}}' }));
+      } else {
+        const blob = new Blob([data.html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        toast.success(t('ilq.analytics.reportDownloaded'));
+      }
     } catch (error: any) {
       console.error('Error generating report:', error);
       toast.error(error.message || t('ilq.analytics.reportFailed'));

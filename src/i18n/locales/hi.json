@@ -214,6 +214,17 @@
         "Missed morning dose": "सुबह की खुराक छूट गई",
         "Missed afternoon dose": "दोपहर की खुराक छूट गई"
       }
+    },
+    "notifications": {
+      "enableReminders": "रिमाइंडर चालू करें",
+      "disableReminders": "रिमाइंडर बंद करें",
+      "reminderTitle": "दवा रिमाइंडर",
+      "reminderBody": "{{name}} {{dosage}} लेने का समय",
+      "scheduled": "दवा रिमाइंडर निर्धारित",
+      "cancelled": "दवा रिमाइंडर रद्द",
+      "notEnabled": "सूचनाएं सक्षम नहीं हैं",
+      "noSchedules": "याद दिलाने के लिए कोई सक्रिय दवा शेड्यूल नहीं",
+      "error": "रिमाइंडर निर्धारित करने में विफल"
     }
   },
   "dataSharing": {
@@ -1018,12 +1029,46 @@
       "statusUnsupported": "इस डिवाइस से कोई डेटा उपलब्ध नहीं है",
       "statusFailed": "सिंक विफल",
       "lastSynced": "अंतिम सिंक: {{time}}",
+      "showingDataSince": "{{time}} पर सिंक किया गया डेटा दिखाया जा रहा है",
       "webNotSupported": "ब्लूटूथ सिंक के लिए इंस्टॉल किया गया मोबाइल ऐप आवश्यक है और यह ब्राउज़र में काम नहीं करेगा।",
       "noDevices": "सिंक करने के लिए अभी कोई डिवाइस नहीं है। पहले एक डिवाइस पंजीकृत करें।",
       "healthConnect": {
         "tooltip": "Health Connect से सिंक करें",
         "notInstalled": "Health Connect इंस्टॉल नहीं है, इसलिए Zepp जैसे ऐप्स का डेटा अभी नहीं आ सकता।",
         "installAction": "Health Connect इंस्टॉल करें"
+      },
+      "healthSource": {
+        "label": "Health Connect स्रोत",
+        "none": "सेट नहीं",
+        "recordCount": "{{count}} रीडिंग",
+        "takenBy": "{{device}} द्वारा उपयोग में",
+        "saved": "{{device}} अब {{source}} से सिंक होता है",
+        "cleared": "{{device}} अब Health Connect से सिंक नहीं होता",
+        "alreadyTaken": "{{source}} पहले से किसी अन्य डिवाइस को सौंपा गया है। पहले उसे वहाँ हटाएँ।",
+        "unmappedWarning": "Health Connect से सिंक करने के लिए वह ऐप चुनें जो इस डिवाइस का डेटा प्रकाशित करता है।",
+        "noSources": "किसी ऐप ने अभी तक स्वास्थ्य डेटा नहीं लिखा है। पहले घड़ी का ऐप खोलें और उसे Health Connect से सिंक होने दें।"
+      },
+      "permissions": {
+        "title": "Health Connect मेट्रिक्स",
+        "summary": "{{total}} में से {{granted}} मेट्रिक्स की अनुमति है",
+        "granted": "{{total}} में से {{granted}} मेट्रिक्स की अनुमति है",
+        "blocked": "अभी अनुमति नहीं:",
+        "andMore": " और {{count}} अन्य",
+        "allowAll": "सभी मेट्रिक्स की अनुमति दें",
+        "failed": "Health Connect अनुमति स्क्रीन नहीं खुल सकी"
+      },
+      "background": {
+        "title": "बैकग्राउंड सिंक",
+        "description": "ऐप बंद होने पर लगभग हर {{minutes}} मिनट में सिंक करें। Android इससे कम अंतराल की अनुमति नहीं देता।",
+        "enabled": "बैकग्राउंड सिंक लगभग हर {{minutes}} मिनट में चलता है",
+        "disabled": "बैकग्राउंड सिंक बंद",
+        "configureFailed": "बैकग्राउंड सिंक सेट अप नहीं हो सका",
+        "enableFailed": "बैकग्राउंड सिंक चालू नहीं हो सका",
+        "queued": "बैकग्राउंड सिंक कतार में",
+        "runNow": "अभी चलाएं",
+        "lastRun": "पिछला बैकग्राउंड सिंक {{time}}",
+        "notRunYet": "अभी तक नहीं चला",
+        "needsBackgroundPermission": "Health Connect को बैकग्राउंड में डेटा पढ़ने की अनुमति दें, अन्यथा सिंक केवल ऐप खुली होने पर काम करेगा।"
       }
     }
   },
@@ -1214,6 +1259,16 @@
         "lowDesc": "<4,000 कदम/दिन",
         "noData": "कोई डेटा नहीं"
       }
+    },
+    "allMetrics": {
+      "title": "सभी स्वास्थ्य मेट्रिक्स",
+      "description": "जुड़े उपकरणों द्वारा {{total}} में से {{recorded}} मेट्रिक्स दर्ज",
+      "empty": "इस अवधि में कोई डिवाइस रीडिंग नहीं। मेट्रिक्स यहाँ देखने के लिए कोई डिवाइस सिंक करें।",
+      "notRecorded": "दर्ज नहीं",
+      "showAll": "सभी मेट्रिक्स दिखाएँ",
+      "hideEmpty": "अदर्ज छिपाएँ",
+      "permissionNeeded": "अनुमति आवश्यक",
+      "blockedCount": "अनुमतियों के कारण {{count}} अवरुद्ध"
     }
   },
   "alerts": {
@@ -1980,7 +2035,7 @@
       "insights": "मुख्य अंतर्दृष्टि",
       "totalAlerts": "कुल अलर्ट",
       "active": "सक्रिय",
-      "requireAttention": "ध्यान देने की आवश्यकता है",
+      "requireAttention": "ध्यान की आवश्यकता है",
       "resolved": "हल किया गया",
       "successfullyHandled": "सफलतापूर्वक संभाला गया",
       "avgResponseTime": "औसत प्रतिक्रिया समय",
@@ -2026,10 +2081,6 @@
       "oxygenPercent": "ऑक्सीजन (%)",
       "range": "सीमा",
       "normalRange": "सामान्य सीमा: 95-100%",
-      "requireAttention": "ध्यान की आवश्यकता है",
-      "successfullyHandled": "सफलतापूर्वक संभाला गया",
-      "minutesToAcknowledge": "स्वीकार करने के लिए मिनट",
-      "noTitle": "कोई शीर्षक नहीं",
       "standardDeviation": "मानक विचलन",
       "normalRange70140": "70-140 mg/dL",
       "noEnvironmentalData": "कोई पर्यावरणीय डेटा नहीं",
@@ -2120,7 +2171,6 @@
       "comfortScore": "आराम स्कोर",
       "optimalConditions": "इष्टतम स्थितियां",
       "currentConditions": "वर्तमान स्थितियां",
-      "recommendations": "सिफारिशें",
       "hours": "घंटे",
       "hour": "घंटा",
       "min": "मिनट",

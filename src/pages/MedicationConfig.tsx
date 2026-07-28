@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,12 +8,15 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Pill, Plus, ClipboardList } from 'lucide-react';
+import { Pill, Plus, ClipboardList, Bell, BellOff } from 'lucide-react';
 import { MedicationScheduleForm } from '@/components/medication/MedicationScheduleForm';
 import { MedicationScheduleList } from '@/components/medication/MedicationScheduleList';
 import { MedicationAdherenceLog } from '@/components/medication/MedicationAdherenceLog';
 import { useTranslation } from 'react-i18next';
 import { Footer } from '@/components/Footer';
+import { useCapacitorNotifications } from '@/hooks/useCapacitorNotifications';
+import { isNative } from '@/lib/capacitor/platform';
+import { toast } from 'sonner';
 
 interface MedicationSchedule {
   id: string;
@@ -35,6 +38,86 @@ export default function MedicationConfig() {
   const [selectedPersonId, setSelectedPersonId] = useState<string>('');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editSchedule, setEditSchedule] = useState<MedicationSchedule | null>(null);
+  const {
+    isEnabled: notificationsEnabled,
+    scheduleNotification,
+    cancelAllNotifications,
+    getPendingNotifications,
+  } = useCapacitorNotifications();
+  const [remindersEnabled, setRemindersEnabled] = useState(false);
+  const [isSchedulingReminders, setIsSchedulingReminders] = useState(false);
+
+  // Local notifications survive app restarts, so the toggle reflects what the OS
+  // still has pending rather than anything we keep in our own state.
+  useEffect(() => {
+    if (!isNative()) return;
+    getPendingNotifications().then((pending) => setRemindersEnabled(pending.length > 0));
+  }, [getPendingNotifications]);
+
+  const scheduleMedicationReminders = async () => {
+    if (!notificationsEnabled) {
+      toast.error(t('medication.notifications.notEnabled', 'Notifications are not enabled'));
+      return;
+    }
+
+    setIsSchedulingReminders(true);
+    try {
+      const { data: schedules, error } = await supabase
+        .from('medication_schedules')
+        .select('*')
+        .eq('elderly_person_id', selectedPersonId)
+        .eq('is_active', true);
+
+      if (error) throw error;
+
+      if (!schedules || schedules.length === 0) {
+        toast.info(t('medication.notifications.noSchedules', 'No active medication schedules to remind'));
+        return;
+      }
+
+      // Rescheduling is a full replace, so clear the previous set first — otherwise
+      // edited or deleted medications would keep firing their old reminders.
+      await cancelAllNotifications();
+
+      for (const schedule of schedules) {
+        for (const time of schedule.times) {
+          const [hours, minutes] = time.split(':').map(Number);
+          const scheduleDate = new Date();
+          scheduleDate.setHours(hours, minutes, 0, 0);
+
+          // A time already past today would fire immediately, so start it tomorrow.
+          if (scheduleDate <= new Date()) {
+            scheduleDate.setDate(scheduleDate.getDate() + 1);
+          }
+
+          await scheduleNotification({
+            title: t('medication.notifications.reminderTitle', 'Medication Reminder'),
+            body: t('medication.notifications.reminderBody', {
+              name: schedule.medication_name,
+              dosage: schedule.dosage_mg ? `${schedule.dosage_mg}${schedule.dosage_unit || 'mg'}` : '',
+              defaultValue: 'Time to take {{name}} {{dosage}}',
+            }),
+            severity: 'high',
+            schedule: { at: scheduleDate, repeats: true, every: 'day' },
+          });
+        }
+      }
+
+      setRemindersEnabled(true);
+      toast.success(t('medication.notifications.scheduled', 'Medication reminders scheduled'));
+    } catch (error) {
+      console.error('Failed to schedule reminders:', error);
+      toast.error(t('medication.notifications.error', 'Failed to schedule reminders'));
+    } finally {
+      setIsSchedulingReminders(false);
+    }
+  };
+
+  const cancelMedicationReminders = async () => {
+    await cancelAllNotifications();
+    setRemindersEnabled(false);
+    toast.success(t('medication.notifications.cancelled', 'Medication reminders cancelled'));
+  };
 
   const { data: elderlyPersons } = useQuery({
     queryKey: ['elderly-persons', user?.id],
@@ -86,10 +169,29 @@ export default function MedicationConfig() {
                 </Select>
               </div>
               {selectedPersonId && (
-                <Button onClick={() => setShowAddDialog(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t('medication.config.addMedication')}
-                </Button>
+                <div className="flex gap-2">
+                  {/* Local notifications are a no-op in a browser, so only offer them in the app. */}
+                  {isNative() && (
+                    <Button
+                      variant="outline"
+                      disabled={isSchedulingReminders}
+                      onClick={remindersEnabled ? cancelMedicationReminders : scheduleMedicationReminders}
+                    >
+                      {remindersEnabled ? (
+                        <BellOff className="h-4 w-4 mr-2" />
+                      ) : (
+                        <Bell className="h-4 w-4 mr-2" />
+                      )}
+                      {remindersEnabled
+                        ? t('medication.notifications.disableReminders', 'Turn off reminders')
+                        : t('medication.notifications.enableReminders', 'Turn on reminders')}
+                    </Button>
+                  )}
+                  <Button onClick={() => setShowAddDialog(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t('medication.config.addMedication')}
+                  </Button>
+                </div>
               )}
             </div>
           </CardContent>

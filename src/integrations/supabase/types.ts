@@ -543,12 +543,14 @@ export type Database = {
         Row: {
           api_key: string
           battery_level: number | null
+          ble_device_id: string | null
           company_id: string | null
           created_at: string
           device_id: string
           device_name: string
           device_type: string
           elderly_person_id: string
+          health_source: string | null
           id: string
           last_sync: string | null
           location: string | null
@@ -559,12 +561,14 @@ export type Database = {
         Insert: {
           api_key?: string
           battery_level?: number | null
+          ble_device_id?: string | null
           company_id?: string | null
           created_at?: string
           device_id: string
           device_name: string
           device_type: string
           elderly_person_id: string
+          health_source?: string | null
           id?: string
           last_sync?: string | null
           location?: string | null
@@ -575,12 +579,14 @@ export type Database = {
         Update: {
           api_key?: string
           battery_level?: number | null
+          ble_device_id?: string | null
           company_id?: string | null
           created_at?: string
           device_id?: string
           device_name?: string
           device_type?: string
           elderly_person_id?: string
+          health_source?: string | null
           id?: string
           last_sync?: string | null
           location?: string | null
@@ -1632,6 +1638,16 @@ export type Database = {
       convert_local_to_utc_time: {
         Args: { local_time: string; tz: string }
         Returns: string
+      }
+      device_metric_summary: {
+        Args: { p_person_id: string; p_since: string }
+        Returns: {
+          data_type: string
+          latest_recorded_at: string
+          latest_unit: string | null
+          latest_value: Json
+          reading_count: number
+        }[]
       }
       convert_schedule_time_to_utc: {
         Args: { local_time: string; tz: string }

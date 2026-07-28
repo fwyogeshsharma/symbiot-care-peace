@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { clearBackgroundSync } from '@/lib/capacitor/backgroundSync';
 
 interface AuthContextType {
   user: User | null;
@@ -196,6 +197,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.warn('Failed to update session log:', sessionLogError);
         }
       }
+
+      // The native background worker holds its own copy of the session, so it keeps
+      // syncing after sign-out unless it is cleared explicitly.
+      await clearBackgroundSync();
 
       // Attempt Supabase signout - may fail if session already expired
       const { error } = await supabase.auth.signOut();

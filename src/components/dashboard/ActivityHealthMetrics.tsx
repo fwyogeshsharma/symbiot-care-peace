@@ -3,6 +3,7 @@ import { Heart, Activity, Thermometer, Droplets } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { extractNumericValue, extractBloodPressure } from "@/lib/valueExtractor";
 
 interface ActivityHealthMetricsProps {
   elderlyPersonId: string;
@@ -31,62 +32,35 @@ export const ActivityHealthMetrics = ({ elderlyPersonId, dateRange }: ActivityHe
     enabled: !!elderlyPersonId,
   });
 
-  // Calculate averages with NaN validation
-  const heartRateData = healthData.filter(d => d.data_type === 'heart_rate');
-  const avgHeartRate = heartRateData.length > 0
-    ? (() => {
-        const sum = heartRateData.reduce((acc, d) => {
-          const val = parseFloat(d.value);
-          return !isNaN(val) ? acc + val : acc;
-        }, 0);
-        const validCount = heartRateData.filter(d => !isNaN(parseFloat(d.value))).length;
-        return validCount > 0 ? Math.round(sum / validCount) : null;
-      })()
-    : null;
+  // device_data.value is JSONB ({ bpm: 72 }, { count: 1234 }, ...), so it has to go
+  // through the shared extractor — parseFloat on the object yields NaN for every row.
+  const numericValues = (dataType: string) =>
+    healthData
+      .filter(d => d.data_type === dataType)
+      .map(d => extractNumericValue(d.value, dataType))
+      .filter((v): v is number => v !== null);
 
-  const temperatureData = healthData.filter(d => d.data_type === 'temperature');
-  const avgTemperature = temperatureData.length > 0
-    ? (() => {
-        const sum = temperatureData.reduce((acc, d) => {
-          const val = parseFloat(d.value);
-          return !isNaN(val) ? acc + val : acc;
-        }, 0);
-        const validCount = temperatureData.filter(d => !isNaN(parseFloat(d.value))).length;
-        return validCount > 0 ? (sum / validCount).toFixed(1) : null;
-      })()
-    : null;
+  const average = (values: number[]) =>
+    values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : null;
 
-  const oxygenData = healthData.filter(d => d.data_type === 'oxygen_saturation');
-  const avgOxygen = oxygenData.length > 0
-    ? (() => {
-        const sum = oxygenData.reduce((acc, d) => {
-          const val = parseFloat(d.value);
-          return !isNaN(val) ? acc + val : acc;
-        }, 0);
-        const validCount = oxygenData.filter(d => !isNaN(parseFloat(d.value))).length;
-        return validCount > 0 ? Math.round(sum / validCount) : null;
-      })()
-    : null;
+  const heartRateAvg = average(numericValues('heart_rate'));
+  const avgHeartRate = heartRateAvg !== null ? Math.round(heartRateAvg) : null;
 
-  const stepsData = healthData.filter(d => d.data_type === 'steps');
-  const totalSteps = stepsData.length > 0
-    ? (() => {
-        const sum = stepsData.reduce((acc, d) => {
-          const val = parseInt(d.value);
-          return !isNaN(val) ? acc + val : acc;
-        }, 0);
-        return sum > 0 ? sum : null;
-      })()
-    : null;
+  const temperatureAvg = average(numericValues('temperature'));
+  const avgTemperature = temperatureAvg !== null ? temperatureAvg.toFixed(1) : null;
+
+  const oxygenAvg = average(numericValues('oxygen_saturation'));
+  const avgOxygen = oxygenAvg !== null ? Math.round(oxygenAvg) : null;
+
+  // Steps arrive as per-interval deltas, so the range total is their sum.
+  const stepValues = numericValues('steps');
+  const stepsSum = stepValues.reduce((a, b) => a + b, 0);
+  const totalSteps = stepsSum > 0 ? stepsSum : null;
 
   // Get latest blood pressure
   const bpData = healthData.filter(d => d.data_type === 'blood_pressure');
-  const latestBP = bpData.length > 0 ? bpData[0].value : null;
-  const formattedBP = latestBP
-    ? (typeof latestBP === 'object' && latestBP.systolic && latestBP.diastolic
-        ? `${latestBP.systolic}/${latestBP.diastolic}`
-        : latestBP)
-    : null;
+  const latestBP = bpData.length > 0 ? extractBloodPressure(bpData[0].value) : null;
+  const formattedBP = latestBP ? `${latestBP.systolic}/${latestBP.diastolic}` : null;
 
   return (
     <div className="space-y-4">

@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { de, es, fr, frCA, enUS, Locale } from 'date-fns/locale';
 import { isHealthDevice, isHealthDataType } from '@/lib/deviceDataMapping';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import HealthMetricsCharts from './HealthMetricsCharts';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
 import { extractNumericValue, extractBloodPressure, extractBooleanValue, extractStringValue } from '@/lib/valueExtractor';
@@ -104,6 +104,45 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
     enabled: !!selectedPersonId,
     refetchInterval: 10000,
   });
+
+  // Steps are stored as per-interval deltas (Health Connect writes one record per
+  // segment), so the newest row is a single segment — a few hundred steps — not the
+  // figure the source app shows. Sum today's segments to get the comparable total.
+  const { data: stepsToday = null } = useQuery({
+    queryKey: ['steps-today', selectedPersonId],
+    queryFn: async () => {
+      if (!selectedPersonId) return null;
+
+      const dayStart = new Date();
+      dayStart.setHours(0, 0, 0, 0);
+
+      const { data, error } = await supabase
+        .from('device_data')
+        .select('value')
+        .eq('elderly_person_id', selectedPersonId)
+        .eq('data_type', 'steps')
+        .gte('recorded_at', dayStart.toISOString());
+
+      if (error) throw error;
+
+      return (data || []).reduce((sum, row) => {
+        const count = extractNumericValue(row.value, 'steps');
+        return count !== null ? sum + count : sum;
+      }, 0);
+    },
+    enabled: !!selectedPersonId,
+    refetchInterval: 10000,
+  });
+
+  const vitals = useMemo(
+    () =>
+      recentData.map((item: any) =>
+        item.data_type === 'steps' && stepsToday !== null
+          ? { ...item, value: { count: stepsToday } }
+          : item
+      ),
+    [recentData, stepsToday]
+  );
 
   const getVitalIcon = (type: string) => {
     const iconMap: Record<string, any> = {
@@ -574,7 +613,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recentData.map((item: any) => {
+            {vitals.map((item: any) => {
             const Icon = getVitalIcon(item.data_type);
             const color = getVitalColor(item.data_type, item.value);
             
