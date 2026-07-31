@@ -1334,6 +1334,14 @@
     "vitalSigns": "Signes Vitaux",
     "activity": "Activité",
     "quickActions": "Actions Rapides",
+    "allMetrics": {
+      "title": "Toutes les mesures de santé",
+      "description": "{{recorded}} mesures sur {{total}} enregistrées par les appareils connectés",
+      "empty": "Aucun relevé d'appareil sur cette période. Synchronisez un appareil pour voir ses mesures ici.",
+      "notRecorded": "Non enregistrée",
+      "showAll": "Afficher toutes les mesures",
+      "hideEmpty": "Masquer les non enregistrées"
+    },
     "stats": {
       "monitoredPersons": {
         "label": "Personnes Surveillées",

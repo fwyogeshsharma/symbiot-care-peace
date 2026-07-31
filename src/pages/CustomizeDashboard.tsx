@@ -57,14 +57,14 @@ const CustomizeDashboard = () => {
       enabled: true,
       category: 'people'
     },
-    {
+    /* {
       id: 'vital-metrics',
       name: t('dashboard.vitalMetrics', { defaultValue: 'Vital Metrics' }),
       description: t('dashboard.vitalMetricsDesc', { defaultValue: 'Heart rate, blood pressure, oxygen levels' }),
       icon: HeartPulse,
       enabled: true,
       category: 'health'
-    },
+    }, */
     {
       id: 'health-charts',
       name: t('dashboard.healthCharts', { defaultValue: 'Health Metrics Charts' }),

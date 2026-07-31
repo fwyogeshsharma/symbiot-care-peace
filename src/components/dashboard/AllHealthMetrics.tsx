@@ -1,0 +1,359 @@
+import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Activity, Loader2 } from 'lucide-react';
+import { Line, LineChart, ResponsiveContainer, YAxis } from 'recharts';
+import { formatDistanceToNow } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  GROUP_LABELS,
+  SYNCED_METRICS,
+  describeMetric,
+  formatMetricValue,
+  metricNumber,
+  type MetricDescriptor,
+} from '@/lib/healthMetrics';
+
+interface AllHealthMetricsProps {
+  selectedPersonId: string | null;
+}
+
+const WINDOW_OPTIONS = [
+  { days: 1, label: '24h' },
+  { days: 7, label: '7d' },
+  { days: 30, label: '30d' },
+];
+
+// device_data rows are small but a wearable emits a lot of them; cap the pull so a busy
+// month cannot drag the dashboard down. Newest first, so a cap trims the oldest.
+//
+// This cap is why the sparkline data cannot also drive the tiles: it applies across all
+// types at once, so heart rate (a row a minute) can push a whole week of weight readings
+// out of the result. Counts and latest values come from device_metric_summary instead,
+// which is exact per metric; a sparkline is a sample by nature, so skew is fine there.
+const ROW_LIMIT = 4000;
+
+interface Reading {
+  data_type: string;
+  value: unknown;
+  unit: string | null;
+  recorded_at: string;
+}
+
+/** One row per data_type from the summary RPC — exact regardless of per-metric volume. */
+interface MetricRollup {
+  data_type: string;
+  reading_count: number;
+  latest_value: unknown;
+  latest_unit: string | null;
+  latest_recorded_at: string;
+}
+
+interface MetricSummary {
+  dataType: string;
+  descriptor: MetricDescriptor;
+  /** Null when nothing has been recorded for this metric in the window. */
+  latest: MetricRollup | null;
+  count: number;
+  unit: string;
+  series: { t: number; v: number }[];
+}
+
+/**
+ * Every metric the sync can record for a person, grouped and charted.
+ *
+ * Shows the whole catalogue rather than only what is already stored: a metric that has
+ * never arrived renders as "not recorded" instead of vanishing, which is what separates
+ * "this watch doesn't measure it" from "the sync isn't picking it up". Anything found in
+ * device_data but outside the catalogue (environment sensors, BLE peripherals) is included
+ * too, so nothing stored is ever hidden.
+ */
+const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
+  const { t } = useTranslation();
+  const [windowDays, setWindowDays] = useState(7);
+  const [hideEmpty, setHideEmpty] = useState(false);
+
+  const since = useMemo(
+    () => new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString(),
+    [windowDays]
+  );
+
+  // Null (not []) when the summary function is missing, so the card can fall back to the
+  // raw rows instead of reporting "no readings" — an absent migration must never look
+  // identical to an absent device.
+  const { data: rollups, isLoading: isLoadingRollups } = useQuery({
+    queryKey: ['all-health-metrics', selectedPersonId, windowDays, 'summary'],
+    queryFn: async (): Promise<MetricRollup[] | null> => {
+      if (!selectedPersonId) return [];
+
+      const { data, error } = await supabase.rpc('device_metric_summary', {
+        p_person_id: selectedPersonId,
+        p_since: since,
+      });
+
+      if (error) {
+        // 42883 undefined_function / PGRST202 no such RPC: the migration adding
+        // device_metric_summary has not been applied to this project yet.
+        if (error.code === '42883' || error.code === 'PGRST202') {
+          console.warn(
+            'device_metric_summary is unavailable (migration not applied); ' +
+              'falling back to raw rows, so per-metric counts may be capped.',
+            error
+          );
+          return null;
+        }
+        throw error;
+      }
+      return (data ?? []) as MetricRollup[];
+    },
+    enabled: !!selectedPersonId,
+  });
+
+  const { data: readings = [], isLoading: isLoadingReadings } = useQuery({
+    queryKey: ['all-health-metrics', selectedPersonId, windowDays],
+    queryFn: async (): Promise<Reading[]> => {
+      if (!selectedPersonId) return [];
+
+      const { data, error } = await supabase
+        .from('device_data')
+        .select('data_type, value, unit, recorded_at')
+        .eq('elderly_person_id', selectedPersonId)
+        .gte('recorded_at', since)
+        .order('recorded_at', { ascending: false })
+        .limit(ROW_LIMIT);
+
+      if (error) throw error;
+      return (data ?? []) as Reading[];
+    },
+    enabled: !!selectedPersonId,
+  });
+
+  const { grouped, recordedCount, totalCount } = useMemo(() => {
+    const byType = new Map<string, Reading[]>();
+    for (const reading of readings) {
+      const list = byType.get(reading.data_type);
+      if (list) list.push(reading);
+      else byType.set(reading.data_type, [reading]);
+    }
+
+    // Undefined while loading, null when the RPC is missing; both mean "derive from rows".
+    const haveRollups = Array.isArray(rollups);
+    const byTypeRollup = new Map((rollups ?? []).map((r) => [r.data_type, r]));
+
+    // The full catalogue first, then anything stored that is not part of it — so a metric
+    // from an environment sensor or BLE peripheral still shows up rather than being
+    // silently dropped for not being a Health Connect type.
+    const extras = [...byTypeRollup.keys(), ...byType.keys()].filter(
+      (type) => !SYNCED_METRICS.includes(type)
+    );
+    const allTypes = [...SYNCED_METRICS, ...new Set(extras)];
+
+    const summaries: MetricSummary[] = allTypes.map((dataType) => {
+      const descriptor = describeMetric(dataType);
+      const rollup = byTypeRollup.get(dataType) ?? null;
+      const rows = byType.get(dataType) ?? [];
+
+      // rows arrive newest first; reverse for a left-to-right time axis.
+      const series = rows
+        .map((r) => ({ t: new Date(r.recorded_at).getTime(), v: metricNumber(dataType, r.value) }))
+        .filter((p): p is { t: number; v: number } => p.v !== null)
+        .reverse();
+
+      // Prefer the rollup: the raw pull is capped across all types, so a low-volume metric
+      // can be missing from it entirely while still having readings. Without the rollup,
+      // rows are all there is — counts are then capped, which is far better than blank.
+      const fromRows: MetricRollup | null = rows.length
+        ? {
+            data_type: dataType,
+            reading_count: rows.length,
+            latest_value: rows[0].value,
+            latest_unit: rows[0].unit,
+            latest_recorded_at: rows[0].recorded_at,
+          }
+        : null;
+      const latest = haveRollups ? rollup : fromRows;
+
+      return {
+        dataType,
+        descriptor,
+        latest,
+        count: latest?.reading_count ?? 0,
+        unit: latest?.latest_unit || descriptor.unit,
+        series,
+      };
+    });
+
+    const visible = hideEmpty ? summaries.filter((s) => s.count > 0) : summaries;
+
+    const byGroup = new Map<MetricDescriptor['group'], MetricSummary[]>();
+    // Recorded metrics lead within each group; an empty one is a placeholder and should
+    // never push a live reading further down the card.
+    const ordered = [...visible].sort((a, b) => {
+      if ((a.count > 0) !== (b.count > 0)) return a.count > 0 ? -1 : 1;
+      return a.descriptor.label.localeCompare(b.descriptor.label);
+    });
+    for (const summary of ordered) {
+      const list = byGroup.get(summary.descriptor.group);
+      if (list) list.push(summary);
+      else byGroup.set(summary.descriptor.group, [summary]);
+    }
+
+    const order: MetricDescriptor['group'][] = [
+      'vitals',
+      'activity',
+      'sleep',
+      'body',
+      'environment',
+      'other',
+    ];
+
+    return {
+      grouped: order
+        .filter((g) => byGroup.has(g))
+        .map((g) => ({ group: g, metrics: byGroup.get(g)! })),
+      recordedCount: summaries.filter((s) => s.count > 0).length,
+      totalCount: summaries.length,
+    };
+  }, [readings, rollups, hideEmpty]);
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              {t('dashboard.allMetrics.title', 'All health metrics')}
+            </CardTitle>
+            <CardDescription>
+              {t('dashboard.allMetrics.description', {
+                recorded: recordedCount,
+                total: totalCount,
+                defaultValue: '{{recorded}} of {{total}} metrics recorded by connected devices',
+              })}
+            </CardDescription>
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <div className="flex gap-1">
+              {WINDOW_OPTIONS.map((option) => (
+                <Button
+                  key={option.days}
+                  size="sm"
+                  variant={windowDays === option.days ? 'default' : 'outline'}
+                  className="h-7 px-2"
+                  onClick={() => setWindowDays(option.days)}
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 px-2 text-[11px] text-muted-foreground"
+              onClick={() => setHideEmpty((v) => !v)}
+            >
+              {hideEmpty
+                ? t('dashboard.allMetrics.showAll', 'Show all metrics')
+                : t('dashboard.allMetrics.hideEmpty', 'Hide not recorded')}
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        {isLoadingRollups || isLoadingReadings ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : recordedCount === 0 ? (
+          <p className="text-sm text-muted-foreground py-6 text-center">
+            {t(
+              'dashboard.allMetrics.empty',
+              'No device readings in this period. Sync a device to see its metrics here.'
+            )}
+          </p>
+        ) : (
+          <div className="space-y-6">
+            {grouped.map(({ group, metrics }) => (
+              <div key={group} className="space-y-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {GROUP_LABELS[group]}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {metrics.map((metric) => (
+                    <div
+                      key={metric.dataType}
+                      className={`rounded-lg border p-3 space-y-2 ${
+                        metric.latest ? '' : 'border-dashed bg-muted/30'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground truncate">
+                            {metric.descriptor.label}
+                          </p>
+                          <p
+                            className={`text-xl font-semibold leading-tight ${
+                              metric.latest ? '' : 'text-muted-foreground/50'
+                            }`}
+                          >
+                            {metric.latest
+                              ? formatMetricValue(metric.dataType, metric.latest.latest_value)
+                              : '—'}
+                            {metric.latest && metric.unit && (
+                              <span className="ml-1 text-xs font-normal text-muted-foreground">
+                                {metric.unit}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                        {metric.count > 0 && (
+                          <Badge variant="secondary" className="shrink-0 text-[10px]">
+                            {metric.count}
+                          </Badge>
+                        )}
+                      </div>
+
+                      {/* Two points is the minimum that says anything about direction. */}
+                      {metric.series.length > 1 && (
+                        <div className="h-10 -mx-1">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={metric.series}>
+                              <YAxis hide domain={['dataMin', 'dataMax']} />
+                              <Line
+                                type="monotone"
+                                dataKey="v"
+                                stroke="hsl(var(--primary))"
+                                strokeWidth={1.5}
+                                dot={false}
+                                isAnimationActive={false}
+                              />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      )}
+
+                      <p className="text-[11px] text-muted-foreground">
+                        {metric.latest
+                          ? formatDistanceToNow(new Date(metric.latest.latest_recorded_at), {
+                              addSuffix: true,
+                            })
+                          : t('dashboard.allMetrics.notRecorded', 'Not recorded')}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default AllHealthMetrics;

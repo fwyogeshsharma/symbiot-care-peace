@@ -692,6 +692,14 @@
     "vitalMetricsDesc": "Heart rate, blood pressure, oxygen levels",
     "healthCharts": "Health Metrics Charts",
     "healthChartsDesc": "Detailed health trend charts and history",
+    "allMetrics": {
+      "title": "All health metrics",
+      "description": "{{recorded}} of {{total}} metrics recorded by connected devices",
+      "empty": "No device readings in this period. Sync a device to see its metrics here.",
+      "notRecorded": "Not recorded",
+      "showAll": "Show all metrics",
+      "hideEmpty": "Hide not recorded"
+    },
     "alerts": "Active Alerts",
     "alertsDesc": "Current alerts and notifications",
     "panicSos": "Panic/SOS Events",

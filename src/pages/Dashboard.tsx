@@ -3,7 +3,8 @@ import { Card } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
-import VitalMetrics from '@/components/dashboard/VitalMetrics';
+// import VitalMetrics from '@/components/dashboard/VitalMetrics';
+import AllHealthMetrics from '@/components/dashboard/AllHealthMetrics';
 import AlertsList from '@/components/dashboard/AlertsList';
 import ElderlyList from '@/components/dashboard/ElderlyList';
 import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
@@ -190,9 +191,10 @@ const Dashboard = () => {
           <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Left Column - Health & Monitoring */}
             <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-              {isComponentEnabled('vital-metrics') && (
+              {/* {isComponentEnabled('vital-metrics') && (
                 <VitalMetrics selectedPersonId={selectedPersonId} />
-              )}
+              )} */}
+              <AllHealthMetrics selectedPersonId={selectedPersonId} />
               {isComponentEnabled('health-charts') && (
                 <HealthMetricsCharts 
                   open={healthChartsOpen} 

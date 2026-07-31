@@ -1340,6 +1340,14 @@
     "vitalSigns": "Vitalzeichen",
     "activity": "Aktivität",
     "quickActions": "Schnellaktionen",
+    "allMetrics": {
+      "title": "Alle Gesundheitswerte",
+      "description": "{{recorded}} von {{total}} Messwerten von verbundenen Geräten erfasst",
+      "empty": "In diesem Zeitraum keine Gerätemesswerte. Synchronisieren Sie ein Gerät, um seine Werte hier zu sehen.",
+      "notRecorded": "Nicht erfasst",
+      "showAll": "Alle Messwerte anzeigen",
+      "hideEmpty": "Nicht erfasste ausblenden"
+    },
     "stats": {
       "monitoredPersons": {
         "label": "Überwachte Personen",

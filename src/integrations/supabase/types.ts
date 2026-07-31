@@ -1648,6 +1648,16 @@ export type Database = {
           status: string
         }[]
       }
+      device_metric_summary: {
+        Args: { p_person_id: string; p_since: string }
+        Returns: {
+          data_type: string
+          latest_recorded_at: string
+          latest_unit: string | null
+          latest_value: Json
+          reading_count: number
+        }[]
+      }
       get_accessible_elderly_persons: {
         Args: { _user_id: string }
         Returns: {

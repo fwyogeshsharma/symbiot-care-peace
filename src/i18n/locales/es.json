@@ -1348,6 +1348,14 @@
     "vitalSigns": "Signos Vitales",
     "activity": "Actividad",
     "quickActions": "Acciones Rápidas",
+    "allMetrics": {
+      "title": "Todas las métricas de salud",
+      "description": "{{recorded}} de {{total}} métricas registradas por los dispositivos conectados",
+      "empty": "No hay lecturas de dispositivos en este periodo. Sincroniza un dispositivo para ver sus métricas aquí.",
+      "notRecorded": "Sin registrar",
+      "showAll": "Mostrar todas las métricas",
+      "hideEmpty": "Ocultar sin registrar"
+    },
     "stats": {
       "monitoredPersons": {
         "label": "Personas Monitoreadas",
