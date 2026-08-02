@@ -21,7 +21,7 @@ export const SleepQualityReport = ({ selectedPerson, dateRange }: SleepQualityRe
       let query = supabase
         .from('device_data')
         .select('*')
-        .eq('data_type', 'sleep_quality')
+        .eq('data_type', 'sleep')
         .gte('recorded_at', dateRange.from.toISOString())
         .lte('recorded_at', dateRange.to.toISOString())
         .order('recorded_at', { ascending: true});
@@ -44,21 +44,28 @@ export const SleepQualityReport = ({ selectedPerson, dateRange }: SleepQualityRe
     return Number(value) || 0;
   };
 
+  // Health Connect has no "quality score" — sleep_efficiency_percentage (time asleep vs
+  // time in bed) is the closest real equivalent. Duration comes in as minutes; this report
+  // works in hours throughout, as it did before this pulled from real device data.
+  const extractQuality = (value: any) => extractValue(value, 'sleep_efficiency_percentage');
+  const extractDurationHours = (value: any) => extractValue(value, 'duration_minutes') / 60;
+  const extractDisturbances = (value: any) => extractValue(value, 'awakenings_count');
+
   // Group by day and aggregate
   const chartData = sleepData.reduce((acc: any[], item) => {
     const date = format(new Date(item.recorded_at), 'dMMM');
     const existing = acc.find(d => d.date === date);
 
     if (existing) {
-      existing.qualityValues.push(extractValue(item.value, 'quality'));
-      existing.durationValues.push(extractValue(item.value, 'duration'));
-      existing.disturbances = (existing.disturbances || 0) + extractValue(item.value, 'disturbances');
+      existing.qualityValues.push(extractQuality(item.value));
+      existing.durationValues.push(extractDurationHours(item.value));
+      existing.disturbances = (existing.disturbances || 0) + extractDisturbances(item.value);
     } else {
       acc.push({
         date,
-        qualityValues: [extractValue(item.value, 'quality')],
-        durationValues: [extractValue(item.value, 'duration')],
-        disturbances: extractValue(item.value, 'disturbances'),
+        qualityValues: [extractQuality(item.value)],
+        durationValues: [extractDurationHours(item.value)],
+        disturbances: extractDisturbances(item.value),
       });
     }
     return acc;
@@ -70,19 +77,19 @@ export const SleepQualityReport = ({ selectedPerson, dateRange }: SleepQualityRe
   }));
 
   const avgQuality = sleepData.length > 0
-    ? Math.round(sleepData.reduce((sum, item) => sum + extractValue(item.value, 'quality'), 0) / sleepData.length)
+    ? Math.round(sleepData.reduce((sum, item) => sum + extractQuality(item.value), 0) / sleepData.length)
     : 0;
 
   const avgDuration = sleepData.length > 0
-    ? (sleepData.reduce((sum, item) => sum + extractValue(item.value, 'duration'), 0) / sleepData.length).toFixed(1)
+    ? (sleepData.reduce((sum, item) => sum + extractDurationHours(item.value), 0) / sleepData.length).toFixed(1)
     : 0;
 
   const avgDisturbances = sleepData.length > 0
-    ? Math.round(sleepData.reduce((sum, item) => sum + extractValue(item.value, 'disturbances'), 0) / sleepData.length)
+    ? Math.round(sleepData.reduce((sum, item) => sum + extractDisturbances(item.value), 0) / sleepData.length)
     : 0;
 
-  const goodNights = sleepData.filter(item => extractValue(item.value, 'quality') >= 80).length;
-  const poorNights = sleepData.filter(item => extractValue(item.value, 'quality') < 60).length;
+  const goodNights = sleepData.filter(item => extractQuality(item.value) >= 80).length;
+  const poorNights = sleepData.filter(item => extractQuality(item.value) < 60).length;
 
   const sleepEfficiency = avgDuration && Number(avgDuration) > 0
     ? Math.round((Number(avgDuration) / 8) * 100)

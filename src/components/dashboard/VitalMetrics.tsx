@@ -158,6 +158,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       temperature: Thermometer,
       steps: Footprints,
       activity: Activity,
+      sleep: Moon,
       sleep_quality: Moon,
       sleep_stage: Moon,
       medication_taken: Pill,
@@ -253,6 +254,17 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         if (bodyFat === null) return 'text-foreground';
         if (bodyFat < 15 || bodyFat > 30) return 'text-warning';
         return 'text-success';
+
+      // No "quality score" in Health Connect — sleep_efficiency_percentage (time asleep
+      // vs time in bed) is the closest real equivalent.
+      case 'sleep':
+        const sleepEfficiency = typeof value?.sleep_efficiency_percentage === 'number'
+          ? value.sleep_efficiency_percentage
+          : null;
+        if (sleepEfficiency === null) return 'text-foreground';
+        if (sleepEfficiency >= 80) return 'text-success';
+        if (sleepEfficiency >= 60) return 'text-warning';
+        return 'text-destructive';
 
       case 'sleep_quality':
         const sleepQuality = extractNumericValue(value, type);
@@ -354,6 +366,18 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
           .split(' ')
           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
           .join(' ');
+
+      case 'sleep': {
+        const durationMinutes = extractNumericValue(value, type);
+        if (durationMinutes === null) return 'N/A';
+        const hours = Math.floor(durationMinutes / 60);
+        const minutes = Math.round(durationMinutes % 60);
+        const durationStr = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+        const efficiency = value?.sleep_efficiency_percentage;
+        return typeof efficiency === 'number'
+          ? `${durationStr} (${Math.round(efficiency)}%)`
+          : durationStr;
+      }
 
       case 'sleep_quality':
         const quality = extractNumericValue(value, type);
@@ -515,6 +539,7 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
       temperature: 'healthMetrics.types.temperature',
       steps: 'healthMetrics.types.steps',
       activity: 'healthMetrics.types.activity',
+      sleep: 'healthMetrics.types.sleep',
       sleep_quality: 'healthMetrics.types.sleep_quality',
       sleep_stage: 'healthMetrics.types.sleep_stage',
       medication_taken: 'healthMetrics.types.medication_taken',

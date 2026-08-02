@@ -54,7 +54,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
         .from('device_data')
         .select('recorded_at')
         .eq('elderly_person_id', selectedPersonId)
-        .in('data_type', ['heart_rate', 'blood_pressure', 'oxygen_saturation', 'temperature', 'sleep_quality'])
+        .in('data_type', ['heart_rate', 'blood_pressure', 'oxygen_saturation', 'temperature', 'sleep'])
         .order('recorded_at', { ascending: true })
         .limit(1);
 
@@ -95,7 +95,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           'blood_pressure',
           'oxygen_saturation',
           'temperature',
-          'sleep_quality',
+          'sleep',
           'humidity',
           'button_pressed'
         ])
@@ -192,8 +192,8 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
 
       // Extract numeric value from different formats
       if (typeof value === 'object' && value !== null) {
-        if ('quality' in value && dataType === 'sleep_quality') {
-          value = value.quality;
+        if (dataType === 'sleep' && typeof value.sleep_efficiency_percentage === 'number') {
+          value = value.sleep_efficiency_percentage;
         } else if ('value' in value) {
           value = value.value;
         } else if ('bpm' in value) {
@@ -676,7 +676,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
             <TabsContent value="sleep_quality" className="mt-4">
               <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-4">{t('healthMetrics.charts.sleepOverTime')}</h3>
-                {renderChart('sleep_quality', t('healthMetrics.charts.sleepQuality'), 'hsl(var(--info))', '%')}
+                {renderChart('sleep', t('healthMetrics.charts.sleepQuality'), 'hsl(var(--info))', '%')}
               </Card>
             </TabsContent>
 

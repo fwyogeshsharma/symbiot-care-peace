@@ -38,6 +38,7 @@ import androidx.health.connect.client.records.WheelchairPushesRecord
 import androidx.health.connect.client.records.metadata.DataOrigin
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
+import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
 import kotlin.reflect.KClass
@@ -368,17 +369,68 @@ class HealthConnectReader(private val context: Context) {
             record.endTime
         )
 
-        // A session becomes one summary row plus a row per stage, so a caller can chart
-        // total sleep without unpacking stages, or break it down when it wants to.
+        // A session becomes one summary row carrying every stage-derived figure (time
+        // asleep, efficiency, awakenings, per-stage minutes, the raw stage timeline) plus a
+        // row per stage, so a caller can chart total sleep without unpacking stages, or
+        // break it down when it wants to.
         is SleepSessionRecord -> buildList {
+            val stageMinutes = linkedMapOf(
+                "awake" to 0L,
+                "awake_in_bed" to 0L,
+                "out_of_bed" to 0L,
+                "light" to 0L,
+                "deep" to 0L,
+                "rem" to 0L,
+                "sleeping" to 0L,
+                "unknown" to 0L
+            )
+            var awakenings = 0
+            val stagesJson = JSONArray()
+
+            record.stages.forEach { stage ->
+                val name = sleepStageName(stage.stage)
+                val minutes = minutesBetween(stage.startTime, stage.endTime)
+                stageMinutes[name] = (stageMinutes[name] ?: 0L) + minutes
+                if (stage.stage == SleepSessionRecord.STAGE_TYPE_AWAKE) awakenings++
+                stagesJson.put(
+                    JSONObject()
+                        .put("stage", name)
+                        .put("start", stage.startTime.toString())
+                        .put("end", stage.endTime.toString())
+                        .put("duration_minutes", minutes)
+                )
+            }
+
+            val totalMinutes = minutesBetween(record.startTime, record.endTime)
+            // "Asleep" excludes awake/out-of-bed/unknown segments; "sleeping" covers devices
+            // that report one undifferentiated asleep stage instead of light/deep/REM.
+            val asleepMinutes = (stageMinutes["light"] ?: 0L) +
+                (stageMinutes["deep"] ?: 0L) +
+                (stageMinutes["rem"] ?: 0L) +
+                (stageMinutes["sleeping"] ?: 0L)
+            val efficiencyPercentage: Long? =
+                if (totalMinutes > 0) Math.round(asleepMinutes.toDouble() / totalMinutes * 100) else null
+
             add(
                 Reading(
                     "sleep",
                     JSONObject()
-                        .put("duration_minutes", minutesBetween(record.startTime, record.endTime))
+                        .put("duration_minutes", totalMinutes)
                         .put("start", record.startTime.toString())
                         .put("end", record.endTime.toString())
-                        .put("title", record.title ?: JSONObject.NULL),
+                        .put("title", record.title ?: JSONObject.NULL)
+                        .put("notes", record.notes ?: JSONObject.NULL)
+                        .put("time_in_bed_minutes", totalMinutes)
+                        .put("time_asleep_minutes", asleepMinutes)
+                        .put("sleep_efficiency_percentage", efficiencyPercentage ?: JSONObject.NULL)
+                        .put("awakenings_count", awakenings)
+                        .put(
+                            "stage_minutes",
+                            JSONObject().apply {
+                                stageMinutes.forEach { (name, minutes) -> put("${name}_minutes", minutes) }
+                            }
+                        )
+                        .put("stages", stagesJson),
                     "minutes",
                     record.endTime.toEpochMilli()
                 )

@@ -83,6 +83,7 @@
       "temperature": "Température Corporelle",
       "steps": "Pas Aujourd'hui",
       "activity": "Niveau d'Activité",
+      "sleep": "Sommeil",
       "sleep_quality": "Qualité du Sommeil",
       "sleep_stage": "Stade du Sommeil",
       "medication_taken": "Médicament Pris",

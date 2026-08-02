@@ -25,7 +25,7 @@ export const ILQScoreTrendsReport = ({ selectedPerson, dateRange }: ILQScoreTren
         .select('*')
         .in('data_type', [
           'heart_rate', 'blood_pressure', 'oxygen_saturation', 'steps',
-          'sleep_quality', 'activity_level', 'blood_sugar', 'glucose'
+          'sleep', 'activity_level', 'blood_sugar', 'glucose'
         ])
         .gte('recorded_at', dateRange.from.toISOString())
         .lte('recorded_at', dateRange.to.toISOString())
@@ -88,10 +88,11 @@ export const ILQScoreTrendsReport = ({ selectedPerson, dateRange }: ILQScoreTren
       factors++;
     }
 
-    // Sleep Quality (max 20 points)
-    const sleepData = dayData.filter(d => d.data_type === 'sleep_quality');
+    // Sleep Quality (max 20 points) — sleep_efficiency_percentage is the closest Health
+    // Connect equivalent to a "quality" score.
+    const sleepData = dayData.filter(d => d.data_type === 'sleep');
     if (sleepData.length > 0) {
-      const avgSleep = sleepData.reduce((sum, d) => sum + extractValue(d.value, 'quality'), 0) / sleepData.length;
+      const avgSleep = sleepData.reduce((sum, d) => sum + extractValue(d.value, 'sleep_efficiency_percentage'), 0) / sleepData.length;
       if (avgSleep >= 80) score += 20;
       else if (avgSleep >= 60) score += 15;
       else if (avgSleep >= 40) score += 10;

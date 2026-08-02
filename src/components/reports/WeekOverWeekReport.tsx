@@ -22,7 +22,7 @@ export const WeekOverWeekReport = ({ selectedPerson, dateRange }: WeekOverWeekRe
         .from('device_data')
         .select('*')
         .in('data_type', [
-          'heart_rate', 'oxygen_saturation', 'steps', 'sleep_quality',
+          'heart_rate', 'oxygen_saturation', 'steps', 'sleep',
           'blood_pressure', 'blood_sugar', 'glucose'
         ])
         .gte('recorded_at', dateRange.from.toISOString())
@@ -63,7 +63,7 @@ export const WeekOverWeekReport = ({ selectedPerson, dateRange }: WeekOverWeekRe
     const heartRateData = weekData.filter(d => d.data_type === 'heart_rate');
     const o2Data = weekData.filter(d => d.data_type === 'oxygen_saturation');
     const stepsData = weekData.filter(d => d.data_type === 'steps');
-    const sleepData = weekData.filter(d => d.data_type === 'sleep_quality');
+    const sleepData = weekData.filter(d => d.data_type === 'sleep');
 
     return {
       week: format(weekStart, 'MMM dd'),
@@ -78,8 +78,10 @@ export const WeekOverWeekReport = ({ selectedPerson, dateRange }: WeekOverWeekRe
       steps: stepsData.length > 0
         ? Math.round(stepsData.reduce((sum, d) => sum + extractValue(d.value), 0) / stepsData.length)
         : 0,
+      // No "quality score" in Health Connect — sleep_efficiency_percentage (time asleep vs
+      // time in bed) is the closest real equivalent.
       sleepQuality: sleepData.length > 0
-        ? Math.round(sleepData.reduce((sum, d) => sum + extractValue(d.value, 'quality'), 0) / sleepData.length)
+        ? Math.round(sleepData.reduce((sum, d) => sum + extractValue(d.value, 'sleep_efficiency_percentage'), 0) / sleepData.length)
         : 0,
     };
   });

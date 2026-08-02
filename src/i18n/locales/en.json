@@ -95,6 +95,7 @@
       "temperature": "Body Temperature",
       "steps": "Steps Today",
       "activity": "Activity Level",
+      "sleep": "Sleep",
       "sleep_quality": "Sleep Quality",
       "sleep_stage": "Sleep Stage",
       "medication_taken": "Medication Taken",

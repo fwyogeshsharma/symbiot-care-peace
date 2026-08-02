@@ -22,7 +22,7 @@ export const MonthOverMonthReport = ({ selectedPerson, dateRange }: MonthOverMon
         .from('device_data')
         .select('*')
         .in('data_type', [
-          'heart_rate', 'oxygen_saturation', 'steps', 'sleep_quality',
+          'heart_rate', 'oxygen_saturation', 'steps', 'sleep',
           'blood_pressure', 'blood_sugar', 'glucose', 'activity_level'
         ])
         .gte('recorded_at', dateRange.from.toISOString())
@@ -63,7 +63,7 @@ export const MonthOverMonthReport = ({ selectedPerson, dateRange }: MonthOverMon
     const heartRateData = monthData.filter(d => d.data_type === 'heart_rate');
     const o2Data = monthData.filter(d => d.data_type === 'oxygen_saturation');
     const stepsData = monthData.filter(d => d.data_type === 'steps');
-    const sleepData = monthData.filter(d => d.data_type === 'sleep_quality');
+    const sleepData = monthData.filter(d => d.data_type === 'sleep');
     const glucoseData = monthData.filter(d => d.data_type === 'blood_sugar' || d.data_type === 'glucose');
 
     return {
@@ -80,11 +80,13 @@ export const MonthOverMonthReport = ({ selectedPerson, dateRange }: MonthOverMon
         ? Math.round(stepsData.reduce((sum, d) => sum + extractValue(d.value), 0) / stepsData.length)
         : 0,
       totalSteps: stepsData.reduce((sum, d) => sum + extractValue(d.value), 0),
+      // No "quality score" in Health Connect — sleep_efficiency_percentage (time asleep vs
+      // time in bed) is the closest real equivalent.
       sleepQuality: sleepData.length > 0
-        ? Math.round(sleepData.reduce((sum, d) => sum + extractValue(d.value, 'quality'), 0) / sleepData.length)
+        ? Math.round(sleepData.reduce((sum, d) => sum + extractValue(d.value, 'sleep_efficiency_percentage'), 0) / sleepData.length)
         : 0,
       sleepDuration: sleepData.length > 0
-        ? (sleepData.reduce((sum, d) => sum + extractValue(d.value, 'duration'), 0) / sleepData.length).toFixed(1)
+        ? (sleepData.reduce((sum, d) => sum + extractValue(d.value, 'duration_minutes'), 0) / sleepData.length / 60).toFixed(1)
         : 0,
       glucose: glucoseData.length > 0
         ? Math.round(glucoseData.reduce((sum, d) => sum + extractValue(d.value), 0) / glucoseData.length)

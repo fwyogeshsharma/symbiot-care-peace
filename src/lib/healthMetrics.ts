@@ -55,7 +55,8 @@ export const METRIC_REGISTRY: Record<string, MetricDescriptor> = {
   bmi: { label: 'BMI', valueKey: 'value', unit: '', precision: 1, group: 'body' },
   basal_metabolic_rate: { label: 'Basal metabolic rate', valueKey: 'kcal_per_day', unit: 'kcal/day', precision: 0, group: 'body' },
 
-  sleep: { label: 'Sleep', valueKey: 'duration_minutes', unit: 'min', precision: 0, group: 'sleep' },
+  // Unit is embedded in formatMetricValue's "Xh Ym" output rather than appended separately.
+  sleep: { label: 'Sleep', valueKey: 'duration_minutes', unit: '', precision: 0, group: 'sleep' },
   sleep_stage: { label: 'Sleep stage', valueKey: 'duration_minutes', unit: 'min', precision: 0, group: 'sleep' },
   sleep_quality: { label: 'Sleep quality', valueKey: 'score', unit: '', precision: 0, group: 'sleep' },
 };
@@ -213,6 +214,16 @@ export const formatMetricValue = (dataType: string, value: unknown): string => {
   if (dataType === 'sleep_stage' && record && typeof record.stage === 'string') {
     const minutes = metricNumber(dataType, value);
     return minutes === null ? record.stage : `${record.stage} · ${Math.round(minutes)}m`;
+  }
+
+  if (dataType === 'sleep' && record) {
+    const totalMinutes = metricNumber(dataType, value);
+    if (totalMinutes === null) return '—';
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = Math.round(totalMinutes % 60);
+    const duration = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+    const efficiency = record.sleep_efficiency_percentage;
+    return typeof efficiency === 'number' ? `${duration} · ${Math.round(efficiency)}%` : duration;
   }
 
   const numeric = metricNumber(dataType, value);

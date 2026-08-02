@@ -37,6 +37,7 @@ export const HEALTH_DATA_TYPES = [
   'blood_pressure',
   'temperature',
   'oxygen_saturation',
+  'sleep',
   'sleep_quality',
   'sleep_stage',
   'medication_taken',
