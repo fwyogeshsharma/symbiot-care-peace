@@ -10,12 +10,14 @@ import { formatDistanceToNow } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import {
   GROUP_LABELS,
+  METRIC_PERMISSIONS,
   SYNCED_METRICS,
   describeMetric,
   formatMetricValue,
   metricNumber,
   type MetricDescriptor,
 } from '@/lib/healthMetrics';
+import { checkNativeHealthPermissions } from '@/lib/capacitor/backgroundSync';
 
 interface AllHealthMetricsProps {
   selectedPersonId: string | null;
@@ -60,6 +62,12 @@ interface MetricSummary {
   count: number;
   unit: string;
   series: { t: number; v: number }[];
+  /**
+   * True when the metric has no data *and* Health Connect permission for it was declined.
+   * Separates "you haven't allowed this" from "your watch doesn't publish it" — the two
+   * look identical otherwise, since a declined type is skipped silently on read.
+   */
+  blocked: boolean;
 }
 
 /**
@@ -70,6 +78,12 @@ interface MetricSummary {
  * "this watch doesn't measure it" from "the sync isn't picking it up". Anything found in
  * device_data but outside the catalogue (environment sensors, BLE peripherals) is included
  * too, so nothing stored is ever hidden.
+ *
+ * The 24h/7d/30d buttons only scope the sparkline and the reading-count badge. Each tile's
+ * headline value is the latest reading ever recorded for that metric, from any device — a
+ * metric that has not synced within the window (e.g. sleep, three days quiet) keeps showing
+ * its last known value with its own age underneath, rather than going blank. It stays cached
+ * like that until a newer reading for that person and metric arrives and replaces it.
  */
 const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
   const { t } = useTranslation();
@@ -131,7 +145,14 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
     enabled: !!selectedPersonId,
   });
 
-  const { grouped, recordedCount, totalCount } = useMemo(() => {
+  // Null on web, where there are no Health Connect permissions to report on.
+  const { data: permissions } = useQuery({
+    queryKey: ['health-connect-permissions'],
+    staleTime: 60 * 1000,
+    queryFn: () => checkNativeHealthPermissions(),
+  });
+
+  const { grouped, recordedCount, totalCount, blockedCount } = useMemo(() => {
     const byType = new Map<string, Reading[]>();
     for (const reading of readings) {
       const list = byType.get(reading.data_type);
@@ -176,6 +197,8 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
         : null;
       const latest = haveRollups ? rollup : fromRows;
 
+      const permission = METRIC_PERMISSIONS[dataType];
+
       return {
         dataType,
         descriptor,
@@ -183,16 +206,21 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
         count: latest?.reading_count ?? 0,
         unit: latest?.latest_unit || descriptor.unit,
         series,
+        blocked:
+          !latest && !!permission && !!permissions && !permissions.granted.includes(permission),
       };
     });
 
-    const visible = hideEmpty ? summaries.filter((s) => s.count > 0) : summaries;
+    // "Recorded" means a reading exists at all, not that one landed inside the selected
+    // window - a metric that last synced days ago is still recorded, just stale. Keying
+    // this off `count` (which is windowed) would hide or bury it right after a sync gap.
+    const visible = hideEmpty ? summaries.filter((s) => s.latest) : summaries;
 
     const byGroup = new Map<MetricDescriptor['group'], MetricSummary[]>();
     // Recorded metrics lead within each group; an empty one is a placeholder and should
     // never push a live reading further down the card.
     const ordered = [...visible].sort((a, b) => {
-      if ((a.count > 0) !== (b.count > 0)) return a.count > 0 ? -1 : 1;
+      if (!!a.latest !== !!b.latest) return a.latest ? -1 : 1;
       return a.descriptor.label.localeCompare(b.descriptor.label);
     });
     for (const summary of ordered) {
@@ -214,10 +242,11 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
       grouped: order
         .filter((g) => byGroup.has(g))
         .map((g) => ({ group: g, metrics: byGroup.get(g)! })),
-      recordedCount: summaries.filter((s) => s.count > 0).length,
+      recordedCount: summaries.filter((s) => s.latest).length,
       totalCount: summaries.length,
+      blockedCount: summaries.filter((s) => s.blocked).length,
     };
-  }, [readings, rollups, hideEmpty]);
+  }, [readings, rollups, permissions, hideEmpty]);
 
   return (
     <Card>
@@ -234,6 +263,15 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
                 total: totalCount,
                 defaultValue: '{{recorded}} of {{total}} metrics recorded by connected devices',
               })}
+              {blockedCount > 0 && (
+                <span className="text-warning">
+                  {' · '}
+                  {t('dashboard.allMetrics.blockedCount', {
+                    count: blockedCount,
+                    defaultValue: '{{count}} blocked by permissions',
+                  })}
+                </span>
+              )}
             </CardDescription>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
@@ -269,7 +307,10 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
           <div className="flex justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
-        ) : recordedCount === 0 ? (
+        ) : recordedCount === 0 && blockedCount === 0 ? (
+          /* Nothing recorded and nothing blocked: the prompt to sync is more use than 31
+             empty tiles. With blocked metrics, the grid is shown so the user can see which
+             permissions are the reason — "sync a device" would be the wrong advice. */
           <p className="text-sm text-muted-foreground py-6 text-center">
             {t(
               'dashboard.allMetrics.empty',
@@ -337,12 +378,18 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
                         </div>
                       )}
 
-                      <p className="text-[11px] text-muted-foreground">
+                      <p
+                        className={`text-[11px] ${
+                          metric.blocked ? 'text-warning' : 'text-muted-foreground'
+                        }`}
+                      >
                         {metric.latest
                           ? formatDistanceToNow(new Date(metric.latest.latest_recorded_at), {
                               addSuffix: true,
                             })
-                          : t('dashboard.allMetrics.notRecorded', 'Not recorded')}
+                          : metric.blocked
+                            ? t('dashboard.allMetrics.permissionNeeded', 'Permission needed')
+                            : t('dashboard.allMetrics.notRecorded', 'Not recorded')}
                       </p>
                     </div>
                   ))}
