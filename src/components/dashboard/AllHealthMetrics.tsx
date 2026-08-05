@@ -78,6 +78,12 @@ interface MetricSummary {
  * "this watch doesn't measure it" from "the sync isn't picking it up". Anything found in
  * device_data but outside the catalogue (environment sensors, BLE peripherals) is included
  * too, so nothing stored is ever hidden.
+ *
+ * The 24h/7d/30d buttons only scope the sparkline and the reading-count badge. Each tile's
+ * headline value is the latest reading ever recorded for that metric, from any device — a
+ * metric that has not synced within the window (e.g. sleep, three days quiet) keeps showing
+ * its last known value with its own age underneath, rather than going blank. It stays cached
+ * like that until a newer reading for that person and metric arrives and replaces it.
  */
 const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
   const { t } = useTranslation();
@@ -205,13 +211,16 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
       };
     });
 
-    const visible = hideEmpty ? summaries.filter((s) => s.count > 0) : summaries;
+    // "Recorded" means a reading exists at all, not that one landed inside the selected
+    // window - a metric that last synced days ago is still recorded, just stale. Keying
+    // this off `count` (which is windowed) would hide or bury it right after a sync gap.
+    const visible = hideEmpty ? summaries.filter((s) => s.latest) : summaries;
 
     const byGroup = new Map<MetricDescriptor['group'], MetricSummary[]>();
     // Recorded metrics lead within each group; an empty one is a placeholder and should
     // never push a live reading further down the card.
     const ordered = [...visible].sort((a, b) => {
-      if ((a.count > 0) !== (b.count > 0)) return a.count > 0 ? -1 : 1;
+      if (!!a.latest !== !!b.latest) return a.latest ? -1 : 1;
       return a.descriptor.label.localeCompare(b.descriptor.label);
     });
     for (const summary of ordered) {
@@ -233,7 +242,7 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
       grouped: order
         .filter((g) => byGroup.has(g))
         .map((g) => ({ group: g, metrics: byGroup.get(g)! })),
-      recordedCount: summaries.filter((s) => s.count > 0).length,
+      recordedCount: summaries.filter((s) => s.latest).length,
       totalCount: summaries.length,
       blockedCount: summaries.filter((s) => s.blocked).length,
     };
