@@ -18,6 +18,7 @@ import { AlertNotificationDialog } from '@/components/dashboard/AlertNotificatio
 import { toast } from 'sonner';
 import { Footer } from '@/components/Footer';
 import { ToiletHealthInsights } from '@/components/dashboard/ToiletHealthInsights';
+import { DiseaseRiskInsights } from '@/components/dashboard/DiseaseRiskInsights';
 import { getDateRangePreset } from '@/lib/movementUtils';
 
 const Health = () => {
@@ -384,6 +385,7 @@ const Health = () => {
             <div data-tour="vital-metrics">
               <VitalMetrics selectedPersonId={selectedPersonId} />
             </div>
+            <DiseaseRiskInsights selectedPersonId={selectedPersonId} />
             {selectedPersonId && (
               <ToiletHealthInsights
                 selectedPerson={selectedPersonId}

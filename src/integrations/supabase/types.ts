@@ -619,6 +619,149 @@ export type Database = {
           },
         ]
       }
+      disease_risk_analysis_runs: {
+        Row: {
+          elderly_person_id: string
+          last_run_at: string
+          last_run_date: string
+          last_run_source: string | null
+        }
+        Insert: {
+          elderly_person_id: string
+          last_run_at?: string
+          last_run_date: string
+          last_run_source?: string | null
+        }
+        Update: {
+          elderly_person_id?: string
+          last_run_at?: string
+          last_run_date?: string
+          last_run_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disease_risk_analysis_runs_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: true
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disease_risk_flags: {
+        Row: {
+          computed_date: string
+          confidence_stars: number
+          confidence_tier: string
+          created_at: string
+          days_of_data: number
+          details: Json
+          disease_key: string
+          elderly_person_id: string
+          flagged: boolean
+          id: string
+          message: string | null
+          score: number | null
+          updated_at: string
+          window_days_used: number | null
+        }
+        Insert: {
+          computed_date?: string
+          confidence_stars?: number
+          confidence_tier: string
+          created_at?: string
+          days_of_data?: number
+          details?: Json
+          disease_key: string
+          elderly_person_id: string
+          flagged?: boolean
+          id?: string
+          message?: string | null
+          score?: number | null
+          updated_at?: string
+          window_days_used?: number | null
+        }
+        Update: {
+          computed_date?: string
+          confidence_stars?: number
+          confidence_tier?: string
+          created_at?: string
+          days_of_data?: number
+          details?: Json
+          disease_key?: string
+          elderly_person_id?: string
+          flagged?: boolean
+          id?: string
+          message?: string | null
+          score?: number | null
+          updated_at?: string
+          window_days_used?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disease_risk_flags_disease_key_fkey"
+            columns: ["disease_key"]
+            isOneToOne: false
+            referencedRelation: "disease_risk_thresholds"
+            referencedColumns: ["disease_key"]
+          },
+          {
+            foreignKeyName: "disease_risk_flags_elderly_person_id_fkey"
+            columns: ["elderly_person_id"]
+            isOneToOne: false
+            referencedRelation: "elderly_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disease_risk_thresholds: {
+        Row: {
+          base_confidence_stars: number
+          category: string
+          created_at: string
+          description: string | null
+          disease_key: string
+          disease_name: string
+          is_active: boolean
+          min_bucket_days: number
+          min_days: number
+          recommended_bucket_days: number
+          recommended_days: number
+          required_data_types: string[]
+          updated_at: string
+        }
+        Insert: {
+          base_confidence_stars: number
+          category: string
+          created_at?: string
+          description?: string | null
+          disease_key: string
+          disease_name: string
+          is_active?: boolean
+          min_bucket_days: number
+          min_days: number
+          recommended_bucket_days: number
+          recommended_days: number
+          required_data_types: string[]
+          updated_at?: string
+        }
+        Update: {
+          base_confidence_stars?: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          disease_key?: string
+          disease_name?: string
+          is_active?: boolean
+          min_bucket_days?: number
+          min_days?: number
+          recommended_bucket_days?: number
+          recommended_days?: number
+          required_data_types?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       elderly_persons: {
         Row: {
           address: string | null
@@ -1713,6 +1856,10 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       lookup_user_by_email: { Args: { _email: string }; Returns: string }
+      run_disease_risk_analysis: {
+        Args: { p_elderly_person_id: string; p_source?: string }
+        Returns: Json
+      }
       show_recent_cron_runs: {
         Args: never
         Returns: {
