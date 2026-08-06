@@ -135,9 +135,11 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
   const stepsData = dataByType.steps || [];
   const totalSteps = stepsData.reduce((sum: number, d: any) => sum + extractValue(d.value), 0);
 
-  const sleepData = dataByType.sleep_quality || [];
+  const sleepData = dataByType.sleep || [];
+  // No "quality score" in Health Connect — sleep efficiency (time asleep vs time in bed)
+  // is the closest real equivalent.
   const avgSleep = sleepData.length > 0
-    ? Math.round(sleepData.reduce((sum: number, d: any) => sum + extractValue(d.value, 'quality'), 0) / sleepData.length)
+    ? Math.round(sleepData.reduce((sum: number, d: any) => sum + extractValue(d.value, 'sleep_efficiency_percentage'), 0) / sleepData.length)
     : null;
 
   const glucoseData = dataByType.blood_sugar || dataByType.glucose || [];
@@ -183,8 +185,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
     : null;
 
   // Detailed sleep data
-  const sleepDurationData = dataByType.sleep_duration || [];
-  const totalSleepMinutes = sleepDurationData.reduce((sum: number, d: any) => sum + extractValue(d.value), 0);
+  const totalSleepMinutes = sleepData.reduce((sum: number, d: any) => sum + extractValue(d.value, 'duration_minutes'), 0);
   const sleepHours = totalSleepMinutes > 0 ? Math.floor(totalSleepMinutes / 60) : null;
   const sleepMinutes = totalSleepMinutes > 0 ? totalSleepMinutes % 60 : null;
 
@@ -573,7 +574,7 @@ export const EndOfDayReport = ({ selectedPerson, dateRange }: EndOfDayReportProp
                 </>
               )}
               <p className="text-xs text-muted-foreground mt-2">
-                {sleepData.length + sleepDurationData.length} {t('reports.content.sleepDataPoints')}
+                {sleepData.length} {t('reports.content.sleepDataPoints')}
               </p>
               {sleepHours !== null && (
                 <p className="text-xs text-muted-foreground mt-1">

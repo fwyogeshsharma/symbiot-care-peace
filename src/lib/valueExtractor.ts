@@ -56,6 +56,9 @@ export const extractNumericValue = (value: any, dataType?: string): number | nul
         if ('km' in value) return value.km;
         break;
       case 'sleep':
+        // Health Connect writes duration_minutes; duration_hours only ever appeared in
+        // older mock data.
+        if ('duration_minutes' in value) return value.duration_minutes;
         if ('duration_hours' in value) return value.duration_hours;
         break;
       case 'sleep_quality':

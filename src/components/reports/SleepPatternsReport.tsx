@@ -15,15 +15,13 @@ interface SleepPatternsReportProps {
 export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatternsReportProps) => {
   const { t } = useTranslation();
 
-  console.log('SleepPatternsReport rendered for:', selectedPerson, dateRange);
-
   const { data: sleepData = [], isLoading } = useQuery({
     queryKey: ['sleep-patterns-report', selectedPerson, dateRange],
     queryFn: async () => {
       let query = supabase
         .from('device_data')
         .select('*')
-        .eq('data_type', 'sleep_quality')
+        .eq('data_type', 'sleep')
         .gte('recorded_at', dateRange.from.toISOString())
         .lte('recorded_at', dateRange.to.toISOString())
         .order('recorded_at', { ascending: true });
@@ -37,42 +35,34 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
         console.error('Error fetching sleep patterns data:', error);
         throw error;
       }
-      console.log('Sleep patterns data fetched:', data?.length || 0, 'records');
       return data || [];
     },
   });
 
-  const extractValue = (value: any, field?: string) => {
-    if (typeof value === 'number') return value;
-    if (typeof value === 'object' && value !== null) {
-      if (field && field in value) return Number(value[field]);
-      if ('value' in value) return Number(value.value);
-    }
-    return Number(value) || 0;
+  const stageMinutes = (value: any, key: string): number => {
+    const minutes = value?.stage_minutes?.[key];
+    return typeof minutes === 'number' ? minutes : 0;
   };
 
-  // Process sleep stages data from sleep_quality data
+  // awake_in_bed and out_of_bed are folded into "awake" — this report only distinguishes
+  // asleep stages from everything else.
+  const awakeMinutes = (value: any) =>
+    stageMinutes(value, 'awake_minutes') +
+    stageMinutes(value, 'awake_in_bed_minutes') +
+    stageMinutes(value, 'out_of_bed_minutes');
+
+  // Real per-night stage breakdown from Health Connect, not a synthetic split.
   const stagesData = sleepData
     .slice(0, 14) // Limit to last 14 days
-    .map((item) => {
-      const duration = extractValue(item.value, 'duration') || 7; // Default 7 hours
-      const quality = extractValue(item.value, 'quality') || 75; // Default 75%
-      const totalMinutes = duration * 60;
-
-      // Calculate realistic sleep stage distributions based on duration and quality
-      const deepPercent = 0.15 + (quality / 100) * 0.10; // 15-25% based on quality
-      const remPercent = 0.20 + (quality / 100) * 0.05; // 20-25%
-      const lightPercent = 0.50 + (1 - quality / 100) * 0.10; // 50-60%
-      const awakePercent = 0.05 + (1 - quality / 100) * 0.10; // 5-15%
-
-      return {
-        date: format(new Date(item.recorded_at), 'dMMM'),
-        deep: Math.round(totalMinutes * deepPercent),
-        light: Math.round(totalMinutes * lightPercent),
-        rem: Math.round(totalMinutes * remPercent),
-        awake: Math.round(totalMinutes * awakePercent),
-      };
-    });
+    .map((item) => ({
+      date: format(new Date(item.recorded_at), 'dMMM'),
+      deep: Math.round(stageMinutes(item.value, 'deep_minutes')),
+      // "sleeping" covers devices that report one undifferentiated asleep stage instead of
+      // light/deep/REM; folded into light so it still counts toward total sleep time.
+      light: Math.round(stageMinutes(item.value, 'light_minutes') + stageMinutes(item.value, 'sleeping_minutes')),
+      rem: Math.round(stageMinutes(item.value, 'rem_minutes')),
+      awake: Math.round(awakeMinutes(item.value)),
+    }));
 
   // Calculate sleep stage averages
   const avgDeep = stagesData.length > 0
@@ -95,21 +85,20 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
   const totalSleepMinutes = avgDeep + avgLight + avgREM;
   const sleepCycles = Math.round(totalSleepMinutes / 90); // Average sleep cycle is 90 minutes
 
-  // Bedtime patterns - estimate from recorded_at time
+  // Bedtime patterns from the session's real start timestamp.
   const bedtimeData = sleepData
     .slice(0, 7)
     .map(item => {
-      // Assume sleep data is recorded in the morning, so bedtime was ~8-10 hours before
-      const recordTime = new Date(item.recorded_at);
-      const duration = extractValue(item.value, 'duration') || 7;
-      // Estimate bedtime by subtracting duration from record time
-      const estimatedBedtimeHour = (recordTime.getHours() - duration + 24) % 24;
-      // Normalize bedtime to realistic range (20:00 - 02:00)
-      const bedtimeHour = estimatedBedtimeHour < 18 ? 22 : estimatedBedtimeHour;
+      const sessionStart = (item.value as any)?.start;
+      const start = sessionStart ? new Date(sessionStart) : new Date(item.recorded_at);
+      const hour = start.getHours() + start.getMinutes() / 60;
+      // Normalize to a 24h+ scale so a bedtime just after midnight averages alongside an
+      // evening bedtime instead of looking like it happened first thing that day.
+      const bedtime = hour < 12 ? hour + 24 : hour;
 
       return {
-        date: format(recordTime, 'dMMM'),
-        bedtime: bedtimeHour >= 18 ? bedtimeHour : bedtimeHour + 24, // Normalize to 24h+ for late night
+        date: format(start, 'dMMM'),
+        bedtime,
       };
     });
 
@@ -119,7 +108,8 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
 
   const formatBedtime = (hour: number) => {
     const h = hour >= 24 ? hour - 24 : hour;
-    return `${h}:00 ${h >= 12 ? t('reports.sleepPatterns.pm') : t('reports.sleepPatterns.am')}`;
+    const displayHour = Math.floor(h);
+    return `${displayHour}:00 ${displayHour >= 12 ? t('reports.sleepPatterns.pm') : t('reports.sleepPatterns.am')}`;
   };
 
   // Sleep stages distribution
@@ -130,15 +120,11 @@ export const SleepPatternsReport = ({ selectedPerson, dateRange }: SleepPatterns
     { name: t('reports.content.awake'), value: avgAwake, color: '#f59e0b', percentage: Math.round((avgAwake / (totalSleepMinutes + avgAwake)) * 100) },
   ];
 
-  console.log('Sleep data:', sleepData.length, 'Stages data:', stagesData.length);
-
   if (isLoading) {
     return <div className="text-center py-8">{t('common.loading', { defaultValue: 'Loading...' })}</div>;
   }
 
   if (sleepData.length === 0) {
-    console.log('No data available for sleep patterns - sleepData length:', sleepData.length);
-
     return (
       <Card>
         <CardContent className="text-center py-12">

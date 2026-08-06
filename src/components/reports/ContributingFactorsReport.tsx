@@ -24,7 +24,7 @@ export const ContributingFactorsReport = ({ selectedPerson, dateRange }: Contrib
         .select('*')
         .in('data_type', [
           'heart_rate', 'blood_pressure', 'oxygen_saturation', 'steps',
-          'sleep_quality', 'activity_level', 'blood_sugar', 'glucose',
+          'sleep', 'activity_level', 'blood_sugar', 'glucose',
           'temperature', 'humidity'
         ])
         .gte('recorded_at', dateRange.from.toISOString())
@@ -87,17 +87,18 @@ export const ContributingFactorsReport = ({ selectedPerson, dateRange }: Contrib
   const activityScore = avgDailySteps >= 5000 ? 100 : avgDailySteps >= 3000 ? 75 : avgDailySteps >= 1000 ? 50 : 25;
   const activityFactor = { score: activityScore, avg: Math.round(avgDailySteps), count: stepsData.length };
 
-  // Sleep Quality Factor
-  const sleepData = healthData.filter(d => d.data_type === 'sleep_quality');
+  // Sleep Quality Factor — sleep_efficiency_percentage (time asleep vs time in bed) is the
+  // closest Health Connect equivalent to a "quality" score.
+  const sleepData = healthData.filter(d => d.data_type === 'sleep');
   const sleepFactor = {
     score: sleepData.length > 0
       ? Math.round(sleepData.reduce((sum, d) => {
-          const quality = extractValue(d.value, 'quality');
+          const quality = extractValue(d.value, 'sleep_efficiency_percentage');
           return sum + (quality >= 80 ? 100 : quality >= 60 ? 75 : quality >= 40 ? 50 : 25);
         }, 0) / sleepData.length)
       : 0,
     avg: sleepData.length > 0
-      ? Math.round(sleepData.reduce((sum, d) => sum + extractValue(d.value, 'quality'), 0) / sleepData.length)
+      ? Math.round(sleepData.reduce((sum, d) => sum + extractValue(d.value, 'sleep_efficiency_percentage'), 0) / sleepData.length)
       : 0,
     count: sleepData.length,
   };

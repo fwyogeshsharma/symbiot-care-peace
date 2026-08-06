@@ -55,14 +55,30 @@ export const generateValueFromModelSpec = (spec: any, dataType: string): any => 
       const stepsMax = spec.max || 15000;
       return { count: Math.floor(stepsMin + Math.random() * (stepsMax - stepsMin)) };
 
-    case 'sleep':
+    // Mirrors the shape HealthConnectReader.kt writes for a real synced sleep session, so
+    // simulated devices render identically to real ones in reports and dashboards.
+    case 'sleep': {
       const sleepMin = spec.min || 5;
       const sleepMax = spec.max || 9;
       const hours = sleepMin + Math.random() * (sleepMax - sleepMin);
+      const durationMinutes = Math.round(hours * 60);
+      const efficiency = Math.floor(60 + Math.random() * 35); // 60-95%
+      const deepMinutes = Math.round(durationMinutes * (0.15 + (efficiency / 100) * 0.10));
+      const remMinutes = Math.round(durationMinutes * (0.20 + (efficiency / 100) * 0.05));
+      const awakeMinutes = Math.round(durationMinutes * (0.15 - (efficiency / 100) * 0.10));
+      const lightMinutes = Math.max(0, durationMinutes - deepMinutes - remMinutes - awakeMinutes);
       return {
-        duration_hours: Number(hours.toFixed(1)),
-        quality: ['poor', 'fair', 'good', 'excellent'][Math.floor(Math.random() * 4)],
+        duration_minutes: durationMinutes,
+        sleep_efficiency_percentage: efficiency,
+        awakenings_count: Math.round(awakeMinutes / 20),
+        stage_minutes: {
+          deep_minutes: deepMinutes,
+          rem_minutes: remMinutes,
+          light_minutes: lightMinutes,
+          awake_minutes: awakeMinutes,
+        },
       };
+    }
 
     case 'activity':
       const activities = spec.values || ['walking', 'sitting', 'standing', 'running', 'sleeping'];
@@ -260,7 +276,7 @@ const getDefaultUnit = (dataType: string): string => {
     spo2: '%',
     temperature: '°C',
     steps: 'steps',
-    sleep: 'hours',
+    sleep: 'minutes',
     calories: 'kcal',
     distance: 'km',
     weight: 'kg',

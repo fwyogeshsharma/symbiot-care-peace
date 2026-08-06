@@ -83,6 +83,7 @@
       "temperature": "Temperatura Corporal",
       "steps": "Pasos Hoy",
       "activity": "Nivel de Actividad",
+      "sleep": "Sueño",
       "sleep_quality": "Calidad del Sueño",
       "sleep_stage": "Etapa del Sueño",
       "medication_taken": "Medicamento Tomado",
