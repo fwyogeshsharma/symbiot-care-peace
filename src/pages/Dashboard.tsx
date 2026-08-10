@@ -170,7 +170,7 @@ const Dashboard = () => {
               {t('dashboard.subtitle', { defaultValue: 'Monitor and manage elderly care' })}
             </p>
           </div>
-          <Button onClick={() => navigate('/customize-dashboard')} variant="outline">
+          <Button onClick={() => navigate('/customize-dashboard')} variant="outline" className="hidden sm:inline-flex">
             <LayoutDashboard className="w-4 h-4 mr-2" />
             {t('profile.customizeDashboard', { defaultValue: 'Customize Dashboard' })}
           </Button>
