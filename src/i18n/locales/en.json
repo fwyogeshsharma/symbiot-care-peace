@@ -134,12 +134,13 @@
       "bloodPressureOverTime": "Blood Pressure Over Time",
       "oxygenOverTime": "Oxygen Saturation Over Time",
       "temperatureOverTime": "Body Temperature Over Time",
-      "sleepOverTime": "Sleep Quality Over Time",
+      "sleepOverTime": "Sleep Over Time",
       "panicSosOverTime": "Panic/SOS Events Over Time",
       "systolic": "Systolic",
       "diastolic": "Diastolic",
       "oxygenLevel": "Oxygen Level",
       "sleepQuality": "Sleep Quality",
+      "sleepDuration": "Sleep Duration",
       "buttonPresses": "Button Presses",
       "noHeartRateData": "No heart rate data available for this period",
       "noBloodPressureData": "No blood pressure data available for this period",
@@ -1779,7 +1780,19 @@
       "computeHistorical": "Calculate Historical",
       "computingHistorical": "Calculating historical ILQ scores for all past data...",
       "historicalSuccess": "Successfully calculated {{count}} historical scores!",
-      "historicalFailed": "Failed to calculate historical scores"
+      "historicalFailed": "Failed to calculate historical scores",
+      "vitalsTrend": {
+        "title": "{{days}}-Day Vitals Trend",
+        "description": "Sleep is measured directly; Recovery, Strain and Stress are estimated from heart rate, HRV and daily activity - a quick read on what might be going wrong.",
+        "empty": "Not enough device data in the last {{days}} days to chart these trends yet.",
+        "sleep": "Sleep",
+        "recovery": "Recovery",
+        "strain": "Strain",
+        "stress": "Stress",
+        "needsAttention": "Needs attention",
+        "watchOn": "On {{date}}:",
+        "pointColorKey": "Each point:"
+      }
     }
   },
   "homeHub": {

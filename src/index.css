@@ -52,6 +52,14 @@ All colors MUST be HSL.
     --destructive: 0 85% 60%;
     --destructive-foreground: 0 0% 100%;
 
+    /* ILQ vitals trend chart - series identity (line color, not status).
+       Validated as a set for CVD-safe adjacency; keep this exact order if a
+       fifth series is ever added rather than inserting a new hue mid-sequence. */
+    --chart-sleep: 213 68% 50%;
+    --chart-recovery: 159 73% 40%;
+    --chart-strain: 249 48% 44%;
+    --chart-stress: 337 70% 70%;
+
     /* Borders and inputs */
     --border: 210 20% 88%;
     --input: 210 20% 88%;
@@ -107,6 +115,12 @@ All colors MUST be HSL.
     
     --destructive: 0 85% 55%;
     --destructive-foreground: 0 0% 100%;
+
+    /* ILQ vitals trend chart - re-stepped for the dark surface, same validated order. */
+    --chart-sleep: 213 77% 56%;
+    --chart-recovery: 159 73% 36%;
+    --chart-strain: 247 69% 70%;
+    --chart-stress: 338 61% 58%;
 
     --border: 215 25% 24%;
     --input: 215 25% 24%;

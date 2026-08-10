@@ -192,8 +192,19 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
 
       // Extract numeric value from different formats
       if (typeof value === 'object' && value !== null) {
-        if (dataType === 'sleep' && typeof value.sleep_efficiency_percentage === 'number') {
-          value = value.sleep_efficiency_percentage;
+        if (dataType === 'sleep') {
+          // sleep_efficiency_percentage is only populated when the source app reports sleep
+          // stages, which many devices don't - it's null far more often than not, and a null
+          // check here fell through to the generic extraction below (which finds nothing on a
+          // sleep record and defaults to 0), plotting a flat zero line instead of no data.
+          // duration_minutes is what HealthConnectReader.kt always sets, so read that instead.
+          const minutes =
+            typeof value.duration_minutes === 'number'
+              ? value.duration_minutes
+              : typeof value.time_asleep_minutes === 'number'
+                ? value.time_asleep_minutes
+                : null;
+          value = minutes === null ? null : minutes / 60;
         } else if ('value' in value) {
           value = value.value;
         } else if ('bpm' in value) {
@@ -676,14 +687,14 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
             <TabsContent value="sleep_quality" className="mt-4">
               <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-4">{t('healthMetrics.charts.sleepOverTime')}</h3>
-                {renderChart('sleep', t('healthMetrics.charts.sleepQuality'), 'hsl(var(--info))', '%')}
+                {renderChart('sleep', t('healthMetrics.charts.sleepDuration'), 'hsl(var(--chart-sleep))', 'hrs')}
               </Card>
             </TabsContent>
 
             <TabsContent value="humidity" className="mt-4">
               <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-4">{t('healthMetrics.charts.humidityOverTime')}</h3>
-                {renderChart('humidity', t('healthMetrics.charts.humidity'), 'hsl(var(--info))', '%')}
+                {renderChart('humidity', t('healthMetrics.charts.humidity'), 'hsl(var(--chart-recovery))', '%')}
               </Card>
             </TabsContent>
 
