@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Activity, Loader2 } from 'lucide-react';
 import { Line, LineChart, ResponsiveContainer, YAxis } from 'recharts';
 import { formatDistanceToNow } from 'date-fns';
@@ -44,6 +45,13 @@ interface Reading {
   unit: string | null;
   recorded_at: string;
 }
+
+interface Device {
+  id: string;
+  device_name: string;
+}
+
+const ALL_DEVICES = 'all';
 
 /** One row per data_type from the summary RPC — exact regardless of per-metric volume. */
 interface MetricRollup {
@@ -89,23 +97,53 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
   const { t } = useTranslation();
   const [windowDays, setWindowDays] = useState(7);
   const [hideEmpty, setHideEmpty] = useState(false);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>(ALL_DEVICES);
 
   const since = useMemo(
     () => new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString(),
     [windowDays]
   );
 
+  // Every device that could have written device_data for this person, so a device that has
+  // never reported anything still shows up in the picker rather than only appearing once it
+  // has readings.
+  const { data: devices = [] } = useQuery({
+    queryKey: ['all-health-metrics-devices', selectedPersonId],
+    queryFn: async (): Promise<Device[]> => {
+      if (!selectedPersonId) return [];
+
+      const { data, error } = await supabase
+        .from('devices')
+        .select('id, device_name')
+        .eq('elderly_person_id', selectedPersonId)
+        .order('device_name');
+
+      if (error) throw error;
+      return (data ?? []) as Device[];
+    },
+    enabled: !!selectedPersonId,
+  });
+
+  // A device picked for one person is meaningless for another; switching people without
+  // resetting this would silently apply a stale device_id filter that matches nothing.
+  useEffect(() => {
+    setSelectedDeviceId(ALL_DEVICES);
+  }, [selectedPersonId]);
+
+  const deviceFilter = selectedDeviceId === ALL_DEVICES ? null : selectedDeviceId;
+
   // Null (not []) when the summary function is missing, so the card can fall back to the
   // raw rows instead of reporting "no readings" — an absent migration must never look
   // identical to an absent device.
   const { data: rollups, isLoading: isLoadingRollups } = useQuery({
-    queryKey: ['all-health-metrics', selectedPersonId, windowDays, 'summary'],
+    queryKey: ['all-health-metrics', selectedPersonId, windowDays, deviceFilter, 'summary'],
     queryFn: async (): Promise<MetricRollup[] | null> => {
       if (!selectedPersonId) return [];
 
       const { data, error } = await supabase.rpc('device_metric_summary', {
         p_person_id: selectedPersonId,
         p_since: since,
+        p_device_id: deviceFilter ?? undefined,
       });
 
       if (error) {
@@ -127,15 +165,21 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
   });
 
   const { data: readings = [], isLoading: isLoadingReadings } = useQuery({
-    queryKey: ['all-health-metrics', selectedPersonId, windowDays],
+    queryKey: ['all-health-metrics', selectedPersonId, windowDays, deviceFilter],
     queryFn: async (): Promise<Reading[]> => {
       if (!selectedPersonId) return [];
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('device_data')
         .select('data_type, value, unit, recorded_at')
         .eq('elderly_person_id', selectedPersonId)
-        .gte('recorded_at', since)
+        .gte('recorded_at', since);
+
+      if (deviceFilter) {
+        query = query.eq('device_id', deviceFilter);
+      }
+
+      const { data, error } = await query
         .order('recorded_at', { ascending: false })
         .limit(ROW_LIMIT);
 
@@ -258,11 +302,20 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
               {t('dashboard.allMetrics.title', 'All health metrics')}
             </CardTitle>
             <CardDescription>
-              {t('dashboard.allMetrics.description', {
-                recorded: recordedCount,
-                total: totalCount,
-                defaultValue: '{{recorded}} of {{total}} metrics recorded by connected devices',
-              })}
+              {deviceFilter
+                ? t('dashboard.allMetrics.descriptionByDevice', {
+                    recorded: recordedCount,
+                    total: totalCount,
+                    device:
+                      devices.find((d) => d.id === deviceFilter)?.device_name ??
+                      t('dashboard.allMetrics.thisDevice', 'this device'),
+                    defaultValue: '{{recorded}} of {{total}} metrics recorded by {{device}}',
+                  })
+                : t('dashboard.allMetrics.description', {
+                    recorded: recordedCount,
+                    total: totalCount,
+                    defaultValue: '{{recorded}} of {{total}} metrics recorded by connected devices',
+                  })}
               {blockedCount > 0 && (
                 <span className="text-warning">
                   {' · '}
@@ -275,6 +328,23 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
             </CardDescription>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
+            {devices.length > 0 && (
+              <Select value={selectedDeviceId} onValueChange={setSelectedDeviceId}>
+                <SelectTrigger className="h-7 w-[160px] text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL_DEVICES}>
+                    {t('dashboard.allMetrics.allDevices', 'All devices')}
+                  </SelectItem>
+                  {devices.map((device) => (
+                    <SelectItem key={device.id} value={device.id}>
+                      {device.device_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <div className="flex gap-1">
               {WINDOW_OPTIONS.map((option) => (
                 <Button
