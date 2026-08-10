@@ -779,6 +779,9 @@
     "allMetrics": {
       "title": "All health metrics",
       "description": "{{recorded}} of {{total}} metrics recorded by connected devices",
+      "descriptionByDevice": "{{recorded}} of {{total}} metrics recorded by {{device}}",
+      "allDevices": "All devices",
+      "thisDevice": "this device",
       "empty": "No device readings in this period. Sync a device to see its metrics here.",
       "notRecorded": "Not recorded",
       "showAll": "Show all metrics",

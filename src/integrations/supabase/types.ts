@@ -1640,7 +1640,7 @@ export type Database = {
         Returns: string
       }
       device_metric_summary: {
-        Args: { p_person_id: string; p_since: string }
+        Args: { p_device_id?: string; p_person_id: string; p_since: string }
         Returns: {
           data_type: string
           latest_recorded_at: string
