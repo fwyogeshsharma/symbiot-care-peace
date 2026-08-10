@@ -221,6 +221,42 @@ function computeHealthVitals(dataByType: Record<string, any[]>, ranges: any): nu
     }
   }
 
+  // Resting heart rate
+  if (dataByType.resting_heart_rate) {
+    const avgRHR = average(dataByType.resting_heart_rate.map(v => v.bpm || 0).filter(v => v > 0));
+    if (avgRHR > 0) {
+      totalScore += normalizeValue(avgRHR, ranges.resting_heart_rate?.min || 40, ranges.resting_heart_rate?.max || 100, ranges.resting_heart_rate?.optimal || 62);
+      count++;
+    }
+  }
+
+  // Heart rate variability (rMSSD) - higher is generally better, so "optimal" sits near the top of the range
+  if (dataByType.heart_rate_variability) {
+    const avgHRV = average(dataByType.heart_rate_variability.map(v => v.rmssd_ms || 0).filter(v => v > 0));
+    if (avgHRV > 0) {
+      totalScore += normalizeValue(avgHRV, ranges.heart_rate_variability?.min || 10, ranges.heart_rate_variability?.max || 100, ranges.heart_rate_variability?.optimal || 60);
+      count++;
+    }
+  }
+
+  // Respiratory rate
+  if (dataByType.respiratory_rate) {
+    const avgRR = average(dataByType.respiratory_rate.map(v => v.breaths_per_minute || 0).filter(v => v > 0));
+    if (avgRR > 0) {
+      totalScore += normalizeValue(avgRR, ranges.respiratory_rate?.min || 8, ranges.respiratory_rate?.max || 25, ranges.respiratory_rate?.optimal || 16);
+      count++;
+    }
+  }
+
+  // Blood glucose
+  if (dataByType.blood_glucose) {
+    const avgGlucose = average(dataByType.blood_glucose.map(v => v.value || 0).filter(v => v > 0));
+    if (avgGlucose > 0) {
+      totalScore += normalizeValue(avgGlucose, ranges.blood_glucose?.min || 3.0, ranges.blood_glucose?.max || 11.0, ranges.blood_glucose?.optimal || 5.5);
+      count++;
+    }
+  }
+
   // Blood pressure
   if (dataByType.blood_pressure) {
     const avgSystolic = average(dataByType.blood_pressure.map(v => v.systolic || 0).filter(v => v > 0));
@@ -239,9 +275,12 @@ function computeHealthVitals(dataByType: Record<string, any[]>, ranges: any): nu
     }
   }
 
-  // Temperature
-  if (dataByType.temperature) {
-    const avgTemp = average(dataByType.temperature.map(v => v.celsius || 0).filter(v => v > 0));
+  // Body temperature. Health Connect reports this as body_temperature (and, less commonly,
+  // basal_body_temperature) - "temperature" is the *ambient/room* reading from environmental
+  // sensors and belongs in computeEnvironmentalSafety instead, not here.
+  const bodyTemp = dataByType.body_temperature || dataByType.basal_body_temperature;
+  if (bodyTemp) {
+    const avgTemp = average(bodyTemp.map(v => v.celsius || 0).filter(v => v > 0));
     if (avgTemp > 0) {
       totalScore += normalizeValue(avgTemp, ranges.temperature?.min || 36.1, ranges.temperature?.max || 37.2, ranges.temperature?.optimal || 36.8);
       count++;
@@ -262,6 +301,34 @@ function computePhysicalActivity(dataByType: Record<string, any[]>, ranges: any)
     count++;
   }
 
+  // Distance covered
+  if (dataByType.distance) {
+    const totalMeters = dataByType.distance.reduce((sum, v) => sum + (v.meters || 0), 0);
+    totalScore += normalizeValue(totalMeters, ranges.distance_daily?.min || 500, ranges.distance_daily?.max || 5000, ranges.distance_daily?.optimal || 3000);
+    count++;
+  }
+
+  // Active calories burned
+  if (dataByType.active_calories) {
+    const totalKcal = dataByType.active_calories.reduce((sum, v) => sum + (v.kcal || 0), 0);
+    totalScore += normalizeValue(totalKcal, ranges.active_calories_daily?.min || 100, ranges.active_calories_daily?.max || 800, ranges.active_calories_daily?.optimal || 400);
+    count++;
+  }
+
+  // Floors climbed
+  if (dataByType.floors_climbed) {
+    const totalFloors = dataByType.floors_climbed.reduce((sum, v) => sum + (v.floors || 0), 0);
+    totalScore += normalizeValue(totalFloors, ranges.floors_climbed_daily?.min || 0, ranges.floors_climbed_daily?.max || 20, ranges.floors_climbed_daily?.optimal || 8);
+    count++;
+  }
+
+  // Exercise sessions
+  if (dataByType.exercise_session) {
+    const totalMinutes = dataByType.exercise_session.reduce((sum, v) => sum + (v.duration_minutes || 0), 0);
+    totalScore += normalizeValue(totalMinutes, ranges.exercise_minutes_daily?.min || 0, ranges.exercise_minutes_daily?.max || 60, ranges.exercise_minutes_daily?.optimal || 30);
+    count++;
+  }
+
   // Movement/Position tracking
   if (dataByType.position) {
     const movementFrequency = dataByType.position.length;
@@ -270,8 +337,8 @@ function computePhysicalActivity(dataByType: Record<string, any[]>, ranges: any)
   }
 
   // Falls (negative impact)
-  if (dataByType.fall_detection) {
-    const fallCount = dataByType.fall_detection.filter(v => v.detected === true).length;
+  if (dataByType.fall_detected) {
+    const fallCount = dataByType.fall_detected.filter(v => v.detected === true).length;
     const fallPenalty = Math.min(50, fallCount * 20); // Each fall reduces score by 20, max 50 penalty
     totalScore += Math.max(0, 100 - fallPenalty);
     count++;
@@ -360,9 +427,9 @@ function computeEnvironmentalSafety(dataByType: Record<string, any[]>): number {
   let totalScore = 0;
   let count = 0;
 
-  // Temperature
-  if (dataByType.environmental_temperature) {
-    const avgTemp = average(dataByType.environmental_temperature.map(v => v.celsius || 0).filter(v => v > 0));
+  // Ambient/room temperature (the environmental sensor reading - not a vital sign)
+  if (dataByType.temperature) {
+    const avgTemp = average(dataByType.temperature.map(v => v.celsius || 0).filter(v => v > 0));
     if (avgTemp > 0) {
       totalScore += isInRange(avgTemp, 18, 25) ? 100 : 50;
       count++;
@@ -384,15 +451,15 @@ function computeEnvironmentalSafety(dataByType: Record<string, any[]>): number {
 function computeEmergencyResponse(dataByType: Record<string, any[]>): number {
   let score = 100;
 
-  // Panic button usage (reduce score)
-  if (dataByType.button_press) {
-    const panicCount = dataByType.button_press.filter(v => v.type === 'panic' || v.type === 'sos').length;
+  // Panic/SOS button presses (reduce score) - each row is one press event
+  if (dataByType.button_pressed) {
+    const panicCount = dataByType.button_pressed.length;
     score -= Math.min(50, panicCount * 15); // Each panic reduces by 15
   }
 
   // Falls (already counted in activity, but affects emergency too)
-  if (dataByType.fall_detection) {
-    const fallCount = dataByType.fall_detection.filter(v => v.detected === true).length;
+  if (dataByType.fall_detected) {
+    const fallCount = dataByType.fall_detected.filter(v => v.detected === true).length;
     score -= Math.min(30, fallCount * 15);
   }
 

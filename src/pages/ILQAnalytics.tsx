@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Activity, TrendingUp, AlertCircle, BarChart3, RefreshCw, Download, Mail } from 'lucide-react';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
+import { ILQVitalsTrendChart } from '@/components/dashboard/ILQVitalsTrendChart';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { useElderly } from '@/contexts/ElderlyContext';
@@ -335,9 +336,12 @@ export default function ILQAnalytics() {
         </div>
 
         {selectedPersonId && (
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2">
             <ILQWidget elderlyPersonId={selectedPersonId} hideViewDetails />
-          
+
+          {/* Superseded by ILQVitalsTrendChart below, which breaks the 7-day trend down into
+              Sleep/Recovery/Strain/Stress instead of a single score delta. Left commented
+              rather than deleted in case the simple delta view is wanted back.
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -364,6 +368,7 @@ export default function ILQAnalytics() {
               )}
             </CardContent>
           </Card>
+          */}
 
           <Card>
             <CardHeader>
@@ -389,6 +394,8 @@ export default function ILQAnalytics() {
           </Card>
           </div>
         )}
+
+        {selectedPersonId && <ILQVitalsTrendChart elderlyPersonId={selectedPersonId} days={7} />}
 
         {selectedPersonId && (
           <Tabs defaultValue="history" className="space-y-4">
