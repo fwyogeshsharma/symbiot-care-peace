@@ -96,7 +96,7 @@ interface MetricSummary {
 const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
   const { t } = useTranslation();
   const [windowDays, setWindowDays] = useState(7);
-  const [hideEmpty, setHideEmpty] = useState(false);
+  const [hideEmpty, setHideEmpty] = useState(true);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>(ALL_DEVICES);
 
   const since = useMemo(
