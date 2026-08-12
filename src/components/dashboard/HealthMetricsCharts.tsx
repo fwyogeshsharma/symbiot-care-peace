@@ -13,7 +13,12 @@ import { CalendarIcon, Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { celsiusToFahrenheit } from '@/lib/unitConversions';
+import { extractNumericValue } from '@/lib/valueExtractor';
 import { useTranslation } from 'react-i18next';
+
+// data_type values that all represent body temperature (as opposed to 'temperature'
+// reported by an ambient/environmental sensor, which the Temperature tab excludes).
+const BODY_TEMPERATURE_DATA_TYPES = ['temperature', 'body_temperature', 'basal_body_temperature'];
 
 // Map language codes to date-fns locales
 const getDateLocale = (language: string) => {
@@ -54,7 +59,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
         .from('device_data')
         .select('recorded_at')
         .eq('elderly_person_id', selectedPersonId)
-        .in('data_type', ['heart_rate', 'blood_pressure', 'oxygen_saturation', 'temperature', 'sleep'])
+        .in('data_type', ['heart_rate', 'blood_pressure', 'oxygen_saturation', 'temperature', 'body_temperature', 'basal_body_temperature', 'sleep'])
         .order('recorded_at', { ascending: true })
         .limit(1);
 
@@ -95,6 +100,8 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
           'blood_pressure',
           'oxygen_saturation',
           'temperature',
+          'body_temperature',
+          'basal_body_temperature',
           'sleep',
           'humidity',
           'button_pressed'
@@ -149,11 +156,20 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
   const processChartData = (dataType: string) => {
     if (!historicalData) return [];
 
-    const filtered = historicalData.filter((item: any) => {
-      if (item.data_type !== dataType) return false;
+    // Health Connect and wearables report body temperature under 'body_temperature' /
+    // 'basal_body_temperature', never 'temperature' - that data_type is reserved for
+    // ambient/environmental sensors. The Temperature tab needs to match on all three so
+    // real body-temperature readings aren't silently excluded from the query results.
+    const matchesDataType = (itemDataType: string) =>
+      dataType === 'temperature' ? BODY_TEMPERATURE_DATA_TYPES.includes(itemDataType) : itemDataType === dataType;
 
-      // Special handling for temperature: exclude environmental sensors
-      if (dataType === 'temperature') {
+    const filtered = historicalData.filter((item: any) => {
+      if (!matchesDataType(item.data_type)) return false;
+
+      // Special handling for the ambient 'temperature' data_type: exclude environmental
+      // sensors. body_temperature/basal_body_temperature are always person-worn sources,
+      // so they never need this check.
+      if (item.data_type === 'temperature') {
         const deviceCategory = item.devices?.device_types?.category;
         const deviceType = item.devices?.device_type;
 
@@ -192,7 +208,7 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
 
       // Extract numeric value from different formats
       if (typeof value === 'object' && value !== null) {
-        if (dataType === 'sleep') {
+        if (item.data_type === 'sleep') {
           // sleep_efficiency_percentage is only populated when the source app reports sleep
           // stages, which many devices don't - it's null far more often than not, and a null
           // check here fell through to the generic extraction below (which finds nothing on a
@@ -205,21 +221,19 @@ const HealthMetricsCharts = ({ open, onOpenChange, selectedPersonId }: HealthMet
                 ? value.time_asleep_minutes
                 : null;
           value = minutes === null ? null : minutes / 60;
-        } else if ('value' in value) {
-          value = value.value;
-        } else if ('bpm' in value) {
-          value = value.bpm;
-        } else if ('count' in value) {
-          value = value.count;
-        } else if ('celsius' in value) {
-          value = value.celsius;
+        } else {
+          // Use the shared extractor (also used by VitalMetrics/reports) instead of a local,
+          // partial key list - it already covers 'percentage' (oxygen_saturation, humidity),
+          // 'celsius'/'fahrenheit' (temperature), etc., so readings from any device/source
+          // that this component didn't previously recognize a value key for aren't dropped.
+          value = extractNumericValue(value, item.data_type);
         }
       }
 
       let numericValue = typeof value === 'number' ? value : parseFloat(value) || 0;
 
       // Convert temperature from Celsius to Fahrenheit (if not already in Fahrenheit)
-      if (dataType === 'temperature' && !isTemperatureFahrenheit(item.unit)) {
+      if (BODY_TEMPERATURE_DATA_TYPES.includes(item.data_type) && !isTemperatureFahrenheit(item.unit)) {
         numericValue = celsiusToFahrenheit(numericValue);
       }
 
