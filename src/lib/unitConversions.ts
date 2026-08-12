@@ -51,6 +51,22 @@ export function feetToMeters(feet: number): number {
 }
 
 /**
+ * Convert kilograms to pounds
+ * Formula: lbs = kg × 2.20462
+ */
+export function kilogramsToPounds(kilograms: number): number {
+  return kilograms * 2.20462;
+}
+
+/**
+ * Convert pounds to kilograms
+ * Formula: kg = lbs × 0.453592
+ */
+export function poundsToKilograms(pounds: number): number {
+  return pounds * 0.453592;
+}
+
+/**
  * Format temperature in Fahrenheit with degree symbol
  */
 export function formatTemperatureFahrenheit(celsius: number, decimals: number = 1): string {

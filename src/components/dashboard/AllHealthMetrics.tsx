@@ -248,7 +248,7 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
         descriptor,
         latest,
         count: latest?.reading_count ?? 0,
-        unit: latest?.latest_unit || descriptor.unit,
+        unit: dataType === 'weight' ? 'lbs' : (latest?.latest_unit || descriptor.unit),
         series,
         blocked:
           !latest && !!permission && !!permissions && !permissions.granted.includes(permission),
@@ -413,7 +413,7 @@ const AllHealthMetrics = ({ selectedPersonId }: AllHealthMetricsProps) => {
                             }`}
                           >
                             {metric.latest
-                              ? formatMetricValue(metric.dataType, metric.latest.latest_value)
+                              ? formatMetricValue(metric.dataType, metric.latest.latest_value, metric.latest.latest_unit)
                               : '—'}
                             {metric.latest && metric.unit && (
                               <span className="ml-1 text-xs font-normal text-muted-foreground">

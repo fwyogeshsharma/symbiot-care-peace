@@ -1,3 +1,5 @@
+import { kilogramsToPounds } from '@/lib/unitConversions';
+
 /**
  * Presentation metadata for the metrics device sync writes into device_data.
  *
@@ -195,13 +197,29 @@ export const metricNumber = (dataType: string, value: unknown): number | null =>
   return typeof firstNumeric === 'number' ? firstNumeric : null;
 };
 
+const isWeightPounds = (unit: string | null | undefined): boolean => {
+  if (!unit) return false;
+  const normalized = unit.toLowerCase().trim();
+  return normalized === 'lb' || normalized === 'lbs' || normalized === 'pound' || normalized === 'pounds';
+};
+
 /**
  * Display string for a reading. Blood pressure is the one genuinely two-number metric,
  * so it renders as systolic/diastolic rather than losing half the reading.
+ *
+ * `unit` is the device-reported unit (device_data.unit), used only to decide whether a
+ * value needs converting - the displayed unit label is decided by the caller.
  */
-export const formatMetricValue = (dataType: string, value: unknown): string => {
+export const formatMetricValue = (dataType: string, value: unknown, unit?: string | null): string => {
   const record = asRecord(value);
   const descriptor = describeMetric(dataType);
+
+  if (dataType === 'weight') {
+    const kg = metricNumber(dataType, value);
+    if (kg === null) return '—';
+    const pounds = isWeightPounds(unit) ? kg : kilogramsToPounds(kg);
+    return pounds.toFixed(descriptor.precision);
+  }
 
   if (dataType === 'blood_pressure' && record) {
     const systolic = record.systolic;

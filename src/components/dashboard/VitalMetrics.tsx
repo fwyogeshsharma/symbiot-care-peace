@@ -8,7 +8,7 @@ import { isHealthDevice, isHealthDataType } from '@/lib/deviceDataMapping';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import HealthMetricsCharts from './HealthMetricsCharts';
-import { celsiusToFahrenheit } from '@/lib/unitConversions';
+import { celsiusToFahrenheit, kilogramsToPounds } from '@/lib/unitConversions';
 import { extractNumericValue, extractBloodPressure, extractBooleanValue, extractStringValue } from '@/lib/valueExtractor';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +30,13 @@ const isTemperatureFahrenheit = (unit: string | null | undefined): boolean => {
   if (!unit) return false;
   const normalizedUnit = unit.toLowerCase().trim();
   return normalizedUnit === '°f' || normalizedUnit === 'f' || normalizedUnit === 'fahrenheit';
+};
+
+// Check if weight unit is already pounds
+const isWeightPounds = (unit: string | null | undefined): boolean => {
+  if (!unit) return false;
+  const normalizedUnit = unit.toLowerCase().trim();
+  return normalizedUnit === 'lb' || normalizedUnit === 'lbs' || normalizedUnit === 'pound' || normalizedUnit === 'pounds';
 };
 
 interface VitalMetricsProps {
@@ -398,10 +405,12 @@ const VitalMetrics = ({ selectedPersonId }: VitalMetricsProps) => {
         if (force === null) return 'N/A';
         return `${force.toFixed(1)} G`;
 
-      case 'weight':
-        const weight = extractNumericValue(value, type);
-        if (weight === null) return 'N/A';
-        return `${weight.toFixed(1)} kg`;
+      case 'weight': {
+        const weightVal = extractNumericValue(value, type);
+        if (weightVal === null) return 'N/A';
+        const weightFinal = isWeightPounds(unit) ? weightVal : kilogramsToPounds(weightVal);
+        return `${weightFinal.toFixed(1)} lbs`;
+      }
 
       case 'bmi':
         const bmiVal = extractNumericValue(value, type);
