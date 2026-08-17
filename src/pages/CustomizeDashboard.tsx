@@ -114,6 +114,14 @@ const CustomizeDashboard = () => {
       category: 'analytics'
     },
     {
+      id: 'irq-score',
+      name: t('dashboard.irqScore', { defaultValue: 'IRQ Score' }),
+      description: t('dashboard.irqScoreDesc', { defaultValue: 'Individual Recovery Quotient — recovery program progress' }),
+      icon: TrendingUp,
+      enabled: false,
+      category: 'analytics'
+    },
+    {
       id: 'movement-summary',
       name: t('dashboard.movementSummary', { defaultValue: 'Movement Summary' }),
       description: t('dashboard.movementSummaryDesc', { defaultValue: 'Activity patterns and movement statistics' }),

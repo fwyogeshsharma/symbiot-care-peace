@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { Footer } from '@/components/Footer';
 import { ToiletHealthInsights } from '@/components/dashboard/ToiletHealthInsights';
 import { DiseaseRiskInsights } from '@/components/dashboard/DiseaseRiskInsights';
+import { RehabProgress } from '@/components/dashboard/RehabProgress';
 import { getDateRangePreset } from '@/lib/movementUtils';
 
 const Health = () => {
@@ -386,6 +387,7 @@ const Health = () => {
               <VitalMetrics selectedPersonId={selectedPersonId} />
             </div>
             <DiseaseRiskInsights selectedPersonId={selectedPersonId} />
+            <RehabProgress selectedPersonId={selectedPersonId} />
             {selectedPersonId && (
               <ToiletHealthInsights
                 selectedPerson={selectedPersonId}
