@@ -232,8 +232,10 @@ function computePhysiologicalStress(dataByType: Record<string, any[]>, ranges: a
   return count > 0 ? totalScore / count : 50; // Default to neutral if no vitals data
 }
 
-// Functionally identical to ilq-compute's computePhysicalActivity — routine/activity is the same
-// signal for recovery as it is for general wellness.
+// Based on ilq-compute's computePhysicalActivity, extended with the gait-speed and
+// wheelchair-pushes signals the physical rehab progress score also uses (_rehab_score_mobility)
+// — recovery from substance use and recovery from a physical condition both care about the same
+// underlying functional-mobility trend, not just step counts.
 function computeActivityRoutine(dataByType: Record<string, any[]>, ranges: any): number {
   let totalScore = 0;
   let count = 0;
@@ -247,6 +249,24 @@ function computeActivityRoutine(dataByType: Record<string, any[]>, ranges: any):
   if (dataByType.distance) {
     const totalMeters = dataByType.distance.reduce((sum, v) => sum + (v.meters || 0), 0);
     totalScore += normalizeValue(totalMeters, ranges.distance_daily?.min || 500, ranges.distance_daily?.max || 5000, ranges.distance_daily?.optimal || 3000);
+    count++;
+  }
+
+  // Gait speed — a functional-mobility signal shared with the physical rehab progress score
+  // (_rehab_score_mobility). Not cumulative like steps/distance, so it's averaged, not summed.
+  if (dataByType.speed) {
+    const avgSpeed = average(dataByType.speed.map((v) => v.meters_per_second || v.value || 0).filter((v) => v > 0));
+    if (avgSpeed > 0) {
+      totalScore += normalizeValue(avgSpeed, ranges.speed_avg?.min || 0.3, ranges.speed_avg?.max || 2.0, ranges.speed_avg?.optimal || 1.2);
+      count++;
+    }
+  }
+
+  // Wheelchair pushes — the mobility signal for wheelchair users, who won't generate steps/speed.
+  // Only scored when present, same opt-in treatment _rehab_score_mobility gives it.
+  if (dataByType.wheelchair_pushes) {
+    const totalPushes = dataByType.wheelchair_pushes.reduce((sum, v) => sum + (v.count || 0), 0);
+    totalScore += normalizeValue(totalPushes, ranges.wheelchair_pushes_daily?.min || 0, ranges.wheelchair_pushes_daily?.max || 300, ranges.wheelchair_pushes_daily?.optimal || 120);
     count++;
   }
 

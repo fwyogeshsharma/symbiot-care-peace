@@ -98,23 +98,23 @@ BEGIN
 
   IF v_base_steps IS NOT NULL AND v_rec_steps IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_steps - v_base_steps) / NULLIF(v_base_steps, 0) * 100, true, 30);
-  ELSE v_missing := v_missing || 'steps'; END IF;
+  ELSE v_missing := v_missing || 'steps'::text; END IF;
 
   IF v_base_distance IS NOT NULL AND v_rec_distance IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_distance - v_base_distance) / NULLIF(v_base_distance, 0) * 100, true, 30);
-  ELSE v_missing := v_missing || 'distance'; END IF;
+  ELSE v_missing := v_missing || 'distance'::text; END IF;
 
   IF v_base_exercise IS NOT NULL AND v_rec_exercise IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_exercise - v_base_exercise) / NULLIF(v_base_exercise, 0) * 100, true, 40);
-  ELSE v_missing := v_missing || 'exercise_session'; END IF;
+  ELSE v_missing := v_missing || 'exercise_session'::text; END IF;
 
   IF v_base_floors IS NOT NULL AND v_rec_floors IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_floors - v_base_floors) / NULLIF(v_base_floors, 0) * 100, true, 40);
-  ELSE v_missing := v_missing || 'floors_climbed'; END IF;
+  ELSE v_missing := v_missing || 'floors_climbed'::text; END IF;
 
   IF v_base_speed IS NOT NULL AND v_rec_speed IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_speed - v_base_speed) / NULLIF(v_base_speed, 0) * 100, true, 20);
-  ELSE v_missing := v_missing || 'speed'; END IF;
+  ELSE v_missing := v_missing || 'speed'::text; END IF;
 
   IF v_base_wheelchair IS NOT NULL AND v_rec_wheelchair IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_wheelchair - v_base_wheelchair) / NULLIF(v_base_wheelchair, 0) * 100, true, 30);
@@ -184,15 +184,15 @@ BEGIN
 
   IF v_base_rhr IS NOT NULL AND v_rec_rhr IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_rhr - v_base_rhr) / NULLIF(v_base_rhr, 0) * 100, false, 15);
-  ELSE v_missing := v_missing || 'resting_heart_rate'; END IF;
+  ELSE v_missing := v_missing || 'resting_heart_rate'::text; END IF;
 
   IF v_base_hrv IS NOT NULL AND v_rec_hrv IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_hrv - v_base_hrv) / NULLIF(v_base_hrv, 0) * 100, true, 40);
-  ELSE v_missing := v_missing || 'heart_rate_variability'; END IF;
+  ELSE v_missing := v_missing || 'heart_rate_variability'::text; END IF;
 
   IF v_base_spo2 IS NOT NULL AND v_rec_spo2 IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_spo2 - v_base_spo2) / NULLIF(v_base_spo2, 0) * 100, true, 5);
-  ELSE v_missing := v_missing || 'oxygen_saturation'; END IF;
+  ELSE v_missing := v_missing || 'oxygen_saturation'::text; END IF;
 
   SELECT AVG(c) INTO v_score FROM unnest(v_components) c;
 
@@ -251,17 +251,17 @@ BEGIN
 
   IF v_base_lean IS NOT NULL AND v_rec_lean IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_lean - v_base_lean) / NULLIF(v_base_lean, 0) * 100, true, 10);
-  ELSE v_missing := v_missing || 'lean_body_mass'; END IF;
+  ELSE v_missing := v_missing || 'lean_body_mass'::text; END IF;
 
   IF v_base_fat IS NOT NULL AND v_rec_fat IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_fat - v_base_fat) / NULLIF(v_base_fat, 0) * 100, false, 15);
-  ELSE v_missing := v_missing || 'body_fat'; END IF;
+  ELSE v_missing := v_missing || 'body_fat'::text; END IF;
 
   -- Weight is scored on stability against the person's own baseline, not directionality:
   -- large swings either way are the concern in elderly rehab, not weight gain or loss per se.
   IF v_base_weight IS NOT NULL AND v_rec_weight IS NOT NULL THEN
     v_components := v_components || rehab_stability_score(v_rec_weight, v_base_weight, 15);
-  ELSE v_missing := v_missing || 'weight'; END IF;
+  ELSE v_missing := v_missing || 'weight'::text; END IF;
 
   SELECT AVG(c) INTO v_score FROM unnest(v_components) c;
 
@@ -309,17 +309,17 @@ BEGIN
 
   IF v_base_eff IS NOT NULL AND v_rec_eff IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_eff - v_base_eff) / NULLIF(v_base_eff, 0) * 100, true, 20);
-  ELSE v_missing := v_missing || 'sleep_efficiency'; END IF;
+  ELSE v_missing := v_missing || 'sleep_efficiency'::text; END IF;
 
   IF v_base_awake IS NOT NULL AND v_rec_awake IS NOT NULL THEN
     v_components := v_components || rehab_normalize_score((v_rec_awake - v_base_awake) / NULLIF(v_base_awake, 0) * 100, false, 50);
-  ELSE v_missing := v_missing || 'awakenings'; END IF;
+  ELSE v_missing := v_missing || 'awakenings'::text; END IF;
 
   -- Duration is scored against a healthy-adult target (8h), not "more is better" — too much
   -- time in bed is as much a recovery-quality signal as too little in an elderly population.
   IF v_rec_dur IS NOT NULL THEN
     v_components := v_components || rehab_stability_score(v_rec_dur, 480, 25);
-  ELSE v_missing := v_missing || 'sleep_duration'; END IF;
+  ELSE v_missing := v_missing || 'sleep_duration'::text; END IF;
 
   SELECT AVG(c) INTO v_score FROM unnest(v_components) c;
 
@@ -367,13 +367,13 @@ BEGIN
 
   IF v_base_pain IS NOT NULL AND v_rec_pain IS NOT NULL THEN
     v_components := v_components || rehab_delta_score(v_base_pain, v_rec_pain, false, 5);
-  ELSE v_missing := v_missing || 'pain_score'; END IF;
+  ELSE v_missing := v_missing || 'pain_score'::text; END IF;
 
   -- Adherence is a standing measure ("how well are they keeping up right now"), not a
   -- trend, so it's used directly as its own 0-100 component rather than compared to baseline.
   IF v_rec_adherence IS NOT NULL THEN
     v_components := v_components || v_rec_adherence;
-  ELSE v_missing := v_missing || 'exercise_adherence'; END IF;
+  ELSE v_missing := v_missing || 'exercise_adherence'::text; END IF;
 
   SELECT AVG(c) INTO v_score FROM unnest(v_components) c;
 

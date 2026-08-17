@@ -39,14 +39,17 @@ interface RehabProgressProps {
 export function RehabProgress({ selectedPersonId }: RehabProgressProps) {
   const [showCheckinForm, setShowCheckinForm] = useState(false);
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['rehab-progress-analysis', selectedPersonId],
     queryFn: async (): Promise<RehabProgressResult> => {
       const { data, error } = await supabase.rpc('run_rehab_progress_analysis', {
         p_elderly_person_id: selectedPersonId as string,
         p_source: 'web',
       });
-      if (error) throw error;
+      if (error) {
+        console.error('run_rehab_progress_analysis failed:', error);
+        throw error;
+      }
       return data as unknown as RehabProgressResult;
     },
     enabled: !!selectedPersonId,
@@ -89,9 +92,10 @@ export function RehabProgress({ selectedPersonId }: RehabProgressProps) {
             <div className="animate-pulse text-muted-foreground text-sm">Checking...</div>
           </div>
         ) : isError ? (
-          <p className="text-sm text-muted-foreground py-4 text-center">
-            Couldn't load rehab progress right now.
-          </p>
+          <div className="text-sm text-muted-foreground py-4 text-center space-y-1">
+            <p>Couldn't load rehab progress right now.</p>
+            {error instanceof Error && <p className="text-xs text-destructive/80">{error.message}</p>}
+          </div>
         ) : data?.status === 'no_active_enrollment' ? (
           <div className="text-center py-6 space-y-3">
             <p className="text-sm text-muted-foreground">
