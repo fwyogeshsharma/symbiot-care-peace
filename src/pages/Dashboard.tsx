@@ -11,6 +11,7 @@ import PanicSosEvents from '@/components/dashboard/PanicSosEvents';
 import EnvironmentalSensors from '@/components/dashboard/EnvironmentalSensors';
 import { MedicationManagement } from '@/components/dashboard/MedicationManagement';
 import { ILQWidget } from '@/components/dashboard/ILQWidget';
+import { IRQWidget } from '@/components/dashboard/IRQWidget';
 import HealthMetricsCharts from '@/components/dashboard/HealthMetricsCharts';
 import { MovementSummary } from '@/components/dashboard/MovementSummary';
 import { MovementTimeline } from '@/components/dashboard/MovementTimeline';
@@ -220,6 +221,9 @@ const Dashboard = () => {
             <div className="space-y-4 sm:space-y-6">
               {isComponentEnabled('ilq-score') && (
                 <ILQWidget elderlyPersonId={selectedPersonId || ''} />
+              )}
+              {isComponentEnabled('irq-score') && (
+                <IRQWidget elderlyPersonId={selectedPersonId || ''} />
               )}
               {isComponentEnabled('medication') && (
                 <MedicationManagement selectedPersonId={selectedPersonId} />

@@ -18,6 +18,9 @@ verify_jwt = true
 [functions.ilq-compute]
 verify_jwt = true
 
+[functions.irq-compute]
+verify_jwt = true
+
 [functions.ilq-trend-analyzer]
 verify_jwt = true
 
