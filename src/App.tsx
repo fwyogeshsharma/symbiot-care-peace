@@ -29,6 +29,7 @@ import Alerts from "./pages/Alerts";
 import PlatformMetrics from "./pages/PlatformMetrics";
 import Pricing from "./pages/Pricing";
 import ILQAnalytics from "./pages/ILQAnalytics";
+import IRQAnalytics from "./pages/IRQAnalytics";
 import InvestorInfo from "./pages/InvestorInfo";
 import MedicationConfig from "./pages/MedicationConfig";
 import Reports from "./pages/Reports";
@@ -189,6 +190,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ILQAnalytics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/irq-analytics"
+              element={
+                <ProtectedRoute>
+                  <IRQAnalytics />
                 </ProtectedRoute>
               }
             />
