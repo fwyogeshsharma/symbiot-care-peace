@@ -7,7 +7,7 @@ import { IRQInfoDialog } from './IRQInfoDialog';
 import { Activity, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { IRQScoreRow } from '@/lib/irq';
+import { IRQScoreRow, describeFunctionError } from '@/lib/irq';
 
 interface IRQWidgetProps {
   elderlyPersonId: string;
@@ -68,8 +68,7 @@ export function IRQWidget({ elderlyPersonId, hideViewDetails = false }: IRQWidge
       refetch();
     } catch (error) {
       console.error('Error computing IRQ:', error);
-      const message = error instanceof Error ? error.message : 'Failed to compute IRQ score';
-      toast.error(message);
+      toast.error(await describeFunctionError(error));
     } finally {
       setIsComputing(false);
     }

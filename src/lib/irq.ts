@@ -1,3 +1,5 @@
+import { FunctionsHttpError } from '@supabase/supabase-js';
+
 /**
  * Display metadata for IRQ (Individual Recovery Quotient) — see supabase/functions/irq-compute
  * and supabase/migrations/20260817140000_create_irq_tables.sql.
@@ -5,6 +7,24 @@
  * Person-first language throughout: refer to the tracked person by name or as "person in
  * recovery", never by a diagnosis or stigmatizing label.
  */
+
+/**
+ * supabase.functions.invoke() throws a FunctionsHttpError whose .message is just "Edge Function
+ * returned a non-2xx status code" - the actual reason (insufficient data, missing config, a DB
+ * error) is in the response body instead. This pulls that out so the UI can show it.
+ */
+export async function describeFunctionError(error: unknown): Promise<string> {
+  if (error instanceof FunctionsHttpError) {
+    try {
+      const body = await error.context.json();
+      if (typeof body?.message === 'string') return body.message;
+      if (typeof body?.error === 'string') return body.error;
+    } catch {
+      // response body wasn't JSON — fall through to the generic message below
+    }
+  }
+  return error instanceof Error ? error.message : 'Something went wrong';
+}
 
 export type IRQComponentKey = 'physiological_stress' | 'activity_routine' | 'sobriety' | 'craving_control';
 

@@ -28,7 +28,7 @@ import {
 import { useElderly } from '@/contexts/ElderlyContext';
 import Header from '@/components/layout/Header';
 import { Footer } from '@/components/Footer';
-import { COMPONENT_LABELS, formatCleanDays, IRQScoreRow } from '@/lib/irq';
+import { COMPONENT_LABELS, formatCleanDays, IRQScoreRow, describeFunctionError } from '@/lib/irq';
 
 const num = (v: number | string | null | undefined): number =>
   v === null || v === undefined ? 0 : typeof v === 'string' ? parseFloat(v) : v;
@@ -146,7 +146,7 @@ export default function IRQAnalytics() {
       refetch();
     } catch (error) {
       console.error('Error computing IRQ:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to compute IRQ score');
+      toast.error(await describeFunctionError(error));
     }
   };
 
